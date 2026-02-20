@@ -1,0 +1,23 @@
+# WordPress runtime / media
+wp-admin/
+wp-includes/
+wp-content/uploads/
+wp-content/litespeed/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/upgrade-temp-backup/
+wp-content/plugins/
+wp-content/languages/
+
+# Secrets
+wp-config.php
+laravel_home/.env
+
+# Dependency/vendor artifacts
+laravel_home/vendor/
+laravel_home/node_modules/
+wp-content/plugins/**/vendor/
+
+# OS/editor
+.DS_Store
+Thumbs.db
