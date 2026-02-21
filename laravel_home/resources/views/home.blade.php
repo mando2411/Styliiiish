@@ -735,6 +735,7 @@
             display: flex;
             direction: ltr;
             gap: 0;
+            align-items: flex-start;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
@@ -781,16 +782,19 @@
         }
 
         .review-shot {
-            display: block;
+            display: flex;
             position: relative;
             flex: 0 0 100%;
             max-width: 100%;
             scroll-snap-align: start;
             user-select: none;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
             border-radius: 14px;
             overflow: hidden;
             border: 1px solid var(--line);
-            background: #fff;
+            background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
             box-shadow: 0 8px 18px rgba(23, 39, 59, 0.06);
             transition: .2s ease;
         }
@@ -802,10 +806,15 @@
         }
 
         .review-shot img {
-            width: 100%;
+            width: auto;
+            max-width: 100%;
             height: auto;
             object-fit: contain;
             display: block;
+            margin: 0 auto;
+            max-height: min(76vh, 760px);
+            border-radius: 10px;
+            box-shadow: 0 6px 18px rgba(23, 39, 59, 0.12);
             background: #f2f2f5;
         }
 
