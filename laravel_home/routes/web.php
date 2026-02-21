@@ -270,24 +270,31 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
     $page = max(1, (int) $request->query('page', 1));
     $perPage = 9;
 
-    $wpApiBase = $currentLocale === 'ar'
-        ? $wpBaseUrl . '/ar/wp-json/wp/v2/posts'
-        : $wpBaseUrl . '/wp-json/wp/v2/posts';
+    $wpApiCandidates = $currentLocale === 'ar'
+        ? [
+            [$wpBaseUrl . '/wp-json/wp/v2/posts', ['lang' => 'ar']],
+            [$wpBaseUrl . '/ar/wp-json/wp/v2/posts', []],
+        ]
+        : [
+            [$wpBaseUrl . '/wp-json/wp/v2/posts', []],
+        ];
 
     try {
-        $apiResponse = Http::timeout(8)->get($wpApiBase, [
-            'per_page' => $perPage,
-            'page' => $page,
-            '_embed' => 1,
-            'orderby' => 'date',
-            'order' => 'desc',
-            'status' => 'publish',
-        ]);
+        foreach ($wpApiCandidates as [$apiUrl, $extraParams]) {
+            $apiResponse = Http::timeout(8)->get($apiUrl, array_merge([
+                'per_page' => $perPage,
+                'page' => $page,
+                '_embed' => 1,
+                'orderby' => 'date',
+                'order' => 'desc',
+                'status' => 'publish',
+            ], $extraParams));
 
-        if ($apiResponse->successful()) {
+            if (!$apiResponse->successful()) {
+                continue;
+            }
+
             $postsData = collect($apiResponse->json());
-            $total = (int) $apiResponse->header('X-WP-Total', $postsData->count());
-
             $items = $postsData->map(function ($post) {
                 $embedded = $post['_embedded']['wp:featuredmedia'][0]['source_url'] ?? null;
 
@@ -303,6 +310,18 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                 ];
             });
 
+            if ($currentLocale === 'ar') {
+                $items = $items->filter(function ($post) {
+                    $link = mb_strtolower((string) ($post->permalink ?? ''));
+                    return str_contains($link, '/ar/');
+                })->values();
+            }
+
+            if ($items->isEmpty()) {
+                continue;
+            }
+
+            $total = $items->count();
             $posts = new LengthAwarePaginator(
                 $items,
                 $total,
