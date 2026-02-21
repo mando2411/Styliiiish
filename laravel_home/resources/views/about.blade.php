@@ -518,7 +518,7 @@
             <h5>{{ $t('policies') }}</h5>
             <ul class="footer-links">
                 <li><a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a></li>
-                <li><a href="{{ $wpBaseUrl }}/privacy-policy/" target="_blank" rel="noopener">{{ $t('privacy') }}</a></li>
+                <li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('privacy') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/terms-conditions/" target="_blank" rel="noopener">{{ $t('terms') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/refund-return-policy/" target="_blank" rel="noopener">{{ $t('refund_policy') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
