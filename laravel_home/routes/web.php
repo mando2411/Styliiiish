@@ -329,9 +329,8 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                     ];
                 })->filter(function ($post) {
                     $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
-                    $title = (string) ($post->post_title ?? '');
 
-                    return str_contains($link, '/ar/') && preg_match('/[\x{0600}-\x{06FF}]/u', $title) === 1;
+                    return str_contains($link, '/ar/');
                 })->values();
 
                 if ($allItems->isEmpty()) {
@@ -393,13 +392,9 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             if ($currentLocale === 'ar') {
                 $items = $items->filter(function ($post) {
                     $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
-                    $title = (string) ($post->post_title ?? '');
-
                     $hasArabicPath = str_contains($link, '/ar/');
-                    $hasArabicArchivePath = str_contains($link, '/ar/مدونة/');
-                    $isArabicTitle = preg_match('/[\x{0600}-\x{06FF}]/u', $title) === 1;
 
-                    return $hasArabicPath && $hasArabicArchivePath && $isArabicTitle;
+                    return $hasArabicPath;
                 })->values();
             }
 
