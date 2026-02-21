@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 $homeHandler = function (string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
@@ -263,6 +264,7 @@ Route::get('/en/ads', fn () => $adsHandler('en'));
 $blogHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
 
     $baseQuery = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
@@ -283,19 +285,35 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             'img.guid as image'
         );
 
-    $localizedQuery = clone $baseQuery;
-    $localizedPostsCount = $localizedQuery
-        ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
-        ->join('wp_term_taxonomy as tt', function ($join) {
-            $join->on('tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
-                ->where('tt.taxonomy', 'language');
-        })
-        ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
-        ->where('t.slug', $currentLocale)
-        ->count('p.ID');
+    $appliedLocaleFilter = false;
 
-    if ($localizedPostsCount > 0) {
-        $baseQuery
+    if (Schema::hasTable('wp_icl_translations')) {
+        $wpmlLocalizedCount = DB::table('wp_posts as p')
+            ->join('wp_icl_translations as icl', function ($join) {
+                $join->on('p.ID', '=', 'icl.element_id')
+                    ->where('icl.element_type', 'post_post');
+            })
+            ->where('p.post_type', 'post')
+            ->where('p.post_status', 'publish')
+            ->where('icl.language_code', $currentLocale)
+            ->count('p.ID');
+
+        if ($wpmlLocalizedCount > 0) {
+            $baseQuery
+                ->join('wp_icl_translations as icl', function ($join) {
+                    $join->on('p.ID', '=', 'icl.element_id')
+                        ->where('icl.element_type', 'post_post');
+                })
+                ->where('icl.language_code', $currentLocale)
+                ->distinct('p.ID');
+
+            $appliedLocaleFilter = true;
+        }
+    }
+
+    if (!$appliedLocaleFilter && Schema::hasTable('wp_term_relationships') && Schema::hasTable('wp_term_taxonomy') && Schema::hasTable('wp_terms')) {
+        $localizedQuery = clone $baseQuery;
+        $localizedPostsCount = $localizedQuery
             ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
             ->join('wp_term_taxonomy as tt', function ($join) {
                 $join->on('tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
@@ -303,12 +321,24 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             })
             ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
             ->where('t.slug', $currentLocale)
-            ->distinct('p.ID');
+            ->count('p.ID');
+
+        if ($localizedPostsCount > 0) {
+            $baseQuery
+                ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
+                ->join('wp_term_taxonomy as tt', function ($join) {
+                    $join->on('tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                        ->where('tt.taxonomy', 'language');
+                })
+                ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+                ->where('t.slug', $currentLocale)
+                ->distinct('p.ID');
+        }
     }
 
     $posts = $baseQuery->paginate(9);
 
-    return view('blog', compact('posts', 'currentLocale', 'localePrefix'));
+    return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
 
 Route::get('/blog', fn (Request $request) => $blogHandler($request, 'ar'));

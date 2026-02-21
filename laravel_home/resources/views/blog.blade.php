@@ -4,8 +4,9 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
 
-    $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
-    $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $wpLogo = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $wpIcon = $wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 
     $translations = [
         'ar' => [
@@ -111,19 +112,21 @@
     $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
 
     $canonicalPath = $localePrefix . '/blog';
+    $wpDisplayHost = preg_replace('#^https?://#', '', $wpBaseUrl);
+    $wpBlogArchiveBase = $isEnglish ? '/blog/' : '/ar/' . rawurlencode('مدونة') . '/';
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $t('meta_desc') }}">
-    <link rel="canonical" href="https://styliiiish.com{{ $canonicalPath }}">
-    <link rel="alternate" hreflang="ar" href="https://styliiiish.com/ar/blog">
-    <link rel="alternate" hreflang="en" href="https://styliiiish.com/en/blog">
+    <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/blog">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/blog">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $t('page_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
-    <meta property="og:url" content="https://styliiiish.com{{ $canonicalPath }}">
+    <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <meta property="og:image" content="{{ $wpIcon }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $t('page_title') }}">
@@ -589,8 +592,8 @@
             <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
             <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
             <a class="active" href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-            <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
-            <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
+            <a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
+            <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
             <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>
 
@@ -623,11 +626,11 @@
             <div class="posts-grid">
                 @foreach($posts as $post)
                     @php
-                        $wpBlogBase = $isEnglish ? 'https://styliiiish.com/' : 'https://styliiiish.com/ar/';
-                        $postUrl = $wpBlogBase . ltrim((string) $post->post_name, '/') . '/';
+                        $slug = rawurlencode(rawurldecode((string) $post->post_name));
+                        $postUrl = $wpBaseUrl . $wpBlogArchiveBase . $slug . '/';
                         $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
-                        $image = $post->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+                        $image = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
                     @endphp
 
                     <article class="post-card">
@@ -678,8 +681,8 @@
                 <li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li>
                 <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
-                <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
-                <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
             </ul>
         </div>
 
@@ -695,29 +698,29 @@
         <div class="footer-col">
             <h5>{{ $t('policies') }}</h5>
             <ul class="footer-links">
-                <li><a href="https://styliiiish.com/about-us/" target="_blank" rel="noopener">{{ $t('about_us') }}</a></li>
-                <li><a href="https://styliiiish.com/privacy-policy/" target="_blank" rel="noopener">{{ $t('privacy') }}</a></li>
-                <li><a href="https://styliiiish.com/terms-conditions/" target="_blank" rel="noopener">{{ $t('terms') }}</a></li>
-                <li><a href="https://styliiiish.com/Marketplace-Policy/" target="_blank" rel="noopener">{{ $t('market_policy') }}</a></li>
-                <li><a href="https://styliiiish.com/refund-return-policy/" target="_blank" rel="noopener">{{ $t('refund_policy') }}</a></li>
-                <li><a href="https://styliiiish.com/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
-                <li><a href="https://styliiiish.com/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
-                <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/about-us/" target="_blank" rel="noopener">{{ $t('about_us') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/privacy-policy/" target="_blank" rel="noopener">{{ $t('privacy') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/terms-conditions/" target="_blank" rel="noopener">{{ $t('terms') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/Marketplace-Policy/" target="_blank" rel="noopener">{{ $t('market_policy') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/refund-return-policy/" target="_blank" rel="noopener">{{ $t('refund_policy') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
+                <li><a href="{{ $wpBaseUrl }}/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
             </ul>
         </div>
     </div>
 
     <div class="container footer-bottom">
         <span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
-        <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
+        <span><a href="{{ $wpBaseUrl }}/" target="_blank" rel="noopener">{{ $wpDisplayHost }}</a></span>
     </div>
 
     <div class="container footer-mini-nav">
         <a href="{{ $localePrefix }}">{{ $t('home_mini') }}</a>
         <a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a>
-        <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a>
-        <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
-        <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a>
+        <a href="{{ $wpBaseUrl }}/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a>
+        <a href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
+        <a href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a>
     </div>
 </footer>
 </body>
