@@ -1878,7 +1878,7 @@
                 <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
                 <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
                 <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a>
-                <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('nav_contact') }}</a>
+                <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
             </nav>
 
             <div class="header-actions">
@@ -2215,7 +2215,7 @@
                 </p>
                 <p class="footer-open-hours"><strong>{{ $t('open_hours_label') }}:</strong> {{ $t('open_hours_value') }}</p>
                 <div class="footer-contact-row">
-                    <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('contact_us') }}</a>
+                    <a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a>
                     <a href="tel:+201050874255">{{ $t('direct_call') }}</a>
                 </div>
             </div>
@@ -2239,7 +2239,7 @@
                 <ul class="footer-links">
                     <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">{{ $t('official_address') }}</a></li>
                     <li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-                    <li><a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('nav_contact') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
                 </ul>
             </div>
 

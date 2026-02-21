@@ -259,3 +259,14 @@ $adsHandler = function (string $locale = 'ar') {
 Route::get('/ads', fn () => $adsHandler('ar'));
 Route::get('/ar/ads', fn () => $adsHandler('ar'));
 Route::get('/en/ads', fn () => $adsHandler('en'));
+
+$contactHandler = function (string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+
+    return view('contact', compact('currentLocale', 'localePrefix'));
+};
+
+Route::get('/contact-us', fn () => $contactHandler('ar'));
+Route::get('/ar/contact-us', fn () => $contactHandler('ar'));
+Route::get('/en/contact-us', fn () => $contactHandler('en'));
