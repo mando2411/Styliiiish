@@ -663,6 +663,20 @@ Route::get('/ar/shipping-delivery-policy', fn (Request $request) => $shippingPol
 Route::get('/en/shipping-delivery-policy', fn (Request $request) => $shippingPolicyHandler($request, 'en'));
 Route::get('/shipping-delivery-policy/', fn (Request $request) => $shippingPolicyHandler($request, 'en'));
 
+$cookiePolicyHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('cookie-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'ar'));
+Route::get('/ar/cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'ar'));
+Route::get('/en/cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
+Route::get('/🍪-cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
+Route::get('/🍪-cookie-policy/', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');

@@ -2254,7 +2254,7 @@
                     <li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund_policy') }}</a></li>
                     <li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li>
                     <li><a href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('shipping_policy') }}</a></li>
-                    <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/cookie-policy">{{ $t('cookies') }}</a></li>
                 </ul>
             </div>
         </div>
