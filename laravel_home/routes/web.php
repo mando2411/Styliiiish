@@ -4,7 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
-Route::get('/', function () {
+$homeHandler = function (string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
     $reviewFiles = collect(array_merge(
         glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
@@ -99,8 +101,12 @@ Route::get('/', function () {
         ];
     });
 
-    return view('home', compact('products', 'stats', 'reviewImages'));
-});
+    return view('home', compact('products', 'stats', 'reviewImages', 'currentLocale', 'localePrefix'));
+};
+
+Route::get('/', fn () => $homeHandler('ar'));
+Route::get('/ar', fn () => $homeHandler('ar'));
+Route::get('/en', fn () => $homeHandler('en'));
 
 $shopDataHandler = function (Request $request) {
     $search = trim((string) $request->query('q', ''));
@@ -153,7 +159,10 @@ $shopDataHandler = function (Request $request) {
     return [$products, $search, $sort];
 };
 
-$shopHandler = function (Request $request) use ($shopDataHandler) {
+$shopHandler = function (Request $request, string $locale = 'ar') use ($shopDataHandler) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+
     [$products, $search, $sort] = $shopDataHandler($request);
 
     if ($request->expectsJson() || $request->wantsJson() || strtolower((string) $request->header('X-Requested-With')) === 'xmlhttprequest') {
@@ -196,12 +205,17 @@ $shopHandler = function (Request $request) use ($shopDataHandler) {
         ]);
     }
 
-    return view('shop', compact('search', 'sort'));
+    return view('shop', compact('search', 'sort', 'currentLocale', 'localePrefix'));
 };
 
-Route::get('/shop', $shopHandler);
+Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
+Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
+Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-Route::get('/ads', function () {
+$adsHandler = function (string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+
     $products = Cache::remember('ads_products', 300, function () {
         return DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
@@ -239,5 +253,9 @@ Route::get('/ads', function () {
             ->count();
     });
 
-    return view('ads-landing', compact('products', 'total'));
-});
+    return view('ads-landing', compact('products', 'total', 'currentLocale', 'localePrefix'));
+};
+
+Route::get('/ads', fn () => $adsHandler('ar'));
+Route::get('/ar/ads', fn () => $adsHandler('ar'));
+Route::get('/en/ads', fn () => $adsHandler('en'));

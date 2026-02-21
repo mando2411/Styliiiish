@@ -11,8 +11,14 @@ $path = $path === '' ? '/' : $path;
 $laravel_exact_routes = [
     '/',
     '/index.php',
+    '/ar',
+    '/en',
     '/shop',
+    '/ar/shop',
+    '/en/shop',
     '/ads',
+    '/ar/ads',
+    '/en/ads',
     '/google-reviews',
     '/brand',
     '/favicon.ico',
@@ -20,6 +26,8 @@ $laravel_exact_routes = [
 
 // Prefix routes (assets/subpaths) handled by Laravel
 $laravel_prefix_routes = [
+    '/ar/',
+    '/en/',
     '/shop/',
     '/ads/',
     '/google-reviews/',

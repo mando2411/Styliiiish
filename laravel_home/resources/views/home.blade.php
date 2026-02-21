@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+@php
+    $currentLocale = $currentLocale ?? 'ar';
+    $localePrefix = $localePrefix ?? '/ar';
+    $isEnglish = $currentLocale === 'en';
+@endphp
+<html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
     @php
         $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
@@ -10,7 +15,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>ستيليش | فساتين سهرة وزفاف في مصر</title>
+    <title>{{ $isEnglish ? 'Styliiiish | Evening & Bridal Dresses in Egypt' : 'ستيليش | فساتين سهرة وزفاف في مصر' }}</title>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;
@@ -99,6 +104,55 @@
             padding: 4px 10px;
             font-weight: 700;
             font-size: 12px;
+        }
+
+        .lang-switch {
+            position: relative;
+            display: inline-grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            width: 110px;
+            height: 34px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 999px;
+            padding: 3px;
+            overflow: hidden;
+        }
+
+        .lang-switch .lang-indicator {
+            position: absolute;
+            top: 3px;
+            width: calc(50% - 3px);
+            height: calc(100% - 6px);
+            background: #fff;
+            border-radius: 999px;
+            transition: .25s ease;
+            z-index: 1;
+        }
+
+        .lang-switch.is-ar .lang-indicator {
+            right: 3px;
+        }
+
+        .lang-switch.is-en .lang-indicator {
+            left: 3px;
+        }
+
+        .lang-switch a {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            opacity: .95;
+            color: #fff;
+            padding: 5px 0;
+        }
+
+        .lang-switch a.active {
+            color: var(--secondary);
+            opacity: 1;
         }
 
         .main-header {
@@ -1530,6 +1584,11 @@
                 <a href="tel:+201050874255">+20 010 5087 4255</a>
             </div>
             <div class="topbar-left">
+                <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
+                    <span class="lang-indicator" aria-hidden="true"></span>
+                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar">AR</a>
+                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en">EN</a>
+                </div>
                 <span class="topbar-note">⚡ خصومات يومية</span>
                 <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">فيسبوك</a>
                 <a href="https://www.instagram.com/styliiish.egypt/" target="_blank" rel="noopener">إنستجرام</a>
@@ -1540,14 +1599,14 @@
 
     <header class="main-header">
         <div class="container main-header-inner">
-            <a class="brand" href="https://styliiiish.com/" target="_blank" rel="noopener">
+            <a class="brand" href="{{ $localePrefix }}">
                 <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
                 <span class="brand-tag">لأن كل امرأة تستحق أن تتألق</span>
             </a>
 
             <nav class="main-nav" aria-label="Main Navigation">
-                <a class="active" href="https://styliiiish.com/" target="_blank" rel="noopener">الرئيسية</a>
-                <a href="/shop">المتجر</a>
+                <a class="active" href="{{ $localePrefix }}">الرئيسية</a>
+                <a href="{{ $localePrefix }}/shop">المتجر</a>
                 <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">الماركت بليس</a>
                 <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">بيعي فستانك</a>
                 <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">المدونة</a>
@@ -1584,7 +1643,7 @@
                 </ul>
 
                 <div class="actions">
-                    <a class="btn btn-primary" href="/shop">تسوقي الفساتين الآن</a>
+                    <a class="btn btn-primary" href="{{ $localePrefix }}/shop">تسوقي الفساتين الآن</a>
                     <a class="btn btn-light" href="/my-dresses/">بيعي فستانك الآن</a>
                 </div>
 
@@ -1663,7 +1722,7 @@
                     <h2 class="section-title">منتجات مختارة لك الآن</h2>
                     <p class="section-sub">أحدث الفساتين من المتجر مع إبراز العروض والخصومات</p>
                 </div>
-                <a class="btn btn-light" href="/shop">عرض كل المنتجات</a>
+                <a class="btn btn-light" href="{{ $localePrefix }}/shop">عرض كل المنتجات</a>
             </div>
 
             <div class="grid">
@@ -1871,7 +1930,7 @@
         <h3>جاهزة تتألقي في مناسبتك القادمة؟</h3>
         <p>اكتشفي أجدد الموديلات والعروض الحصرية الآن، أو ارفعي فستانك للبيع في دقائق ووصول أسرع لآلاف المشترين في مصر.</p>
         <div class="actions">
-            <a class="btn btn-primary" href="/shop">ابدئي التسوق</a>
+            <a class="btn btn-primary" href="{{ $localePrefix }}/shop">ابدئي التسوق</a>
             <a class="btn btn-light" href="/my-dresses/">ابدئي البيع</a>
         </div>
     </section>
@@ -1934,7 +1993,7 @@
 
         <div class="container footer-mini-nav">
             <a href="https://styliiiish.com/" target="_blank" rel="noopener">الرئيسية</a>
-            <a href="/shop">المتجر</a>
+            <a href="{{ $localePrefix }}/shop">المتجر</a>
             <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">السلة</a>
             <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">حسابي</a>
             <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">المفضلة</a>
