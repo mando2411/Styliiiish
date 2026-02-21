@@ -734,11 +734,11 @@
         .reviews-slider {
             display: flex;
             direction: ltr;
-            gap: 14px;
+            gap: 0;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             scroll-behavior: smooth;
-            padding: 2px 2px 8px;
+            padding: 2px 0 8px;
             scrollbar-width: none;
         }
 
@@ -783,7 +783,8 @@
         .review-shot {
             display: block;
             position: relative;
-            flex: 0 0 clamp(320px, 76vw, 760px);
+            flex: 0 0 100%;
+            max-width: 100%;
             scroll-snap-align: start;
             user-select: none;
             border-radius: 14px;
@@ -1299,10 +1300,6 @@
                 gap: 10px;
             }
 
-            .review-shot {
-                flex-basis: 88vw;
-            }
-
             .reviews-nav {
                 display: none;
             }
@@ -1468,10 +1465,6 @@
 
             .products-section .grid {
                 grid-template-columns: 1fr;
-            }
-
-            .review-shot {
-                flex-basis: 92vw;
             }
 
             .products-section .buy,
