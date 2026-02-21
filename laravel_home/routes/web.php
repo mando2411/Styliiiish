@@ -328,9 +328,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                         'permalink' => $link,
                     ];
                 })->filter(function ($post) {
-                    $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
-
-                    return str_contains($link, '/ar/');
+                    return trim((string) ($post->post_title ?? '')) !== '';
                 })->values();
 
                 if ($allItems->isEmpty()) {
@@ -389,15 +387,6 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                 ];
             });
 
-            if ($currentLocale === 'ar') {
-                $items = $items->filter(function ($post) {
-                    $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
-                    $hasArabicPath = str_contains($link, '/ar/');
-
-                    return $hasArabicPath;
-                })->values();
-            }
-
             if ($items->isEmpty()) {
                 continue;
             }
@@ -417,21 +406,6 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
         }
     } catch (\Throwable $exception) {
-    }
-
-    if ($currentLocale === 'ar') {
-        $posts = new LengthAwarePaginator(
-            collect(),
-            0,
-            $perPage,
-            $page,
-            [
-                'path' => $request->url(),
-                'query' => $request->query(),
-            ]
-        );
-
-        return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
     }
 
     $baseQuery = DB::table('wp_posts as p')
@@ -463,7 +437,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             })
             ->where('p.post_type', 'post')
             ->where('p.post_status', 'publish')
-            ->where('icl.language_code', $currentLocale)
+            ->where('icl.language_code', 'like', $currentLocale . '%')
             ->count('p.ID');
 
         if ($wpmlLocalizedCount > 0) {
@@ -472,7 +446,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                     $join->on('p.ID', '=', 'icl.element_id')
                         ->where('icl.element_type', 'post_post');
                 })
-                ->where('icl.language_code', $currentLocale)
+                ->where('icl.language_code', 'like', $currentLocale . '%')
                 ->distinct('p.ID');
 
             $appliedLocaleFilter = true;
@@ -488,7 +462,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                     ->where('tt.taxonomy', 'language');
             })
             ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
-            ->where('t.slug', $currentLocale)
+            ->where('t.slug', 'like', $currentLocale . '%')
             ->count('p.ID');
 
         if ($localizedPostsCount > 0) {
@@ -499,7 +473,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                         ->where('tt.taxonomy', 'language');
                 })
                 ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
-                ->where('t.slug', $currentLocale)
+                ->where('t.slug', 'like', $currentLocale . '%')
                 ->distinct('p.ID');
         }
     }
@@ -523,3 +497,8 @@ $contactHandler = function (string $locale = 'ar') {
 Route::get('/contact-us', fn () => $contactHandler('ar'));
 Route::get('/ar/contact-us', fn () => $contactHandler('ar'));
 Route::get('/en/contact-us', fn () => $contactHandler('en'));
+
+Route::get('/favicon.ico', function (Request $request) {
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
+});
