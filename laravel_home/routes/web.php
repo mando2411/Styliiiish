@@ -282,6 +282,79 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
         ];
 
     if ($currentLocale === 'ar') {
+        $arArchiveUrl = rtrim($wpBaseUrl . $arBlogArchivePath, '/');
+        if ($page > 1) {
+            $arArchiveUrl .= '/page/' . $page . '/';
+        } else {
+            $arArchiveUrl .= '/';
+        }
+
+        try {
+            $archiveResponse = Http::timeout(10)->get($arArchiveUrl);
+            if ($archiveResponse->successful() && trim((string) $archiveResponse->body()) !== '') {
+                $html = (string) $archiveResponse->body();
+                $dom = new \DOMDocument();
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                $xpath = new \DOMXPath($dom);
+
+                $articleNodes = $xpath->query('//article');
+                $items = collect();
+
+                foreach ($articleNodes as $index => $article) {
+                    $titleNode = $xpath->query('.//h1//a | .//h2//a | .//h3//a | .//*[contains(@class,"entry-title")]//a', $article)->item(0);
+                    $link = $titleNode ? trim((string) $titleNode->getAttribute('href')) : '';
+                    $title = $titleNode ? trim(html_entity_decode((string) $titleNode->textContent, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')) : '';
+
+                    if ($link === '' || $title === '') {
+                        continue;
+                    }
+
+                    if (!str_contains(mb_strtolower(rawurldecode($link)), '/ar/')) {
+                        continue;
+                    }
+
+                    $timeNode = $xpath->query('.//time', $article)->item(0);
+                    $dateValue = $timeNode ? (string) ($timeNode->getAttribute('datetime') ?: $timeNode->textContent) : '';
+
+                    $excerptNode = $xpath->query('.//*[contains(@class,"entry-summary") or contains(@class,"entry-content") or contains(@class,"post-excerpt")]', $article)->item(0);
+                    $excerpt = $excerptNode ? trim(html_entity_decode(strip_tags((string) $excerptNode->textContent), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')) : '';
+
+                    $imgNode = $xpath->query('.//img[@src]', $article)->item(0);
+                    $image = $imgNode ? trim((string) $imgNode->getAttribute('src')) : null;
+
+                    $items->push((object) [
+                        'ID' => $index + 1,
+                        'post_title' => $title,
+                        'post_name' => basename(parse_url($link, PHP_URL_PATH) ?: ''),
+                        'post_excerpt' => $excerpt,
+                        'post_content' => $excerpt,
+                        'post_date' => $dateValue !== '' ? date('Y-m-d H:i:s', strtotime($dateValue)) : now()->toDateTimeString(),
+                        'image' => $image,
+                        'permalink' => $link,
+                    ]);
+                }
+
+                if ($items->isNotEmpty()) {
+                    $hasNextPage = $xpath->query('//a[contains(@class,"next") or contains(@class,"nextpostslink") or contains(@aria-label,"Next") or contains(@aria-label,"التالي")]')->length > 0;
+                    $estimatedTotal = ($page - 1) * $perPage + $items->count() + ($hasNextPage ? 1 : 0);
+
+                    $posts = new LengthAwarePaginator(
+                        $items,
+                        $estimatedTotal,
+                        $perPage,
+                        $page,
+                        [
+                            'path' => $request->url(),
+                            'query' => $request->query(),
+                        ]
+                    );
+
+                    return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
+                }
+            }
+        } catch (\Throwable $exception) {
+        }
+
         $arFeedCandidates = [
             rtrim($wpBaseUrl . $arBlogArchivePath, '/') . '/feed/',
             $wpBaseUrl . '/ar/feed/',
