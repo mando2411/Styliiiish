@@ -1875,6 +1875,7 @@
             <nav class="main-nav" aria-label="Main Navigation">
                 <a class="active" href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
                 <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
+                <a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a>
                 <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
                 <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
                 <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
