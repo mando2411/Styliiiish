@@ -279,6 +279,84 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             [$wpBaseUrl . '/wp-json/wp/v2/posts', []],
         ];
 
+    if ($currentLocale === 'ar') {
+        $arFeedCandidates = [
+            $wpBaseUrl . '/ar/' . rawurlencode('مدونة') . '/feed/',
+            $wpBaseUrl . '/ar/feed/',
+        ];
+
+        foreach ($arFeedCandidates as $feedUrl) {
+            try {
+                $feedResponse = Http::timeout(8)->get($feedUrl);
+                if (!$feedResponse->successful() || trim((string) $feedResponse->body()) === '') {
+                    continue;
+                }
+
+                $feedXml = @simplexml_load_string((string) $feedResponse->body(), 'SimpleXMLElement', LIBXML_NOCDATA);
+                if (!$feedXml || !isset($feedXml->channel->item)) {
+                    continue;
+                }
+
+                $allItems = collect($feedXml->channel->item)->map(function ($item, $index) {
+                    $title = html_entity_decode(trim((string) ($item->title ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    $link = trim((string) ($item->link ?? ''));
+                    $description = html_entity_decode(strip_tags((string) ($item->description ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                    $pubDate = trim((string) ($item->pubDate ?? ''));
+
+                    $contentEncoded = '';
+                    $namespaces = $item->getNameSpaces(true);
+                    if (isset($namespaces['content'])) {
+                        $contentNode = $item->children($namespaces['content']);
+                        $contentEncoded = (string) ($contentNode->encoded ?? '');
+                    }
+
+                    $image = null;
+                    if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $contentEncoded ?: (string) $item->description, $m)) {
+                        $image = $m[1];
+                    }
+
+                    return (object) [
+                        'ID' => $index + 1,
+                        'post_title' => $title,
+                        'post_name' => basename(parse_url($link, PHP_URL_PATH) ?: ''),
+                        'post_excerpt' => trim($description),
+                        'post_content' => trim(html_entity_decode(strip_tags($contentEncoded), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
+                        'post_date' => $pubDate !== '' ? date('Y-m-d H:i:s', strtotime($pubDate)) : now()->toDateTimeString(),
+                        'image' => $image,
+                        'permalink' => $link,
+                    ];
+                })->filter(function ($post) {
+                    $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
+                    $title = (string) ($post->post_title ?? '');
+
+                    return str_contains($link, '/ar/') && preg_match('/[\x{0600}-\x{06FF}]/u', $title) === 1;
+                })->values();
+
+                if ($allItems->isEmpty()) {
+                    continue;
+                }
+
+                $total = $allItems->count();
+                $offset = ($page - 1) * $perPage;
+                $items = $allItems->slice($offset, $perPage)->values();
+
+                $posts = new LengthAwarePaginator(
+                    $items,
+                    $total,
+                    $perPage,
+                    $page,
+                    [
+                        'path' => $request->url(),
+                        'query' => $request->query(),
+                    ]
+                );
+
+                return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+            } catch (\Throwable $exception) {
+            }
+        }
+    }
+
     try {
         foreach ($wpApiCandidates as [$apiUrl, $extraParams]) {
             $apiResponse = Http::timeout(8)->get($apiUrl, array_merge([
