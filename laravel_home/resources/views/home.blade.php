@@ -803,11 +803,10 @@
 
         .review-shot img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
             display: block;
             background: #f2f2f5;
-            aspect-ratio: 16 / 10;
         }
 
         .review-shot::after {
