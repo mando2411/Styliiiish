@@ -260,6 +260,37 @@ Route::get('/ads', fn () => $adsHandler('ar'));
 Route::get('/ar/ads', fn () => $adsHandler('ar'));
 Route::get('/en/ads', fn () => $adsHandler('en'));
 
+$blogHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+
+    $posts = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as thumb', function ($join) {
+            $join->on('p.ID', '=', 'thumb.post_id')
+                ->where('thumb.meta_key', '_thumbnail_id');
+        })
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->where('p.post_type', 'post')
+        ->where('p.post_status', 'publish')
+        ->orderBy('p.post_date', 'desc')
+        ->select(
+            'p.ID',
+            'p.post_title',
+            'p.post_name',
+            'p.post_excerpt',
+            'p.post_content',
+            'p.post_date',
+            'img.guid as image'
+        )
+        ->paginate(9);
+
+    return view('blog', compact('posts', 'currentLocale', 'localePrefix'));
+};
+
+Route::get('/blog', fn (Request $request) => $blogHandler($request, 'ar'));
+Route::get('/ar/blog', fn (Request $request) => $blogHandler($request, 'ar'));
+Route::get('/en/blog', fn (Request $request) => $blogHandler($request, 'en'));
+
 $contactHandler = function (string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';

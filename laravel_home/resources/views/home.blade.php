@@ -1877,7 +1877,7 @@
                 <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
                 <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
                 <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-                <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a>
+                <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
                 <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
             </nav>
 
@@ -2224,7 +2224,7 @@
                 <h5>{{ $t('quick_links') }}</h5>
                 <ul class="footer-links">
                     <li><a href="https://styliiiish.com/" target="_blank" rel="noopener">{{ $t('nav_home') }}</a></li>
-                    <li><a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                     <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('shop_now') }}</a></li>
                     <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('nav_shop') }}</a></li>
                     <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>

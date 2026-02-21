@@ -4,60 +4,34 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
 
-    $businessTimezone = new DateTimeZone('Africa/Cairo');
-    $nowInCairo = new DateTimeImmutable('now', $businessTimezone);
-    $currentMinutes = ((int) $nowInCairo->format('H') * 60) + (int) $nowInCairo->format('i');
-    $openFromMinutes = 11 * 60;
-    $openUntilMinutes = 19 * 60;
-    $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
-
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 
     $translations = [
         'ar' => [
-            'page_title' => 'تواصل معنا | Styliiiish',
-            'meta_desc' => 'تواصلي مع Styliiiish Fashion House في القاهرة لحجز زيارة أو الاستفسار عن فساتين جاهزة، تفصيل، أو تأجير.',
+            'page_title' => 'المدونة | Styliiiish',
+            'meta_desc' => 'اقرئي أحدث مقالات Styliiiish عن الموضة والفساتين ونصائح اختيار إطلالة مناسبة لكل مناسبة.',
             'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
             'nav_home' => 'الرئيسية',
             'nav_shop' => 'المتجر',
-            'nav_blog' => 'المدونة',
             'nav_marketplace' => 'الماركت بليس',
             'nav_sell' => 'بيعي فستانك',
             'nav_contact' => 'تواصل معنا',
+            'nav_blog' => 'المدونة',
             'lang_switch' => 'تبديل اللغة',
-            'hero_badge' => '📞 نحن هنا دائمًا لخدمتك',
-            'hero_title' => 'تواصل معنا',
-            'hero_desc' => 'في Styliiiish Fashion House نسعد دائمًا بتواصلك. سواء كنتِ تبحثين عن فستان جاهز، تصميم خاص، أو تأجير لفستان مناسبتك، فريقنا هنا لدعمك بخبرة واهتمام.',
-            'status_label' => 'الحالة',
-            'open' => 'مفتوح',
-            'closed' => 'مغلق',
-            'open_hours' => 'ساعات العمل',
-            'open_hours_value' => 'السبت – الجمعة: 11:00 ص – 7:00 م',
-            'section_get_in_touch' => 'تواصلي معنا مباشرة',
-            'section_get_in_touch_desc' => 'هل لديكِ سؤال أو تحتاجين مساعدة؟ تواصلي معنا وسنرد عليكِ بأسرع وقت ممكن.',
-            'phone' => 'الهاتف',
-            'email' => 'البريد الإلكتروني',
-            'visit_note' => 'الزيارات',
-            'visit_note_value' => 'يرجى حجز موعد قبل الزيارة',
-            'studio_title' => 'زوري الأتيليه',
-            'studio_desc' => 'يمكنك زيارة الأتيليه للتعرف على أحدث الموديلات أو مناقشة تصميمك الخاص.',
-            'address_title' => 'العنوان',
-            'address_line_1' => '1 شارع نبيل خليل',
-            'address_line_2' => 'متفرع من شارع حسنين هيكل',
-            'address_line_3' => 'خلف مطعم جاد، مدينة نصر',
-            'address_line_4' => 'القاهرة، مصر',
-            'view_map' => 'عرض على Google Maps',
-            'message_title' => 'أرسلي لنا رسالة',
-            'message_desc' => 'احكي لنا عن مناسبتك القادمة — زفاف، خطوبة، أو احتفال خاص — وفريقنا يساعدك في اختيار الإطلالة المثالية.',
-            'field_name' => 'الاسم',
-            'field_email' => 'البريد الإلكتروني',
-            'field_subject' => 'الموضوع',
-            'field_message' => 'رسالتك (اختياري)',
-            'send_message' => 'إرسال الرسالة',
-            'send_note' => 'سيتم فتح تطبيق البريد الإلكتروني لإرسال رسالتك.',
-            'map_title' => 'موقعنا على الخريطة',
-            'map_desc' => 'تعرفي على موقعنا بدقة وزورينا لاكتشاف أحدث المجموعات وخيارات التفصيل والتأجير.',
+            'hero_badge' => '📝 محتوى جديد باستمرار',
+            'hero_title' => 'مدونة Styliiiish',
+            'hero_desc' => 'دليلك لعالم الفساتين والموضة: أفكار للإطلالة، نصائح عملية، واتجاهات حديثة من خبراء Styliiiish.',
+            'latest_articles' => 'أحدث المقالات',
+            'article_count' => 'مقال منشور',
+            'read_more' => 'قراءة المزيد',
+            'published_on' => 'نُشر بتاريخ',
+            'empty_title' => 'لا توجد مقالات متاحة الآن',
+            'empty_desc' => 'يرجى العودة لاحقًا للاطلاع على أحدث المقالات.',
+            'prev' => 'السابق',
+            'next' => 'التالي',
+            'page' => 'الصفحة',
+            'of' => 'من',
             'footer_title' => 'ستيليش فاشون هاوس',
             'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
             'footer_hours' => 'مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.',
@@ -84,48 +58,29 @@
             'fav_mini' => 'المفضلة',
         ],
         'en' => [
-            'page_title' => 'Contact Us | Styliiiish',
-            'meta_desc' => 'Get in touch with Styliiiish Fashion House in Cairo for ready-made dresses, custom designs, or dress rental support.',
+            'page_title' => 'Blog | Styliiiish',
+            'meta_desc' => 'Explore the latest Styliiiish blog posts about fashion, dresses, and practical styling tips for every occasion.',
             'brand_tag' => 'Because every woman deserves to shine',
             'nav_home' => 'Home',
             'nav_shop' => 'Shop',
-            'nav_blog' => 'Blog',
             'nav_marketplace' => 'Marketplace',
             'nav_sell' => 'Sell Your Dress',
             'nav_contact' => 'Contact Us',
+            'nav_blog' => 'Blog',
             'lang_switch' => 'Language Switcher',
-            'hero_badge' => '📞 We are always here to help',
-            'hero_title' => 'Contact Us',
-            'hero_desc' => 'At Styliiiish Fashion House, we are always happy to hear from you. Whether you need a ready-made dress, a custom design, or dress rental support, our team is here with care and professionalism.',
-            'status_label' => 'Status',
-            'open' => 'Open',
-            'closed' => 'Closed',
-            'open_hours' => 'Open Hours',
-            'open_hours_value' => 'Sat – Fri: 11:00 am – 7:00 pm.',
-            'section_get_in_touch' => 'Get in Touch',
-            'section_get_in_touch_desc' => 'Have a question or need assistance? Contact us and we will reply as quickly as possible.',
-            'phone' => 'Phone',
-            'email' => 'Email',
-            'visit_note' => 'Visits',
-            'visit_note_value' => 'Appointment required before visit',
-            'studio_title' => 'Visit Our Studio',
-            'studio_desc' => 'You are welcome to visit our studio to explore collections or discuss your custom design.',
-            'address_title' => 'Address',
-            'address_line_1' => '1 Nabil Khalil Street',
-            'address_line_2' => 'off Hassanein Heikal Street',
-            'address_line_3' => 'behind Gad Restaurant, Nasr City',
-            'address_line_4' => 'Cairo, Egypt',
-            'view_map' => 'View on Google Maps',
-            'message_title' => 'Send Us a Message',
-            'message_desc' => 'Tell us about your upcoming event — wedding, engagement, or a special celebration — and our team will guide you to the perfect look.',
-            'field_name' => 'Your Name',
-            'field_email' => 'Your Email',
-            'field_subject' => 'Subject',
-            'field_message' => 'Your Message (Optional)',
-            'send_message' => 'Send Message',
-            'send_note' => 'Your email app will open to send the message.',
-            'map_title' => 'Our Location on the Map',
-            'map_desc' => 'Find us on the map below and visit Styliiiish to explore our latest collections and rental/custom options.',
+            'hero_badge' => '📝 Fresh content regularly',
+            'hero_title' => 'Styliiiish Blog',
+            'hero_desc' => 'Your guide to dresses and fashion: styling ideas, practical tips, and modern trends from Styliiiish experts.',
+            'latest_articles' => 'Latest Articles',
+            'article_count' => 'Published Posts',
+            'read_more' => 'Read More',
+            'published_on' => 'Published on',
+            'empty_title' => 'No articles available right now',
+            'empty_desc' => 'Please check back later for the latest posts.',
+            'prev' => 'Previous',
+            'next' => 'Next',
+            'page' => 'Page',
+            'of' => 'of',
             'footer_title' => 'Styliiiish Fashion House',
             'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
             'footer_hours' => 'Working hours: Saturday to Friday from 11:00 AM to 7:00 PM.',
@@ -155,7 +110,7 @@
 
     $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
 
-    $canonicalPath = $localePrefix . '/contact-us';
+    $canonicalPath = $localePrefix . '/blog';
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -163,8 +118,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $t('meta_desc') }}">
     <link rel="canonical" href="https://styliiiish.com{{ $canonicalPath }}">
-    <link rel="alternate" hreflang="ar" href="https://styliiiish.com/ar/contact-us">
-    <link rel="alternate" hreflang="en" href="https://styliiiish.com/en/contact-us">
+    <link rel="alternate" hreflang="ar" href="https://styliiiish.com/ar/blog">
+    <link rel="alternate" hreflang="en" href="https://styliiiish.com/en/blog">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $t('page_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
@@ -175,29 +130,6 @@
     <meta name="twitter:description" content="{{ $t('meta_desc') }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>{{ $t('page_title') }}</title>
-
-    <script type="application/ld+json">
-        {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'LocalBusiness',
-            'name' => 'Styliiiish Fashion House',
-            'url' => 'https://styliiiish.com' . $canonicalPath,
-            'telephone' => '+20 105 087 4255',
-            'email' => 'email@styliiiish.com',
-            'address' => [
-                '@type' => 'PostalAddress',
-                'streetAddress' => '1 Nabil Khalil Street, behind Gad Restaurant, Nasr City',
-                'addressLocality' => 'Cairo',
-                'addressCountry' => 'EG',
-            ],
-            'openingHours' => 'Sa-Fr 11:00-19:00',
-            'sameAs' => [
-                'https://www.facebook.com/Styliiish.Egypt/',
-                'https://www.instagram.com/styliiish.egypt/',
-                'https://g.page/styliish'
-            ]
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-    </script>
 
     <style>
         :root {
@@ -212,8 +144,6 @@
             --primary: var(--wf-main-color);
             --primary-2: #b70f1a;
             --secondary: var(--wf-secondary-color);
-            --success: #0a8f5b;
-            --soft: #ffeef0;
         }
 
         * { box-sizing: border-box; }
@@ -228,12 +158,9 @@
 
         a { color: inherit; text-decoration: none; }
 
-        .container {
-            width: min(1120px, 92%);
-            margin: 0 auto;
-        }
+        .container { width: min(1180px, 92%); margin: 0 auto; }
 
-        .header {
+        .main-header {
             background: #fff;
             border-bottom: 1px solid var(--line);
             position: sticky;
@@ -242,55 +169,48 @@
             box-shadow: 0 8px 24px rgba(23, 39, 59, 0.06);
         }
 
-        .header-inner {
-            min-height: 78px;
+        .main-header-inner {
+            min-height: 84px;
             display: grid;
             grid-template-columns: auto 1fr auto;
-            gap: 14px;
             align-items: center;
+            gap: 16px;
         }
 
-        .brand {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+        .brand { display: flex; flex-direction: column; gap: 2px; }
 
         .brand-logo {
-            height: 38px;
+            height: 40px;
+            width: auto;
             max-width: min(220px, 38vw);
             object-fit: contain;
         }
 
-        .brand-tag {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 600;
-        }
+        .brand-tag { color: var(--muted); font-size: 12px; font-weight: 600; }
 
-        .nav {
+        .main-nav {
             display: flex;
-            align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
+            align-items: center;
             gap: 8px;
+            flex-wrap: wrap;
             background: #f9fbff;
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 6px;
         }
 
-        .nav a {
+        .main-nav a {
+            color: var(--secondary);
             font-size: 14px;
             font-weight: 700;
-            color: var(--secondary);
             padding: 8px 12px;
             border-radius: 8px;
             transition: .2s ease;
         }
 
-        .nav a:hover,
-        .nav a.active {
+        .main-nav a:hover,
+        .main-nav a.active {
             color: var(--primary);
             background: #fff4f5;
         }
@@ -335,13 +255,10 @@
             padding: 5px 0;
         }
 
-        .lang-switch a.active {
-            opacity: 1;
-            color: var(--secondary);
-        }
+        .lang-switch a.active { opacity: 1; }
 
         .hero {
-            padding: 34px 0 16px;
+            padding: 34px 0 18px;
         }
 
         .hero-box {
@@ -355,8 +272,7 @@
         .badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            background: var(--soft);
+            background: #ffeef0;
             color: var(--primary);
             border-radius: 999px;
             padding: 7px 12px;
@@ -365,93 +281,18 @@
             margin-bottom: 12px;
         }
 
-        h1 {
+        .hero h1 {
             margin: 0 0 10px;
             font-size: clamp(28px, 4vw, 44px);
             line-height: 1.2;
         }
 
-        .hero-box p {
-            margin: 0;
-            color: var(--muted);
-            max-width: 860px;
-            font-size: 16px;
-        }
+        .hero p { margin: 0; color: var(--muted); max-width: 840px; }
 
-        .status-row {
-            margin-top: 16px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px 14px;
-            font-size: 14px;
-        }
+        .section { padding: 8px 0 28px; }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 10px;
-            border-radius: 999px;
-            font-weight: 800;
-            font-size: 12px;
-            border: 1px solid transparent;
-        }
-
-        .status-pill.is-open {
-            color: var(--success);
-            border-color: rgba(10, 143, 91, 0.45);
-            background: rgba(10, 143, 91, 0.14);
-        }
-
-        .status-pill.is-closed {
-            color: var(--primary);
-            border-color: rgba(var(--wf-main-rgb), 0.45);
-            background: rgba(var(--wf-main-rgb), 0.14);
-        }
-
-        .section {
-            padding: 12px 0 28px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1.1fr .9fr;
-            gap: 16px;
-        }
-
-        .card {
-            background: #fff;
-            border: 1px solid var(--line);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 8px 20px rgba(23, 39, 59, 0.05);
-        }
-
-        .card h2 {
-            margin: 0 0 8px;
-            font-size: 24px;
-        }
-
-        .desc {
-            margin: 0 0 14px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .contact-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: grid;
-            gap: 10px;
-        }
-
-        .contact-list li {
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 11px 12px;
-            background: #fbfcff;
+        .section-head {
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -459,114 +300,135 @@
             flex-wrap: wrap;
         }
 
-        .contact-list strong {
-            color: var(--secondary);
-            font-size: 13px;
-        }
+        .section-title { margin: 0; font-size: 24px; }
+        .section-meta { color: var(--muted); font-size: 14px; font-weight: 600; }
 
-        .contact-list span,
-        .contact-list a {
-            color: var(--muted);
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .contact-list a:hover { color: var(--primary); }
-
-        .address {
-            margin: 10px 0 14px;
-            color: var(--muted);
+        .posts-grid {
             display: grid;
-            gap: 3px;
-            font-size: 14px;
-            font-style: normal;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
         }
 
-        .btn-row {
+        .post-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            overflow: hidden;
             display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 20px rgba(23, 39, 59, 0.05);
+            transition: .25s ease;
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 28px rgba(23, 39, 59, 0.12);
+            border-color: rgba(213, 21, 34, 0.35);
+        }
+
+        .post-thumb {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            object-fit: cover;
+            background: #f1f3f7;
+        }
+
+        .post-content {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 220px;
+        }
+
+        .post-title {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-meta {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .post-excerpt {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-read {
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            min-height: 40px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--secondary);
+            background: #fff;
+            transition: .2s ease;
+        }
+
+        .post-read:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff4f5;
+        }
+
+        .empty-box {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .empty-box h3 { margin: 0 0 6px; }
+        .empty-box p { margin: 0; color: var(--muted); }
+
+        .pager {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
         }
 
-        .btn {
+        .pager-btn {
             border: 1px solid var(--line);
+            background: #fff;
+            color: var(--secondary);
             border-radius: 10px;
-            min-height: 42px;
-            padding: 10px 14px;
-            font-size: 14px;
+            padding: 8px 12px;
+            font-size: 13px;
             font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: .2s ease;
+            min-width: 84px;
+            text-align: center;
         }
 
-        .btn-primary {
-            color: #fff;
-            background: var(--primary);
-            border-color: var(--primary);
+        .pager-btn.disabled {
+            opacity: .45;
+            pointer-events: none;
         }
 
-        .btn-primary:hover { background: var(--primary-2); }
-
-        .btn-light {
-            color: var(--secondary);
-            background: #fff;
-        }
-
-        .btn-light:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .form {
-            display: grid;
-            gap: 10px;
-        }
-
-        .input,
-        .textarea {
-            width: 100%;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            background: #fff;
-            font: inherit;
-            color: var(--secondary);
-            padding: 10px 12px;
-            outline: none;
-        }
-
-        .textarea {
-            resize: vertical;
-            min-height: 130px;
-        }
-
-        .input:focus,
-        .textarea:focus {
-            border-color: rgba(var(--wf-main-rgb), 0.45);
-            box-shadow: 0 0 0 3px rgba(var(--wf-main-rgb), 0.12);
-        }
-
-        .form-note {
-            margin: 4px 0 0;
+        .pager-info {
             color: var(--muted);
-            font-size: 12px;
-        }
-
-        .map-wrap {
-            margin-top: 12px;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid var(--line);
-            box-shadow: 0 8px 20px rgba(23, 39, 59, 0.08);
-            background: #fff;
-        }
-
-        .map-wrap iframe {
-            width: 100%;
-            height: 360px;
-            border: 0;
-            display: block;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         .site-footer {
@@ -615,13 +477,7 @@
             font-size: 14px;
         }
 
-        .footer-links {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: grid;
-            gap: 7px;
-        }
+        .footer-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
 
         .footer-links a {
             color: #b8c2d1;
@@ -629,9 +485,7 @@
             transition: .2s ease;
         }
 
-        .footer-links a:hover {
-            color: #fff;
-        }
+        .footer-links a:hover { color: #fff; }
 
         .footer-brand .footer-contact-row {
             display: flex;
@@ -670,43 +524,30 @@
             padding-bottom: 18px;
         }
 
-        .footer-mini-nav a {
-            color: #b8c2d1;
-            font-size: 13px;
-        }
+        .footer-mini-nav a { color: #b8c2d1; font-size: 13px; }
+        .footer-mini-nav a:hover { color: #fff; }
 
-        .footer-mini-nav a:hover {
-            color: #fff;
-        }
-
-        @media (max-width: 900px) {
-            .header-inner {
+        @media (max-width: 980px) {
+            .main-header-inner {
                 grid-template-columns: 1fr;
-                padding: 10px 0;
+                padding: 12px 0;
             }
 
             .brand,
-            .nav,
+            .main-nav,
             .header-tools {
                 justify-content: center;
                 text-align: center;
             }
 
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .footer-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
+            .posts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
 
         @media (max-width: 640px) {
             .hero { padding-top: 20px; }
-            .hero-box,
-            .card { padding: 14px; border-radius: 14px; }
-            .card h2 { font-size: 21px; }
-            .map-wrap iframe { height: 300px; }
+            .hero-box { border-radius: 14px; padding: 16px; }
+            .posts-grid { grid-template-columns: 1fr; gap: 12px; }
 
             .footer-grid {
                 grid-template-columns: 1fr;
@@ -715,9 +556,7 @@
             }
 
             .footer-brand,
-            .footer-col {
-                padding: 12px;
-            }
+            .footer-col { padding: 12px; }
 
             .footer-bottom {
                 flex-direction: column;
@@ -734,34 +573,32 @@
                 padding-bottom: 12px;
             }
 
-            .footer-mini-nav::-webkit-scrollbar {
-                display: none;
-            }
+            .footer-mini-nav::-webkit-scrollbar { display: none; }
         }
     </style>
 </head>
 <body>
-<header class="header">
-    <div class="container header-inner">
+<header class="main-header">
+    <div class="container main-header-inner">
         <a class="brand" href="{{ $localePrefix }}">
             <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
             <span class="brand-tag">{{ $t('brand_tag') }}</span>
         </a>
 
-        <nav class="nav" aria-label="Main Navigation">
+        <nav class="main-nav" aria-label="Main Navigation">
             <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
             <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-            <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
+            <a class="active" href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
             <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
             <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-            <a class="active" href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
+            <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>
 
         <div class="header-tools">
             <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}">
                 <span class="lang-indicator" aria-hidden="true"></span>
-                <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/contact-us">AR</a>
-                <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/contact-us">EN</a>
+                <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/blog">AR</a>
+                <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/blog">EN</a>
             </div>
         </div>
     </div>
@@ -772,77 +609,51 @@
         <span class="badge">{{ $t('hero_badge') }}</span>
         <h1>{{ $t('hero_title') }}</h1>
         <p>{{ $t('hero_desc') }}</p>
+    </div>
+</section>
 
-        <div class="status-row">
-            <span><strong>{{ $t('status_label') }}:</strong></span>
-            <span class="status-pill {{ $isOpenNow ? 'is-open' : 'is-closed' }}">{{ $isOpenNow ? $t('open') : $t('closed') }}</span>
-            <span><strong>{{ $t('open_hours') }}:</strong> {{ $t('open_hours_value') }}</span>
+<section class="section">
+    <div class="container">
+        <div class="section-head">
+            <h2 class="section-title">{{ $t('latest_articles') }}</h2>
+            <span class="section-meta">{{ number_format((int) $posts->total()) }} {{ $t('article_count') }}</span>
         </div>
-    </div>
-</section>
 
-<section class="section">
-    <div class="container grid">
-        <article class="card">
-            <h2>{{ $t('section_get_in_touch') }}</h2>
-            <p class="desc">{{ $t('section_get_in_touch_desc') }}</p>
+        @if($posts->count() > 0)
+            <div class="posts-grid">
+                @foreach($posts as $post)
+                    @php
+                        $postUrl = 'https://styliiiish.com/' . ltrim((string) $post->post_name, '/') . '/';
+                        $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
+                        $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
+                        $image = $post->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+                    @endphp
 
-            <ul class="contact-list">
-                <li><strong>{{ $t('phone') }}</strong><a href="tel:+201050874255">+20 105 087 4255</a></li>
-                <li><strong>{{ $t('email') }}</strong><a href="mailto:email@styliiiish.com">email@styliiiish.com</a></li>
-                <li><strong>{{ $t('visit_note') }}</strong><span>{{ $t('visit_note_value') }}</span></li>
-            </ul>
-        </article>
-
-        <article class="card">
-            <h2>{{ $t('studio_title') }}</h2>
-            <p class="desc">{{ $t('studio_desc') }}</p>
-
-            <h3 style="margin:0 0 6px; font-size:16px;">{{ $t('address_title') }}</h3>
-            <address class="address">
-                <span>{{ $t('address_line_1') }}</span>
-                <span>{{ $t('address_line_2') }}</span>
-                <span>{{ $t('address_line_3') }}</span>
-                <span>{{ $t('address_line_4') }}</span>
-            </address>
-
-            <div class="btn-row">
-                <a class="btn btn-light" href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">{{ $t('view_map') }}</a>
-                <a class="btn btn-primary" href="tel:+201050874255">{{ $t('phone') }}</a>
+                    <article class="post-card">
+                        <a href="{{ $postUrl }}" target="_blank" rel="noopener">
+                            <img class="post-thumb" src="{{ $image }}" alt="{{ $post->post_title }}" loading="lazy">
+                        </a>
+                        <div class="post-content">
+                            <h3 class="post-title">{{ $post->post_title }}</h3>
+                            <span class="post-meta">{{ $t('published_on') }} {{ \Carbon\Carbon::parse($post->post_date)->format('Y-m-d') }}</span>
+                            <p class="post-excerpt">{{ $excerpt }}</p>
+                            <a class="post-read" href="{{ $postUrl }}" target="_blank" rel="noopener">{{ $t('read_more') }}</a>
+                        </div>
+                    </article>
+                @endforeach
             </div>
-        </article>
-    </div>
-</section>
 
-<section class="section">
-    <div class="container grid">
-        <article class="card">
-            <h2>{{ $t('message_title') }}</h2>
-            <p class="desc">{{ $t('message_desc') }}</p>
-
-            <form class="form" action="mailto:email@styliiiish.com" method="post" enctype="text/plain">
-                <input class="input" type="text" name="name" placeholder="{{ $t('field_name') }}" required>
-                <input class="input" type="email" name="email" placeholder="{{ $t('field_email') }}" required>
-                <input class="input" type="text" name="subject" placeholder="{{ $t('field_subject') }}" required>
-                <textarea class="textarea" name="message" placeholder="{{ $t('field_message') }}"></textarea>
-                <button class="btn btn-primary" type="submit">{{ $t('send_message') }}</button>
-                <p class="form-note">{{ $t('send_note') }}</p>
-            </form>
-        </article>
-
-        <article class="card">
-            <h2>{{ $t('map_title') }}</h2>
-            <p class="desc">{{ $t('map_desc') }}</p>
-
-            <div class="map-wrap">
-                <iframe
-                    src="https://www.google.com/maps?q=30.0639814,31.3461491&z=16&output=embed"
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="Styliiiish Location">
-                </iframe>
+            <div class="pager">
+                <a class="pager-btn {{ $posts->onFirstPage() ? 'disabled' : '' }}" href="{{ $posts->onFirstPage() ? '#' : $posts->previousPageUrl() }}">{{ $t('prev') }}</a>
+                <span class="pager-info">{{ $t('page') }} {{ $posts->currentPage() }} {{ $t('of') }} {{ $posts->lastPage() }}</span>
+                <a class="pager-btn {{ $posts->hasMorePages() ? '' : 'disabled' }}" href="{{ $posts->hasMorePages() ? $posts->nextPageUrl() : '#' }}">{{ $t('next') }}</a>
             </div>
-        </article>
+        @else
+            <div class="empty-box">
+                <h3>{{ $t('empty_title') }}</h3>
+                <p>{{ $t('empty_desc') }}</p>
+            </div>
+        @endif
     </div>
 </section>
 
@@ -868,7 +679,6 @@
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
                 <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
                 <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
-                <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
             </ul>
         </div>
 
