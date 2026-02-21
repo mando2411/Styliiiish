@@ -622,6 +622,20 @@ Route::get('/en/marketplace-policy', fn (Request $request) => $marketplacePolicy
 Route::get('/Marketplace-Policy', fn (Request $request) => $marketplacePolicyHandler($request, 'en'));
 Route::get('/Marketplace-Policy/', fn (Request $request) => $marketplacePolicyHandler($request, 'en'));
 
+$refundReturnPolicyHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('refund-return-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/refund-return-policy', fn (Request $request) => $refundReturnPolicyHandler($request, 'ar'));
+Route::get('/ar/refund-return-policy', fn (Request $request) => $refundReturnPolicyHandler($request, 'ar'));
+Route::get('/en/refund-return-policy', fn (Request $request) => $refundReturnPolicyHandler($request, 'en'));
+Route::get('/Refund-Return-Policy', fn (Request $request) => $refundReturnPolicyHandler($request, 'en'));
+Route::get('/Refund-Return-Policy/', fn (Request $request) => $refundReturnPolicyHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
