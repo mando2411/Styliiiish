@@ -1,0 +1,4 @@
+2025-12-01T14:00:47+00:00 INFO Start-Cartflows_Admin_Report_Emails::send_weekly_report_email
+2025-12-01T14:00:47+00:00 INFO Send weekly emails to stylish@styliiiish.com
+2025-12-01T14:00:47+00:00 INFO Total Revenue: <span class="woocommerce-Price-amount amount"><bdi>1.550,0<span class="woocommerce-Price-currencySymbol">EGP</span></bdi></span>
+2025-12-01T14:00:49+00:00 INFO Email send status for email stylish@styliiiish.com is 

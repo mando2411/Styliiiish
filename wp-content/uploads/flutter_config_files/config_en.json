@@ -1,0 +1,557 @@
+{
+  "HorizonLayout": [
+    {
+      "layout": "logo",
+      "showMenu": true,
+      "showSearch": true,
+      "showLogo": true,
+      "enableBackground": true
+    },
+    {
+      "layout": "category",
+      "type": "icon",
+      "useFor": "mobile",
+      "wrap": false,
+      "size": 1.0,
+      "radius": 50.0,
+      "enableBackground": true,
+      "items": [
+        {
+          "category": 55,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/dress-2.png",
+          "colors": ["#7A1C24", "#7A1C24"],
+          "originalColor": false
+        },
+        {
+          "category": 66,
+          "label": "Bridesmaids' Dresses",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/woman.png",
+          "colors": ["#7A1C24", "#7A1C24"]
+        },
+        {
+          "category": 60,
+          "label": "Custom-Made Dresses",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/dress.png",
+          "colors": ["#7A1C24", "#7A1C24"]
+        },
+        {
+          "category": 54,
+          "label": "Engagement Dresses",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/woman-1.png",
+          "colors": ["#7A1C24", "#7A1C24"]
+        },
+        {
+          "category": 25,
+          "label": "Evening Dresses",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/long-elegant-dress.png",
+          "colors": ["#7A1C24", "#7A1C24"]
+        },
+        {
+          "category": 53,
+          "label": "Large Size",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/wedding-dress-1.png",
+          "colors": ["#7A1C24", "#7A1C24"]
+        }
+      ]
+    },
+    {
+      "layout": "bannerImage",
+      "isSlider": true,
+      "autoPlay": false,
+      "showNumber": false,
+      "design": "default",
+      "showBackGround": true,
+      "radius": 2.0,
+      "enableBackground": true,
+      "items": [
+        {
+          "category": 71,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Cat1.1.png",
+          "padding": 15.0
+        },
+        {
+          "category": 25,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Cat2.1.png",
+          "padding": 15.0
+        },
+        {
+          "product": 990,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Product1.1.png",
+          "padding": 15.0
+        }
+      ],
+      "itemsWeb": [
+        {
+          "category": 71,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Cat1.1.png",
+          "padding": 15.0
+        },
+        {
+          "category": 25,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Cat2.1.png",
+          "padding": 15.0
+        },
+        {
+          "product": 990,
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Product1.1.png",
+          "padding": 15.0
+        }
+      ]
+    },
+    {
+      "layout": "category",
+      "type": "twoRow",
+      "wrap": true,
+      "useFor": "web",
+      "showShortDescription": true,
+      "size": 1.0,
+      "radius": 150.0,
+      "title": "Shop by category",
+      "spacing": 12.0,
+      "items": [
+        {
+          "category": "51",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_4y5lx74y5lx74y5l.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Dress",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "55",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_s6ya3cs6ya3cs6ya.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Bridal Party Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "60",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_j5h1y7j5h1y7j5h1.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Custom-Made Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "66",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_3tyokx3tyokx3tyo.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Bridesmaids' Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "54",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_6kn4oi6kn4oi6kn4.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Engagement Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "53",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_jw4iqpjw4iqpjw4i.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Large Size",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "56",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_3nilw93nilw93nil.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Mothers Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "57",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_q4j8n8q4j8n8q4j8.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Pre-Engagement Dresses",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "86",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_jlgoyajlgoyajlgo.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Used Dress",
+          "onSale": false,
+          "isFeatured": false
+        },
+        {
+          "category": "25",
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_kzauzfkzauzfkzau.png",
+          "showText": true,
+          "originalColor": true,
+          "keepDefaultTitle": false,
+          "showDescription": false,
+          "productType": false,
+          "title": "Evening Dresses",
+          "onSale": false,
+          "isFeatured": false
+        }
+      ],
+      "line": false,
+      "marginLeft": 16.0,
+      "marginRight": 16.0,
+      "marginTop": 10.0,
+      "marginBottom": 10.0,
+      "paddingX": 10.0,
+      "paddingY": 10.0,
+      "marginX": 0.0,
+      "marginY": 0.0,
+      "hideTitle": false,
+      "noBackground": false,
+      "imageBorderWidth": 0.0,
+      "imageBorderColor": "ffe61a00",
+      "imageBorderStyle": "dot",
+      "imageSpacing": 0.0,
+      "border": 0.6,
+      "enableBorder": false,
+      "textAlignment": "topCenter",
+      "imageBoxFit": "fitWidth",
+      "columns": 4,
+      "itemSize": {
+        "width": 270.0,
+        "height": 118.0
+      }
+    },
+    {
+      "key": "v14g5clzc34tf8",
+      "name": "On Sale Today ⚡️",
+      "layout": "saleOff",
+      "isSnapping": true,
+      "rows": 1,
+      "columns": 0,
+      "imageBoxfit": "cover",
+      "imageRatio": 1.2,
+      "hMargin": 9.0,
+      "vMargin": 30.0,
+      "hPadding": 8.0,
+      "vPadding": 6.0,
+      "pos": 400,
+      "showStockStatus": false,
+      "enableRating": true,
+      "hideTitle": false,
+      "hideStore": false,
+      "onSale": true,
+      "hidePrice": false,
+      "featured": false,
+      "showHeart": true,
+      "showCartButton": false,
+      "cartIconRadius": 9.0,
+      "showQuantity": false,
+      "showCartIconColor": false,
+      "showCartIcon": false,
+      "enableBottomAddToCart": false,
+      "cardDesign": "card",
+      "borderRadius": 12.0,
+      "backgroundRadius": 0.0,
+      "showCartButtonWithQuantity": false,
+      "category": null,
+      "tag": null,
+      "showCountDown": true,
+      "backgroundColor": "ecc5c8",
+      "backgroundImage": "https://styliiiish.com/wp-content/uploads/2025/11/sale4.2.png",
+      "spaceWidth": 130.0,
+      "backgroundHeight": 288.0,
+      "backgroundBoxFit": "contain",
+      "parallax": true,
+      "parallaxImageRatio": 1.2,
+      "boxShadow": {
+        "blurRadius": 14.0,
+        "colorOpacity": 0.1,
+        "spreadRadius": 10.0,
+        "x": 0.0,
+        "y": 6.0
+      },
+      "hideEmptyProductLayout": false,
+      "enableBackground": true
+    },
+    {
+      "name": "Mothers Dress Collections",
+      "image": "https://styliiiish.com/wp-content/uploads/2025/11/Gemini_Generated_Image_3nilw93nilw93nil.png",
+      "layout": "twoColumn",
+      "category": 56,
+      "enableBackground": true
+    },
+    {
+      "layout": "bannerImage",
+      "design": "static",
+      "useFor": "mobile",
+      "fit": "fitWidth",
+      "marginLeft": 0.0,
+      "enableBackground": true,
+      "items": [
+        {
+          "image": "https://styliiiish.com/wp-content/uploads/2025/11/new_year_sale_700x263.png",
+          "coupon": "NEWY",
+          "padding": 15.0,
+          "radius": 9.0
+        }
+      ],
+      "marginBottom": 0.0,
+      "height": 0.15,
+      "marginRight": 0.0,
+      "marginTop": 20.0
+    },
+    {
+      "name": "Recent View",
+      "layout": "recentView"
+    },
+    {
+      "name": "Our Blog Posts",
+      "layout": "blog"
+    },
+    {
+      "name": "Final Clearance",
+      "layout": "staggered",
+      "limit": 20,
+      "category": 71
+    },
+    {
+      "layout": "bannerGrid",
+      "startImage": "https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-19-2025-02_23_08-AM.png",
+      "endImage": "https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-19-2025-02_42_55-AM.png",
+      "centerImage": "https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-19-2025-02_35_13-AM.png",
+      "centerTopImage": "https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-19-2025-02_32_57-AM.png",
+      "centerBottomImage": "https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-19-2025-02_37_31-AM.png",
+      "borderRadius": 8.0,
+      "blog": 1329
+    }
+  ],
+  "Setting": {
+    "MainColor": "#7A1C24",
+    "FontFamily": "Inter",
+    "FontHeader": "Inter",
+    "ProductListLayout": "list",
+    "StickyHeader": false,
+    "ShowChat": true,
+    "useMaterial3": false,
+    "AgeRestriction": {
+      "enable": false,
+      "imageUrl": "",
+      "backgroundImageUrl": "",
+      "title": "Welcome to Styliiiish ✨ Discover your style with our curated fashion collections",
+      "deniedMessage": "You must be older than 8 to use this application",
+      "hintMessage": "What is your year of birth?",
+      "minimumAge": 8,
+      "useLogo": true,
+      "alwaysShowUponOpen": true
+    },
+    "AboutUS": "https://styliiiish.com/about-us",
+    "Privacy": "https://styliiiish.com/privacy-policy/",
+    "FAQ": "https://styliiiish.com/contact-us/",
+    "News": "https://styliiiish.com/",
+    "Support": "https://styliiiish.com/contact-us/",
+    "DownloadApp": "https://styliiiish.com/app",
+    "SmartEngagementBanner": {
+      "popup": {
+        "enable": false,
+        "data": {
+          "layout": "bannerImage",
+          "design": "static",
+          "fit": "fitHeight",
+          "marginLeft": null,
+          "items": [
+            {
+              "image": "https://i.imgur.com/ZL1LO75.png",
+              "showSubcategory": false,
+              "bannerWithProduct": false,
+              "defaultShowProduct": false,
+              "products": [],
+              "category": "17",
+              "padding": 0.0
+            }
+          ],
+          "marginBottom": 10.0,
+          "height": 0.45,
+          "marginRight": null,
+          "marginTop": 10.0,
+          "enableParallax": false,
+          "parallaxImageRatio": 1.2,
+          "isHorizontal": false,
+          "parallax": false,
+          "key": "p2oq4zc4hg"
+        },
+        "alwaysShowUponOpen": true,
+        "closePosition": "topRight",
+        "updatedTime": 1661314494281
+      },
+      "flexible": {
+        "enable": false,
+        "data": {
+          "alignment": "topCenter",
+          "marginTop": 0.0,
+          "marginBottom": 0.0,
+          "items": [
+            {
+              "image": "https://assets9.lottiefiles.com/private_files/lf30_a4mKwA.json",
+              "width": 100.0,
+              "height": 80.0,
+              "borderRadius": 2.0,
+              "marginLeft": 0.0,
+              "marginRight": 0.0,
+              "textFontSize": 14.0,
+              "useMaxWidth": true,
+              "navigator": {
+                "showSubcategory": false,
+                "coupon": "blackf"
+              }
+            }
+          ],
+          "layout": "button"
+        },
+        "canDrag": true,
+        "canClose": true,
+        "width": 100.0,
+        "height": 100.0
+      },
+      "sticky": {
+        "enable": false,
+        "data": {
+          "layout": "bannerImage",
+          "design": "static",
+          "fit": "fitWidth",
+          "marginLeft": 10.0,
+          "items": [
+            {
+              "image": "https://i.imgur.com/LUaEM3v.jpeg",
+              "showSubcategory": false,
+              "bannerWithProduct": false,
+              "defaultShowProduct": false,
+              "products": [],
+              "coupon": "halfprice",
+              "padding": 0.0,
+              "radius": 9.0
+            }
+          ],
+          "marginBottom": 10.0,
+          "marginRight": 10.0,
+          "marginTop": 10.0,
+          "height": 0.2,
+          "enableParallax": false,
+          "parallaxImageRatio": 1.2,
+          "isHorizontal": false,
+          "parallax": false,
+          "key": "ga8oe39k5t"
+        }
+      }
+    }
+  },
+  "TabBar": [
+    {
+      "layout": "home",
+      "icon": "assets/icons/tabs/icon-home.png"
+    },
+    {
+      "layout": "category",
+      "categoryLayout": "card",
+      "icon": "assets/icons/tabs/icon-category.png"
+    },
+    {
+      "layout": "cart",
+      "icon": "assets/icons/tabs/icon-cart2.png"
+    },
+    {
+      "layout": "profile",
+      "icon": "assets/icons/tabs/icon-user.png",
+      "showChat": true,
+      "showBackground": true,
+      "styleItem": "listTile",
+      "settingStyle": "normal"
+    }
+  ],
+  "searchSuggestion": [
+    "Here are some suggestions:",
+    "Dress",
+    "Evening Dress",
+    "Chiffon Dress",
+    "White Dress",
+    "Final Clearance",
+    "Elegant",
+    "Off White",
+    "Emerald Green"
+  ],
+  "PrivacyPoliciesPageUrlOrId": "https://styliiiish.com/privacy-policy/",
+  "MetaSeo": {
+    "app": {
+      "excludes": [
+        "checkout"
+      ],
+      "config": {
+        "author": "Styliiiish",
+        "description": "Because Every Woman Deserves to Shine",
+        "keywords": [
+          "Flutter",
+          "Dart",
+          "SEO",
+          "Meta",
+          "Web",
+          "FluxStore",
+          "FluxBuilder"
+        ]
+      }
+    },
+    "routes": [
+      {
+        "route": "dashboard",
+        "config": {
+          "author": "Styliiiish",
+          "description": "Because Every Woman Deserves to Shine",
+          "keywords": [
+            "Flutter",
+            "Dart",
+            "SEO",
+            "Meta",
+            "Web",
+            "FluxStore"
+          ]
+        }
+      }
+    ]
+  },
+  "overrideTranslation": {
+    "@@locale": "en",
+    "copyright": "Copyright © 2024 WebsiteFlexi. All rights reserved."
+  }
+}

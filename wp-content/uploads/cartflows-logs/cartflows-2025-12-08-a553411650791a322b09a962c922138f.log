@@ -1,0 +1,24 @@
+2025-12-08T14:00:05+00:00 INFO Start-Cartflows_Admin_Report_Emails::send_weekly_report_email
+2025-12-08T14:00:05+00:00 INFO Send weekly emails to stylish@styliiiish.com
+2025-12-08T14:00:05+00:00 INFO Total Revenue: <span class="woocommerce-Price-amount amount"><bdi>1.550,0<span class="woocommerce-Price-currencySymbol">EGP</span></bdi></span>
+2025-12-08T14:00:07+00:00 INFO Email send status for email stylish@styliiiish.com is 1
+2025-12-08T14:01:05+00:00 INFO Start-Cartflows_Admin_Report_Emails::send_weekly_report_email
+2025-12-08T14:01:05+00:00 INFO Send weekly emails to stylish@styliiiish.com
+2025-12-08T14:01:05+00:00 INFO Total Revenue: <span class="woocommerce-Price-amount amount"><bdi>1.550,0<span class="woocommerce-Price-currencySymbol">EGP</span></bdi></span>
+2025-12-08T14:01:06+00:00 INFO Email send status for email stylish@styliiiish.com is 1
+2025-12-08T14:24:18+00:00 INFO Start-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:24:18+00:00 INFO Only for thank you page
+2025-12-08T14:24:18+00:00 INFO Checkout ID : 1356
+2025-12-08T14:24:18+00:00 INFO End-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:24:18+00:00 INFO Start-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:24:18+00:00 INFO Only for thank you page
+2025-12-08T14:24:18+00:00 INFO Checkout ID : 1356
+2025-12-08T14:24:18+00:00 INFO End-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:35:08+00:00 INFO Start-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:35:08+00:00 INFO Only for thank you page
+2025-12-08T14:35:08+00:00 INFO Checkout ID : 1356
+2025-12-08T14:35:08+00:00 INFO End-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:35:08+00:00 INFO Start-Cartflows_Frontend::redirect_to_thankyou_page
+2025-12-08T14:35:08+00:00 INFO Only for thank you page
+2025-12-08T14:35:08+00:00 INFO Checkout ID : 1356
+2025-12-08T14:35:08+00:00 INFO End-Cartflows_Frontend::redirect_to_thankyou_page
