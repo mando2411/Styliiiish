@@ -735,6 +735,7 @@
 
         .review-shot {
             display: block;
+            position: relative;
             border-radius: 14px;
             overflow: hidden;
             border: 1px solid var(--line);
@@ -756,6 +757,33 @@
             display: block;
             background: #f2f2f5;
             aspect-ratio: 4 / 3;
+        }
+
+        .review-shot::after {
+            content: "عرض على Google";
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.92);
+            color: var(--secondary);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid rgba(23, 39, 59, 0.14);
+        }
+
+        .review-meta {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: rgba(23, 39, 59, 0.82);
+            color: #fff;
+            border-radius: 8px;
+            padding: 5px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            backdrop-filter: blur(2px);
         }
 
         .final-cta {
@@ -1625,10 +1653,14 @@
             </div>
 
             <div class="reviews-grid">
+                @php
+                    $googleReviewsLink = 'https://www.google.com/search?newwindow=1&sa=X&sca_esv=7a144a3578fe712f&rlz=1C1CHBD_arEG1137EG1137&hl=ar-NL&q=Styliiiiish+%D8%A7%D9%84%D8%A2%D8%B1%D8%A7%D8%A1&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxtDC0MDA1MbMwM7UwMDaxMDYxM9jAyPiKUSK4pDInEwSKMxRuLL_ZcmPRjY03lt9YuIgVpxQApWPa_VEAAAA&rldimm=18180546865803483460&tbm=lcl&ved=2ahUKEwi12NOiw-qSAxVk0AIHHc_3KTEQ9fQKegQIQBAG&biw=1536&bih=852&dpr=1.25#lkt=LocalPoiReviews';
+                @endphp
                 @for ($i = 1; $i <= 13; $i++)
                     @php $reviewImage = sprintf('/google-reviews/review-%02d.png', $i); @endphp
-                    <a class="review-shot" href="{{ $reviewImage }}" target="_blank" rel="noopener" aria-label="Google Review {{ $i }}">
+                    <a class="review-shot" href="{{ $googleReviewsLink }}" target="_blank" rel="noopener nofollow" aria-label="فتح تقييمات Google">
                         <img src="{{ $reviewImage }}" alt="Google Review {{ $i }}" loading="lazy">
+                        <span class="review-meta">تقييم {{ $i }}</span>
                     </a>
                 @endfor
             </div>
