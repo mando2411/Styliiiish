@@ -7,7 +7,10 @@ use Illuminate\Support\Facades\Cache;
 Route::get('/', function () {
 
     $reviewImages = collect(glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [])
-        ->map(fn ($path) => '/google-reviews/' . basename($path))
+        ->map(function ($path) {
+            $version = @filemtime($path) ?: time();
+            return '/google-reviews/' . basename($path) . '?v=' . $version;
+        })
         ->sort(SORT_NATURAL | SORT_FLAG_CASE)
         ->values();
 

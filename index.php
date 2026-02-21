@@ -71,7 +71,11 @@ if ($send_to_laravel) {
             header('Content-Type: ' . $mime_types[$ext]);
         }
 
-        header('Cache-Control: public, max-age=604800');
+        if (strpos($request_uri, '/google-reviews/') === 0) {
+            header('Cache-Control: public, max-age=300, must-revalidate');
+        } else {
+            header('Cache-Control: public, max-age=604800');
+        }
         readfile($requested_file);
         exit;
     }
