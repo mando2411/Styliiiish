@@ -669,6 +669,12 @@
         .btn-light {
             background: #fff;
             border: 1px solid var(--line);
+            color: var(--secondary);
+        }
+
+        .btn-light:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .hero-side h3 {
@@ -1112,6 +1118,7 @@
             border-radius: 18px;
             padding: 28px;
             margin: 12px 0 46px;
+            text-align: center;
         }
 
         .final-cta h3 {
@@ -1120,9 +1127,14 @@
         }
 
         .final-cta p {
-            margin: 0 0 16px;
+            margin: 0 auto 16px;
             color: #d7e0ed;
             max-width: 740px;
+        }
+
+        .final-cta .actions {
+            justify-content: center;
+            margin-bottom: 0;
         }
 
         .site-footer {
