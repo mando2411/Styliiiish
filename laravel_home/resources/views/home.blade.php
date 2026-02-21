@@ -1753,7 +1753,10 @@
 
             const goToIndex = (index) => {
                 currentIndex = Math.max(0, Math.min(index, cards.length - 1));
-                cards[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+                slider.scrollTo({
+                    left: cards[currentIndex].offsetLeft,
+                    behavior: 'smooth'
+                });
                 updateButtons();
             };
 
