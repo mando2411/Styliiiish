@@ -596,6 +596,18 @@ Route::get('/ar/privacy-policy', fn (Request $request) => $privacyHandler($reque
 Route::get('/en/privacy-policy', fn (Request $request) => $privacyHandler($request, 'en'));
 Route::get('/ar/سياسة-الخصوصية', fn (Request $request) => $privacyHandler($request, 'ar'));
 
+$termsHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('terms-conditions', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/terms-conditions', fn (Request $request) => $termsHandler($request, 'ar'));
+Route::get('/ar/terms-conditions', fn (Request $request) => $termsHandler($request, 'ar'));
+Route::get('/en/terms-conditions', fn (Request $request) => $termsHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
