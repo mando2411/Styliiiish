@@ -627,7 +627,8 @@
                 @foreach($posts as $post)
                     @php
                         $slug = rawurlencode(rawurldecode((string) $post->post_name));
-                        $postUrl = $wpBaseUrl . $wpBlogArchiveBase . $slug . '/';
+                        $fallbackPostUrl = $wpBaseUrl . $wpBlogArchiveBase . $slug . '/';
+                        $postUrl = !empty($post->permalink) ? (string) $post->permalink : $fallbackPostUrl;
                         $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
                         $image = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');

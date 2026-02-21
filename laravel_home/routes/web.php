@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 
 $homeHandler = function (string $locale = 'ar') {
@@ -265,6 +267,57 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $page = max(1, (int) $request->query('page', 1));
+    $perPage = 9;
+
+    $wpApiBase = $currentLocale === 'ar'
+        ? $wpBaseUrl . '/ar/wp-json/wp/v2/posts'
+        : $wpBaseUrl . '/wp-json/wp/v2/posts';
+
+    try {
+        $apiResponse = Http::timeout(8)->get($wpApiBase, [
+            'per_page' => $perPage,
+            'page' => $page,
+            '_embed' => 1,
+            'orderby' => 'date',
+            'order' => 'desc',
+            'status' => 'publish',
+        ]);
+
+        if ($apiResponse->successful()) {
+            $postsData = collect($apiResponse->json());
+            $total = (int) $apiResponse->header('X-WP-Total', $postsData->count());
+
+            $items = $postsData->map(function ($post) {
+                $embedded = $post['_embedded']['wp:featuredmedia'][0]['source_url'] ?? null;
+
+                return (object) [
+                    'ID' => (int) ($post['id'] ?? 0),
+                    'post_title' => html_entity_decode(strip_tags((string) ($post['title']['rendered'] ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                    'post_name' => (string) ($post['slug'] ?? ''),
+                    'post_excerpt' => trim(html_entity_decode(strip_tags((string) ($post['excerpt']['rendered'] ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
+                    'post_content' => trim(html_entity_decode(strip_tags((string) ($post['content']['rendered'] ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
+                    'post_date' => (string) ($post['date'] ?? ''),
+                    'image' => $embedded,
+                    'permalink' => (string) ($post['link'] ?? ''),
+                ];
+            });
+
+            $posts = new LengthAwarePaginator(
+                $items,
+                $total,
+                $perPage,
+                $page,
+                [
+                    'path' => $request->url(),
+                    'query' => $request->query(),
+                ]
+            );
+
+            return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+        }
+    } catch (\Throwable $exception) {
+    }
 
     $baseQuery = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
@@ -336,7 +389,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
         }
     }
 
-    $posts = $baseQuery->paginate(9);
+    $posts = $baseQuery->paginate($perPage);
 
     return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
