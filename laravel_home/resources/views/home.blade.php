@@ -877,6 +877,25 @@
             padding: 34px 0 22px;
         }
 
+        .footer-brand,
+        .footer-col {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .footer-brand-logo {
+            width: auto;
+            height: 34px;
+            max-width: min(220px, 100%);
+            object-fit: contain;
+            display: block;
+            margin-bottom: 12px;
+            filter: brightness(0) invert(1);
+            opacity: 0.96;
+        }
+
         .footer-brand h4,
         .footer-col h5 {
             margin: 0 0 10px;
@@ -906,6 +925,23 @@
 
         .footer-links a:hover {
             color: #fff;
+        }
+
+        .footer-brand .footer-contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .footer-brand .footer-contact-row a {
+            color: #fff;
+            background: rgba(213, 21, 34, 0.16);
+            border: 1px solid rgba(213, 21, 34, 0.35);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .footer-bottom {
@@ -1404,6 +1440,11 @@
                 padding: 22px 0 14px;
             }
 
+            .footer-brand,
+            .footer-col {
+                padding: 12px;
+            }
+
             .footer-brand h4,
             .footer-col h5 {
                 font-size: 17px;
@@ -1838,10 +1879,14 @@
     <footer class="site-footer">
         <div class="container footer-grid">
             <div class="footer-brand">
+                <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
                 <h4>ستيليش فاشون هاوس</h4>
                 <p>نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.</p>
                 <p>مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.</p>
-                <p><a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">تواصلي معنا</a></p>
+                <div class="footer-contact-row">
+                    <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">تواصلي معنا</a>
+                    <a href="tel:+201050874255">اتصال مباشر</a>
+                </div>
             </div>
 
             <div class="footer-col">
