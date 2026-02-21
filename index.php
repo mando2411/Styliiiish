@@ -43,6 +43,21 @@ if ($send_to_laravel) {
     $laravel_public = __DIR__ . '/laravel_home/public';
     $requested_file = realpath($laravel_public . $request_uri);
 
+    if ($requested_file === false && $request_uri === '/favicon.ico') {
+        $favicon_fallbacks = [
+            realpath($laravel_public . '/favicon.ico'),
+            realpath($laravel_public . '/brand/icons.png'),
+            realpath($laravel_public . '/brand/logo.png'),
+        ];
+
+        foreach ($favicon_fallbacks as $fallback_file) {
+            if ($fallback_file !== false && is_file($fallback_file)) {
+                $requested_file = $fallback_file;
+                break;
+            }
+        }
+    }
+
     if ($requested_file === false && strpos($request_uri, '/google-reviews/') === 0) {
         $fallback_reviews_dir = realpath(__DIR__ . '/laravel_home/Google Reviews');
         $fallback_candidate = $fallback_reviews_dir
