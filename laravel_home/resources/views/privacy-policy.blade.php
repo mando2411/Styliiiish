@@ -265,6 +265,7 @@
     <style>
         :root { --wf-main-rgb: 213, 21, 34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color: #17273B; --bg: #f6f7fb; --card: #ffffff; --text: #17273B; --muted: #5a6678; --line: rgba(189, 189, 189, 0.4); --primary: var(--wf-main-color); --secondary: var(--wf-secondary-color); }
         * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body { margin: 0; font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.65; }
         a { color: inherit; text-decoration: none; }
         .container { width: min(1180px, 92%); margin: 0 auto; }
@@ -295,8 +296,12 @@
         .card h2 { margin: 0 0 10px; font-size: 22px; }
         .toc-list, .bullets { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
         .toc-list li, .bullets li { border: 1px solid var(--line); background: #fbfcff; border-radius: 10px; padding: 9px 11px; font-size: 14px; color: var(--secondary); }
+        .toc-list li { padding: 0; overflow: hidden; }
+        .toc-list a { display: block; padding: 9px 11px; font-weight: 700; }
+        .toc-list a:hover { background: #fff4f5; color: var(--primary); }
         .help-box { margin-top: 12px; background: #fff6f7; border: 1px solid rgba(var(--wf-main-rgb), .2); border-radius: 12px; padding: 10px 12px; }
         .content article { margin-bottom: 12px; }
+        .content article[id] { scroll-margin-top: 110px; }
         .content h3 { margin: 0 0 6px; font-size: 20px; }
         .content p { margin: 0 0 8px; color: var(--muted); }
         .site-footer { margin-top: 8px; background: #0f1a2a; color: #fff; border-top: 4px solid var(--primary); }
@@ -353,19 +358,19 @@
         <aside class="card">
             <h2>{{ $t('toc') }}</h2>
             <ul class="toc-list">
-                <li>{{ $t('s1_t') }}</li>
-                <li>{{ $t('s2_t') }}</li>
-                <li>{{ $t('s3_t') }}</li>
-                <li>{{ $t('s4_t') }}</li>
-                <li>{{ $t('s5_t') }}</li>
-                <li>{{ $t('s6_t') }}</li>
-                <li>{{ $t('s7_t') }}</li>
-                <li>{{ $t('s8_t') }}</li>
-                <li>{{ $t('s9_t') }}</li>
-                <li>{{ $t('s10_t') }}</li>
-                <li>{{ $t('s11_t') }}</li>
-                <li>{{ $t('s12_t') }}</li>
-                <li>{{ $t('s13_t') }}</li>
+                <li><a href="#pp-1">{{ $t('s1_t') }}</a></li>
+                <li><a href="#pp-2">{{ $t('s2_t') }}</a></li>
+                <li><a href="#pp-3">{{ $t('s3_t') }}</a></li>
+                <li><a href="#pp-4">{{ $t('s4_t') }}</a></li>
+                <li><a href="#pp-5">{{ $t('s5_t') }}</a></li>
+                <li><a href="#pp-6">{{ $t('s6_t') }}</a></li>
+                <li><a href="#pp-7">{{ $t('s7_t') }}</a></li>
+                <li><a href="#pp-8">{{ $t('s8_t') }}</a></li>
+                <li><a href="#pp-9">{{ $t('s9_t') }}</a></li>
+                <li><a href="#pp-10">{{ $t('s10_t') }}</a></li>
+                <li><a href="#pp-11">{{ $t('s11_t') }}</a></li>
+                <li><a href="#pp-12">{{ $t('s12_t') }}</a></li>
+                <li><a href="#pp-13">{{ $t('s13_t') }}</a></li>
             </ul>
             <div class="help-box">
                 <strong>{{ $t('need_help') }}</strong>
@@ -374,19 +379,19 @@
         </aside>
 
         <div class="content">
-            <article class="card"><h3>{{ $t('s1_t') }}</h3><p>{{ $t('s1_p1') }}</p><p>{{ $t('s1_p2') }}</p><p>{{ $t('s1_p3') }}</p></article>
-            <article class="card"><h3>{{ $t('s2_t') }}</h3><p>{{ $t('s2_p') }}</p><ul class="bullets"><li>{{ $t('s2_1') }}</li><li>{{ $t('s2_2') }}</li><li>{{ $t('s2_3') }}</li><li>{{ $t('s2_4') }}</li><li>{{ $t('s2_5') }}</li><li>{{ $t('s2_6') }}</li><li>{{ $t('s2_7') }}</li></ul></article>
-            <article class="card"><h3>{{ $t('s3_t') }}</h3><p>{{ $t('s3_p') }}</p><ul class="bullets"><li>{{ $t('s3_1') }}</li><li>{{ $t('s3_2') }}</li><li>{{ $t('s3_3') }}</li><li>{{ $t('s3_4') }}</li><li>{{ $t('s3_5') }}</li><li>{{ $t('s3_6') }}</li></ul></article>
-            <article class="card"><h3>{{ $t('s4_t') }}</h3><p>{{ $t('s4_p') }}</p><ul class="bullets"><li>{{ $t('s4_1') }}</li><li>{{ $t('s4_2') }}</li><li>{{ $t('s4_3') }}</li><li>{{ $t('s4_4') }}</li></ul></article>
-            <article class="card"><h3>{{ $t('s5_t') }}</h3><p>{{ $t('s5_p1') }}</p><p>{{ $t('s5_p2') }}</p></article>
-            <article class="card"><h3>{{ $t('s6_t') }}</h3><p>{{ $t('s6_p') }}</p><ul class="bullets"><li>{{ $t('s6_1') }}</li><li>{{ $t('s6_2') }}</li><li>{{ $t('s6_3') }}</li><li>{{ $t('s6_4') }}</li><li>{{ $t('s6_5') }}</li><li>{{ $t('s6_6') }}</li></ul><p>{{ $t('s6_note') }}</p></article>
-            <article class="card"><h3>{{ $t('s7_t') }}</h3><p>{{ $t('s7_p1') }}</p><p>{{ $t('s7_p2') }}</p><p>{{ $t('s7_p3') }}</p></article>
-            <article class="card"><h3>{{ $t('s8_t') }}</h3><p>{{ $t('s8_p1') }}</p><p>{{ $t('s8_p2') }}</p><p>{{ $t('s8_p3') }}</p><p>{{ $t('s8_p4') }}</p></article>
-            <article class="card"><h3>{{ $t('s9_t') }}</h3><ul class="bullets"><li>{{ $t('s9_1') }}</li><li>{{ $t('s9_2') }}</li><li>{{ $t('s9_3') }}</li></ul></article>
-            <article class="card"><h3>{{ $t('s10_t') }}</h3><p>{{ $t('s10_p') }}</p><ul class="bullets"><li>{{ $t('s10_1') }}</li><li>{{ $t('s10_2') }}</li><li>{{ $t('s10_3') }}</li><li>{{ $t('s10_4') }}</li><li>{{ $t('s10_5') }}</li><li>{{ $t('s10_6') }}</li><li>{{ $t('s10_7') }}</li></ul><p>{{ $t('s10_p2') }}</p></article>
-            <article class="card"><h3>{{ $t('s11_t') }}</h3><p>{{ $t('s11_p') }}</p></article>
-            <article class="card"><h3>{{ $t('s12_t') }}</h3><p>{{ $t('s12_p') }}</p></article>
-            <article class="card"><h3>{{ $t('s13_t') }}</h3><p>{{ $t('s13_p') }}</p><p><strong>{{ $t('questions') }}</strong> {{ $t('questions_desc') }}</p></article>
+            <article id="pp-1" class="card"><h3>{{ $t('s1_t') }}</h3><p>{{ $t('s1_p1') }}</p><p>{{ $t('s1_p2') }}</p><p>{{ $t('s1_p3') }}</p></article>
+            <article id="pp-2" class="card"><h3>{{ $t('s2_t') }}</h3><p>{{ $t('s2_p') }}</p><ul class="bullets"><li>{{ $t('s2_1') }}</li><li>{{ $t('s2_2') }}</li><li>{{ $t('s2_3') }}</li><li>{{ $t('s2_4') }}</li><li>{{ $t('s2_5') }}</li><li>{{ $t('s2_6') }}</li><li>{{ $t('s2_7') }}</li></ul></article>
+            <article id="pp-3" class="card"><h3>{{ $t('s3_t') }}</h3><p>{{ $t('s3_p') }}</p><ul class="bullets"><li>{{ $t('s3_1') }}</li><li>{{ $t('s3_2') }}</li><li>{{ $t('s3_3') }}</li><li>{{ $t('s3_4') }}</li><li>{{ $t('s3_5') }}</li><li>{{ $t('s3_6') }}</li></ul></article>
+            <article id="pp-4" class="card"><h3>{{ $t('s4_t') }}</h3><p>{{ $t('s4_p') }}</p><ul class="bullets"><li>{{ $t('s4_1') }}</li><li>{{ $t('s4_2') }}</li><li>{{ $t('s4_3') }}</li><li>{{ $t('s4_4') }}</li></ul></article>
+            <article id="pp-5" class="card"><h3>{{ $t('s5_t') }}</h3><p>{{ $t('s5_p1') }}</p><p>{{ $t('s5_p2') }}</p></article>
+            <article id="pp-6" class="card"><h3>{{ $t('s6_t') }}</h3><p>{{ $t('s6_p') }}</p><ul class="bullets"><li>{{ $t('s6_1') }}</li><li>{{ $t('s6_2') }}</li><li>{{ $t('s6_3') }}</li><li>{{ $t('s6_4') }}</li><li>{{ $t('s6_5') }}</li><li>{{ $t('s6_6') }}</li></ul><p>{{ $t('s6_note') }}</p></article>
+            <article id="pp-7" class="card"><h3>{{ $t('s7_t') }}</h3><p>{{ $t('s7_p1') }}</p><p>{{ $t('s7_p2') }}</p><p>{{ $t('s7_p3') }}</p></article>
+            <article id="pp-8" class="card"><h3>{{ $t('s8_t') }}</h3><p>{{ $t('s8_p1') }}</p><p>{{ $t('s8_p2') }}</p><p>{{ $t('s8_p3') }}</p><p>{{ $t('s8_p4') }}</p></article>
+            <article id="pp-9" class="card"><h3>{{ $t('s9_t') }}</h3><ul class="bullets"><li>{{ $t('s9_1') }}</li><li>{{ $t('s9_2') }}</li><li>{{ $t('s9_3') }}</li></ul></article>
+            <article id="pp-10" class="card"><h3>{{ $t('s10_t') }}</h3><p>{{ $t('s10_p') }}</p><ul class="bullets"><li>{{ $t('s10_1') }}</li><li>{{ $t('s10_2') }}</li><li>{{ $t('s10_3') }}</li><li>{{ $t('s10_4') }}</li><li>{{ $t('s10_5') }}</li><li>{{ $t('s10_6') }}</li><li>{{ $t('s10_7') }}</li></ul><p>{{ $t('s10_p2') }}</p></article>
+            <article id="pp-11" class="card"><h3>{{ $t('s11_t') }}</h3><p>{{ $t('s11_p') }}</p></article>
+            <article id="pp-12" class="card"><h3>{{ $t('s12_t') }}</h3><p>{{ $t('s12_p') }}</p></article>
+            <article id="pp-13" class="card"><h3>{{ $t('s13_t') }}</h3><p>{{ $t('s13_p') }}</p><p><strong>{{ $t('questions') }}</strong> {{ $t('questions_desc') }}</p></article>
         </div>
     </div>
 </section>
