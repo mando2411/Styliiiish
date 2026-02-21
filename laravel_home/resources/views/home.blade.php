@@ -1715,13 +1715,16 @@
                 @php
                     $googleReviewsLink = 'https://www.google.com/search?newwindow=1&sa=X&sca_esv=7a144a3578fe712f&rlz=1C1CHBD_arEG1137EG1137&hl=ar-NL&q=Styliiiiish+%D8%A7%D9%84%D8%A2%D8%B1%D8%A7%D8%A1&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxtDC0MDA1MbMwM7UwMDaxMDYxM9jAyPiKUSK4pDInEwSKMxRuLL_ZcmPRjY03lt9YuIgVpxQApWPa_VEAAAA&rldimm=18180546865803483460&tbm=lcl&ved=2ahUKEwi12NOiw-qSAxVk0AIHHc_3KTEQ9fQKegQIQBAG&biw=1536&bih=852&dpr=1.25#lkt=LocalPoiReviews';
                 @endphp
-                @for ($i = 1; $i <= 13; $i++)
-                    @php $reviewImage = sprintf('/google-reviews/review-%02d.png', $i); @endphp
+                @forelse (($reviewImages ?? collect()) as $index => $reviewImage)
                     <a class="review-shot" href="{{ $googleReviewsLink }}" target="_blank" rel="noopener nofollow" aria-label="فتح تقييمات Google">
-                        <img src="{{ $reviewImage }}" alt="Google Review {{ $i }}" loading="lazy">
-                        <span class="review-meta">تقييم {{ $i }}</span>
+                        <img src="{{ $reviewImage }}" alt="Google Review {{ $index + 1 }}" loading="lazy">
+                        <span class="review-meta">تقييم {{ $index + 1 }}</span>
                     </a>
-                @endfor
+                @empty
+                    <div class="review-shot" style="justify-content:center; min-height: 140px; color: var(--muted);">
+                        لا توجد صور مراجعات متاحة الآن.
+                    </div>
+                @endforelse
                 </div>
             </div>
         </div>

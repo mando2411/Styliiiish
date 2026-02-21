@@ -6,6 +6,11 @@ use Illuminate\Support\Facades\Cache;
 
 Route::get('/', function () {
 
+    $reviewImages = collect(glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [])
+        ->map(fn ($path) => '/google-reviews/' . basename($path))
+        ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+        ->values();
+
     $products = Cache::remember('home_products', 300, function () {
 
         return DB::table('wp_posts as p')
@@ -83,7 +88,7 @@ Route::get('/', function () {
         ];
     });
 
-    return view('home', compact('products', 'stats'));
+    return view('home', compact('products', 'stats', 'reviewImages'));
 });
 
 $shopDataHandler = function (Request $request) {
