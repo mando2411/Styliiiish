@@ -623,7 +623,8 @@
             <div class="posts-grid">
                 @foreach($posts as $post)
                     @php
-                        $postUrl = 'https://styliiiish.com/' . ltrim((string) $post->post_name, '/') . '/';
+                        $wpBlogBase = $isEnglish ? 'https://styliiiish.com/' : 'https://styliiiish.com/ar/';
+                        $postUrl = $wpBlogBase . ltrim((string) $post->post_name, '/') . '/';
                         $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
                         $image = $post->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';

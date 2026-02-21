@@ -264,7 +264,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
-    $posts = DB::table('wp_posts as p')
+    $baseQuery = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
             $join->on('p.ID', '=', 'thumb.post_id')
                 ->where('thumb.meta_key', '_thumbnail_id');
@@ -281,8 +281,32 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             'p.post_content',
             'p.post_date',
             'img.guid as image'
-        )
-        ->paginate(9);
+        );
+
+    $localizedQuery = clone $baseQuery;
+    $localizedPostsCount = $localizedQuery
+        ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
+        ->join('wp_term_taxonomy as tt', function ($join) {
+            $join->on('tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                ->where('tt.taxonomy', 'language');
+        })
+        ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+        ->where('t.slug', $currentLocale)
+        ->count('p.ID');
+
+    if ($localizedPostsCount > 0) {
+        $baseQuery
+            ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
+            ->join('wp_term_taxonomy as tt', function ($join) {
+                $join->on('tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                    ->where('tt.taxonomy', 'language');
+            })
+            ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+            ->where('t.slug', $currentLocale)
+            ->distinct('p.ID');
+    }
+
+    $posts = $baseQuery->paginate(9);
 
     return view('blog', compact('posts', 'currentLocale', 'localePrefix'));
 };
