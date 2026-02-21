@@ -571,6 +571,18 @@ Route::get('/contact-us', fn () => $contactHandler('ar'));
 Route::get('/ar/contact-us', fn () => $contactHandler('ar'));
 Route::get('/en/contact-us', fn () => $contactHandler('en'));
 
+$aboutHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('about', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/about-us', fn (Request $request) => $aboutHandler($request, 'ar'));
+Route::get('/ar/about-us', fn (Request $request) => $aboutHandler($request, 'ar'));
+Route::get('/en/about-us', fn (Request $request) => $aboutHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
