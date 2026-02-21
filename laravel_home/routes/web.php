@@ -636,6 +636,20 @@ Route::get('/en/refund-return-policy', fn (Request $request) => $refundReturnPol
 Route::get('/Refund-Return-Policy', fn (Request $request) => $refundReturnPolicyHandler($request, 'en'));
 Route::get('/Refund-Return-Policy/', fn (Request $request) => $refundReturnPolicyHandler($request, 'en'));
 
+$faqHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('faq', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/faq', fn (Request $request) => $faqHandler($request, 'ar'));
+Route::get('/ar/faq', fn (Request $request) => $faqHandler($request, 'ar'));
+Route::get('/en/faq', fn (Request $request) => $faqHandler($request, 'en'));
+Route::get('/styliiiish-faq', fn (Request $request) => $faqHandler($request, 'en'));
+Route::get('/styliiiish-faq/', fn (Request $request) => $faqHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');

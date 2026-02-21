@@ -10,8 +10,8 @@
 
     $translations = [
         'ar' => [
-            'page_title' => 'سياسة الاسترجاع والاستبدال | Styliiiish',
-            'meta_desc' => 'توضح سياسة الاسترجاع والاستبدال في Styliiiish شروط الإرجاع، الاستبدال، رد المبالغ، وتكاليف الشحن.',
+            'page_title' => 'الأسئلة الشائعة | Styliiiish',
+            'meta_desc' => 'اعرفي إجابات واضحة عن الشحن، الاسترجاع، البيع عبر الماركت بليس، الطلبات، وخدمة التأجير في Styliiiish.',
             'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
             'nav_home' => 'الرئيسية',
             'nav_shop' => 'المتجر',
@@ -22,46 +22,46 @@
             'nav_contact' => 'تواصل معنا',
             'nav_terms' => 'الشروط والأحكام',
             'lang_switch' => 'تبديل اللغة',
-            'hero_badge' => 'سياسات الطلبات',
-            'hero_title' => 'سياسة الاسترجاع والاستبدال',
-            'hero_desc' => 'في Styliiiish نحرص على رضاك الكامل عن طلبك. توضح هذه السياسة متى وكيف يمكنك الاسترجاع أو الاستبدال وآلية رد المبالغ.',
-            's1_t' => '1) أهلية الاسترجاع والاستبدال',
-            's1_p1' => 'يمكنك طلب استرجاع أو استبدال في الحالات التالية:',
-            's1_l1' => 'وصول المنتج تالفًا أو به عيب.',
-            's1_l2' => 'استلام منتج أو مقاس أو لون مختلف عن الطلب.',
-            's1_l3' => 'عدم مطابقة المنتج للوصف أو الصور على الموقع.',
-            's1_p2' => 'وللتأهل للاسترجاع أو الاستبدال، يجب أن يكون المنتج:',
-            's1_l4' => 'غير مستخدم وغير مُرتدى وبنفس الحالة عند الاستلام.',
-            's1_l5' => 'مع جميع البطاقات والملصقات والتغليف الأصلي.',
-            's1_l6' => 'تقديم الطلب خلال 3 أيام من تاريخ التسليم.',
-            's2_t' => '2) المنتجات غير القابلة للاسترجاع',
-            's2_p1' => 'عادةً لا يمكن استرجاع أو استرداد المنتجات التالية:',
-            's2_l1' => 'الفساتين المستخدمة أو المرتداة (إلا في وجود عيب تصنيع واضح يتم الإبلاغ عنه فورًا عند الاستلام).',
-            's2_l2' => 'المنتجات المباعة كـ "بيع نهائي" أو المعلّمة بأنها غير قابلة للإرجاع.',
-            's2_l3' => 'المنتجات المخصصة أو المعدلة بناءً على طلب العميل.',
-            's2_l4' => 'طلبات التأجير بعد بدء فترة التأجير.',
-            's2_p2' => 'تحتفظ Styliiiish بحق فحص المنتجات المرتجعة ورفض الإرجاع إذا لم تتحقق الشروط.',
-            's3_t' => '3) كيفية طلب الاسترجاع أو الاستبدال',
-            's3_p1' => 'لطلب الاسترجاع أو الاستبدال، يرجى اتباع الخطوات التالية:',
-            's3_l1' => 'التواصل عبر email@styliiiish.com مع رقم الطلب والتفاصيل.',
-            's3_l2' => 'إرفاق صور واضحة للمنتج (وللمشكلة إن وُجدت).',
-            's3_l3' => 'سيقوم الفريق بمراجعة الطلب والرد بالموافقة أو التعليمات أو طلب توضيحات.',
-            's3_p2' => 'يرجى عدم إرسال أي منتج قبل تأكيد مسبق من فريق الدعم.',
-            's4_t' => '4) رد المبالغ (Refunds)',
-            's4_p1' => 'بعد استلام وفحص المنتج المرتجع، سنقوم بإبلاغك بقبول أو رفض طلب رد المبلغ. في حال الموافقة:',
-            's4_l1' => 'يتم رد المبلغ إلى وسيلة الدفع الأصلية قدر الإمكان.',
-            's4_l2' => 'يشمل المبلغ المسترد سعر المنتج فقط ما لم يُتفق كتابةً على غير ذلك.',
-            's4_l3' => 'قد تختلف مدة المعالجة حسب البنك أو مزود الدفع (عادة 3–4 أيام عمل).',
-            's4_p2' => 'في بعض الحالات قد نوفّر رصيد متجر أو استبدال بدلًا من استرداد نقدي وفق الحالة وتفضيل العميل.',
-            's5_t' => '5) تكاليف الشحن',
-            's5_p1' => 'رسوم الشحن غير قابلة للاسترداد غالبًا، باستثناء الحالات التالية:',
-            's5_l1' => 'استلام منتج خاطئ.',
-            's5_l2' => 'وصول المنتج تالفًا أو معيبًا.',
-            's5_p2' => 'في الحالات الأخرى، قد يتحمل العميل تكلفة شحن الإرجاع، وسيتم توضيح التفاصيل أثناء معالجة الطلب.',
-            's6_t' => '6) التواصل والدعم',
-            's6_p' => 'لأي استفسارات أو مساعدة بخصوص الاسترجاع أو رد المبالغ، تواصل معنا عبر:',
-            'email_label' => 'البريد الإلكتروني',
-            'web_label' => 'الموقع',
+            'hero_badge' => 'مساعدة ودعم',
+            'hero_title' => 'الأسئلة الشائعة',
+            'hero_desc' => 'هنا ستجدين إجابات واضحة لأكثر الأسئلة شيوعًا حول الشراء، الشحن، الاسترجاع، البيع عبر الماركت بليس، والخدمات في Styliiiish.',
+            'section_shipping' => 'الشحن والتوصيل',
+            'section_returns' => 'الاسترجاع والاسترداد',
+            'section_marketplace' => 'الماركت بليس (بيعي فستانك)',
+            'section_orders' => 'المنتجات والطلبات',
+            'section_rental' => 'خدمات تأجير الفساتين',
+            'section_support' => 'التواصل والدعم',
+
+            'q1' => 'كم تستغرق مدة التوصيل للمنتجات الجاهزة للشحن؟',
+            'a1' => 'يتم تجهيز المنتجات الجاهزة خلال 1–2 يوم عمل، ويتم التوصيل خلال 1–3 أيام عمل. المدة الإجمالية المتوقعة: 2–4 أيام عمل.',
+            'q2' => 'كم تستغرق مدة التوصيل للمنتجات المصنوعة حسب الطلب؟',
+            'a2' => 'المنتجات المصنوعة حسب الطلب تحتاج 6–7 أيام عمل للتجهيز قبل الشحن، ثم 1–3 أيام عمل للتوصيل. المدة الإجمالية المتوقعة: 7–10 أيام عمل.',
+            'q3' => 'هل توفرون شحنًا خارج مصر؟',
+            'a3' => 'لا. حاليًا خدمات الشحن في Styliiiish متاحة داخل مصر فقط عبر شركاء شحن موثوقين.',
+
+            'q4' => 'هل يمكنني استرجاع أو استبدال طلبي؟',
+            'a4' => 'نعم، يمكن طلب الاسترجاع أو الاستبدال خلال 3 أيام من تاريخ التسليم بشرط أن يكون المنتج غير مستخدم، غير مُرتدى، وفي حالته الأصلية.',
+            'q5' => 'ما المنتجات غير القابلة للاسترجاع؟',
+            'a5' => 'الفساتين المستخدمة أو المرتداة، والمنتجات المخصصة أو المصنوعة حسب الطلب، والمنتجات المعلّمة بأنها بيع نهائي، غير قابلة للاسترجاع أو الاسترداد.',
+
+            'q6' => 'كيف يعمل Styliiiish Marketplace؟',
+            'a6' => 'يتيح Styliiiish Marketplace للأفراد عرض وبيع فساتينهم. وتقوم Styliiiish بتسهيل معالجة المدفوعات، تنسيق التوصيل، ودعم العملاء.',
+            'q7' => 'ما نسبة عمولة الماركت بليس؟',
+            'a7' => 'تطبق Styliiiish رسوم خدمة ماركت بليس بنسبة 50%. يحدد البائع صافي السعر، والسعر النهائي المعروض للمشتري يشمل رسوم الخدمة.',
+            'q8' => 'متى يستلم البائع مستحقاته؟',
+            'a8' => 'يتم صرف مستحقات البائع بعد نجاح التسليم وفق إجراءات التحقق وجدولة الصرف المعتمدة لدى Styliiiish.',
+
+            'q9' => 'هل كل المنتجات متاحة بمقاسات متعددة؟',
+            'a9' => 'كل منتج متاح بمقاس جاهز واحد. وإذا طُلب مقاس آخر، يتم تنفيذ القطعة حسب الطلب.',
+            'q10' => 'هل يمكن إلغاء الطلب بعد إتمامه؟',
+            'a10' => 'يمكن إلغاء الطلب فقط قبل بدء التجهيز أو التفصيل. يرجى التواصل مع الدعم في أسرع وقت بعد تأكيد الطلب.',
+
+            'q11' => 'هل يمكن تأجير الفساتين أونلاين؟',
+            'a11' => 'لا. خدمات تأجير الفساتين متاحة حصريًا داخل الفرع الفعلي ولا تتم عبر الموقع الإلكتروني.',
+
+            'q12' => 'كيف يمكنني التواصل مع دعم Styliiiish؟',
+            'a12' => 'يمكنك التواصل معنا في أي وقت عبر: email@styliiiish.com',
+
             'footer_title' => 'ستيليش فاشون هاوس',
             'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
             'footer_hours' => 'مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.',
@@ -88,8 +88,8 @@
             'fav_mini' => 'المفضلة',
         ],
         'en' => [
-            'page_title' => 'Refund & Return Policy | Styliiiish',
-            'meta_desc' => 'Refund & Return Policy for Styliiiish: eligibility, non-returnable items, return request process, refunds, and shipping costs.',
+            'page_title' => 'Styliiiish FAQ | Styliiiish',
+            'meta_desc' => 'Find clear answers to common questions about shopping, shipping, returns, marketplace selling, and services at Styliiiish.',
             'brand_tag' => 'Because every woman deserves to shine',
             'nav_home' => 'Home',
             'nav_shop' => 'Shop',
@@ -100,46 +100,46 @@
             'nav_contact' => 'Contact Us',
             'nav_terms' => 'Terms & Conditions',
             'lang_switch' => 'Language Switcher',
-            'hero_badge' => 'Order Policies',
-            'hero_title' => 'Refund & Return Policy',
-            'hero_desc' => 'At Styliiiish, we want you to be completely satisfied with your order. This policy explains when and how you can return or exchange items, and how refunds are processed.',
-            's1_t' => '1) Eligibility for Returns & Exchanges',
-            's1_p1' => 'You may request a return or exchange in the following cases:',
-            's1_l1' => 'The item arrived damaged or defective.',
-            's1_l2' => 'You received the wrong product, size, or color.',
-            's1_l3' => 'The item does not match the description or photos on the website.',
-            's1_p2' => 'To be eligible for a return or exchange, items must:',
-            's1_l4' => 'Be unused, unworn, and in the same condition as received.',
-            's1_l5' => 'Have all original tags, labels, and packaging.',
-            's1_l6' => 'Be requested within 3 days of the delivery date.',
-            's2_t' => '2) Non-Returnable Items',
-            's2_p1' => 'The following items are generally not eligible for return or refund:',
-            's2_l1' => 'Used or worn dresses (unless there is a clear manufacturing defect reported immediately upon delivery).',
-            's2_l2' => 'Items purchased as final sale or marked as non-returnable.',
-            's2_l3' => 'Customized or altered items based on customer request.',
-            's2_l4' => 'Rental orders after the rental period has started.',
-            's2_p2' => 'Styliiiish reserves the right to inspect returned items and decline the return if conditions are not met.',
-            's3_t' => '3) How to Request a Return or Exchange',
-            's3_p1' => 'To request a return or exchange, please follow these steps:',
-            's3_l1' => 'Contact us at email@styliiiish.com with your order number and details.',
-            's3_l2' => 'Attach clear photos of the item (and the issue, if damaged or defective).',
-            's3_l3' => 'Our team will review your request and respond with approval, instructions, or clarification.',
-            's3_p2' => 'Please do not send any items back without prior confirmation from our support team.',
-            's4_t' => '4) Refunds',
-            's4_p1' => 'Once we receive and inspect your returned item, we will notify you of the approval or rejection of your refund. If approved:',
-            's4_l1' => 'Refunds will be issued to the original payment method whenever possible.',
-            's4_l2' => 'The refund amount will cover the product price only, unless otherwise agreed in writing.',
-            's4_l3' => 'Processing time may vary depending on your bank or payment provider (usually 3–4 business days).',
-            's4_p2' => 'In some cases, we may offer store credit or an exchange instead of a cash refund, based on the situation and your preference.',
-            's5_t' => '5) Shipping Costs',
-            's5_p1' => 'Shipping fees are generally non-refundable, except in cases where:',
-            's5_l1' => 'You received the wrong item.',
-            's5_l2' => 'The product is defective or damaged upon arrival.',
-            's5_p2' => 'In other cases, the customer may be responsible for the cost of return shipping. Details will be clearly communicated during the return request process.',
-            's6_t' => '6) Contact & Support',
-            's6_p' => 'If you have any questions or need help with a return or refund, please contact us:',
-            'email_label' => 'Email',
-            'web_label' => 'Website',
+            'hero_badge' => 'Help & Support',
+            'hero_title' => 'Frequently Asked Questions (FAQ)',
+            'hero_desc' => 'Find clear answers to the most common questions about shopping, shipping, returns, marketplace selling, and services at Styliiiish.',
+            'section_shipping' => 'Shipping & Delivery',
+            'section_returns' => 'Returns & Refunds',
+            'section_marketplace' => 'Marketplace (Sell Your Dress)',
+            'section_orders' => 'Products & Orders',
+            'section_rental' => 'Dress Rental Services',
+            'section_support' => 'Contact & Support',
+
+            'q1' => 'How long does delivery take for ready-to-ship items?',
+            'a1' => 'Ready-to-ship items are prepared within 1–2 business days and delivered within 1–3 business days. Total estimated delivery time is 2–4 business days.',
+            'q2' => 'How long does delivery take for made-to-order items?',
+            'a2' => 'Made-to-order items require 6–7 business days for preparation before shipment, followed by 1–3 business days for delivery. Total estimated delivery time is 7–10 business days.',
+            'q3' => 'Do you ship outside Egypt?',
+            'a3' => 'No. Styliiiish currently provides shipping services within Egypt only through trusted courier partners.',
+
+            'q4' => 'Can I return or exchange my order?',
+            'a4' => 'Yes, returns or exchanges are accepted within 3 days of delivery if the item is unused, unworn, and in its original condition.',
+            'q5' => 'Which items are non-returnable?',
+            'a5' => 'Used or worn dresses, customized or made-to-order items, and products marked as final sale are not eligible for return or refund.',
+
+            'q6' => 'How does Styliiiish Marketplace work?',
+            'a6' => 'Styliiiish Marketplace allows individuals to list and sell their own dresses. Styliiiish facilitates payment processing, delivery coordination, and customer support.',
+            'q7' => 'What is the marketplace commission?',
+            'a7' => 'Styliiiish applies a 50% marketplace service fee. Sellers enter their net price, and the final price shown to buyers includes the service fee.',
+            'q8' => 'When do sellers receive their payment?',
+            'a8' => 'Seller payouts are processed after successful delivery, according to Styliiiish verification and payout procedures.',
+
+            'q9' => 'Are all products available in multiple sizes?',
+            'a9' => 'Each product is available in one ready size. If another size is requested, the item will be made to order.',
+            'q10' => 'Can I cancel my order after placing it?',
+            'a10' => 'Orders can only be canceled before preparation or tailoring begins. Please contact support as soon as possible after placing your order.',
+
+            'q11' => 'Can I rent dresses online?',
+            'a11' => 'No. Dress rental services are available exclusively at our physical branch and are not processed through the website.',
+
+            'q12' => 'How can I contact Styliiiish support?',
+            'a12' => 'You can contact us anytime at email@styliiiish.com.',
+
             'footer_title' => 'Styliiiish Fashion House',
             'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
             'footer_hours' => 'Working hours: Saturday to Friday from 11:00 AM to 7:00 PM.',
@@ -168,7 +168,7 @@
     ];
 
     $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
-    $canonicalPath = $localePrefix . '/refund-return-policy';
+    $canonicalPath = $localePrefix . '/faq';
     $wpDisplayHost = preg_replace('#^https?://#', '', $wpBaseUrl);
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
@@ -177,8 +177,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ $t('meta_desc') }}">
     <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
-    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/refund-return-policy">
-    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/refund-return-policy">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/faq">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/faq">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $t('page_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
@@ -214,12 +214,16 @@
         .hero h1 { margin: 0 0 8px; font-size: clamp(28px,4vw,42px); line-height: 1.2; }
         .hero p { margin: 0; color: var(--muted); max-width: 920px; }
         .section { padding: 8px 0 22px; }
-        .content-grid { display: grid; gap: 12px; }
-        .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: 0 8px 20px rgba(23,39,59,.05); }
-        .card h2 { margin: 0 0 8px; font-size: 22px; }
-        .card p { margin: 0 0 8px; color: var(--muted); }
-        .card ul { margin: 6px 0 2px; padding-inline-start: 20px; color: var(--muted); }
-        .card li { margin-bottom: 6px; }
+        .faq-group { margin-bottom: 14px; }
+        .faq-title { margin: 0 0 8px; font-size: 20px; }
+        .faq-item { background: #fff; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 8px 20px rgba(23,39,59,.04); }
+        .faq-btn { all: unset; display: flex; width: 100%; cursor: pointer; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; font-weight: 700; color: var(--secondary); }
+        .faq-btn:hover { background: #fff7f8; }
+        .faq-icon { width: 26px; height: 26px; border-radius: 999px; border: 1px solid rgba(213,21,34,.25); display: inline-flex; align-items: center; justify-content: center; color: var(--primary); font-size: 18px; line-height: 1; transition: transform .25s ease; }
+        .faq-item.open .faq-icon { transform: rotate(45deg); }
+        .faq-content { max-height: 0; overflow: hidden; transition: max-height .26s ease; border-top: 1px solid transparent; }
+        .faq-item.open .faq-content { border-top-color: var(--line); }
+        .faq-content p { margin: 0; padding: 12px 16px 14px; color: var(--muted); }
         .site-footer { margin-top: 8px; background: #0f1a2a; color: #fff; border-top: 4px solid var(--primary); }
         .footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 18px; padding: 34px 0 22px; }
         .footer-brand, .footer-col { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 16px; }
@@ -235,7 +239,7 @@
         .footer-mini-nav { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding-bottom: 18px; }
         .footer-mini-nav a { color: #b8c2d1; font-size: 13px; }
         @media (max-width:980px) { .main-header-inner { grid-template-columns: 1fr; padding: 12px 0; } .brand, .main-nav, .header-tools { justify-content: center; text-align: center; } .footer-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-        @media (max-width:640px) { .hero { padding-top: 20px; } .hero-box, .card { border-radius: 14px; padding: 14px; } .footer-grid { grid-template-columns: 1fr; gap: 14px; padding: 22px 0 14px; } .footer-bottom { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 14px; } .footer-mini-nav { justify-content: flex-start; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding-bottom: 12px; } }
+        @media (max-width:640px) { .hero { padding-top: 20px; } .hero-box { border-radius: 14px; padding: 14px; } .faq-btn { padding: 12px 14px; } .faq-content p { padding: 10px 14px 12px; } .footer-grid { grid-template-columns: 1fr; gap: 14px; padding: 22px 0 14px; } .footer-bottom { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px 0 14px; } .footer-mini-nav { justify-content: flex-start; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding-bottom: 12px; } }
     </style>
 </head>
 <body>
@@ -253,7 +257,7 @@
             <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>
         <div class="header-tools">
-            <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}"><span class="lang-indicator" aria-hidden="true"></span><a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/refund-return-policy">AR</a><a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/refund-return-policy">EN</a></div>
+            <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}"><span class="lang-indicator" aria-hidden="true"></span><a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/faq">AR</a><a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/faq">EN</a></div>
         </div>
     </div>
 </header>
@@ -267,13 +271,42 @@
 </section>
 
 <section class="section">
-    <div class="container content-grid">
-        <article class="card"><h2>{{ $t('s1_t') }}</h2><p>{{ $t('s1_p1') }}</p><ul><li>{{ $t('s1_l1') }}</li><li>{{ $t('s1_l2') }}</li><li>{{ $t('s1_l3') }}</li></ul><p>{{ $t('s1_p2') }}</p><ul><li>{{ $t('s1_l4') }}</li><li>{{ $t('s1_l5') }}</li><li>{{ $t('s1_l6') }}</li></ul></article>
-        <article class="card"><h2>{{ $t('s2_t') }}</h2><p>{{ $t('s2_p1') }}</p><ul><li>{{ $t('s2_l1') }}</li><li>{{ $t('s2_l2') }}</li><li>{{ $t('s2_l3') }}</li><li>{{ $t('s2_l4') }}</li></ul><p>{{ $t('s2_p2') }}</p></article>
-        <article class="card"><h2>{{ $t('s3_t') }}</h2><p>{{ $t('s3_p1') }}</p><ul><li>{{ $t('s3_l1') }}</li><li>{{ $t('s3_l2') }}</li><li>{{ $t('s3_l3') }}</li></ul><p>{{ $t('s3_p2') }}</p></article>
-        <article class="card"><h2>{{ $t('s4_t') }}</h2><p>{{ $t('s4_p1') }}</p><ul><li>{{ $t('s4_l1') }}</li><li>{{ $t('s4_l2') }}</li><li>{{ $t('s4_l3') }}</li></ul><p>{{ $t('s4_p2') }}</p></article>
-        <article class="card"><h2>{{ $t('s5_t') }}</h2><p>{{ $t('s5_p1') }}</p><ul><li>{{ $t('s5_l1') }}</li><li>{{ $t('s5_l2') }}</li></ul><p>{{ $t('s5_p2') }}</p></article>
-        <article class="card"><h2>{{ $t('s6_t') }}</h2><p>{{ $t('s6_p') }}</p><p>📧 <a href="mailto:email@styliiiish.com">email@styliiiish.com</a></p><p>🌐 <a href="{{ $wpBaseUrl }}" target="_blank" rel="noopener">{{ $wpBaseUrl }}</a></p></article>
+    <div class="container">
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_shipping') }}</h2>
+            <article class="faq-item open"><button class="faq-btn" type="button"><span>{{ $t('q1') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a1') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q2') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a2') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q3') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a3') }}</p></div></article>
+        </div>
+
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_returns') }}</h2>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q4') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a4') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q5') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a5') }}</p></div></article>
+        </div>
+
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_marketplace') }}</h2>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q6') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a6') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q7') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a7') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q8') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a8') }}</p></div></article>
+        </div>
+
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_orders') }}</h2>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q9') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a9') }}</p></div></article>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q10') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a10') }}</p></div></article>
+        </div>
+
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_rental') }}</h2>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q11') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a11') }}</p></div></article>
+        </div>
+
+        <div class="faq-group">
+            <h2 class="faq-title">{{ $t('section_support') }}</h2>
+            <article class="faq-item"><button class="faq-btn" type="button"><span>{{ $t('q12') }}</span><span class="faq-icon">+</span></button><div class="faq-content"><p>{{ $t('a12') }}</p></div></article>
+        </div>
     </div>
 </section>
 
@@ -287,5 +320,41 @@
     <div class="container footer-bottom"><span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span><span><a href="{{ $wpBaseUrl }}/" target="_blank" rel="noopener">{{ $wpDisplayHost }}</a></span></div>
     <div class="container footer-mini-nav"><a href="{{ $localePrefix }}">{{ $t('home_mini') }}</a><a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a><a href="{{ $wpBaseUrl }}/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a><a href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a><a href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a></div>
 </footer>
+
+<script>
+    (function () {
+        const items = Array.from(document.querySelectorAll('.faq-item'));
+        const openItem = (item) => {
+            const content = item.querySelector('.faq-content');
+            item.classList.add('open');
+            content.style.maxHeight = content.scrollHeight + 'px';
+        };
+        const closeItem = (item) => {
+            const content = item.querySelector('.faq-content');
+            item.classList.remove('open');
+            content.style.maxHeight = '0px';
+        };
+
+        items.forEach((item) => {
+            const btn = item.querySelector('.faq-btn');
+            const content = item.querySelector('.faq-content');
+            if (item.classList.contains('open')) {
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+            btn.addEventListener('click', () => {
+                const isOpen = item.classList.contains('open');
+                items.forEach(closeItem);
+                if (!isOpen) openItem(item);
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            items.filter(item => item.classList.contains('open')).forEach((item) => {
+                const content = item.querySelector('.faq-content');
+                content.style.maxHeight = content.scrollHeight + 'px';
+            });
+        });
+    })();
+</script>
 </body>
 </html>

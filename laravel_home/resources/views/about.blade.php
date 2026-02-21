@@ -521,7 +521,7 @@
                 <li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('privacy') }}</a></li>
                 <li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('terms') }}</a></li>
                 <li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund_policy') }}</a></li>
-                <li><a href="{{ $wpBaseUrl }}/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
+                <li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
             </ul>

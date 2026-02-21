@@ -889,7 +889,7 @@
                 <li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('terms') }}</a></li>
                 <li><a href="{{ $localePrefix }}/marketplace-policy">{{ $t('market_policy') }}</a></li>
                 <li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund_policy') }}</a></li>
-                <li><a href="https://styliiiish.com/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
+                <li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li>
                 <li><a href="https://styliiiish.com/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
                 <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
             </ul>
