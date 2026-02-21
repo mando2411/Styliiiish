@@ -650,6 +650,19 @@ Route::get('/en/faq', fn (Request $request) => $faqHandler($request, 'en'));
 Route::get('/styliiiish-faq', fn (Request $request) => $faqHandler($request, 'en'));
 Route::get('/styliiiish-faq/', fn (Request $request) => $faqHandler($request, 'en'));
 
+$shippingPolicyHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    return view('shipping-delivery-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/shipping-delivery-policy', fn (Request $request) => $shippingPolicyHandler($request, 'ar'));
+Route::get('/ar/shipping-delivery-policy', fn (Request $request) => $shippingPolicyHandler($request, 'ar'));
+Route::get('/en/shipping-delivery-policy', fn (Request $request) => $shippingPolicyHandler($request, 'en'));
+Route::get('/shipping-delivery-policy/', fn (Request $request) => $shippingPolicyHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
