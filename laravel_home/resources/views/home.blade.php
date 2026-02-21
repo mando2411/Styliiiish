@@ -83,6 +83,11 @@
             'footer_title' => 'ستيليش فاشون هاوس',
             'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
             'footer_hours' => 'مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.',
+            'status_label' => 'الحالة',
+            'open_now' => 'مفتوح',
+            'closed_now' => 'مغلق',
+            'open_hours_label' => 'ساعات العمل',
+            'open_hours_value' => 'السبت – الجمعة: 11:00 ص – 7:00 م',
             'contact_us' => 'تواصلي معنا',
             'direct_call' => 'اتصال مباشر',
             'quick_links' => 'روابط سريعة',
@@ -184,6 +189,11 @@
             'footer_title' => 'Styliiiish Fashion House',
             'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
             'footer_hours' => 'Working hours: Saturday to Friday from 11:00 AM to 7:00 PM.',
+            'status_label' => 'Status',
+            'open_now' => 'Open',
+            'closed_now' => 'Closed',
+            'open_hours_label' => 'Open Hours',
+            'open_hours_value' => 'Sat – Fri: 11:00 am – 7:00 pm.',
             'contact_us' => 'Contact Us',
             'direct_call' => 'Direct Call',
             'quick_links' => 'Quick Links',
@@ -208,6 +218,13 @@
             'fav_mini' => 'Wishlist',
         ],
     ];
+
+    $businessTimezone = new DateTimeZone('Africa/Cairo');
+    $nowInCairo = new DateTimeImmutable('now', $businessTimezone);
+    $currentMinutes = ((int) $nowInCairo->format('H') * 60) + (int) $nowInCairo->format('i');
+    $openFromMinutes = 11 * 60;
+    $openUntilMinutes = 19 * 60;
+    $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
 
     $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
 @endphp
@@ -1181,6 +1198,37 @@
             margin: 0 0 10px;
             color: var(--footer-soft);
             font-size: 14px;
+        }
+
+        .footer-status,
+        .footer-open-hours {
+            margin: 0 0 10px;
+            color: var(--footer-soft);
+            font-size: 14px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid transparent;
+            line-height: 1.2;
+        }
+
+        .status-pill.is-open {
+            color: var(--success);
+            border-color: rgba(10, 143, 91, 0.45);
+            background: rgba(10, 143, 91, 0.14);
+        }
+
+        .status-pill.is-closed {
+            color: var(--primary);
+            border-color: rgba(var(--wf-main-rgb), 0.45);
+            background: rgba(var(--wf-main-rgb), 0.14);
         }
 
         .footer-links {
@@ -2161,7 +2209,11 @@
                 <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
                 <h4>{{ $t('footer_title') }}</h4>
                 <p>{{ $t('footer_desc') }}</p>
-                <p>{{ $t('footer_hours') }}</p>
+                <p class="footer-status">
+                    {{ $t('status_label') }} :
+                    <span class="status-pill {{ $isOpenNow ? 'is-open' : 'is-closed' }}">{{ $isOpenNow ? $t('open_now') : $t('closed_now') }}</span>
+                </p>
+                <p class="footer-open-hours"><strong>{{ $t('open_hours_label') }}:</strong> {{ $t('open_hours_value') }}</p>
                 <div class="footer-contact-row">
                     <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('contact_us') }}</a>
                     <a href="tel:+201050874255">{{ $t('direct_call') }}</a>
