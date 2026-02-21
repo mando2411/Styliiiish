@@ -733,6 +733,7 @@
 
         .reviews-slider {
             display: flex;
+            direction: ltr;
             gap: 14px;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
@@ -784,6 +785,7 @@
             position: relative;
             flex: 0 0 clamp(320px, 76vw, 760px);
             scroll-snap-align: start;
+            user-select: none;
             border-radius: 14px;
             overflow: hidden;
             border: 1px solid var(--line);
@@ -1733,15 +1735,47 @@
 
             if (!slider || !prevBtn || !nextBtn) return;
 
-            const scrollAmount = () => Math.max(320, Math.floor(slider.clientWidth * 0.82));
+            const cards = Array.from(slider.querySelectorAll('.review-shot'));
+            if (!cards.length) return;
 
-            prevBtn.addEventListener('click', () => {
-                slider.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
-            });
+            let currentIndex = 0;
 
-            nextBtn.addEventListener('click', () => {
-                slider.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
-            });
+            const updateButtons = () => {
+                prevBtn.disabled = currentIndex <= 0;
+                nextBtn.disabled = currentIndex >= cards.length - 1;
+                prevBtn.style.opacity = prevBtn.disabled ? '0.45' : '1';
+                nextBtn.style.opacity = nextBtn.disabled ? '0.45' : '1';
+            };
+
+            const goToIndex = (index) => {
+                currentIndex = Math.max(0, Math.min(index, cards.length - 1));
+                cards[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+                updateButtons();
+            };
+
+            const detectActiveIndex = () => {
+                const sliderRect = slider.getBoundingClientRect();
+                let bestIndex = currentIndex;
+                let bestDistance = Infinity;
+
+                cards.forEach((card, index) => {
+                    const rect = card.getBoundingClientRect();
+                    const distance = Math.abs(rect.left - sliderRect.left);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestIndex = index;
+                    }
+                });
+
+                currentIndex = bestIndex;
+                updateButtons();
+            };
+
+            prevBtn.addEventListener('click', () => goToIndex(currentIndex - 1));
+            nextBtn.addEventListener('click', () => goToIndex(currentIndex + 1));
+            slider.addEventListener('scroll', detectActiveIndex, { passive: true });
+
+            updateButtons();
         })();
     </script>
 
