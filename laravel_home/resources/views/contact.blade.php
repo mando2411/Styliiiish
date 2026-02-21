@@ -57,7 +57,30 @@
             'send_note' => 'سيتم فتح تطبيق البريد الإلكتروني لإرسال رسالتك.',
             'map_title' => 'موقعنا على الخريطة',
             'map_desc' => 'تعرفي على موقعنا بدقة وزورينا لاكتشاف أحدث المجموعات وخيارات التفصيل والتأجير.',
-            'footer_rights' => 'جميع الحقوق محفوظة © :year Styliiiish',
+            'footer_title' => 'ستيليش فاشون هاوس',
+            'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
+            'footer_hours' => 'مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.',
+            'contact_us' => 'تواصلي معنا',
+            'direct_call' => 'اتصال مباشر',
+            'quick_links' => 'روابط سريعة',
+            'official_info' => 'معلومات رسمية',
+            'policies' => 'سياسات وقوانين',
+            'about_us' => 'من نحن',
+            'privacy' => 'سياسة الخصوصية',
+            'terms' => 'الشروط والأحكام',
+            'market_policy' => 'سياسة الماركت بليس',
+            'refund_policy' => 'سياسة الاسترجاع والاستبدال',
+            'faq' => 'الأسئلة الشائعة',
+            'shipping_policy' => 'سياسة الشحن والتوصيل',
+            'cookies' => 'سياسة ملفات الارتباط',
+            'categories' => 'الأقسام',
+            'official_address' => '1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر',
+            'rights' => 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير',
+            'home_mini' => 'الرئيسية',
+            'shop_mini' => 'المتجر',
+            'cart_mini' => 'السلة',
+            'account_mini' => 'حسابي',
+            'fav_mini' => 'المفضلة',
         ],
         'en' => [
             'page_title' => 'Contact Us | Styliiiish',
@@ -101,7 +124,30 @@
             'send_note' => 'Your email app will open to send the message.',
             'map_title' => 'Our Location on the Map',
             'map_desc' => 'Find us on the map below and visit Styliiiish to explore our latest collections and rental/custom options.',
-            'footer_rights' => 'All rights reserved © :year Styliiiish',
+            'footer_title' => 'Styliiiish Fashion House',
+            'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
+            'footer_hours' => 'Working hours: Saturday to Friday from 11:00 AM to 7:00 PM.',
+            'contact_us' => 'Contact Us',
+            'direct_call' => 'Direct Call',
+            'quick_links' => 'Quick Links',
+            'official_info' => 'Official Info',
+            'policies' => 'Policies & Legal',
+            'about_us' => 'About Us',
+            'privacy' => 'Privacy Policy',
+            'terms' => 'Terms & Conditions',
+            'market_policy' => 'Marketplace Policy',
+            'refund_policy' => 'Refund & Return Policy',
+            'faq' => 'FAQ',
+            'shipping_policy' => 'Shipping & Delivery Policy',
+            'cookies' => 'Cookie Policy',
+            'categories' => 'Categories',
+            'official_address' => '1 Nabil Khalil St, Nasr City, Cairo, Egypt',
+            'rights' => 'All rights reserved © :year Styliiiish | Powered by',
+            'home_mini' => 'Home',
+            'shop_mini' => 'Shop',
+            'cart_mini' => 'Cart',
+            'account_mini' => 'Account',
+            'fav_mini' => 'Wishlist',
         ],
     ];
 
@@ -521,13 +567,114 @@
             display: block;
         }
 
-        .footer {
-            border-top: 1px solid var(--line);
-            margin-top: 12px;
-            padding: 18px 0 26px;
-            color: var(--muted);
+        .site-footer {
+            margin-top: 8px;
+            background: #0f1a2a;
+            color: #fff;
+            border-top: 4px solid var(--primary);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr 1fr;
+            gap: 18px;
+            padding: 34px 0 22px;
+        }
+
+        .footer-brand,
+        .footer-col {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px;
+        }
+
+        .footer-brand-logo {
+            width: auto;
+            height: 34px;
+            max-width: min(220px, 100%);
+            object-fit: contain;
+            display: block;
+            margin-bottom: 12px;
+            filter: brightness(0) invert(1);
+            opacity: 0.96;
+        }
+
+        .footer-brand h4,
+        .footer-col h5 {
+            margin: 0 0 10px;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .footer-brand p {
+            margin: 0 0 10px;
+            color: #b8c2d1;
+            font-size: 14px;
+        }
+
+        .footer-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 7px;
+        }
+
+        .footer-links a {
+            color: #b8c2d1;
+            font-size: 14px;
+            transition: .2s ease;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .footer-brand .footer-contact-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .footer-brand .footer-contact-row a {
+            color: #fff;
+            background: rgba(213, 21, 34, 0.16);
+            border: 1px solid rgba(213, 21, 34, 0.35);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            padding: 12px 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            color: #b8c2d1;
             font-size: 13px;
-            text-align: center;
+        }
+
+        .footer-mini-nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding-bottom: 18px;
+        }
+
+        .footer-mini-nav a {
+            color: #b8c2d1;
+            font-size: 13px;
+        }
+
+        .footer-mini-nav a:hover {
+            color: #fff;
         }
 
         @media (max-width: 900px) {
@@ -546,6 +693,10 @@
             .grid {
                 grid-template-columns: 1fr;
             }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 640px) {
@@ -554,6 +705,36 @@
             .card { padding: 14px; border-radius: 14px; }
             .card h2 { font-size: 21px; }
             .map-wrap iframe { height: 300px; }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                padding: 22px 0 14px;
+            }
+
+            .footer-brand,
+            .footer-col {
+                padding: 12px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 10px 0 14px;
+            }
+
+            .footer-mini-nav {
+                justify-content: flex-start;
+                overflow-x: auto;
+                white-space: nowrap;
+                scrollbar-width: none;
+                padding-bottom: 12px;
+            }
+
+            .footer-mini-nav::-webkit-scrollbar {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -662,8 +843,67 @@
     </div>
 </section>
 
-<footer class="footer">
-    <div class="container">{{ str_replace(':year', (string) date('Y'), $t('footer_rights')) }}</div>
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div class="footer-brand">
+            <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
+            <h4>{{ $t('footer_title') }}</h4>
+            <p>{{ $t('footer_desc') }}</p>
+            <p>{{ $t('footer_hours') }}</p>
+            <div class="footer-contact-row">
+                <a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a>
+                <a href="tel:+201050874255">{{ $t('direct_call') }}</a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h5>{{ $t('quick_links') }}</h5>
+            <ul class="footer-links">
+                <li><a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a></li>
+                <li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li>
+                <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
+                <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
+                <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h5>{{ $t('official_info') }}</h5>
+            <ul class="footer-links">
+                <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">{{ $t('official_address') }}</a></li>
+                <li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
+                <li><a href="mailto:email@styliiiish.com">email@styliiiish.com</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h5>{{ $t('policies') }}</h5>
+            <ul class="footer-links">
+                <li><a href="https://styliiiish.com/about-us/" target="_blank" rel="noopener">{{ $t('about_us') }}</a></li>
+                <li><a href="https://styliiiish.com/privacy-policy/" target="_blank" rel="noopener">{{ $t('privacy') }}</a></li>
+                <li><a href="https://styliiiish.com/terms-conditions/" target="_blank" rel="noopener">{{ $t('terms') }}</a></li>
+                <li><a href="https://styliiiish.com/Marketplace-Policy/" target="_blank" rel="noopener">{{ $t('market_policy') }}</a></li>
+                <li><a href="https://styliiiish.com/refund-return-policy/" target="_blank" rel="noopener">{{ $t('refund_policy') }}</a></li>
+                <li><a href="https://styliiiish.com/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
+                <li><a href="https://styliiiish.com/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
+                <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container footer-bottom">
+        <span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
+        <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
+    </div>
+
+    <div class="container footer-mini-nav">
+        <a href="{{ $localePrefix }}">{{ $t('home_mini') }}</a>
+        <a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a>
+        <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a>
+        <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
+        <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a>
+    </div>
 </footer>
 </body>
 </html>
