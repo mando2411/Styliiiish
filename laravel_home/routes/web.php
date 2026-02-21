@@ -312,8 +312,13 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
 
             if ($currentLocale === 'ar') {
                 $items = $items->filter(function ($post) {
-                    $link = mb_strtolower((string) ($post->permalink ?? ''));
-                    return str_contains($link, '/ar/');
+                    $link = mb_strtolower(rawurldecode((string) ($post->permalink ?? '')));
+                    $title = (string) ($post->post_title ?? '');
+
+                    $hasArabicPath = str_contains($link, '/ar/');
+                    $isArabicTitle = preg_match('/[\x{0600}-\x{06FF}]/u', $title) === 1;
+
+                    return $hasArabicPath && $isArabicTitle;
                 })->values();
             }
 
@@ -336,6 +341,21 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
         }
     } catch (\Throwable $exception) {
+    }
+
+    if ($currentLocale === 'ar') {
+        $posts = new LengthAwarePaginator(
+            collect(),
+            0,
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+
+        return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
     }
 
     $baseQuery = DB::table('wp_posts as p')
