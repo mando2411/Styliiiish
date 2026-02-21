@@ -401,7 +401,7 @@
             <p class="note" style="margin-top:10px;">{{ $t('market_note') }}</p>
             <div class="cta-row">
                 <a class="btn btn-light" href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('learn_sell') }}</a>
-                <a class="btn btn-primary" href="{{ $wpBaseUrl }}/Marketplace-Policy/" target="_blank" rel="noopener">{{ $t('market_policy') }}</a>
+                <a class="btn btn-primary" href="{{ $localePrefix }}/marketplace-policy">{{ $t('market_policy') }}</a>
             </div>
         </article>
 
