@@ -43,9 +43,27 @@ if ($send_to_laravel) {
     $laravel_public = __DIR__ . '/laravel_home/public';
     $requested_file = realpath($laravel_public . $request_uri);
 
+    if ($requested_file === false && strpos($request_uri, '/google-reviews/') === 0) {
+        $fallback_reviews_dir = realpath(__DIR__ . '/laravel_home/Google Reviews');
+        $fallback_candidate = $fallback_reviews_dir
+            ? realpath($fallback_reviews_dir . '/' . basename($request_uri))
+            : false;
+
+        if (
+            $fallback_candidate !== false &&
+            strpos($fallback_candidate, $fallback_reviews_dir) === 0 &&
+            is_file($fallback_candidate)
+        ) {
+            $requested_file = $fallback_candidate;
+        }
+    }
+
     if (
         $requested_file !== false &&
-        strpos($requested_file, realpath($laravel_public)) === 0 &&
+        (
+            strpos($requested_file, realpath($laravel_public)) === 0 ||
+            strpos($requested_file, realpath(__DIR__ . '/laravel_home/Google Reviews')) === 0
+        ) &&
         is_file($requested_file)
     ) {
         $ext = strtolower(pathinfo($requested_file, PATHINFO_EXTENSION));

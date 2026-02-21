@@ -6,12 +6,20 @@ use Illuminate\Support\Facades\Cache;
 
 Route::get('/', function () {
 
-    $reviewImages = collect(glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [])
+    $reviewFiles = collect(array_merge(
+        glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
+        glob(base_path('Google Reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: []
+    ))
+        ->filter(fn ($path) => is_file($path))
+        ->unique(fn ($path) => mb_strtolower(basename($path)))
+        ->sortBy(fn ($path) => basename($path), SORT_NATURAL | SORT_FLAG_CASE)
+        ->values();
+
+    $reviewImages = $reviewFiles
         ->map(function ($path) {
             $version = @filemtime($path) ?: time();
-            return '/google-reviews/' . basename($path) . '?v=' . $version;
+            return '/google-reviews/' . rawurlencode(basename($path)) . '?v=' . $version;
         })
-        ->sort(SORT_NATURAL | SORT_FLAG_CASE)
         ->values();
 
     $products = Cache::remember('home_products', 300, function () {
