@@ -318,6 +318,7 @@
             display: inline-grid;
             grid-template-columns: 1fr 1fr;
             align-items: center;
+            direction: ltr;
             width: 110px;
             height: 34px;
             background: rgba(255, 255, 255, 0.16);
@@ -339,11 +340,11 @@
         }
 
         .lang-switch.is-ar .lang-indicator {
-            right: 3px;
+            left: 3px;
         }
 
         .lang-switch.is-en .lang-indicator {
-            left: 3px;
+            right: 3px;
         }
 
         .lang-switch a {
