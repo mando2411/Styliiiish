@@ -267,6 +267,8 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $arBlogArchivePath = env('WP_AR_BLOG_ARCHIVE_PATH', '/ar/%d9%85%d8%af%d9%88%d9%86%d8%a9/');
+    $arBlogArchivePath = '/' . ltrim((string) $arBlogArchivePath, '/');
     $page = max(1, (int) $request->query('page', 1));
     $perPage = 9;
 
@@ -281,7 +283,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
 
     if ($currentLocale === 'ar') {
         $arFeedCandidates = [
-            $wpBaseUrl . '/ar/' . rawurlencode('مدونة') . '/feed/',
+            rtrim($wpBaseUrl . $arBlogArchivePath, '/') . '/feed/',
             $wpBaseUrl . '/ar/feed/',
         ];
 
@@ -394,9 +396,10 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                     $title = (string) ($post->post_title ?? '');
 
                     $hasArabicPath = str_contains($link, '/ar/');
+                    $hasArabicArchivePath = str_contains($link, '/ar/مدونة/');
                     $isArabicTitle = preg_match('/[\x{0600}-\x{06FF}]/u', $title) === 1;
 
-                    return $hasArabicPath && $isArabicTitle;
+                    return $hasArabicPath && $hasArabicArchivePath && $isArabicTitle;
                 })->values();
             }
 
@@ -416,7 +419,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                 ]
             );
 
-            return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+            return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
         }
     } catch (\Throwable $exception) {
     }
@@ -433,7 +436,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
             ]
         );
 
-        return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+        return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
     }
 
     $baseQuery = DB::table('wp_posts as p')
@@ -508,7 +511,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
 
     $posts = $baseQuery->paginate($perPage);
 
-    return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+    return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
 };
 
 Route::get('/blog', fn (Request $request) => $blogHandler($request, 'ar'));

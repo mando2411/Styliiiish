@@ -113,7 +113,9 @@
 
     $canonicalPath = $localePrefix . '/blog';
     $wpDisplayHost = preg_replace('#^https?://#', '', $wpBaseUrl);
-    $wpBlogArchiveBase = $isEnglish ? '/blog/' : '/ar/' . rawurlencode('مدونة') . '/';
+    $wpBlogArchiveBase = $isEnglish
+        ? '/blog/'
+        : ('/' . ltrim((string) ($arBlogArchivePath ?? '/ar/%d9%85%d8%af%d9%88%d9%86%d8%a9/'), '/'));
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
