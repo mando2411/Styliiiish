@@ -727,15 +727,63 @@
             font-size: 14px;
         }
 
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
+        .reviews-slider-wrap {
+            position: relative;
+        }
+
+        .reviews-slider {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 2px 2px 8px;
+            scrollbar-width: none;
+        }
+
+        .reviews-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .reviews-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.96);
+            color: var(--secondary);
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            box-shadow: 0 8px 18px rgba(23, 39, 59, 0.15);
+        }
+
+        .reviews-nav:hover {
+            border-color: rgba(213, 21, 34, .45);
+            color: var(--primary);
+        }
+
+        .reviews-nav.prev {
+            right: 10px;
+        }
+
+        .reviews-nav.next {
+            left: 10px;
         }
 
         .review-shot {
             display: block;
             position: relative;
+            flex: 0 0 clamp(320px, 76vw, 760px);
+            scroll-snap-align: start;
             border-radius: 14px;
             overflow: hidden;
             border: 1px solid var(--line);
@@ -756,7 +804,7 @@
             object-fit: cover;
             display: block;
             background: #f2f2f5;
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 16 / 10;
         }
 
         .review-shot::after {
@@ -921,8 +969,9 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .reviews-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
+            .reviews-nav {
+                width: 36px;
+                height: 36px;
             }
 
             .hero-points,
@@ -1248,8 +1297,12 @@
                 gap: 10px;
             }
 
-            .reviews-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .review-shot {
+                flex-basis: 88vw;
+            }
+
+            .reviews-nav {
+                display: none;
             }
 
             .card {
@@ -1415,8 +1468,8 @@
                 grid-template-columns: 1fr;
             }
 
-            .reviews-grid {
-                grid-template-columns: 1fr;
+            .review-shot {
+                flex-basis: 92vw;
             }
 
             .products-section .buy,
@@ -1652,7 +1705,11 @@
                 <p>آراء عملائنا بالصورة كما هي لبناء ثقة كاملة قبل الطلب.</p>
             </div>
 
-            <div class="reviews-grid">
+            <div class="reviews-slider-wrap">
+                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="السابق">›</button>
+                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="التالي">‹</button>
+
+                <div class="reviews-slider" id="reviewsSlider">
                 @php
                     $googleReviewsLink = 'https://www.google.com/search?newwindow=1&sa=X&sca_esv=7a144a3578fe712f&rlz=1C1CHBD_arEG1137EG1137&hl=ar-NL&q=Styliiiiish+%D8%A7%D9%84%D8%A2%D8%B1%D8%A7%D8%A1&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxtDC0MDA1MbMwM7UwMDaxMDYxM9jAyPiKUSK4pDInEwSKMxRuLL_ZcmPRjY03lt9YuIgVpxQApWPa_VEAAAA&rldimm=18180546865803483460&tbm=lcl&ved=2ahUKEwi12NOiw-qSAxVk0AIHHc_3KTEQ9fQKegQIQBAG&biw=1536&bih=852&dpr=1.25#lkt=LocalPoiReviews';
                 @endphp
@@ -1663,9 +1720,30 @@
                         <span class="review-meta">تقييم {{ $i }}</span>
                     </a>
                 @endfor
+                </div>
             </div>
         </div>
     </section>
+
+    <script>
+        (() => {
+            const slider = document.getElementById('reviewsSlider');
+            const prevBtn = document.getElementById('reviewsPrev');
+            const nextBtn = document.getElementById('reviewsNext');
+
+            if (!slider || !prevBtn || !nextBtn) return;
+
+            const scrollAmount = () => Math.max(320, Math.floor(slider.clientWidth * 0.82));
+
+            prevBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+            });
+
+            nextBtn.addEventListener('click', () => {
+                slider.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+            });
+        })();
+    </script>
 
     <section class="container final-cta">
         <h3>جاهزة تتألقي في مناسبتك القادمة؟</h3>
