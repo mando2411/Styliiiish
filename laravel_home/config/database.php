@@ -2,13 +2,6 @@
 
 use Illuminate\Support\Str;
 
-$wp_config = file_get_contents('/home/u281896900/domains/styliiiish.com/public_html/wp-config.php');
-
-preg_match("/define\(\s*'DB_NAME'\s*,\s*'(.+?)'\s*\)/", $wp_config, $db_name);
-preg_match("/define\(\s*'DB_USER'\s*,\s*'(.+?)'\s*\)/", $wp_config, $db_user);
-preg_match("/define\(\s*'DB_PASSWORD'\s*,\s*'(.+?)'\s*\)/", $wp_config, $db_pass);
-preg_match("/define\(\s*'DB_HOST'\s*,\s*'(.+?)'\s*\)/", $wp_config, $db_host);
-
 return [
 
     /*
@@ -50,21 +43,25 @@ return [
             'transaction_mode' => 'DEFERRED',
         ],
 
-'mysql' => [
-    'driver' => 'mysql',
-    'host' => 'localhost',
-    'port' => '3306',
-    'database' => 'u281896900_hgrub',
-    'username' => 'u281896900_Go56Q',
-    'password' => 'Y7z0BShH4S',
-    'unix_socket' => '',
-    'charset' => 'utf8mb4',
-    'collation' => 'utf8mb4_unicode_ci',
-    'prefix' => '',
-    'prefix_indexes' => true,
-    'strict' => true,
-    'engine' => null,
-],
+        'mysql' => [
+            'driver' => 'mysql',
+            'url' => env('DB_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
 
         'mariadb' => [
             'driver' => 'mariadb',
