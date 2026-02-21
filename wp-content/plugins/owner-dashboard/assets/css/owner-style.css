@@ -1,0 +1,2979 @@
+        /* =========================================
+           GLOBAL BASE
+        ========================================= */
+        body {
+            background: #f5f5f5;
+            color: #222;
+        }
+        
+        /* حاوية الداشبورد */
+        .owner-dashboard-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+        }
+        
+        /* الكروت الرئيسية */
+        .owner-card {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            border: 1px solid #e3e3e3;
+            transition: 0.2s;
+        }
+        .owner-card:hover {
+            background: #efefef;
+        }
+        .owner-card h3 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* السيكشنات */
+        .owner-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 12px;
+            border: 1px solid #e3e3e3;
+        }
+        
+        /* Toolbar أعلى الداشبورد (فيه زر التبديل Dark/Light) */
+        .owner-dashboard-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* زرار وضع اللون */
+        .owner-theme-toggle {
+            padding: 7px 14px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #fff;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .owner-theme-toggle:hover {
+            background: #f0f0f0;
+        }
+        
+        /* =========================================
+           EMAIL BOX
+        ========================================= */
+        .email-box label {
+            font-weight:bold;
+            margin-top:12px;
+            display:block;
+        }
+        .email-box input,
+        .email-box textarea {
+            width:100%;
+            padding:10px;
+            margin-top:5px;
+            border-radius:8px;
+            border:1px solid #ccc;
+        }
+        .email-send-btn {
+            margin-top:15px;
+            padding:12px 20px;
+            background:#0073aa;
+            border:none;
+            color:#fff;
+            font-size:16px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+        .email-send-btn:hover {
+            background:#005f8d;
+        }
+        
+        /* =========================================
+           PRODUCTS TABLE (OWNER + VENDOR)
+        ========================================= */
+        .owner-products-table,
+        .vendor-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .owner-products-table th,
+        .owner-products-table td,
+        .vendor-products-table th,
+        .vendor-products-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        
+        /* checkbox column */
+        .owner-products-table th:first-child,
+        .owner-products-table td:first-child {
+            width: 35px;
+            text-align: center;
+        }
+        
+        /* image column */
+        .owner-products-table th:nth-child(2),
+        .owner-products-table td:nth-child(2) {
+            width: 55px !important;
+            max-width: 55px !important;
+            text-align: center;
+        }
+        
+        /* المنتج – الصورة */
+        .owner-products-table img,
+        .vendor-products-table img {
+            width: 60px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        /* أزرار الأوامر على المنتجات */
+        .owner-action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .owner-action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #fff;
+            text-decoration: none;
+        }
+        .btn-edit   { background: #0073aa; }
+        .btn-view   { background: #28a745; }
+        .btn-delete { background: #dc3545; }
+        
+        /* vendor buttons */
+        .vendor-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #fff;
+            font-size: 13px;
+            margin-right: 6px;
+        }
+        .btn-approve { background: #28a745; }
+        .btn-reject  { background: #dc3545; }
+        .btn-edit    { background: #0073aa; }
+        .btn-view    { background: #6c757d; }
+        
+        /* =========================================
+           CATEGORY CELL
+        ========================================= */
+        .cats-wrap {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+        .cats-text {
+            font-size: 14px;
+        }
+        .cats-edit-btn {
+            /* نفس ستايل button صغير */
+        }
+        
+        /* =========================================
+           BULK BAR
+        ========================================= */
+        .bulk-bar {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            margin-top:10px;
+            margin-bottom:10px;
+        }
+        .bulk-bar select,
+        .bulk-bar button {
+            padding:6px 10px;
+            border-radius:6px;
+        }
+        
+        /* =========================================
+           ORDERS TABLE
+        ========================================= */
+        .orders-table {
+            width:100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .orders-table th,
+        .orders-table td {
+            padding: 10px 8px;
+            border-bottom:1px solid #ddd;
+        }
+        .orders-badge {
+            padding:4px 10px;
+            border-radius:6px;
+            font-size:12px;
+            color:#fff;
+        }
+        .os-processing { background:#0073aa; }
+        .os-completed  { background:#28a745; }
+        .os-cancelled  { background:#dc3545; }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        /* =========================================
+           PAGINATION
+        ========================================= */
+        .pagination-wrapper {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .pagination-wrapper a.button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        /* =========================================
+           CATEGORY MODAL
+        ========================================= */
+        #editCatsModal {
+            display:none;
+            position: fixed;
+            top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.55);
+            justify-content:center;
+            align-items:center;
+            z-index:99999;
+            padding: 20px;
+        }
+        #editCatsModal .cats-modal-box {
+            background:#fff;
+            padding:20px;
+            border-radius:12px;
+            width:400px;
+            max-width: 95%;
+            max-height: 90%;
+            box-shadow:0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        #editCatsModal h3 {
+            margin-top:0;
+            margin-bottom:15px;
+            text-align:center;
+            font-size:20px;
+        }
+        #cats-checkboxes {
+            flex:1;
+            overflow-y:auto;
+            padding-right:5px;
+            max-height: 65vh;
+        }
+        #cats-checkboxes label {
+            display:flex;
+            align-items:center;
+            gap:10px;
+            padding:8px 5px;
+            border-bottom:1px solid #eee;
+            font-size:15px;
+        }
+        .cats-btn-row {
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            margin-top:15px;
+        }
+        .cats-btn-row .button {
+            flex:1;
+            text-align:center;
+            font-size:15px;
+        }
+        
+        
+        
+        /* =========================================
+           DARK MODE  (body.dark-mode)
+        ========================================= */
+        body.dark-mode {
+            background: #0f1115;
+            color: #f5f5f5;
+        }
+        
+        /* حاوية الداشبورد والكروت */
+        body.dark-mode .owner-dashboard-container {
+            background:#14161a;
+            border-color:#262a32;
+        }
+        body.dark-mode .owner-card {
+            background:#181b20;
+            border-color:#262a32;
+        }
+        body.dark-mode .owner-card:hover {
+            background:#1f2228;
+        }
+        body.dark-mode .owner-card h3 {
+            color:#f5f5f5;
+        }
+        body.dark-mode .owner-section {
+            background:#181b20;
+            border-color:#262a32;
+        }
+        
+        /* جداول */
+        body.dark-mode .owner-products-table,
+        body.dark-mode .vendor-products-table,
+        body.dark-mode .orders-table {
+            background:#14161a;
+        }
+        body.dark-mode .owner-products-table th,
+        body.dark-mode .owner-products-table td,
+        body.dark-mode .vendor-products-table th,
+        body.dark-mode .vendor-products-table td,
+        body.dark-mode .orders-table th,
+        body.dark-mode .orders-table td {
+            border-color:#262a32;
+            color:#f5f5f5;
+        }
+        
+        /* صور تفضل كما هي */
+        
+        /* أزرار عامة */
+        body.dark-mode .owner-action-btn,
+        body.dark-mode .vendor-btn,
+        body.dark-mode .button,
+        body.dark-mode .email-send-btn {
+            border: none;
+        }
+        body.dark-mode .btn-edit   { background:#186ba9; }
+        body.dark-mode .btn-view   { background:#2b8f4d; }
+        body.dark-mode .btn-delete { background:#c73939; }
+        body.dark-mode .btn-approve{ background:#2b8f4d; }
+        body.dark-mode .btn-reject { background:#c73939; }
+        body.dark-mode .btn-view   { background:#6c757d; }
+        body.dark-mode .email-send-btn {
+            background:#186ba9;
+        }
+        body.dark-mode .email-send-btn:hover {
+            background:#13527f;
+        }
+        
+        /* إحصائيات */
+        body.dark-mode .stat-card {
+            background:#181b20;
+            border-color:#262a32;
+        }
+        body.dark-mode .stat-card h3 {
+            color:#e1e5ee;
+        }
+        body.dark-mode .stat-card .stat-number {
+            color:#4ea3ff;
+        }
+        
+        /* Pagination */
+        body.dark-mode .pagination-wrapper a.button {
+            background:#181b20;
+            border:1px solid #2d313a;
+            color:#f5f5f5;
+        }
+        body.dark-mode .pagination-wrapper a.button.button-primary {
+            background:#4ea3ff;
+            border-color:#4ea3ff;
+            color:#0a0c10;
+        }
+        
+        /* Email box */
+        body.dark-mode .email-box input,
+        body.dark-mode .email-box textarea {
+            background:#101218;
+            border-color:#323645;
+            color:#f5f5f5;
+        }
+        body.dark-mode .email-box input::placeholder,
+        body.dark-mode .email-box textarea::placeholder {
+            color:#888;
+        }
+        
+        /* Toolbar toggle */
+        body.dark-mode .owner-theme-toggle {
+            background:#181b20;
+            border-color:#323645;
+            color:#f5f5f5;
+        }
+        body.dark-mode .owner-theme-toggle:hover {
+            background:#20242c;
+        }
+        
+        /* Modal */
+        body.dark-mode #editCatsModal .cats-modal-box {
+            background:#181b20;
+            color:#f5f5f5;
+        }
+        body.dark-mode #cats-checkboxes label {
+            border-bottom-color:#262a32;
+        }
+        body.dark-mode #editCatsModal h3 {
+            color:#f5f5f5;
+        }
+        #cats-checkboxes input[type="checkbox"] {
+            width: auto !important;
+            margin-right: 8px !important;
+            transform: scale(1.2);
+        }
+        
+        #cats-checkboxes label {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 10px 5px !important;
+        }
+        
+        
+        
+        
+        /* ===============================
+           DARK MODE (NETFLIX STYLE)
+        ================================== */
+        
+        body.dark-mode {
+            background: #141414 !important;
+            color: #ffffff !important;
+        }
+        
+        /* الجداول */
+        body.dark-mode .owner-products-table {
+            background: #1f1f1f !important;
+            color: #fff !important;
+            border-color: #333 !important;
+        }
+        
+        body.dark-mode .owner-products-table th {
+            background: #1a1a1a !important;
+            color: #fff !important;
+            border-bottom: 1px solid #333 !important;
+        }
+        
+        body.dark-mode .owner-products-table td {
+            background: #1f1f1f !important;
+            color: #ddd !important;
+            border-bottom: 1px solid #2b2b2b !important;
+        }
+        
+        /* النصوص */
+        body.dark-mode .inline-edit,
+        body.dark-mode span,
+        body.dark-mode p,
+        body.dark-mode td,
+        body.dark-mode th {
+            color: #e6e6e6 !important;
+        }
+        
+        /* وصف داخل inline */
+        body.dark-mode .inline-edit:focus {
+            background: #2a2a2a !important;
+            color: #fff !important;
+            border-bottom-color: #e50914 !important;
+        }
+        
+        /* المودال (الصور + الكاتيجورى) */
+        body.dark-mode #styliiiishImageModal .image-modal-box,
+        body.dark-mode #editCatsModal .cats-modal-box {
+            background: #1f1f1f !important;
+            color: #fff !important;
+            border: 1px solid #333 !important;
+        }
+        
+        body.dark-mode #cats-checkboxes label {
+            border-bottom: 1px solid #333 !important;
+            color: #fff !important;
+        }
+        
+        /* أزرار */
+        body.dark-mode .owner-action-btn {
+            opacity: 0.85;
+        }
+        
+        body.dark-mode .owner-action-btn:hover {
+            opacity: 1;
+        }
+        
+        /* ألوان الأزرار */
+        body.dark-mode .btn-edit {
+            background: #e50914 !important; /* Netflix Red */
+        }
+        body.dark-mode .btn-view {
+            background: #198754 !important;
+        }
+        body.dark-mode .btn-delete {
+            background: #bb2d3b !important;
+        }
+        body.dark-mode .btn-duplicate {
+            background: #6c757d !important;
+        }
+        
+        /* الصورة */
+        body.dark-mode .styliiiish-image-overlay {
+            background: rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        /* ال Stats Bar */
+        body.dark-mode .styliiiish-stat-box {
+            background: #1f1f1f !important;
+            border-color: #333 !important;
+            color: #fff !important;
+        }
+        
+        /* التولبار */
+        body.dark-mode .styliiiish-toolbar {
+            background: #1a1a1a !important;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        /* Dropdown (Status) */
+        body.dark-mode select.inline-status {
+            background: #262626 !important;
+            color: #fff !important;
+            border: 1px solid #444 !important;
+        }
+        
+        /* سكليتون داكن */
+        body.dark-mode .sk-box,
+        body.dark-mode .sk-line,
+        body.dark-mode .sk-img,
+        body.dark-mode .sk-btn,
+        body.dark-mode .sk-dropdown {
+            background: linear-gradient(90deg, #2a2a2a 0px, #444 40px, #2a2a2a 80px) !important;
+        }
+
+        .owner-dashboard-container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+        }
+
+        .owner-card {
+            background: #f7f7f7;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            border: 1px solid #e3e3e3;
+            transition: 0.2s;
+        }
+
+        .owner-card:hover {
+            background: #efefef;
+        }
+
+        .owner-card h3 {
+            margin: 0;
+            font-size: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .owner-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 12px;
+            border: 1px solid #e3e3e3;
+        }
+        
+
+        /* ======== FIX PAGINATION LAYOUT ======== */
+        .pagination-wrapper {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .pagination-wrapper a.button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+        /* ---------------------------------------------------------
+           BASE TABLE + OLD SYSTEM (DON’T REMOVE)
+           --------------------------------------------------------- */
+        
+        .owner-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: #fff;
+            transition: opacity 0.2s ease;
+        }
+        
+        .owner-products-table th,
+        .owner-products-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #ddd;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+        
+        /* Skeleton */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .sk-line, .sk-box, .sk-btn, .sk-dropdown {
+            background: linear-gradient(90deg, #eee 0px, #ddd 40px, #eee 80px);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite linear;
+            border-radius: 4px;
+        }
+        .sk-check { width: 15px; height: 15px; }
+        .sk-img { width: 60px; height: 70px; border-radius: 6px; }
+        .sk-line { height: 12px; margin-bottom: 6px; }
+        .sk-w-50 { width: 50px; }
+        .sk-w-60 { width: 60px; }
+        .sk-w-80 { width: 80px; }
+        .sk-w-90 { width: 90px; }
+        .mt-4 { margin-top: 4px !important; }
+        .sk-dropdown { width: 90px; height: 24px; border-radius: 4px; }
+        .sk-btn { width: 45px; height: 22px; display: inline-block; margin-right: 4px; border-radius: 6px; }
+        
+        
+        /* Image wrapper */
+        .styliiiish-image-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .styliiiish-image-overlay {
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.35);
+            color:#fff;
+            opacity:0;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:11px;
+            border-radius:6px;
+            transition:opacity .18s ease;
+        }
+        .styliiiish-image-wrapper:hover .styliiiish-image-overlay {
+            opacity:1;
+        }
+        
+        /* Categories Edit Button */
+        .cats-edit-btn {
+            background:#0073aa;
+            color:#fff !important;
+            border:none;
+            padding:5px 10px;
+            border-radius:5px;
+            cursor:pointer;
+        }
+        .cats-edit-btn:hover {
+            background:#005f87;
+        }
+        
+        
+        /* ---------------------------------------------------------
+           STYLE C LAYER (NEW MODERN RESPONSIVE DESIGN)
+           --------------------------------------------------------- */
+        
+        /* Header */
+        .owner-products-table th {
+            background: #f4f6f9;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        /* Cells */
+        .owner-products-table td {
+            padding: 12px 10px;
+            vertical-align: top;
+        }
+        
+        /* Image modern box */
+        .styliiiish-image-cell img {
+            width: 70px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0px 2px 6px rgba(0,0,0,0.10);
+        }
+        
+        /* Inline-edit improved */
+        .inline-edit {
+            display: inline-block;
+            padding: 3px 3px;
+            border-bottom: 1px dotted transparent;
+            cursor: text;
+            max-width: 230px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .inline-edit:focus {
+            background: #e8f4ff;
+            outline: none;
+            border-bottom-color: #0073aa;
+            white-space: normal;
+        }
+        
+        
+        /* Action buttons */
+        .owner-action-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .owner-action-btn {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            transition: .2s;
+        }
+        .btn-edit { background: #0073aa; }
+        .btn-view { background: #28a745; }
+        .btn-delete { background: #dc3545; }
+        .btn-duplicate { background: #6c757d; }
+        .owner-action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        
+        
+        
+        /* ------------------------------
+           💠 إصلاح مودال تعديل الكاتيجوري
+           ------------------------------ */
+        #editCatsModal,
+        #styliiiishImageModal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0!important;
+            right: 0!important;
+            bottom: 0!important;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0,0,0,.55);
+            z-index: 999999 !important; /* أعلى شيء في الصفحة */
+            padding: 20px;
+        }
+        
+        /* صندوق المودال */
+        .cats-modal-box,
+        .image-modal-box {
+            position: relative;
+            background: #fff;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 95%;
+            max-height: 90vh;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,.25);
+        }
+        
+        /* ------------------------------
+           💠 إصلاح حقل الـ DESCRIPTION
+           ------------------------------ */
+        .inline-description {
+            max-width: 260px;
+            max-height: 70px;
+            overflow: hidden;
+            display: block;
+            line-height: 1.4em;
+        }
+        
+        /* عند الفتح (focus) : نسمح بالتحرير لكن بدون انفجار */
+        .inline-description:focus {
+            white-space: normal !important;
+            max-height: 180px !important;
+            overflow-y: auto !important;
+            padding: 4px 6px;
+            background: #eef7ff;
+            border-radius: 6px;
+        }
+        
+        /* ------------------------------
+           💠 إصلاح حقل Price – لا يخرج
+           ------------------------------ */
+        td[data-label="Price"] .inline-edit {
+            min-width: 60px;
+            max-width: 100px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        td[data-label="Price"] .inline-edit:focus {
+            max-width: 140px;
+            white-space: normal;
+            overflow: auto;
+        }
+        
+        /* ------------------------------
+           💠 منع أي خلية من الخروج خارج حدود الجدول
+           ------------------------------ */
+        .owner-products-table td {
+            vertical-align: top;
+            position: relative;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+        
+        
+        
+        /* ---------------------------------
+           ✔ 1) تصغير عمود الـ Checkbox
+        ---------------------------------*/
+        .owner-products-table th:first-child,
+        .owner-products-table td:first-child {
+            width: 32px !important;
+            max-width: 32px !important;
+            padding: 4px !important;
+            text-align: center;
+        }
+        
+        /* تصغير حجم الـ checkbox نفسه */
+        .styliiiish-row-check {
+            width: 14px;
+            height: 14px;
+            transform: scale(0.9);
+        }
+        
+        /* ---------------------------------
+           ✔ 2) تصغير عمود الصورة
+        ---------------------------------*/
+        .owner-products-table th:nth-child(2),
+        .owner-products-table td:nth-child(2) {
+            width: 70px !important;
+            max-width: 70px !important;
+            padding: 4px !important;
+            text-align: center;
+        }
+        
+        /* الصورة نفسها */
+        .styliiiish-image-wrapper img {
+            width: 60px !important;
+            height: 70px !important;
+            border-radius: 6px;
+        }
+        
+        /* ---------------------------------
+           ✔ 3) جعل المحتوى يلف داخل الخلية
+              بدون تكبير الصف أو الخلية
+        ---------------------------------*/
+        
+        /* كل الخلايا يكون داخلها لف النص */
+        .owner-products-table td {
+            white-space: normal !important;
+            word-break: break-word !important;
+            overflow: hidden;
+            max-width: 260px; /* منع خروج المحتوى عن حدود العمود */
+        }
+        
+        /* الخلايا ذات المحتوى الطويل – لا تكبر */
+        .inline-edit {
+            display: block;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            line-height: 1.3em;
+        }
+        
+        /* الوصف الطويل */
+        .inline-description {
+            max-height: 60px;
+            overflow: hidden;
+        }
+        
+        /* عند التحرير – Scroll داخلي فقط */
+        .inline-description:focus {
+            max-height: 150px;
+            overflow-y: auto !important;
+            padding: 4px;
+        }
+        
+        /* السعر */
+        td[data-label="Price"] .inline-edit {
+            max-width: 100px;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+        }
+        
+        td[data-label="Price"] .inline-edit:focus {
+            white-space: normal !important;
+            max-height: 90px;
+            overflow-y: auto;
+        }
+        
+        /* ---------------------------------
+           ✔ منع تمدد الصف بالكامل
+        ---------------------------------*/
+        .owner-products-table tr {
+            vertical-align: top !important;
+        }
+        
+        
+        
+        
+        /* ===========================================================
+           ⭐ FIX 1 — Pagination: Highlight Current Page
+        =========================================================== */
+        
+        .styliiiish-page-link.button-primary.styliiiish-current-page {
+            background: #0073aa !important;
+            color: #fff !important;
+            border: 1px solid #005177 !important;
+            box-shadow: 0 0 0 2px rgba(0,114,170,0.2);
+            transform: translateY(-2px);
+            font-weight: 600;
+        }
+        
+        /* Hover تحسين */
+        .styliiiish-page-link:hover {
+            background: #e9f5ff !important;
+            border: 1px solid #c7e7ff !important;
+        }
+        
+        
+        /* ===========================================================
+           ⭐ FIX 2 — Category Modal & Image Modal Positioning
+        =========================================================== */
+        
+        #editCatsModal,
+        #styliiiishImageModal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            display: none;
+            justify-content: center !important;
+            align-items: center !important;
+            background: rgba(0,0,0,0.55) !important;
+            z-index: 999999 !important;
+            padding: 20px;
+        }
+        
+        /* صندوق المودال */
+        .cats-modal-box,
+        .image-modal-box {
+            background: #fff !important;
+            width: 480px !important;
+            max-width: 95%;
+            max-height: 85vh !important;
+            border-radius: 12px !important;
+            padding: 20px !important;
+            overflow-y: auto !important;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+            animation: pop-in 0.22s ease;
+        }
+        
+        /* أنيميشن دخول بسيط */
+        @keyframes pop-in {
+            0% { transform: scale(.92); opacity: .2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* جعل قائمة الكاتيجوري منظمة داخليًا */
+        #cats-checkboxes label {
+            display: flex !important;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+        
+        
+        /* ===========================================================
+           ⭐ FIX 3 — حقل الوصف الطويل لا يخرج من الخلية
+        =========================================================== */
+        
+        .inline-description {
+            max-height: 60px !important;
+            overflow: hidden !important;
+            display: block;
+            white-space: normal !important;
+            line-height: 1.45em;
+        }
+        
+        /* عند الضغط */
+        .inline-description:focus {
+            max-height: 170px !important;
+            overflow-y: auto !important;
+            background: #eef7ff;
+            padding: 5px;
+            border-radius: 6px;
+        }
+        
+        /* ===========================================================
+           ⭐ FIX 4 — عدم تمدد الصفوف
+        =========================================================== */
+        .owner-products-table td {
+            vertical-align: top !important;
+            overflow-wrap: break-word !important;
+            word-break: break-word !important;
+        }
+        
+        
+        
+        
+        /* ====================================================
+           ⭐ NEW STATISTICS BAR — Modern UI
+        ==================================================== */
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+         /* =========================================
+           STATS
+        ========================================= */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e1e1e1;
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .stat-card .stat-number {
+            margin-top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0073aa;
+        }
+        
+                .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            padding: 20px;
+            background: #f8f8f8;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e1e1e1;
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .stat-card .stat-number {
+            margin-top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0073aa;
+        }
+        
+        
+        .styliiiish-stats-bar {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .styliiiish-stat-box {
+            flex: 1;
+            min-width: 140px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px 18px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            border: 1px solid #eaeaea;
+        }
+        
+        .styliiiish-stat-box .label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6e6e6e;
+            letter-spacing: .5px;
+        }
+        
+        .styliiiish-stat-box .value {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 4px;
+            color: #222;
+        }
+        
+        
+        
+        
+        
+/* ============================================================
+   DESKTOP STATS (>= 769px)
+   إصلاح كامل لشكل Published / Total / Draft على الديسكتوب
+============================================================ */
+@media (min-width: 769px) {
+
+    /* الحاوية العامة (ثلاثة صناديق بجانب بعض) */
+    .styliiiish-stats-bar {
+        display: flex;
+        align-items: stretch;
+        gap: 20px;
+        margin: 20px 0;
+    }
+
+    /* كل بوكس */
+    .styliiiish-stat-box {
+        flex: 1;
+        background: #fff;
+        padding: 24px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e5e5e5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+    }
+
+    /* المربع الملون فوق كل بوكس */
+    .styliiiish-stat-box::before {
+        content: "";
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        opacity: 0.25;
+    }
+
+    /* Published — اللون الأخضر */
+    .styliiiish-stat-box.stat-published::before {
+        background: #28a745;
+    }
+
+    /* Total — اللون الأزرق */
+    .styliiiish-stat-box.stat-total::before {
+        background: #0073aa;
+    }
+
+    /* Draft — اللون الأحمر */
+    .styliiiish-stat-box.stat-draft::before {
+        background: #dc3545;
+    }
+
+    /* النص داخل البوكس */
+    .stat-inner {
+        font-size: 20px;
+        font-weight: 600;
+        color: #222;
+        white-space: nowrap;
+    }
+
+    /* إصلاح الصف الداخلي (Total + Draft) */
+    .styliiiish-stats-row {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex: 2;
+    }
+
+    /* Total و Draft ياخدوا نفس الحجم */
+    .styliiiish-stats-row .styliiiish-stat-box {
+        flex: 1;
+    }
+        .btn-edit {
+        display: none !important;
+    }
+}
+
+
+
+
+
+        
+        /* ====================================================
+           ⭐ MODERN FILTER / SEARCH BAR
+        ==================================================== */
+        
+        .styliiiish-toolbar {
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            padding: 12px 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        
+        /* Search box */
+        #styliiiish-search {
+            padding: 7px 12px;
+            font-size: 14px;
+            border: 1px solid #cdd6df;
+            border-radius: 8px;
+            width: 200px;
+            transition: .15s;
+        }
+        #styliiiish-search:focus {
+            border-color: #0073aa;
+            box-shadow: 0 0 0 2px rgba(0,115,170,0.15);
+            outline: none;
+        }
+        
+        /* Dropdowns */
+        #styliiiish-filter-cat,
+        #styliiiish-filter-status,
+        #styliiiish-bulk-action {
+            padding: 7px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #cdd6df;
+            background: #fafafa;
+            transition: .15s;
+        }
+        #styliiiish-filter-cat:focus,
+        #styliiiish-filter-status:focus,
+        #styliiiish-bulk-action:focus {
+            border-color:#0073aa;
+            box-shadow: 0 0 0 2px rgba(0,115,170,0.12);
+            outline:none;
+        }
+        
+        /* Buttons */
+        #styliiiish-bulk-apply {
+            padding: 8px 14px !important;
+            border-radius: 8px !important;
+        }
+        
+        /* Groups */
+        .styliiiish-filters-group {
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        
+        .styliiiish-bulk-group {
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        
+        
+        
+        
+        /* ===========================================================
+           ⭐ تكبير عمود PRICE (العمود السادس)
+        =========================================================== */
+        
+        .owner-products-table td:nth-child(6),
+        .owner-products-table th:nth-child(6) {
+            width: 120px !important;
+            max-width: 120px !important;
+            min-width: 110px !important;
+            text-align: left !important;
+        }
+        
+        /* حقل السعر نفسه */
+        .owner-products-table td:nth-child(6) .inline-edit {
+            display: block;
+            max-width: 110px !important;
+            min-width: 100px !important;
+            font-weight: 600;
+        }
+        
+        .owner-products-table td:nth-child(6) .inline-edit:focus {
+            max-width: 150px !important;
+        }
+        
+        
+        /* ===========================================================
+           ⭐ تصغير عمود STATUS (العمود الثامن)
+        =========================================================== */
+        
+        .owner-products-table td:nth-child(8),
+        .owner-products-table th:nth-child(8) {
+            width: 85px !important;
+            max-width: 85px !important;
+            min-width: 70px !important;
+            text-align: center !important;
+            padding: 0 !important;
+        }
+        
+        /* صياغة select status */
+        .inline-status {
+            width: 80px !important;
+            padding: 3px 5px !important;
+            font-size: 12px !important;
+            border-radius: 6px !important;
+        }
+        
+        
+        /* ===========================================================
+           ✔ تحسين بسيط لتوازن الأعمدة
+        =========================================================== */
+        
+        .owner-products-table td {
+            vertical-align: middle !important;
+        }
+        
+        /* =======================================================
+           ⭐ Modern Image Manager Modal — Shopify Style
+        ======================================================= */
+        
+        #styliiiishImageModal {
+            position: fixed !important;
+            top:0; left:0; right:0; bottom:0;
+            display:none;
+            justify-content:center;
+            align-items:center;
+            background: rgba(0,0,0,.55);
+            z-index: 999900 !important;
+            padding: 25px;
+        }
+        
+        .image-modal-box {
+            background:#fff;
+            width: 620px;
+            max-width: 95%;
+            max-height: 88vh;
+            padding:0;
+            border-radius:14px;
+            overflow:hidden;
+            display:flex;
+            flex-direction:column;
+            box-shadow:0 15px 35px rgba(0,0,0,0.25);
+            animation: zoomIn .2s ease;
+        }
+        
+        /* Zoom animation */
+        @keyframes zoomIn {
+            0% { transform: scale(.92); opacity: .3; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Header */
+        .image-modal-box h3 {
+            margin:0;
+            padding:18px 20px;
+            border-bottom:1px solid #eee;
+            font-size:18px;
+            font-weight:600;
+            background:#fafafa;
+        }
+        
+        /* Body */
+        #styliiiish-images-list {
+            padding:18px;
+            overflow-y:auto;
+        }
+        
+        /* Image Grid */
+        .styliiiish-images-grid {
+            display:grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px,1fr));
+            gap:12px;
+        }
+        
+        /* Image Box */
+        .styliiiish-img-item {
+            border:1px solid #e5e5e5;
+            padding:8px;
+            background:#fff;
+            border-radius:8px;
+            text-align:center;
+            position:relative;
+            transition:.15s;
+        }
+        .styliiiish-img-item:hover {
+            border-color:#0073aa;
+            box-shadow:0 0 0 2px rgba(0,115,170,0.12);
+        }
+        
+        /* Main Tag */
+        .tag-main {
+            position:absolute;
+            top:6px;
+            left:6px;
+            background:#0073aa;
+            color:#fff;
+            font-size:11px;
+            padding:2px 6px;
+            border-radius:4px;
+        }
+        
+        /* Image */
+        .styliiiish-img-item img {
+            width:100%;
+            height:100px;
+            object-fit:cover;
+            border-radius:6px;
+        }
+        
+        /* Buttons row */
+        .image-btn-row {
+            padding:15px;
+            border-top:1px solid #eee;
+            display:flex;
+            justify-content:space-between;
+        }
+        
+        /* Make buttons cleaner */
+        #styliiiish-add-image,
+        #styliiiish-close-image-modal {
+            flex:1;
+            margin:0 5px;
+            border-radius:8px !important;
+            padding:10px 14px !important;
+        }
+        
+        /* ============================
+           ⭐ FIX: Media Library Always on Top
+        ============================ */
+        
+        /* اجعل Media Library فوق كل شيء */
+        /* ميديا لابري فوق كل شي */
+        /* ✅ خلي الـ backdrop تحت والـ modal فوقه بدرجة واحدة */
+        
+        /* الخلفية السوداء */
+        .media-modal-backdrop {
+            z-index: 999998 !important;
+        }
+        
+        /* نافذة مكتبة الميديا نفسها */
+        .media-modal {
+            z-index: 999999 !important;
+        }
+        
+        /* مودالاتنا (الكاتيجوري + الصور) أقل منهم */
+        #styliiiishImageModal,
+        #editCatsModal {
+            z-index: 999990 !important;
+        }
+        @keyframes flashBg {
+            0% { background:#e1f4ff; }
+            100% { background:#fff; }
+        }
+
+        .email-box label { font-weight:bold; margin-top:12px; display:block; }
+        .email-box input, .email-box textarea {
+            width:100%; padding:10px; margin-top:5px;
+            border-radius:8px; border:1px solid #ccc;
+        }
+        .email-send-btn {
+            margin-top:15px; padding:12px 20px;
+            background:#0073aa; border:none;
+            color:#fff; font-size:16px;
+            border-radius:8px; cursor:pointer;
+        }
+        .email-send-btn:hover { background:#005f8d; }
+        
+
+
+        .vendor-products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .vendor-products-table th,
+        .vendor-products-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        .vendor-products-table img {
+            width: 60px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .vendor-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #fff;
+            font-size: 13px;
+            margin-right: 6px;
+        }
+        .btn-approve { background: #28a745; }
+        .btn-reject  { background: #dc3545; }
+        .btn-edit    { background: #0073aa; }
+        .btn-view    { background: #6c757d; }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+/* =========================================================
+   ★★ Scroll Lock System (FINAL - COMPATIBLE WITH EKART) ★★
+   ========================================================= */
+
+/* قفل الاسكرول عند فتح نافذة الـ Attributes  
+   → نستخدم html + body فقط (مناسب لـ Ekart بدون مشاكل Layout) */
+html.attr-modal-open,
+body.attr-modal-open {
+    overflow: hidden !important;
+}
+
+
+
+/* =========================================================
+   ★★ Modal Base Styling ★★
+   ========================================================= */
+
+/* خلفية المودال */
+.attr-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 999999;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.25s ease-out;
+}
+
+/* صندوق المودال */
+.attr-modal-content {
+    background: #ffffff;
+    padding: 30px 28px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 22px;
+    box-shadow: 0 20px 55px rgba(0,0,0,0.25);
+    animation: popIn 0.25s ease-out;
+}
+
+/* العنوان */
+.attr-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 22px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111;
+}
+
+/* Label */
+.attr-modal-content label {
+    font-weight: 600;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 6px;
+    margin-top: 16px;
+}
+
+/* Select */
+.attr-modal-content select {
+    width: 100%;
+    padding: 12px 14px !important;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    font-size: 15px;
+    transition: 0.2s;
+    height: 48px !important;
+    line-height: 24px !important;
+    display: flex;
+    align-items: center;
+}
+
+.attr-modal-content select:focus {
+    border-color: #0073aa;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,115,170,0.15);
+}
+
+/* زرار Save */
+.btn-save {
+    margin-top: 25px;
+    background: #0067b1;
+    color: #fff;
+    padding: 14px 15px;
+    border-radius: 12px;
+    border: none;
+    width: 100%;
+    font-size: 17px;
+    font-weight: 700;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.btn-save:hover {
+    background: #004f85;
+}
+
+/* زرار Close */
+.btn-close {
+    margin-top: 12px;
+    background: #ddd;
+    color: #333;
+    padding: 13px 15px;
+    border-radius: 12px;
+    border: none;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-close:hover {
+    background: #ccc;
+}
+
+/* select2 z-index */
+.select2-container,
+.select2-container .select2-dropdown {
+    z-index: 1000000 !important;
+}
+
+/* انيميشن */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* تحسين شكل select2 */
+.select2-selection--single {
+    height: 48px !important;
+    line-height: 48px !important;
+    padding: 0 14px !important;
+    border-radius: 1 ;
+     
+}
+
+html.attr-modal-open {
+    padding-right: var(--scrollbar-compensation, 0px) !important;
+}
+
+
+.uploading-spinner {
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    opacity: .7;
+}
+
+        
+        
+        
+        
+        
+#styliiiish-upload-progress {
+    margin: 20px 0;
+    text-align: center;
+    animation: fadeIn .2s ease-in-out;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 14px;
+    background: #eee;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.progress-inner {
+    width: 0%;
+    height: 100%;
+    background: #4CAF50; /* اللون الأخضر */
+    transition: width .2s ease-in-out;
+}
+
+.progress-text {
+    font-size: 14px;
+    opacity: .8;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+        
+        
+        
+        
+/* Base style for all statuses */
+.sty-status {
+    display: flex;          /* كان inline-flex */
+    width: 100%;            /* الجديد المهم */
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Active (Published) */
+.status-active {
+    background: #d9fddd;
+    color: #0a8a1f;
+    border: 1px solid #17c83e;
+}
+
+/* Uncomplete (Draft) */
+.status-uncomplete {
+    background: #ffd7d7;
+    color: #d10000;
+    border: 1px solid #ff3b3b;
+}
+
+/* Pending */
+.status-pending {
+    background: #fff3c4;
+    color: #b18100;
+    border: 1px solid #e1b500;
+}
+
+/* Optional: small subtle animation for pending */
+.status-pending::after {
+    content: '⏳';
+    margin-left: 4px;
+    animation: spin 1s linear infinite;
+    opacity: .7;
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+        
+        
+ 
+ 
+ 
+
+
+
+
+
+
+/* ================================
+   USER TABLE COLUMN WIDTH CONTROL
+   ================================ */
+
+.styliiiish-user-manage-products table td,
+.styliiiish-user-manage-products table th {
+    white-space: nowrap; /* يمنع تكسير الكلمات */
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+/* 🖼 Column 1 — (بعد ما أخفينا الـ checkbox خلاص ممكن تلغيه) */
+.styliiiish-user-manage-products table td:nth-child(1),
+.styliiiish-user-manage-products table th:nth-child(1) {
+    width: 0;
+    display: none;
+}
+
+/* 🏷️ Column 2 — Image */
+.styliiiish-user-manage-products table td:nth-child(2),
+.styliiiish-user-manage-products table th:nth-child(2) {
+    width: 80px;
+}
+
+/* 📛 Column 3 — Name */
+.styliiiish-user-manage-products table td:nth-child(3),
+.styliiiish-user-manage-products table th:nth-child(3) {
+    width: 240px;
+}
+
+/* 📝 Column 4 — Description */
+.styliiiish-user-manage-products table td:nth-child(4),
+.styliiiish-user-manage-products table th:nth-child(4) {
+    width: 350px;
+}
+
+/* 💲 Column 5 — Attributes */
+.styliiiish-user-manage-products table td:nth-child(5),
+.styliiiish-user-manage-products table th:nth-child(5) {
+    width: 120px;
+    text-align: center;
+}
+
+/* 🎯 Column 6 — Price */
+.styliiiish-user-manage-products table td:nth-child(6),
+.styliiiish-user-manage-products table th:nth-child(6) {
+    width: 120px ;
+    text-align: center;
+}
+
+/* ⚙️ Column 7 — Categories*/
+.styliiiish-user-manage-products table td:nth-child(7),
+.styliiiish-user-manage-products table th:nth-child(7) {
+    width: 120px;
+    text-align: center;
+}
+
+/* 🎯 Column 8 — Status */
+.styliiiish-user-manage-products table td:nth-child(8),
+.styliiiish-user-manage-products table th:nth-child(8) {
+    width: 140px !important;
+    text-align: center;
+    min-width: 140px !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+        
+/* Hide checkbox (and its column) for USER mode only */
+.styliiiish-user-manage-products td:first-child,
+.styliiiish-user-manage-products th:first-child,
+.styliiiish-user-manage-products .styliiiish-row-check {
+    display: none !important;
+}
+
+
+
+
+/* إخفاء السلكت الخاصة بالمدير عند اليوزر فقط */
+.styliiiish-user-manage-products #styliiiish-filter-status {
+    display: none !important;
+}
+
+
+/*
+.status-deactivated {
+    background: #f3e7ff;
+    color: #6b21a8;
+    border: 1px solid #a855f7;
+}
+*/
+
+
+
+.status-deactivated {
+    background: #f2f2f2;
+    color: #555;
+    border: 1px solid #d9d9d9;
+}
+
+
+
+
+
+
+.btn-deactivate-user {
+    background: linear-gradient(135deg, #f8e7ff, #f0d4ff) !important;
+    color: #7b11c9;
+    border: 1px solid #d8b6ff;
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+.btn-deactivate-user:hover {
+    background: linear-gradient(135deg, #f3d8ff, #e8c3ff);
+    border-color: #c699ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(140, 40, 200, 0.15);
+}
+
+
+
+
+.btn-activate-user {
+    background: linear-gradient(135deg, #dfffec, #b7ffd7);
+    color: #0b8a4a;
+    border: 1px solid #7dffb5;
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s ease-in-out;
+}
+
+.btn-activate-user:hover {
+    background: linear-gradient(135deg, #c9ffe3, #a2ffd0);
+    border-color: #5aff9e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(20, 170, 110, 0.18);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* USER MODE ONLY – My Dresses / User Table */
+.styliiiish-user-manage-products .pretty-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.styliiiish-user-manage-products .pretty-stat-box {
+    flex: 1;
+    min-width: 200px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #eee;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+.styliiiish-user-manage-products .pretty-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    margin: 0 auto 6px auto;
+}
+
+.styliiiish-user-manage-products .pretty-label {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+.styliiiish-user-manage-products .pretty-value {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* Colors */
+.styliiiish-user-manage-products .stat-active-pretty .pretty-dot {
+    background: #c8f3d3;
+}
+
+.styliiiish-user-manage-products .stat-uncomplete-pretty .pretty-dot {
+    background: #ffd8d8;
+}
+
+.styliiiish-user-manage-products .stat-pending-pretty .pretty-dot {
+    background: #d9eaff;
+}
+
+.styliiiish-user-manage-products .stat-deactivated-pretty .pretty-dot {
+    background: #f4e1ff;
+}
+
+/* Hover */
+.styliiiish-user-manage-products .pretty-stat-box:hover {
+    transform: translateY(-3px);
+    transition: 0.2s;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+
+
+
+
+
+
+
+
+
+.styliiiish-user-tips-box {
+    background: #fff7fe;
+    border: 1px solid #f3d7ff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-top: 25px;
+    line-height: 1.6;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+
+
+
+
+
+
+
+
+
+.styliiiish-add-product-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.styliiiish-add-note {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* The Welcome Box */
+.styliiiish-welcome-box {
+    background: #fff5fb; /* وردي خفيف محترم */
+    border: 1px solid #ffd7ef;
+    border-radius: 16px;
+    padding: 28px;
+    margin: 25px 0;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+    transition: 0.2s ease;
+}
+
+/* Hover effect on the whole box */
+.styliiiish-welcome-box:hover {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+/* Title inside box */
+.styliiiish-welcome-box .sty-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #222;
+}
+
+/* Text inside box */
+.styliiiish-welcome-box .sty-text {
+    font-size: 15px;
+    line-height: 1.6;
+    opacity: .85;
+    margin-bottom: 18px;
+}
+
+/* USER BUTTON */
+.sty-btn-user-full {
+    display: inline-block;
+    background: #e91e63;
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 50px; /* Premium rounded */
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(233, 30, 99, 0.25);
+    transition: 0.25s ease;
+}
+
+.sty-btn-user-full:hover {
+    background: #d41756;
+    box-shadow: 0 8px 20px rgba(233, 30, 99, 0.35);
+    transform: translateY(-3px);
+}
+
+/* ADMIN BUTTON */
+.sty-btn-admin-full {
+    display: inline-block;
+    background: #4c4cff;
+    color: #fff;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 5px 15px rgba(76, 76, 255, 0.25);
+    transition: 0.25s ease;
+}
+
+.sty-btn-admin-full:hover {
+    background: #3c3cdf;
+    box-shadow: 0 8px 20px rgba(76, 76, 255, 0.35);
+    transform: translateY(-3px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ===========================
+   Customer Dresses Review – Cards
+   نفس أجواء Manage Products
+=========================== */
+
+.sty-vendor-review-wrapper {
+    margin-top: 10px;
+}
+
+.sty-vendor-review-head h4 {
+    margin: 0 0 6px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.sty-vendor-review-desc {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* قائمة الكروت */
+.sty-vendor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* الكارد */
+.sty-vendor-card {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+.sty-vendor-card-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.sty-vendor-checkbox input[type="checkbox"] {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.sty-vendor-thumb img {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 10px;
+    object-fit: cover;
+    display: block;
+}
+
+/* محتوى الكارد */
+.sty-vendor-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sty-vendor-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 2px;
+}
+
+.sty-vendor-meta {
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* البادجات */
+.sty-vendor-status {
+    margin-top: 4px;
+}
+
+.sty-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.sty-badge-pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffe69c;
+}
+
+.sty-badge-draft {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* الأزرار */
+.sty-vendor-actions {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.sty-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 11px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.2;
+    text-decoration: none;
+    transition: all 0.15s ease-in-out;
+}
+
+/* نفس روح الألوان بتاعت الداشبورد */
+.sty-approve {
+    background: #28a745;
+    color: #fff;
+}
+.sty-approve:hover {
+    background: #218838;
+}
+
+.sty-reject {
+    background: #dc3545;
+    color: #fff;
+}
+.sty-reject:hover {
+    background: #c82333;
+}
+
+.sty-edit {
+    background: #f5f9ff;
+    color: #0073aa;
+    border: 1px solid #cde4ff;
+}
+.sty-edit:hover {
+    background: #e2efff;
+}
+
+.sty-view {
+    background: #ffffff;
+    color: #555;
+    border: 1px solid #ddd;
+}
+.sty-view:hover {
+    background: #f7f7f7;
+}
+
+/* رسالة لا يوجد عناصر */
+.sty-no-items {
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* ==========================
+   GRID على الديسكتوب (3 فى الصف)
+========================== */
+
+@media (min-width: 992px) {
+    .sty-vendor-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .sty-vendor-card {
+        height: 100%;
+    }
+}
+
+/* تابلت: 2 كروت فى الصف */
+@media (min-width: 768px) and (max-width: 991px) {
+    .sty-vendor-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .sty-vendor-card {
+        height: 100%;
+    }
+}
+
+/* موبايل: كارد واحد فى الصف (الافتراضى من flex-column فوق) */
+@media (max-width: 767px) {
+    .sty-vendor-card {
+        padding: 10px 12px;
+    }
+
+    .sty-vendor-title {
+        font-size: 14px;
+    }
+
+    .sty-vendor-meta {
+        font-size: 12px;
+    }
+}
+
+.sty-vendor-card.removing {
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.25s ease-in-out;
+}
+
+
+
+
+.sty-info-table {
+    width: 100%;
+    margin-top: 12px;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: #fafafa;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.sty-info-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.sty-info-table td:first-child {
+    width: 120px;
+    font-weight: bold;
+    color: #444;
+}
+
+.sty-info-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ✨ Styliiiish Dashboard Alert Theme (Modern Glass) ✨ */
+
+/* ✨ Styliiiish Stable PRO Modal (No Freeze Version) ✨ */
+/* ✨ Backdrop Blur */
+.swal2-backdrop-show {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* ✨ Popup */
+.swal2-popup.sty-alert {
+    border-radius: 20px !important;
+    padding: 16px 18px !important;
+    background: rgba(20, 20, 20, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.07) !important;
+    color: #fff !important;
+    max-width: 480px !important;   /* ⬅️ العرض أكبر بشكل شيك */
+    width: 90% !important;         /* مناسب للموبايل */
+    opacity: 1 !important;
+    transition: opacity 0.25s ease-out !important;
+}
+
+/* Title */
+.swal2-title {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    margin-bottom: 12px !important;
+    color: #fff !important;
+}
+
+/* Text */
+.swal2-html-container {
+    font-size: 15.8px !important;
+    line-height: 1.55 !important;
+    color: #e6e6e6 !important;
+    margin-bottom: 26px !important;
+}
+
+/* ✨ Buttons Layout — side by side */
+.swal2-actions {
+    width: 100% !important;               /* ⬅️ الأزرار جمب بعض */
+    display: flex !important;
+    justify-content: center !important;
+    gap: 14px !important;                 /* المسافة بين الزرين */
+    margin-top: 18px !important;
+}
+
+/* Confirm Button */
+.swal2-confirm.sty-btn-primary {
+    flex: 1 !important;
+    background: #ff006e !important;
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 12px 0 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    transition: 0.2s ease;
+}
+
+.swal2-confirm.sty-btn-primary:hover {
+    background: #ff2e8b !important;
+    transform: translateY(-1px);
+}
+
+/* Cancel Button */
+.swal2-cancel.sty-btn-secondary {
+    flex: 1 !important;
+    background: rgba(255,255,255,0.12) !important;
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 12px 0 !important;
+    font-size: 15px !important;
+    color: #fff !important;
+    transition: 0.2s ease;
+}
+
+.swal2-cancel.sty-btn-secondary:hover {
+    background: rgba(255,255,255,0.20) !important;
+    transform: translateY(-1px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.swal2-popup {
+    border-radius: 12px !important;
+    padding: 20px !important;
+    background: #ffffff !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+}
+
+.swal2-title {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #333 !important;
+}
+
+.swal2-html-container {
+    font-size: 15px !important;
+    color: #666 !important;
+}
+
+.swal2-confirm {
+    background: #2ecc71 !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+}
+
+.swal2-cancel {
+    background: #e74c3c !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-size: 15px !important;
+}
+
+/* Override SweetAlert close button (X) */
+.swal2-close {
+    color: #000 !important;
+    font-size: 28px !important;
+    opacity: 1 !important;
+}
+
+
+
+
+
+
+
+
+.sty-gallery-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    padding: 10px;
+}
+
+/* MOBILE FIX: ??? ????? ????? */
+@media (max-width: 600px) {
+    .sty-gallery-wrap {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 6px;
+    }
+}
+
+.sty-img-box {
+    width: 100%;
+    aspect-ratio: 1/1;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.sty-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.sty-img-box img:hover {
+    transform: scale(1.06);
+}
+
+/* Fullscreen viewer */
+.sty-fullscreen-view {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999999;
+}
+
+.sty-fullscreen-view img {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.sty-fullscreen-close {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    color: #fff;
+    font-size: 36px;
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================
+   Vendor Filters
+============================ */
+.sty-vendor-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0 25px;
+}
+
+.vp-filter-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s ease;
+}
+
+.vp-filter-btn:hover {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.vp-filter-btn.active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+    box-shadow: 0 6px 15px rgba(0,0,0,.15);
+}
+
+/* Status colors (??????? ????? ???? ????) */
+.vp-filter-btn[data-status="pending"] { border-color:#ff9800; }
+.vp-filter-btn[data-status="publish"] { border-color:#4caf50; }
+.vp-filter-btn[data-status="incomplete"] { border-color:#9e9e9e; }
+.vp-filter-btn[data-status="deactivated"] { border-color:#f44336; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================
+   Skeleton Loader
+============================ */
+/*
+.sty-skeleton-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.sty-skeleton-card {
+    background: #eee;
+    border-radius: 14px;
+    padding: 15px;
+    animation: skeletonPulse 1.4s infinite ease-in-out;
+}
+
+.sty-skeleton-img {
+    height: 160px;
+    background: #ddd;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.sty-skeleton-line {
+    height: 14px;
+    width: 100%;
+    background: #ddd;
+    border-radius: 7px;
+    margin-bottom: 10px;
+}
+
+.sty-skeleton-line.short {
+    width: 60%;
+}
+
+@keyframes skeletonPulse {
+    0% { opacity: 1; }
+    50% { opacity: .55; }
+    100% { opacity: 1; }
+}
+*/
+
+
+
+
+.sty-skeleton-card {
+    background: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    animation: pulse 1.4s ease-in-out infinite;
+}
+
+.sk-thumb {
+    background: #eee;
+    border-radius: 8px;
+}
+
+.sk-line {
+    height: 12px;
+    background: #eee;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.sk-line.title {
+    width: 60%;
+    height: 14px;
+}
+
+.sk-line.small {
+    width: 40%;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: .4; }
+    100% { opacity: 1; }
+}
+
+
+
+
+
+@media (max-width: 767px) {
+
+    .sty-vendor-list {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        gap: 12px;
+    }
+
+    .sty-skeleton-card {
+        display: block;
+    }
+
+    .sk-thumb {
+        width: 100%;
+        height: 180px;
+        margin-bottom: 10px;
+    }
+}
+
+
+.sty-reject-reason-box {
+    background: #fff6f6;
+    border-left: 4px solid #e53935;
+    padding: 8px 10px;
+    margin-top: 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.sty-reject-reason-box strong {
+    display: block;
+    margin-bottom: 3px;
+    color: #b71c1c;
+}
+
+.sty-reject-note {
+    margin-top: 4px;
+    color: #555;
+    font-style: italic;
+}
+
+
