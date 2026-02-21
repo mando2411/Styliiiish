@@ -774,11 +774,11 @@
         }
 
         .reviews-nav.prev {
-            right: 10px;
+            left: 10px;
         }
 
         .reviews-nav.next {
-            left: 10px;
+            right: 10px;
         }
 
         .review-shot {
@@ -806,13 +806,12 @@
         }
 
         .review-shot img {
-            width: auto;
+            width: 800px;
             max-width: 100%;
-            height: auto;
-            object-fit: contain;
+            height: 270px;
+            object-fit: cover;
             display: block;
             margin: 0 auto;
-            max-height: min(76vh, 760px);
             border-radius: 10px;
             box-shadow: 0 6px 18px rgba(23, 39, 59, 0.12);
             background: #f2f2f5;
@@ -1709,8 +1708,8 @@
             </div>
 
             <div class="reviews-slider-wrap">
-                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="السابق">›</button>
-                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="التالي">‹</button>
+                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="السابق">‹</button>
+                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="التالي">›</button>
 
                 <div class="reviews-slider" id="reviewsSlider">
                 @php
@@ -1740,6 +1739,7 @@
             if (!cards.length) return;
 
             let currentIndex = 0;
+            let autoSlideTimer = null;
 
             const updateButtons = () => {
                 prevBtn.disabled = currentIndex <= 0;
@@ -1752,6 +1752,25 @@
                 currentIndex = Math.max(0, Math.min(index, cards.length - 1));
                 cards[currentIndex].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
                 updateButtons();
+            };
+
+            const goToNext = () => {
+                if (currentIndex >= cards.length - 1) {
+                    goToIndex(0);
+                    return;
+                }
+                goToIndex(currentIndex + 1);
+            };
+
+            const startAutoSlide = () => {
+                stopAutoSlide();
+                autoSlideTimer = setInterval(goToNext, 4000);
+            };
+
+            const stopAutoSlide = () => {
+                if (!autoSlideTimer) return;
+                clearInterval(autoSlideTimer);
+                autoSlideTimer = null;
             };
 
             const detectActiveIndex = () => {
@@ -1772,11 +1791,32 @@
                 updateButtons();
             };
 
-            prevBtn.addEventListener('click', () => goToIndex(currentIndex - 1));
-            nextBtn.addEventListener('click', () => goToIndex(currentIndex + 1));
+            prevBtn.addEventListener('click', () => {
+                goToIndex(currentIndex - 1);
+                startAutoSlide();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                goToIndex(currentIndex + 1);
+                startAutoSlide();
+            });
+
             slider.addEventListener('scroll', detectActiveIndex, { passive: true });
+            slider.addEventListener('mouseenter', stopAutoSlide);
+            slider.addEventListener('mouseleave', startAutoSlide);
+            slider.addEventListener('touchstart', stopAutoSlide, { passive: true });
+            slider.addEventListener('touchend', startAutoSlide, { passive: true });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoSlide();
+                } else {
+                    startAutoSlide();
+                }
+            });
 
             updateButtons();
+            startAutoSlide();
         })();
     </script>
 
