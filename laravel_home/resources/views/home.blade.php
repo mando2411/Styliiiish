@@ -1117,7 +1117,7 @@
             color: #fff;
             border-radius: 18px;
             padding: 28px;
-            margin: 12px 0 46px;
+            margin: 12px auto 46px;
             text-align: center;
         }
 
