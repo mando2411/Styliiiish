@@ -3,6 +3,213 @@
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
+
+    $translations = [
+        'ar' => [
+            'title' => 'ستيليش | فساتين سهرة وزفاف في مصر',
+            'contact_anytime' => 'اتصلي بنا في أي وقت:',
+            'daily_deals' => '⚡ خصومات يومية',
+            'facebook' => 'فيسبوك',
+            'instagram' => 'إنستجرام',
+            'google' => 'جوجل',
+            'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
+            'nav_home' => 'الرئيسية',
+            'nav_shop' => 'المتجر',
+            'nav_marketplace' => 'الماركت بليس',
+            'nav_sell' => 'بيعي فستانك',
+            'nav_blog' => 'المدونة',
+            'nav_contact' => 'تواصل معنا',
+            'search_placeholder' => 'ابحثي عن فستانك...',
+            'search_btn' => 'بحث',
+            'account' => 'حسابي',
+            'wishlist' => 'قائمة الأمنيات',
+            'cart' => 'السلة',
+            'start_selling' => 'ابدئي البيع',
+            'promo_line' => 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل',
+            'hero_badge' => '✨ مجموعة حصرية بتحديثات يومية',
+            'hero_title' => 'اختاري فستان أحلامك لمناسبتك القادمة بأفضل قيمة في مصر',
+            'hero_lead' => 'موديلات سهرة وزفاف وخطوبة مختارة بعناية، مع عروض قوية وتجربة شراء سريعة من منصة موثوقة.',
+            'hero_p1' => '✔️ خصومات تصل إلى 50% على موديلات مختارة',
+            'hero_p2' => '✔️ توصيل داخل مصر خلال 2–10 أيام',
+            'hero_p3' => '✔️ خيارات متنوعة للمقاسات والستايلات',
+            'hero_p4' => '✔️ منصة موثوقة للبيع والشراء',
+            'shop_now' => 'تسوقي الفساتين الآن',
+            'sell_now' => 'بيعي فستانك الآن',
+            'ship_fast' => '🚚 شحن سريع',
+            'secure_pay' => '💳 دفع آمن',
+            'clear_policy' => '🔄 سياسات واضحة',
+            'available_products' => 'منتج متاح الآن',
+            'discounted_products' => 'منتج عليه خصم',
+            'high_trust' => 'ثقة عالية',
+            'support_before_after' => 'خدمة ودعم قبل وبعد الطلب',
+            'why_sty' => 'لماذا Styliiiish؟',
+            'why_note' => 'مزيج بين جودة التصميم وسهولة الشراء، مع روابط وسياسات واضحة لبناء ثقة حقيقية.',
+            'why_1' => '✓ منتجات منشورة مباشرة من متجر ووردبريس لحظيًا',
+            'why_2' => '✓ فساتين سهرة وزفاف وموديلات محتشمة بألوان ومقاسات متنوعة',
+            'why_3' => '✓ عروض يومية وأسعار مميزة على موديلات مختارة',
+            'why_4' => '✓ خدمة داخل مصر مع سياسات شحن واسترجاع واضحة',
+            'available_now' => 'منتج متاح',
+            'on_discount' => 'منتج عليه خصم',
+            'min_price' => 'أقل سعر حالي',
+            'max_price' => 'أعلى سعر حالي',
+            'featured_title' => 'منتجات مختارة لك الآن',
+            'featured_sub' => 'أحدث الفساتين من المتجر مع إبراز العروض والخصومات',
+            'view_all' => 'عرض كل المنتجات',
+            'featured_badge' => 'مختارات مميزة',
+            'discount_badge' => 'خصم',
+            'available_label' => 'متوفر الآن',
+            'delivery_label' => 'توصيل سريع',
+            'contact_for_price' => 'تواصل لمعرفة السعر',
+            'save_prefix' => 'وفّري',
+            'order_now' => 'اطلبي الآن',
+            'view_product' => 'معاينة المنتج',
+            'trust_1_t' => '🚚 شحن سريع داخل مصر',
+            'trust_1_d' => 'توصيل الطلبات خلال 2–10 أيام عمل حسب المحافظة.',
+            'trust_2_t' => '💬 دعم ومتابعة قبل الشراء',
+            'trust_2_d' => 'فريقنا يساعدك تختاري المقاس والموديل الأنسب لمناسبتك.',
+            'trust_3_t' => '💸 بيعي فستانك بسهولة',
+            'trust_3_d' => 'حوّلي فستانك المستعمل إلى دخل إضافي عبر المنصة.',
+            'reviews_title' => 'تجارب حقيقية من Google Reviews',
+            'reviews_sub' => 'آراء عملائنا بالصورة كما هي لبناء ثقة كاملة قبل الطلب.',
+            'prev' => 'السابق',
+            'next' => 'التالي',
+            'open_google_reviews' => 'فتح تقييمات Google',
+            'review_overlay' => 'عرض على Google',
+            'rating' => 'تقييم',
+            'no_reviews_now' => 'لا توجد صور مراجعات متاحة الآن.',
+            'final_title' => 'جاهزة تتألقي في مناسبتك القادمة؟',
+            'final_sub' => 'اكتشفي أجدد الموديلات والعروض الحصرية الآن، أو ارفعي فستانك للبيع في دقائق ووصول أسرع لآلاف المشترين في مصر.',
+            'start_shop' => 'ابدئي التسوق',
+            'footer_title' => 'ستيليش فاشون هاوس',
+            'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
+            'footer_hours' => 'مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.',
+            'contact_us' => 'تواصلي معنا',
+            'direct_call' => 'اتصال مباشر',
+            'quick_links' => 'روابط سريعة',
+            'official_info' => 'معلومات رسمية',
+            'policies' => 'سياسات وقوانين',
+            'about_us' => 'من نحن',
+            'privacy' => 'سياسة الخصوصية',
+            'terms' => 'الشروط والأحكام',
+            'market_policy' => 'سياسة الماركت بليس',
+            'refund_policy' => 'سياسة الاسترجاع والاستبدال',
+            'faq' => 'الأسئلة الشائعة',
+            'shipping_policy' => 'سياسة الشحن والتوصيل',
+            'cookies' => 'سياسة ملفات الارتباط',
+            'categories' => 'الأقسام',
+            'official_address' => '1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر',
+            'rights' => 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير',
+            'footer_note' => 'الصفحة الرئيسية مطورة بـ Laravel ومتصلة ببيانات WordPress مباشرة',
+            'home_mini' => 'الرئيسية',
+            'shop_mini' => 'المتجر',
+            'cart_mini' => 'السلة',
+            'account_mini' => 'حسابي',
+            'fav_mini' => 'المفضلة',
+        ],
+        'en' => [
+            'title' => 'Styliiiish | Evening & Bridal Dresses in Egypt',
+            'contact_anytime' => 'Call us anytime:',
+            'daily_deals' => '⚡ Daily Deals',
+            'facebook' => 'Facebook',
+            'instagram' => 'Instagram',
+            'google' => 'Google',
+            'brand_tag' => 'Because every woman deserves to shine',
+            'nav_home' => 'Home',
+            'nav_shop' => 'Shop',
+            'nav_marketplace' => 'Marketplace',
+            'nav_sell' => 'Sell Your Dress',
+            'nav_blog' => 'Blog',
+            'nav_contact' => 'Contact Us',
+            'search_placeholder' => 'Search for your dress...',
+            'search_btn' => 'Search',
+            'account' => 'My Account',
+            'wishlist' => 'Wishlist',
+            'cart' => 'Cart',
+            'start_selling' => 'Start Selling',
+            'promo_line' => 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days',
+            'hero_badge' => '✨ Exclusive collection with daily updates',
+            'hero_title' => 'Find your dream dress for your next occasion at the best value in Egypt',
+            'hero_lead' => 'Carefully selected evening, bridal, and engagement dresses with strong offers and a fast shopping experience.',
+            'hero_p1' => '✔️ Up to 50% off selected styles',
+            'hero_p2' => '✔️ Delivery across Egypt in 2–10 days',
+            'hero_p3' => '✔️ Wide range of sizes and styles',
+            'hero_p4' => '✔️ Trusted platform for buying and selling',
+            'shop_now' => 'Shop Dresses Now',
+            'sell_now' => 'Sell Your Dress Now',
+            'ship_fast' => '🚚 Fast Shipping',
+            'secure_pay' => '💳 Secure Payment',
+            'clear_policy' => '🔄 Clear Policies',
+            'available_products' => 'Products available now',
+            'discounted_products' => 'Discounted products',
+            'high_trust' => 'High Trust',
+            'support_before_after' => 'Support before and after your order',
+            'why_sty' => 'Why Styliiiish?',
+            'why_note' => 'A blend of design quality and shopping simplicity with clear policies and trusted links.',
+            'why_1' => '✓ Products synced live from WordPress store',
+            'why_2' => '✓ Evening, bridal, and modest styles in many colors and sizes',
+            'why_3' => '✓ Daily offers and standout pricing on selected styles',
+            'why_4' => '✓ Egypt-wide service with clear shipping and return policies',
+            'available_now' => 'Available Products',
+            'on_discount' => 'Discounted Products',
+            'min_price' => 'Current Min Price',
+            'max_price' => 'Current Max Price',
+            'featured_title' => 'Featured Products for You',
+            'featured_sub' => 'Latest dresses from the store with highlighted offers and discounts',
+            'view_all' => 'View All Products',
+            'featured_badge' => 'Featured Pick',
+            'discount_badge' => 'OFF',
+            'available_label' => 'In Stock',
+            'delivery_label' => 'Fast Delivery',
+            'contact_for_price' => 'Contact for Price',
+            'save_prefix' => 'Save',
+            'order_now' => 'Order Now',
+            'view_product' => 'View Product',
+            'trust_1_t' => '🚚 Fast Shipping Across Egypt',
+            'trust_1_d' => 'Orders delivered within 2–10 business days depending on location.',
+            'trust_2_t' => '💬 Pre-purchase Support',
+            'trust_2_d' => 'Our team helps you choose the best size and style for your occasion.',
+            'trust_3_t' => '💸 Sell Your Dress Easily',
+            'trust_3_d' => 'Turn your pre-loved dress into extra income through the platform.',
+            'reviews_title' => 'Real Reviews from Google',
+            'reviews_sub' => 'Authentic customer review screenshots to build confidence before ordering.',
+            'prev' => 'Previous',
+            'next' => 'Next',
+            'open_google_reviews' => 'Open Google Reviews',
+            'review_overlay' => 'View on Google',
+            'rating' => 'Review',
+            'no_reviews_now' => 'No review images available right now.',
+            'final_title' => 'Ready to shine at your next event?',
+            'final_sub' => 'Discover the latest styles and exclusive offers now, or list your dress for sale and reach thousands of buyers in Egypt.',
+            'start_shop' => 'Start Shopping',
+            'footer_title' => 'Styliiiish Fashion House',
+            'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
+            'footer_hours' => 'Working hours: Saturday to Friday from 11:00 AM to 7:00 PM.',
+            'contact_us' => 'Contact Us',
+            'direct_call' => 'Direct Call',
+            'quick_links' => 'Quick Links',
+            'official_info' => 'Official Info',
+            'policies' => 'Policies & Legal',
+            'about_us' => 'About Us',
+            'privacy' => 'Privacy Policy',
+            'terms' => 'Terms & Conditions',
+            'market_policy' => 'Marketplace Policy',
+            'refund_policy' => 'Refund & Return Policy',
+            'faq' => 'FAQ',
+            'shipping_policy' => 'Shipping & Delivery Policy',
+            'cookies' => 'Cookie Policy',
+            'categories' => 'Categories',
+            'official_address' => '1 Nabil Khalil St, Nasr City, Cairo, Egypt',
+            'rights' => 'All rights reserved © :year Styliiiish | Powered by',
+            'footer_note' => 'Homepage is built with Laravel and connected directly to WordPress data',
+            'home_mini' => 'Home',
+            'shop_mini' => 'Shop',
+            'cart_mini' => 'Cart',
+            'account_mini' => 'Account',
+            'fav_mini' => 'Wishlist',
+        ],
+    ];
+
+    $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -15,7 +222,7 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>{{ $isEnglish ? 'Styliiiish | Evening & Bridal Dresses in Egypt' : 'ستيليش | فساتين سهرة وزفاف في مصر' }}</title>
+    <title>{{ $t('title') }}</title>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;
@@ -872,7 +1079,7 @@
         }
 
         .review-shot::after {
-            content: "عرض على Google";
+            content: attr(data-open-label);
             position: absolute;
             top: 10px;
             left: 10px;
@@ -1580,7 +1787,7 @@
     <div class="topbar">
         <div class="container topbar-inner">
             <div class="topbar-right">
-                <strong>اتصلي بنا في أي وقت:</strong>
+                <strong>{{ $t('contact_anytime') }}</strong>
                 <a href="tel:+201050874255">+20 010 5087 4255</a>
             </div>
             <div class="topbar-left">
@@ -1589,10 +1796,10 @@
                     <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar">AR</a>
                     <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en">EN</a>
                 </div>
-                <span class="topbar-note">⚡ خصومات يومية</span>
-                <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">فيسبوك</a>
-                <a href="https://www.instagram.com/styliiish.egypt/" target="_blank" rel="noopener">إنستجرام</a>
-                <a href="https://g.page/styliish" target="_blank" rel="noopener">جوجل</a>
+                <span class="topbar-note">{{ $t('daily_deals') }}</span>
+                <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">{{ $t('facebook') }}</a>
+                <a href="https://www.instagram.com/styliiish.egypt/" target="_blank" rel="noopener">{{ $t('instagram') }}</a>
+                <a href="https://g.page/styliish" target="_blank" rel="noopener">{{ $t('google') }}</a>
             </div>
         </div>
     </div>
@@ -1601,112 +1808,112 @@
         <div class="container main-header-inner">
             <a class="brand" href="{{ $localePrefix }}">
                 <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <span class="brand-tag">لأن كل امرأة تستحق أن تتألق</span>
+                <span class="brand-tag">{{ $t('brand_tag') }}</span>
             </a>
 
             <nav class="main-nav" aria-label="Main Navigation">
-                <a class="active" href="{{ $localePrefix }}">الرئيسية</a>
-                <a href="{{ $localePrefix }}/shop">المتجر</a>
-                <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">الماركت بليس</a>
-                <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">بيعي فستانك</a>
-                <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">المدونة</a>
-                <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">تواصل معنا</a>
+                <a class="active" href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
+                <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
+                <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
+                <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
+                <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a>
+                <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('nav_contact') }}</a>
             </nav>
 
             <div class="header-actions">
                 <form class="search-form" action="https://styliiiish.com/" method="get" target="_blank">
-                    <input class="search-input" type="search" name="s" placeholder="ابحثي عن فستانك..." aria-label="ابحثي عن فستانك">
-                    <button class="search-btn" type="submit">بحث</button>
+                    <input class="search-input" type="search" name="s" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
+                    <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
-                <a class="icon-btn action-account" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" aria-label="حسابي" title="حسابي"><span class="icon" aria-hidden="true">👤</span></a>
-                <a class="icon-btn action-wishlist" href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener" aria-label="قائمة الأمنيات" title="قائمة الأمنيات"><span class="icon" aria-hidden="true">❤</span></a>
-                <a class="icon-btn action-cart" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" aria-label="السلة" title="السلة"><span class="icon" aria-hidden="true">🛒</span></a>
-                <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">ابدئي البيع</a>
+                <a class="icon-btn action-account" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
+                <a class="icon-btn action-wishlist" href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}"><span class="icon" aria-hidden="true">❤</span></a>
+                <a class="icon-btn action-cart" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" aria-label="{{ $t('cart') }}" title="{{ $t('cart') }}"><span class="icon" aria-hidden="true">🛒</span></a>
+                <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
             </div>
         </div>
     </header>
 
-    <div class="promo">لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل</div>
+    <div class="promo">{{ $t('promo_line') }}</div>
 
     <section class="hero">
         <div class="container hero-wrap">
             <div class="hero-main">
-                <span class="badge">✨ مجموعة حصرية بتحديثات يومية</span>
-                <h1>اختاري فستان أحلامك لمناسبتك القادمة بأفضل قيمة في مصر</h1>
-                <p class="lead">موديلات سهرة وزفاف وخطوبة مختارة بعناية، مع عروض قوية وتجربة شراء سريعة من منصة موثوقة.</p>
+                <span class="badge">{{ $t('hero_badge') }}</span>
+                <h1>{{ $t('hero_title') }}</h1>
+                <p class="lead">{{ $t('hero_lead') }}</p>
 
                 <ul class="hero-points">
-                    <li>✔️ خصومات تصل إلى 50% على موديلات مختارة</li>
-                    <li>✔️ توصيل داخل مصر خلال 2–10 أيام</li>
-                    <li>✔️ خيارات متنوعة للمقاسات والستايلات</li>
-                    <li>✔️ منصة موثوقة للبيع والشراء</li>
+                    <li>{{ $t('hero_p1') }}</li>
+                    <li>{{ $t('hero_p2') }}</li>
+                    <li>{{ $t('hero_p3') }}</li>
+                    <li>{{ $t('hero_p4') }}</li>
                 </ul>
 
                 <div class="actions">
-                    <a class="btn btn-primary" href="{{ $localePrefix }}/shop">تسوقي الفساتين الآن</a>
-                    <a class="btn btn-light" href="/my-dresses/">بيعي فستانك الآن</a>
+                    <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('shop_now') }}</a>
+                    <a class="btn btn-light" href="/my-dresses/">{{ $t('sell_now') }}</a>
                 </div>
 
                 <div class="hero-mobile-trust" aria-hidden="true">
-                    <span>🚚 شحن سريع</span>
-                    <span>💳 دفع آمن</span>
-                    <span>🔄 سياسات واضحة</span>
+                    <span>{{ $t('ship_fast') }}</span>
+                    <span>{{ $t('secure_pay') }}</span>
+                    <span>{{ $t('clear_policy') }}</span>
                 </div>
 
                 <div class="hero-kpis">
                     <div class="hero-kpi">
                         <strong>{{ number_format((int)($stats['total_products'] ?? 0)) }}+</strong>
-                        <span>منتج متاح الآن</span>
+                        <span>{{ $t('available_products') }}</span>
                     </div>
                     <div class="hero-kpi">
                         <strong>{{ number_format((int)($stats['sale_products'] ?? 0)) }}+</strong>
-                        <span>منتج عليه خصم</span>
+                        <span>{{ $t('discounted_products') }}</span>
                     </div>
                     <div class="hero-kpi">
-                        <strong>ثقة عالية</strong>
-                        <span>خدمة ودعم قبل وبعد الطلب</span>
+                        <strong>{{ $t('high_trust') }}</strong>
+                        <span>{{ $t('support_before_after') }}</span>
                     </div>
                 </div>
             </div>
 
             <aside class="hero-side">
-                <h3>لماذا Styliiiish؟</h3>
-                <p class="hero-side-note">مزيج بين جودة التصميم وسهولة الشراء، مع روابط وسياسات واضحة لبناء ثقة حقيقية.</p>
+                <h3>{{ $t('why_sty') }}</h3>
+                <p class="hero-side-note">{{ $t('why_note') }}</p>
                 <ul class="list">
-                    <li>✓ منتجات منشورة مباشرة من متجر ووردبريس لحظيًا</li>
-                    <li>✓ فساتين سهرة وزفاف وموديلات محتشمة بألوان ومقاسات متنوعة</li>
-                    <li>✓ عروض يومية وأسعار مميزة على موديلات مختارة</li>
-                    <li>✓ خدمة داخل مصر مع سياسات شحن واسترجاع واضحة</li>
+                    <li>{{ $t('why_1') }}</li>
+                    <li>{{ $t('why_2') }}</li>
+                    <li>{{ $t('why_3') }}</li>
+                    <li>{{ $t('why_4') }}</li>
                 </ul>
 
                 <div class="stats">
                     <div class="stat">
                         <strong>{{ number_format((int)($stats['total_products'] ?? 0)) }}+</strong>
-                        <span>منتج متاح</span>
+                        <span>{{ $t('available_now') }}</span>
                     </div>
                     <div class="stat">
                         <strong>{{ number_format((int)($stats['sale_products'] ?? 0)) }}+</strong>
-                        <span>منتج عليه خصم</span>
+                        <span>{{ $t('on_discount') }}</span>
                     </div>
                     <div class="stat">
                         <strong>
                             @if(!empty($stats['min_price']))
-                                {{ number_format((float)$stats['min_price']) }} ج.م
+                                {{ number_format((float)$stats['min_price']) }} {{ $isEnglish ? 'EGP' : 'ج.م' }}
                             @else
                                 —
                             @endif
                         </strong>
-                        <span>أقل سعر حالي</span>
+                        <span>{{ $t('min_price') }}</span>
                     </div>
                     <div class="stat">
                         <strong>
                             @if(!empty($stats['max_price']))
-                                {{ number_format((float)$stats['max_price']) }} ج.م
+                                {{ number_format((float)$stats['max_price']) }} {{ $isEnglish ? 'EGP' : 'ج.م' }}
                             @else
                                 —
                             @endif
                         </strong>
-                        <span>أعلى سعر حالي</span>
+                        <span>{{ $t('max_price') }}</span>
                     </div>
                 </div>
             </aside>
@@ -1719,10 +1926,10 @@
         <div class="container">
             <div class="section-head">
                 <div>
-                    <h2 class="section-title">منتجات مختارة لك الآن</h2>
-                    <p class="section-sub">أحدث الفساتين من المتجر مع إبراز العروض والخصومات</p>
+                    <h2 class="section-title">{{ $t('featured_title') }}</h2>
+                    <p class="section-sub">{{ $t('featured_sub') }}</p>
                 </div>
-                <a class="btn btn-light" href="{{ $localePrefix }}/shop">عرض كل المنتجات</a>
+                <a class="btn btn-light" href="{{ $localePrefix }}/shop">{{ $t('view_all') }}</a>
             </div>
 
             <div class="grid">
@@ -1740,9 +1947,9 @@
                         <div class="product-media">
                             <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
                             <div class="card-badges">
-                                <span class="badge-chip badge-hot">مختارات مميزة</span>
+                                <span class="badge-chip badge-hot">{{ $t('featured_badge') }}</span>
                                 @if($isSale)
-                                    <span class="badge-chip badge-discount">خصم {{ $discount }}%</span>
+                                    <span class="badge-chip badge-discount">{{ $t('discount_badge') }} {{ $discount }}%</span>
                                 @endif
                             </div>
                         </div>
@@ -1750,31 +1957,31 @@
                         <div class="content">
                             <h3 class="name">{{ $product->post_title }}</h3>
                             <div class="meta">
-                                <span>متوفر الآن</span>
-                                <span>توصيل سريع</span>
+                                <span>{{ $t('available_label') }}</span>
+                                <span>{{ $t('delivery_label') }}</span>
                             </div>
 
                             <div class="prices">
                                 <span class="price">
                                     @if($price > 0)
-                                        {{ number_format($price) }} ج.م
+                                        {{ number_format($price) }} {{ $isEnglish ? 'EGP' : 'ج.م' }}
                                     @else
-                                        تواصل لمعرفة السعر
+                                        {{ $t('contact_for_price') }}
                                     @endif
                                 </span>
                                 @if($isSale)
-                                    <span class="old">{{ number_format($regular) }} ج.م</span>
-                                    <span class="sale">خصم {{ $discount }}%</span>
+                                    <span class="old">{{ number_format($regular) }} {{ $isEnglish ? 'EGP' : 'ج.م' }}</span>
+                                    <span class="sale">{{ $t('discount_badge') }} {{ $discount }}%</span>
                                 @endif
                             </div>
 
                             @if($isSale)
-                                <span class="save">وفّري {{ number_format($saving) }} ج.م</span>
+                                <span class="save">{{ $t('save_prefix') }} {{ number_format($saving) }} {{ $isEnglish ? 'EGP' : 'ج.م' }}</span>
                             @endif
 
                             <div class="card-actions">
-                                <a class="buy" href="/product/{{ $product->post_name }}/">اطلبي الآن</a>
-                                <a class="view-link" href="/product/{{ $product->post_name }}/">معاينة المنتج</a>
+                                <a class="buy" href="/product/{{ $product->post_name }}/">{{ $t('order_now') }}</a>
+                                <a class="view-link" href="/product/{{ $product->post_name }}/">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>
@@ -1786,16 +1993,16 @@
     <section class="section">
         <div class="container trust">
             <article class="trust-item">
-                <h4>🚚 شحن سريع داخل مصر</h4>
-                <p>توصيل الطلبات خلال 2–10 أيام عمل حسب المحافظة.</p>
+                <h4>{{ $t('trust_1_t') }}</h4>
+                <p>{{ $t('trust_1_d') }}</p>
             </article>
             <article class="trust-item">
-                <h4>💬 دعم ومتابعة قبل الشراء</h4>
-                <p>فريقنا يساعدك تختاري المقاس والموديل الأنسب لمناسبتك.</p>
+                <h4>{{ $t('trust_2_t') }}</h4>
+                <p>{{ $t('trust_2_d') }}</p>
             </article>
             <article class="trust-item">
-                <h4>💸 بيعي فستانك بسهولة</h4>
-                <p>حوّلي فستانك المستعمل إلى دخل إضافي عبر المنصة.</p>
+                <h4>{{ $t('trust_3_t') }}</h4>
+                <p>{{ $t('trust_3_d') }}</p>
             </article>
         </div>
     </section>
@@ -1803,26 +2010,26 @@
     <section class="section reviews-trust">
         <div class="container">
             <div class="reviews-head">
-                <h3>تجارب حقيقية من Google Reviews</h3>
-                <p>آراء عملائنا بالصورة كما هي لبناء ثقة كاملة قبل الطلب.</p>
+                <h3>{{ $t('reviews_title') }}</h3>
+                <p>{{ $t('reviews_sub') }}</p>
             </div>
 
             <div class="reviews-slider-wrap">
-                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="السابق">‹</button>
-                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="التالي">›</button>
+                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="{{ $t('prev') }}">‹</button>
+                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="{{ $t('next') }}">›</button>
 
                 <div class="reviews-slider" id="reviewsSlider">
                 @php
                     $googleReviewsLink = 'https://www.google.com/search?newwindow=1&sa=X&sca_esv=7a144a3578fe712f&rlz=1C1CHBD_arEG1137EG1137&hl=ar-NL&q=Styliiiiish+%D8%A7%D9%84%D8%A2%D8%B1%D8%A7%D8%A1&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxtDC0MDA1MbMwM7UwMDaxMDYxM9jAyPiKUSK4pDInEwSKMxRuLL_ZcmPRjY03lt9YuIgVpxQApWPa_VEAAAA&rldimm=18180546865803483460&tbm=lcl&ved=2ahUKEwi12NOiw-qSAxVk0AIHHc_3KTEQ9fQKegQIQBAG&biw=1536&bih=852&dpr=1.25#lkt=LocalPoiReviews';
                 @endphp
                 @forelse (($reviewImages ?? collect()) as $index => $reviewImage)
-                    <a class="review-shot" href="{{ $googleReviewsLink }}" target="_blank" rel="noopener nofollow" aria-label="فتح تقييمات Google">
+                    <a class="review-shot" href="{{ $googleReviewsLink }}" target="_blank" rel="noopener nofollow" aria-label="{{ $t('open_google_reviews') }}" data-open-label="{{ $t('review_overlay') }}">
                         <img src="{{ $reviewImage }}" alt="Google Review {{ $index + 1 }}" loading="lazy">
-                        <span class="review-meta">تقييم {{ $index + 1 }}</span>
+                        <span class="review-meta">{{ $t('rating') }} {{ $index + 1 }}</span>
                     </a>
                 @empty
                     <div class="review-shot" style="justify-content:center; min-height: 140px; color: var(--muted);">
-                        لا توجد صور مراجعات متاحة الآن.
+                        {{ $t('no_reviews_now') }}
                     </div>
                 @endforelse
                 </div>
@@ -1927,11 +2134,11 @@
     </script>
 
     <section class="container final-cta">
-        <h3>جاهزة تتألقي في مناسبتك القادمة؟</h3>
-        <p>اكتشفي أجدد الموديلات والعروض الحصرية الآن، أو ارفعي فستانك للبيع في دقائق ووصول أسرع لآلاف المشترين في مصر.</p>
+        <h3>{{ $t('final_title') }}</h3>
+        <p>{{ $t('final_sub') }}</p>
         <div class="actions">
-            <a class="btn btn-primary" href="{{ $localePrefix }}/shop">ابدئي التسوق</a>
-            <a class="btn btn-light" href="/my-dresses/">ابدئي البيع</a>
+            <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('start_shop') }}</a>
+            <a class="btn btn-light" href="/my-dresses/">{{ $t('start_selling') }}</a>
         </div>
     </section>
 
@@ -1939,67 +2146,67 @@
         <div class="container footer-grid">
             <div class="footer-brand">
                 <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <h4>ستيليش فاشون هاوس</h4>
-                <p>نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.</p>
-                <p>مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.</p>
+                <h4>{{ $t('footer_title') }}</h4>
+                <p>{{ $t('footer_desc') }}</p>
+                <p>{{ $t('footer_hours') }}</p>
                 <div class="footer-contact-row">
-                    <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">تواصلي معنا</a>
-                    <a href="tel:+201050874255">اتصال مباشر</a>
+                    <a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('contact_us') }}</a>
+                    <a href="tel:+201050874255">{{ $t('direct_call') }}</a>
                 </div>
             </div>
 
             <div class="footer-col">
-                <h5>روابط سريعة</h5>
+                <h5>{{ $t('quick_links') }}</h5>
                 <ul class="footer-links">
-                    <li><a href="https://styliiiish.com/" target="_blank" rel="noopener">الرئيسية</a></li>
-                    <li><a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">المدونة</a></li>
-                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">تسوقي الفساتين</a></li>
-                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">تأجير الفساتين</a></li>
-                    <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">الماركت بليس</a></li>
-                    <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">الأقسام</a></li>
-                    <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">بيعي فستانك</a></li>
-                    <li><a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">حسابي</a></li>
+                    <li><a href="https://styliiiish.com/" target="_blank" rel="noopener">{{ $t('nav_home') }}</a></li>
+                    <li><a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a></li>
+                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('shop_now') }}</a></li>
+                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('nav_shop') }}</a></li>
+                    <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
+                    <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                    <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
+                    <li><a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account') }}</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h5>معلومات رسمية</h5>
+                <h5>{{ $t('official_info') }}</h5>
                 <ul class="footer-links">
-                    <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر</a></li>
+                    <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">{{ $t('official_address') }}</a></li>
                     <li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-                    <li><a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">تواصل معنا</a></li>
+                    <li><a href="https://styliiiish.com/contact-us/" target="_blank" rel="noopener">{{ $t('nav_contact') }}</a></li>
                 </ul>
             </div>
 
             <div class="footer-col">
-                <h5>سياسات وقوانين</h5>
+                <h5>{{ $t('policies') }}</h5>
                 <ul class="footer-links">
-                    <li><a href="https://styliiiish.com/about-us/" target="_blank" rel="noopener">من نحن</a></li>
-                    <li><a href="https://styliiiish.com/privacy-policy/" target="_blank" rel="noopener">سياسة الخصوصية</a></li>
-                    <li><a href="https://styliiiish.com/terms-conditions/" target="_blank" rel="noopener">الشروط والأحكام</a></li>
-                    <li><a href="https://styliiiish.com/Marketplace-Policy/" target="_blank" rel="noopener">سياسة الماركت بليس</a></li>
-                    <li><a href="https://styliiiish.com/refund-return-policy/" target="_blank" rel="noopener">سياسة الاسترجاع والاستبدال</a></li>
-                    <li><a href="https://styliiiish.com/styliiiish-faq/" target="_blank" rel="noopener">الأسئلة الشائعة</a></li>
-                    <li><a href="https://styliiiish.com/shipping-delivery-policy/" target="_blank" rel="noopener">سياسة الشحن والتوصيل</a></li>
-                    <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">سياسة ملفات الارتباط</a></li>
+                    <li><a href="https://styliiiish.com/about-us/" target="_blank" rel="noopener">{{ $t('about_us') }}</a></li>
+                    <li><a href="https://styliiiish.com/privacy-policy/" target="_blank" rel="noopener">{{ $t('privacy') }}</a></li>
+                    <li><a href="https://styliiiish.com/terms-conditions/" target="_blank" rel="noopener">{{ $t('terms') }}</a></li>
+                    <li><a href="https://styliiiish.com/Marketplace-Policy/" target="_blank" rel="noopener">{{ $t('market_policy') }}</a></li>
+                    <li><a href="https://styliiiish.com/refund-return-policy/" target="_blank" rel="noopener">{{ $t('refund_policy') }}</a></li>
+                    <li><a href="https://styliiiish.com/styliiiish-faq/" target="_blank" rel="noopener">{{ $t('faq') }}</a></li>
+                    <li><a href="https://styliiiish.com/shipping-delivery-policy/" target="_blank" rel="noopener">{{ $t('shipping_policy') }}</a></li>
+                    <li><a href="https://styliiiish.com/%F0%9F%8D%AA-cookie-policy/" target="_blank" rel="noopener">{{ $t('cookies') }}</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="container footer-bottom">
-            <span>جميع الحقوق محفوظة © {{ date('Y') }} Styliiiish | تشغيل وتطوير <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
+            <span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
             <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
         </div>
 
         <div class="container footer-mini-nav">
-            <a href="https://styliiiish.com/" target="_blank" rel="noopener">الرئيسية</a>
-            <a href="{{ $localePrefix }}/shop">المتجر</a>
-            <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">السلة</a>
-            <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">حسابي</a>
-            <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">المفضلة</a>
+            <a href="https://styliiiish.com/" target="_blank" rel="noopener">{{ $t('home_mini') }}</a>
+            <a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a>
+            <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a>
+            <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
+            <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a>
         </div>
     </footer>
 
-    <div class="footer-note">الصفحة الرئيسية مطورة بـ Laravel ومتصلة ببيانات WordPress مباشرة</div>
+    <div class="footer-note">{{ $t('footer_note') }}</div>
 </body>
 </html>
