@@ -802,6 +802,7 @@
                 const params = new URLSearchParams();
                 params.append('action', 'styliiiish_add_to_cart');
                 formData.forEach((value, key) => {
+                    if (key === 'add-to-cart') return;
                     params.append(key, String(value));
                 });
 
