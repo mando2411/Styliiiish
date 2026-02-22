@@ -21,6 +21,8 @@
             'delivery_note' => 'لجميع تفاصيل الشحن راجعي سياسة الشحن والتوصيل.',
             'shipping_policy' => 'سياسة الشحن والتوصيل',
             'size_guide' => '📏 دليل المقاسات',
+            'size_guide_open' => 'عرض دليل المقاسات',
+            'close' => 'إغلاق',
             'description' => 'وصف المنتج',
             'na' => 'غير محدد',
             'contact_for_price' => 'تواصل لمعرفة السعر',
@@ -40,6 +42,8 @@
             'delivery_note' => 'For full shipping details, please review our Shipping & Delivery Policy.',
             'shipping_policy' => 'Shipping & Delivery Policy',
             'size_guide' => '📏 Size Guide',
+            'size_guide_open' => 'Open Size Guide',
+            'close' => 'Close',
             'description' => 'Product Description',
             'na' => 'N/A',
             'contact_for_price' => 'Contact for Price',
@@ -117,6 +121,28 @@
         .guide-row { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
         .description { margin-top: 14px; color: var(--muted); line-height: 1.7; }
 
+        .sg-modal { position: fixed; inset: 0; z-index: 120; display: none; }
+        .sg-modal.is-open { display: block; }
+        .sg-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
+        .sg-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(980px, 94vw);
+            height: min(86vh, 820px);
+            margin: 6vh auto 0;
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid var(--line);
+            overflow: hidden;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+        .sg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+        .sg-title { margin: 0; font-size: 16px; color: var(--secondary); }
+        .sg-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        .sg-body { width: 100%; height: 100%; }
+        .sg-frame { width: 100%; height: 100%; border: 0; }
+
         @media (max-width: 920px) {
             .product-layout { grid-template-columns: 1fr; }
             .title { font-size: 24px; }
@@ -178,7 +204,7 @@
                 </div>
 
                 <div class="guide-row">
-                    <a class="btn btn-ghost" href="{{ $sizeGuideUrl }}">{{ $t('size_guide') }}</a>
+                    <button type="button" class="btn btn-ghost" id="open-size-guide" data-size-guide-url="{{ $sizeGuideUrl }}">{{ $t('size_guide') }}</button>
                 </div>
 
                 @if($contentHtml !== '')
@@ -190,5 +216,54 @@
             </article>
         </section>
     </main>
+
+    <div class="sg-modal" id="size-guide-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="{{ $t('size_guide_open') }}">
+        <div class="sg-backdrop" data-close-size-guide></div>
+        <div class="sg-dialog">
+            <div class="sg-head">
+                <h3 class="sg-title">{{ $t('size_guide') }}</h3>
+                <button type="button" class="sg-close" data-close-size-guide>{{ $t('close') }}</button>
+            </div>
+            <div class="sg-body">
+                <iframe class="sg-frame" id="size-guide-frame" src="about:blank" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const trigger = document.getElementById('open-size-guide');
+            const modal = document.getElementById('size-guide-modal');
+            const frame = document.getElementById('size-guide-frame');
+            if (!trigger || !modal || !frame) return;
+
+            const guideUrl = (trigger.getAttribute('data-size-guide-url') || '').trim();
+            const closeNodes = modal.querySelectorAll('[data-close-size-guide]');
+
+            const openModal = () => {
+                if (!guideUrl) return;
+                frame.src = guideUrl;
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                frame.src = 'about:blank';
+            };
+
+            trigger.addEventListener('click', openModal);
+            closeNodes.forEach((node) => node.addEventListener('click', closeModal));
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
