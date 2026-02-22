@@ -10,7 +10,7 @@
 
     $translations = [
         'ar' => [
-            'page_title' => 'من نحن | Styliiiish Fashion House',
+            'page_title' => 'من نحن | ستايلش',
             'meta_desc' => 'تعرفي على Styliiiish Fashion House: خبرة في تصميم وبيع وتأجير الفساتين، وخدمات تفصيل احترافية وتجربة تسوق موثوقة داخل مصر.',
             'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
             'nav_home' => 'الرئيسية',

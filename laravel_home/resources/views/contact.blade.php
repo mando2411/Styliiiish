@@ -16,7 +16,7 @@
 
     $translations = [
         'ar' => [
-            'page_title' => 'تواصل معنا | Styliiiish',
+            'page_title' => 'تواصل معنا | ستايلش',
             'meta_desc' => 'تواصلي مع Styliiiish Fashion House في القاهرة لحجز زيارة أو الاستفسار عن فساتين جاهزة، تفصيل، أو تأجير.',
             'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
             'nav_home' => 'الرئيسية',

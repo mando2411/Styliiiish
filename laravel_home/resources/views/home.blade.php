@@ -6,7 +6,8 @@
 
     $translations = [
         'ar' => [
-            'title' => 'ستيليش | فساتين سهرة وزفاف في مصر',
+            'title' => 'ستايلش | فساتين سهرة وزفاف في مصر',
+            'meta_desc' => 'ستايلش: متجر فساتين سهرة وزفاف وخطوبة في مصر مع خصومات يومية حتى 50%، شحن سريع داخل مصر، وتجربة شراء احترافية وآمنة.',
             'contact_anytime' => 'اتصلي بنا في أي وقت:',
             'daily_deals' => '⚡ خصومات يومية',
             'facebook' => 'فيسبوك',
@@ -112,7 +113,8 @@
             'fav_mini' => 'المفضلة',
         ],
         'en' => [
-            'title' => 'Styliiiish | Evening & Bridal Dresses in Egypt',
+            'title' => 'Styliiiish | Evening, Bridal & Engagement Dresses in Egypt',
+            'meta_desc' => 'Styliiiish: Shop evening, bridal, and engagement dresses in Egypt with daily offers up to 50%, fast nationwide shipping, and a secure modern shopping experience.',
             'contact_anytime' => 'Call us anytime:',
             'daily_deals' => '⚡ Daily Deals',
             'facebook' => 'Facebook',
@@ -225,6 +227,8 @@
     $openFromMinutes = 11 * 60;
     $openUntilMinutes = 19 * 60;
     $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $canonicalPath = $localePrefix;
 
     $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
 @endphp
@@ -236,6 +240,22 @@
     @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ $t('meta_desc') }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en">
+    <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
+    <meta property="og:title" content="{{ $t('title') }}">
+    <meta property="og:description" content="{{ $t('meta_desc') }}">
+    <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <meta property="og:image" content="{{ $wpIcon }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $t('title') }}">
+    <meta name="twitter:description" content="{{ $t('meta_desc') }}">
+    <meta name="twitter:image" content="{{ $wpIcon }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">

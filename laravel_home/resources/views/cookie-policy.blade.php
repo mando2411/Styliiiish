@@ -10,7 +10,7 @@
 
     $translations = [
         'ar' => [
-            'page_title' => 'سياسة ملفات الارتباط | Styliiiish',
+            'page_title' => 'سياسة ملفات الارتباط | ستايلش',
             'meta_desc' => 'توضح سياسة ملفات الارتباط لدى Styliiiish كيفية استخدام الكوكيز، Google Consent Mode v2، وإدارة التفضيلات بطريقة متوافقة مع GDPR.',
             'brand_tag' => 'لأن كل امرأة تستحق أن تتألق',
             'nav_home' => 'الرئيسية',

@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        @php
+            $isArabicLocale = str_starts_with(str_replace('_', '-', app()->getLocale()), 'ar');
+            $seoTitle = $isArabicLocale
+                ? 'ستايلش | منصة أزياء حديثة في مصر'
+                : 'Styliiiish | Modern Fashion Platform in Egypt';
+            $seoDescription = $isArabicLocale
+                ? 'ستايلش تقدم تجربة أزياء احترافية وحديثة لفساتين السهرة والزفاف والخطوبة مع أداء سريع وتجربة استخدام متقدمة.'
+                : 'Styliiiish delivers a modern professional fashion experience for evening, bridal, and engagement dresses with fast performance and premium UX.';
+        @endphp
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="{{ $seoDescription }}">
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ $seoTitle }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

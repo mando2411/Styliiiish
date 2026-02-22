@@ -1,16 +1,51 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+@php
+    $currentLocale = $currentLocale ?? 'ar';
+    $localePrefix = $localePrefix ?? '/ar';
+    $isEnglish = $currentLocale === 'en';
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $canonicalPath = $localePrefix . '/ads-landing';
+
+    $translations = [
+        'ar' => [
+            'page_title' => 'عروض خاصة | ستايلش',
+            'meta_desc' => 'اكتشفي عروض ستايلش الحصرية على فساتين السهرة والزفاف والخطوبة بخصومات قوية لفترة محدودة مع توصيل سريع داخل مصر.',
+        ],
+        'en' => [
+            'page_title' => 'Special Offers | Styliiiish',
+            'meta_desc' => 'Discover exclusive Styliiiish offers on evening, bridal, and engagement dresses with limited-time discounts and fast delivery across Egypt.',
+        ],
+    ];
+
+    $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
+
+    $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+@endphp
+<html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
-    @php
-        $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
-        $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
-    @endphp
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ $t('meta_desc') }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/ads-landing">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/ads-landing">
+    <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/ads-landing">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
+    <meta property="og:title" content="{{ $t('page_title') }}">
+    <meta property="og:description" content="{{ $t('meta_desc') }}">
+    <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <meta property="og:image" content="{{ $wpIcon }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $t('page_title') }}">
+    <meta name="twitter:description" content="{{ $t('meta_desc') }}">
+    <meta name="twitter:image" content="{{ $wpIcon }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>عروض خاصة | Styliiiish</title>
+    <title>{{ $t('page_title') }}</title>
     <style>
         :root {
             --primary: #d51522;
