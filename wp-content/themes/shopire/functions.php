@@ -492,9 +492,27 @@ if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 		$product_id = isset($_REQUEST['product_id']) ? absint($_REQUEST['product_id']) : 0;
 		$variation_id = isset($_REQUEST['variation_id']) ? absint($_REQUEST['variation_id']) : 0;
 		$quantity = isset($_REQUEST['quantity']) ? max(1, absint($_REQUEST['quantity'])) : 1;
+		$request_token = isset($_REQUEST['_sty_add_token']) ? wc_clean(wp_unslash((string) $_REQUEST['_sty_add_token'])) : '';
 
 		if (!$product_id) {
 			wp_send_json_error(['message' => 'Invalid product'], 400);
+		}
+
+		if ($request_token !== '' && WC()->session) {
+			$used_tokens = WC()->session->get('styliiiish_add_used_tokens');
+			if (!is_array($used_tokens)) {
+				$used_tokens = [];
+			}
+
+			if (in_array($request_token, $used_tokens, true)) {
+				wp_send_json_success(shopire_styliiiish_build_cart_payload());
+			}
+
+			$used_tokens[] = $request_token;
+			if (count($used_tokens) > 40) {
+				$used_tokens = array_slice($used_tokens, -40);
+			}
+			WC()->session->set('styliiiish_add_used_tokens', $used_tokens);
 		}
 
 		$variation = [];
@@ -502,6 +520,32 @@ if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 			if (strpos((string) $request_key, 'attribute_pa_') === 0) {
 				$variation[sanitize_key((string) $request_key)] = wc_clean(wp_unslash((string) $request_value));
 			}
+		}
+
+		$duplicate_guard_state = null;
+		if (WC()->session) {
+			$variation_for_hash = $variation;
+			ksort($variation_for_hash);
+
+			$fingerprint = md5(wp_json_encode([
+				'product_id' => $product_id,
+				'variation_id' => $variation_id,
+				'quantity' => $quantity,
+				'variation' => $variation_for_hash,
+			]));
+
+			$duplicate_guard_state = WC()->session->get('styliiiish_add_guard');
+			$last_hash = is_array($duplicate_guard_state) ? ($duplicate_guard_state['hash'] ?? '') : '';
+			$last_time = is_array($duplicate_guard_state) ? (int) ($duplicate_guard_state['time'] ?? 0) : 0;
+
+			if ($last_hash === $fingerprint && (time() - $last_time) <= 2) {
+				wp_send_json_success(shopire_styliiiish_build_cart_payload());
+			}
+
+			WC()->session->set('styliiiish_add_guard', [
+				'hash' => $fingerprint,
+				'time' => time(),
+			]);
 		}
 
 		$cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);

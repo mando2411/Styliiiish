@@ -801,6 +801,7 @@
                 const formData = new FormData(addToCartForm);
                 const params = new URLSearchParams();
                 params.append('action', 'styliiiish_add_to_cart');
+                params.append('_sty_add_token', `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`);
                 formData.forEach((value, key) => {
                     if (key === 'add-to-cart') return;
                     params.append(key, String(value));
