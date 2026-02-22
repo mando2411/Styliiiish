@@ -431,3 +431,110 @@ add_action('template_redirect', function () {
 	wp_safe_redirect($target_url, 302);
 	exit;
 }, 1);
+
+if (!function_exists('shopire_styliiiish_build_cart_payload')) {
+	function shopire_styliiiish_build_cart_payload() {
+		if (!function_exists('WC') || !WC()->cart) {
+			return [
+				'count' => 0,
+				'subtotal_html' => '',
+				'items' => [],
+				'cart_url' => home_url('/cart/'),
+				'checkout_url' => home_url('/checkout/'),
+			];
+		}
+
+		$items = [];
+		foreach (WC()->cart->get_cart() as $cart_key => $cart_item) {
+			$product = isset($cart_item['data']) ? $cart_item['data'] : null;
+			if (!$product || !is_object($product)) {
+				continue;
+			}
+
+			$items[] = [
+				'key' => $cart_key,
+				'name' => html_entity_decode(wp_strip_all_tags($product->get_name()), ENT_QUOTES, 'UTF-8'),
+				'qty' => (int) ($cart_item['quantity'] ?? 1),
+				'price_html' => wc_price((float) $product->get_price()),
+				'line_total_html' => wc_price((float) ($cart_item['line_total'] ?? 0)),
+				'image' => wp_get_attachment_image_url($product->get_image_id(), 'woocommerce_thumbnail') ?: wc_placeholder_img_src('woocommerce_thumbnail'),
+				'url' => get_permalink($product->get_id()),
+				'remove_url' => wc_get_cart_remove_url($cart_key),
+			];
+		}
+
+		return [
+			'count' => (int) WC()->cart->get_cart_contents_count(),
+			'subtotal_html' => WC()->cart->get_cart_subtotal(),
+			'items' => $items,
+			'cart_url' => wc_get_cart_url(),
+			'checkout_url' => wc_get_checkout_url(),
+		];
+	}
+}
+
+if (!function_exists('shopire_styliiiish_wc_ajax_summary')) {
+	function shopire_styliiiish_wc_ajax_summary() {
+		wp_send_json_success(shopire_styliiiish_build_cart_payload());
+	}
+}
+add_action('wc_ajax_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
+add_action('wc_ajax_nopriv_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
+
+if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
+	function shopire_styliiiish_wc_ajax_add_to_cart() {
+		if (!function_exists('WC') || !WC()->cart) {
+			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
+		}
+
+		$product_id = isset($_REQUEST['product_id']) ? absint($_REQUEST['product_id']) : 0;
+		$variation_id = isset($_REQUEST['variation_id']) ? absint($_REQUEST['variation_id']) : 0;
+		$quantity = isset($_REQUEST['quantity']) ? max(1, absint($_REQUEST['quantity'])) : 1;
+
+		if (!$product_id) {
+			wp_send_json_error(['message' => 'Invalid product'], 400);
+		}
+
+		$variation = [];
+		foreach ($_REQUEST as $request_key => $request_value) {
+			if (strpos((string) $request_key, 'attribute_pa_') === 0) {
+				$variation[sanitize_key((string) $request_key)] = wc_clean(wp_unslash((string) $request_value));
+			}
+		}
+
+		$cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id, $variation);
+		if (!$cart_item_key) {
+			wp_send_json_error([
+				'message' => __('Unable to add this product to cart.', 'shopire'),
+			], 422);
+		}
+
+		WC()->cart->calculate_totals();
+		wp_send_json_success(shopire_styliiiish_build_cart_payload());
+	}
+}
+add_action('wc_ajax_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
+add_action('wc_ajax_nopriv_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
+
+if (!function_exists('shopire_styliiiish_wc_ajax_remove_from_cart')) {
+	function shopire_styliiiish_wc_ajax_remove_from_cart() {
+		if (!function_exists('WC') || !WC()->cart) {
+			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
+		}
+
+		$cart_key = isset($_REQUEST['cart_key']) ? wc_clean(wp_unslash((string) $_REQUEST['cart_key'])) : '';
+		if ($cart_key === '') {
+			wp_send_json_error(['message' => 'Missing cart key'], 400);
+		}
+
+		$removed = WC()->cart->remove_cart_item($cart_key);
+		if (!$removed) {
+			wp_send_json_error(['message' => 'Unable to remove item'], 422);
+		}
+
+		WC()->cart->calculate_totals();
+		wp_send_json_success(shopire_styliiiish_build_cart_payload());
+	}
+}
+add_action('wc_ajax_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
+add_action('wc_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');

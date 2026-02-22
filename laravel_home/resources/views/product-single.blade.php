@@ -46,6 +46,13 @@
             'view_product' => 'معاينة',
             'buy_now' => 'اطلبي الآن',
             'shop_desc' => 'اكتشفي أحدث فساتين السهرة والزفاف والخطوبة بأسعار تنافسية.',
+            'cart_title' => 'سلة التسوق',
+            'cart_empty' => 'العربة فارغة حاليًا.',
+            'view_cart' => 'عرض العربة',
+            'checkout' => 'إتمام الشراء',
+            'remove' => 'حذف',
+            'added_to_cart' => 'تمت إضافة المنتج للعربة',
+            'add_to_cart_failed' => 'تعذر إضافة المنتج للعربة',
         ],
         'en' => [
             'page_title' => (($product->post_title ?? 'Product') . ' | Styliiiish'),
@@ -86,6 +93,13 @@
             'view_product' => 'View',
             'buy_now' => 'Order Now',
             'shop_desc' => 'Discover latest evening, bridal, and engagement dresses at competitive prices.',
+            'cart_title' => 'Shopping Cart',
+            'cart_empty' => 'Your cart is currently empty.',
+            'view_cart' => 'View Cart',
+            'checkout' => 'Checkout',
+            'remove' => 'Remove',
+            'added_to_cart' => 'Product added to cart',
+            'add_to_cart_failed' => 'Unable to add product to cart',
         ],
     ];
 
@@ -146,6 +160,42 @@
         .nav a { padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; white-space: nowrap; }
         .nav a.active, .nav a:hover { color: var(--primary); background: #fff4f5; }
         .head-btn { border: 1px solid var(--line); border-radius: 10px; min-width: 38px; min-height: 38px; display: inline-flex; align-items: center; justify-content: center; background: #fff; }
+        .cart-trigger-wrap { position: relative; }
+        .cart-trigger { position: relative; }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 800;
+            padding: 0 4px;
+        }
+        .cart-plus-one {
+            position: absolute;
+            top: -24px;
+            right: -4px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+        .cart-plus-one.show {
+            animation: cartPlusOne .8s ease;
+        }
+        @keyframes cartPlusOne {
+            0% { opacity: 0; transform: translateY(8px); }
+            20% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-12px); }
+        }
 
         .product-wrap { padding: 22px 0; }
         .product-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; }
@@ -212,6 +262,40 @@
         .sg-body { width: 100%; height: 100%; }
         .sg-frame { width: 100%; height: 100%; border: 0; }
 
+        .mini-cart { position: fixed; inset: 0; z-index: 130; display: none; }
+        .mini-cart.is-open { display: block; }
+        .mini-cart-backdrop { position: absolute; inset: 0; background: rgba(15,26,42,.55); }
+        .mini-cart-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: min(420px, 92vw);
+            height: 100%;
+            background: #fff;
+            border-inline-start: 1px solid var(--line);
+            box-shadow: 0 12px 30px rgba(0,0,0,.2);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+        }
+        [dir="rtl"] .mini-cart-panel { right: auto; left: 0; border-inline-start: 0; border-inline-end: 1px solid var(--line); }
+        .mini-cart-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
+        .mini-cart-head h3 { margin: 0; font-size: 17px; color: var(--secondary); }
+        .mini-cart-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; cursor: pointer; }
+        .mini-cart-list { overflow: auto; padding: 12px; display: grid; gap: 10px; }
+        .mini-cart-item { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+        .mini-cart-item img { width: 64px; height: 84px; object-fit: cover; border-radius: 8px; background: #f2f2f5; }
+        .mini-cart-item h4 { margin: 0 0 4px; font-size: 13px; line-height: 1.45; color: var(--secondary); }
+        .mini-cart-meta { font-size: 12px; color: var(--muted); }
+        .mini-cart-price { font-size: 12px; color: var(--primary); font-weight: 800; margin-top: 4px; }
+        .mini-cart-remove { border: 0; background: transparent; color: var(--primary); font-size: 12px; cursor: pointer; padding: 2px; }
+        .mini-cart-empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+        .mini-cart-foot { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 8px; }
+        .mini-cart-subtotal { font-size: 13px; color: var(--secondary); display: flex; justify-content: space-between; }
+        .mini-cart-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .mini-cart-actions a { min-height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+        .mini-cart-view { border: 1px solid var(--line); background: #fff; color: var(--secondary); }
+        .mini-cart-checkout { background: var(--primary); color: #fff; }
+
         .site-footer { margin-top: 16px; background: #0f1a2a; color: #fff; border-top: 4px solid var(--primary); }
         .footer-grid { padding: 32px 0 20px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.1fr; gap: 20px; }
         .footer-brand-logo { width: 156px; max-width: 100%; object-fit: contain; margin-bottom: 10px; display: block; }
@@ -263,7 +347,12 @@
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="Account" aria-label="Account">👤</a>
                 <a class="head-btn" href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener" title="Wishlist" aria-label="Wishlist">❤</a>
-                <a class="head-btn" href="{{ $wpBaseUrl }}/cart/" target="_blank" rel="noopener" title="Cart" aria-label="Cart">🛒</a>
+                <span class="cart-trigger-wrap">
+                    <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="Cart" aria-label="Cart">🛒
+                        <span class="cart-count" id="cartCountBadge">0</span>
+                    </button>
+                    <span class="cart-plus-one" id="cartPlusOne">+1</span>
+                </span>
             </div>
         </div>
     </header>
@@ -432,6 +521,24 @@
         </div>
     </footer>
 
+    <div class="mini-cart" id="miniCart" aria-hidden="true">
+        <div class="mini-cart-backdrop" data-close-mini-cart></div>
+        <aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $t('cart_title') }}">
+            <div class="mini-cart-head">
+                <h3>{{ $t('cart_title') }}</h3>
+                <button class="mini-cart-close" type="button" data-close-mini-cart>{{ $t('close') }}</button>
+            </div>
+            <div class="mini-cart-list" id="miniCartList"></div>
+            <div class="mini-cart-foot">
+                <div class="mini-cart-subtotal"><span>Subtotal</span><strong id="miniCartSubtotal">—</strong></div>
+                <div class="mini-cart-actions">
+                    <a class="mini-cart-view" id="miniCartView" href="{{ $wpBaseUrl }}/cart/">{{ $t('view_cart') }}</a>
+                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpBaseUrl }}/checkout/">{{ $t('checkout') }}</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
     <div class="sg-modal" id="size-guide-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="{{ $t('size_guide_open') }}">
         <div class="sg-backdrop" data-close-size-guide></div>
         <div class="sg-dialog">
@@ -451,12 +558,28 @@
             const hasVariations = @json((bool) ($hasVariations ?? false));
             const selectorsWrap = document.getElementById('attributeSelectors');
             const addToCartBtn = document.getElementById('addToCartBtn');
+            const addToCartForm = document.getElementById('addToCartForm');
             const variationIdInput = document.getElementById('variationIdInput');
             const helpText = document.getElementById('cartHelpText');
             const selectNodes = selectorsWrap ? Array.from(selectorsWrap.querySelectorAll('select[data-attribute-key]')) : [];
 
             const chooseOptionsText = @json($t('choose_options_first'));
             const outOfStockText = @json($t('out_of_stock'));
+            const addedToCartText = @json($t('added_to_cart'));
+            const addFailedText = @json($t('add_to_cart_failed'));
+            const cartEmptyText = @json($t('cart_empty'));
+            const removeText = @json($t('remove'));
+            const wcAjaxBase = @json($wpBaseUrl . '/?wc-ajax=');
+
+            const cartTrigger = document.getElementById('miniCartTrigger');
+            const cartBadge = document.getElementById('cartCountBadge');
+            const plusOne = document.getElementById('cartPlusOne');
+            const miniCart = document.getElementById('miniCart');
+            const miniCartList = document.getElementById('miniCartList');
+            const miniCartSubtotal = document.getElementById('miniCartSubtotal');
+            const miniCartView = document.getElementById('miniCartView');
+            const miniCartCheckout = document.getElementById('miniCartCheckout');
+            const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
 
             const syncPostedAttributes = () => {
                 selectNodes.forEach((selectNode) => {
@@ -481,7 +604,9 @@
                 if (!hasVariations) {
                     addToCartBtn.disabled = false;
                     variationIdInput.value = '0';
-                    helpText.textContent = '';
+                    if (helpText.textContent === chooseOptionsText || helpText.textContent === outOfStockText) {
+                        helpText.textContent = '';
+                    }
                     return;
                 }
 
@@ -515,7 +640,105 @@
 
                 variationIdInput.value = String(matched.variation_id || 0);
                 addToCartBtn.disabled = false;
-                helpText.textContent = '';
+                if (helpText.textContent === chooseOptionsText || helpText.textContent === outOfStockText) {
+                    helpText.textContent = '';
+                }
+            };
+
+            const openMiniCart = () => {
+                if (!miniCart) return;
+                miniCart.classList.add('is-open');
+                miniCart.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeMiniCart = () => {
+                if (!miniCart) return;
+                miniCart.classList.remove('is-open');
+                miniCart.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            };
+
+            const animatePlusOne = () => {
+                if (!plusOne) return;
+                plusOne.classList.remove('show');
+                void plusOne.offsetWidth;
+                plusOne.classList.add('show');
+            };
+
+            const renderMiniCart = (payload) => {
+                if (!payload) return;
+
+                const count = Number(payload.count || 0);
+                if (cartBadge) cartBadge.textContent = String(count);
+
+                if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
+                if (miniCartView && payload.cart_url) miniCartView.href = payload.cart_url;
+                if (miniCartCheckout && payload.checkout_url) miniCartCheckout.href = payload.checkout_url;
+
+                if (!miniCartList) return;
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (items.length === 0) {
+                    miniCartList.innerHTML = `<p class="mini-cart-empty">${cartEmptyText}</p>`;
+                    return;
+                }
+
+                miniCartList.innerHTML = items.map((item) => {
+                    return `
+                        <article class="mini-cart-item">
+                            <a href="${item.url || '#'}"><img src="${item.image || ''}" alt="${item.name || ''}"></a>
+                            <div>
+                                <h4>${item.name || ''}</h4>
+                                <div class="mini-cart-meta">× ${item.qty || 1}</div>
+                                <div class="mini-cart-price">${item.line_total_html || item.price_html || ''}</div>
+                            </div>
+                            <button type="button" class="mini-cart-remove" data-remove-cart-key="${item.key || ''}">${removeText}</button>
+                        </article>
+                    `;
+                }).join('');
+            };
+
+            const getCartSummary = async () => {
+                const response = await fetch(`${wcAjaxBase}styliiiish_cart_summary`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                if (!response.ok) throw new Error('summary_failed');
+                const result = await response.json();
+                if (!result || !result.success) throw new Error('summary_failed');
+                renderMiniCart(result.data);
+            };
+
+            const addToCartAjax = async () => {
+                if (!addToCartForm) return;
+
+                const formData = new FormData(addToCartForm);
+                const params = new URLSearchParams();
+                formData.forEach((value, key) => {
+                    params.append(key, String(value));
+                });
+
+                const response = await fetch(`${wcAjaxBase}styliiiish_add_to_cart`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: params.toString(),
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result || !result.success) {
+                    throw new Error((result && result.data && result.data.message) ? result.data.message : addFailedText);
+                }
+
+                renderMiniCart(result.data);
+                animatePlusOne();
+                helpText.textContent = addedToCartText;
+                openMiniCart();
             };
 
             if (selectNodes.length > 0) {
@@ -525,35 +748,113 @@
                 addToCartBtn.disabled = false;
             }
 
+            if (addToCartForm) {
+                addToCartForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    validateVariation();
+                    if (addToCartBtn.disabled) return;
+
+                    const originalText = addToCartBtn.textContent;
+                    addToCartBtn.disabled = true;
+                    addToCartBtn.textContent = '...';
+
+                    try {
+                        await addToCartAjax();
+                    } catch (error) {
+                        helpText.textContent = (error && error.message) ? error.message : addFailedText;
+                    } finally {
+                        addToCartBtn.textContent = originalText;
+                        validateVariation();
+                    }
+                });
+            }
+
+            if (cartTrigger) {
+                cartTrigger.addEventListener('click', async () => {
+                    try {
+                        await getCartSummary();
+                    } catch (_error) {}
+                    openMiniCart();
+                });
+            }
+
+            if (miniCartClosers.length > 0) {
+                miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
+            }
+
+            if (miniCartList) {
+                miniCartList.addEventListener('click', async (event) => {
+                    const removeBtn = event.target.closest('[data-remove-cart-key]');
+                    if (!removeBtn) return;
+
+                    const cartKey = removeBtn.getAttribute('data-remove-cart-key') || '';
+                    if (!cartKey) return;
+
+                    const params = new URLSearchParams();
+                    params.set('cart_key', cartKey);
+
+                    const response = await fetch(`${wcAjaxBase}styliiiish_remove_from_cart`, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: params.toString(),
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result && result.success) {
+                        renderMiniCart(result.data);
+                    }
+                });
+            }
+
+            getCartSummary().catch(() => {
+                if (cartBadge) cartBadge.textContent = '0';
+            });
+
             const trigger = document.getElementById('open-size-guide');
             const modal = document.getElementById('size-guide-modal');
             const frame = document.getElementById('size-guide-frame');
-            if (!trigger || !modal || !frame) return;
 
-            const guideUrl = (trigger.getAttribute('data-size-guide-url') || '').trim();
-            const closeNodes = modal.querySelectorAll('[data-close-size-guide]');
+            if (trigger && modal && frame) {
+                const guideUrl = (trigger.getAttribute('data-size-guide-url') || '').trim();
+                const closeNodes = modal.querySelectorAll('[data-close-size-guide]');
 
-            const openModal = () => {
-                if (!guideUrl) return;
-                frame.src = guideUrl;
-                modal.classList.add('is-open');
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
-            };
+                const openModal = () => {
+                    if (!guideUrl) return;
+                    frame.src = guideUrl;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+                };
 
-            const closeModal = () => {
-                modal.classList.remove('is-open');
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
-                frame.src = 'about:blank';
-            };
+                const closeModal = () => {
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = miniCart && miniCart.classList.contains('is-open') ? 'hidden' : '';
+                    frame.src = 'about:blank';
+                };
 
-            trigger.addEventListener('click', openModal);
-            closeNodes.forEach((node) => node.addEventListener('click', closeModal));
+                trigger.addEventListener('click', openModal);
+                closeNodes.forEach((node) => node.addEventListener('click', closeModal));
+            }
 
             document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modal.classList.contains('is-open')) {
-                    closeModal();
+                if (event.key === 'Escape') {
+                    if (miniCart && miniCart.classList.contains('is-open')) {
+                        closeMiniCart();
+                    }
+
+                    const modal = document.getElementById('size-guide-modal');
+                    const frame = document.getElementById('size-guide-frame');
+                    if (modal && modal.classList.contains('is-open')) {
+                        modal.classList.remove('is-open');
+                        modal.setAttribute('aria-hidden', 'true');
+                        document.body.style.overflow = '';
+                        if (frame) frame.src = 'about:blank';
+                    }
                 }
             });
         })();
