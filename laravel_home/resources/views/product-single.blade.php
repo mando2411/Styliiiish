@@ -265,9 +265,26 @@
         .sg-body { width: 100%; height: 100%; }
         .sg-frame { width: 100%; height: 100%; border: 0; }
 
-        .mini-cart { position: fixed; inset: 0; z-index: 130; display: none; }
-        .mini-cart.is-open { display: block; }
-        .mini-cart-backdrop { position: absolute; inset: 0; background: rgba(15,26,42,.55); }
+        .mini-cart {
+            position: fixed;
+            inset: 0;
+            z-index: 130;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .22s ease;
+        }
+        .mini-cart.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mini-cart-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15,26,42,.55);
+            opacity: 0;
+            transition: opacity .22s ease;
+        }
+        .mini-cart.is-open .mini-cart-backdrop { opacity: 1; }
         .mini-cart-panel {
             position: absolute;
             top: 0;
@@ -279,12 +296,17 @@
             box-shadow: 0 12px 30px rgba(0,0,0,.2);
             display: grid;
             grid-template-rows: auto 1fr auto;
+            transform: translateX(100%);
+            transition: transform .26s ease;
         }
+        .mini-cart.is-open .mini-cart-panel { transform: translateX(0); }
         [dir="rtl"] .mini-cart-panel { right: auto; left: 0; border-inline-start: 0; border-inline-end: 1px solid var(--line); }
+        [dir="rtl"] .mini-cart-panel { transform: translateX(-100%); }
+        [dir="rtl"] .mini-cart.is-open .mini-cart-panel { transform: translateX(0); }
         .mini-cart-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
         .mini-cart-head h3 { margin: 0; font-size: 17px; color: var(--secondary); }
         .mini-cart-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; cursor: pointer; }
-        .mini-cart-list { overflow: auto; padding: 12px; display: grid; gap: 10px; align-content: start; }
+        .mini-cart-list { overflow: auto; padding: 12px; display: grid; gap: 10px; align-content: start; grid-auto-rows: max-content; }
         .mini-cart-item {
             display: grid;
             grid-template-columns: 70px 1fr auto;
@@ -296,6 +318,7 @@
             box-shadow: 0 8px 18px rgba(23,39,59,.05);
         }
         .mini-cart-item img { width: 70px; height: 92px; object-fit: cover; border-radius: 9px; background: #f2f2f5; }
+        .mini-cart-info { min-width: 0; }
         .mini-cart-item h4 {
             margin: 0 0 4px;
             font-size: 13px;
@@ -306,7 +329,7 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        .mini-cart-meta { font-size: 12px; color: var(--muted); }
+        .mini-cart-meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
         .mini-cart-price { font-size: 12px; color: var(--primary); font-weight: 800; margin-top: 4px; }
         .mini-cart-remove {
             border: 1px solid rgba(213,21,34,.24);
@@ -622,12 +645,22 @@
             const miniCartCheckout = document.getElementById('miniCartCheckout');
             const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
             let currentCartCount = Number((cartBadge && cartBadge.textContent) || 0) || 0;
+            let cartPayloadCache = null;
 
             const setCartCount = (count) => {
                 currentCartCount = Math.max(0, Number(count) || 0);
                 if (!cartBadge) return;
                 cartBadge.textContent = String(currentCartCount);
                 cartBadge.style.display = currentCartCount > 0 ? 'inline-block' : 'none';
+            };
+
+            const resolveCountFromPayload = (payload) => {
+                if (!payload) return 0;
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (items.length > 0) {
+                    return items.reduce((total, item) => total + Math.max(0, Number(item.qty || 0)), 0);
+                }
+                return Math.max(0, Number(payload.count || 0));
             };
 
             const syncPostedAttributes = () => {
@@ -717,8 +750,9 @@
 
             const renderMiniCart = (payload) => {
                 if (!payload) return;
+                cartPayloadCache = payload;
 
-                const count = Number(payload.count || 0);
+                const count = resolveCountFromPayload(payload);
                 setCartCount(count);
 
                 if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
@@ -736,9 +770,9 @@
                     return `
                         <article class="mini-cart-item">
                             <a href="${item.url || '#'}"><img src="${item.image || ''}" alt="${item.name || ''}"></a>
-                            <div>
+                            <div class="mini-cart-info">
                                 <h4>${item.name || ''}</h4>
-                                <div class="mini-cart-meta">× ${item.qty || 1}</div>
+                                <div class="mini-cart-meta"><span>Qty:</span><strong>${item.qty || 1}</strong></div>
                                 <div class="mini-cart-price">${item.line_total_html || item.price_html || ''}</div>
                             </div>
                             <button type="button" class="mini-cart-remove" data-remove-cart-key="${item.key || ''}">${removeText}</button>
@@ -822,7 +856,9 @@
             if (cartTrigger) {
                 cartTrigger.addEventListener('click', () => {
                     openMiniCart();
-                    if (miniCartList && miniCartList.innerHTML.trim() === '') {
+                    if (cartPayloadCache) {
+                        renderMiniCart(cartPayloadCache);
+                    } else if (miniCartList && miniCartList.innerHTML.trim() === '') {
                         miniCartList.innerHTML = '<div class="mini-cart-loading">Loading cart…</div>';
                     }
                     getCartSummary().catch(() => {});
