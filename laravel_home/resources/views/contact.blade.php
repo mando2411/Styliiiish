@@ -174,6 +174,8 @@
     <meta name="twitter:title" content="{{ $t('page_title') }}">
     <meta name="twitter:description" content="{{ $t('meta_desc') }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
+    <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('page_title') }}</title>
 
     <script type="application/ld+json">
