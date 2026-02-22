@@ -680,7 +680,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             ->get();
     }
 
-    return view('product-single', [
+    $viewData = [
         'product' => $product,
         'currentLocale' => $currentLocale,
         'localePrefix' => $localePrefix,
@@ -697,7 +697,13 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'variationRules' => $variationRules,
         'productAttributesForSelection' => $productAttributesForSelection,
         'relatedProducts' => $relatedProducts,
-    ]);
+    ];
+
+    return response()
+        ->view('product-single', $viewData)
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', '0');
 };
 
 Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
