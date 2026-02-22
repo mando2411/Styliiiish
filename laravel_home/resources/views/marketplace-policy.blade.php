@@ -305,7 +305,7 @@
             <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
             <a href="{{ $localePrefix }}/about-us">{{ $t('nav_about') }}</a>
             <a href="{{ $localePrefix }}/terms-conditions">{{ $t('nav_terms') }}</a>
-            <a class="active" href="{{ $localePrefix }}/marketplace-policy">{{ $t('nav_marketplace') }}</a>
+            <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
             <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
             <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>

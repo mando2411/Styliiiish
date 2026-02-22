@@ -594,7 +594,7 @@
             <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
             <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
             <a class="active" href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-            <a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
+            <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
             <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
             <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>
@@ -685,7 +685,7 @@
                 <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
                 <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
-                <li><a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
+                <li><a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a></li>
             </ul>
         </div>
 

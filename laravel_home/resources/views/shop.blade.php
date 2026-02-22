@@ -140,7 +140,7 @@
             <nav class="nav" aria-label="Main Navigation">
                 <a href="/">الرئيسية</a>
                 <a class="active" href="/shop">المتجر</a>
-                <a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">الماركت بليس</a>
+                <a href="/ar/marketplace">الماركت بليس</a>
                 <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">بيعي فستانك</a>
                 <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">المدونة</a>
             </nav>

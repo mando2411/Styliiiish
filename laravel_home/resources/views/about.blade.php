@@ -344,7 +344,7 @@
             <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
             <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
             <a class="active" href="{{ $localePrefix }}/about-us">{{ $t('nav_about') }}</a>
-            <a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a>
+            <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
             <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
             <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
         </nav>
