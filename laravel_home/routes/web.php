@@ -327,13 +327,15 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
         ->where('tr.object_id', (int) $product->ID)
         ->where('tt.taxonomy', 'like', 'pa\\_%')
-        ->select('tt.taxonomy', 't.name')
+        ->select('tt.taxonomy', 't.name', 't.slug')
         ->get();
 
     $attributesByTaxonomy = [];
+    $attributeOptionsByTaxonomy = [];
     foreach ($attributeRows as $attributeRow) {
         $taxonomy = (string) $attributeRow->taxonomy;
         $name = trim((string) $attributeRow->name);
+        $slugValue = trim((string) ($attributeRow->slug ?? ''));
 
         if ($name === '') {
             continue;
@@ -345,6 +347,25 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
         if (!in_array($name, $attributesByTaxonomy[$taxonomy], true)) {
             $attributesByTaxonomy[$taxonomy][] = $name;
+        }
+
+        if (!isset($attributeOptionsByTaxonomy[$taxonomy])) {
+            $attributeOptionsByTaxonomy[$taxonomy] = [];
+        }
+
+        $alreadyExists = false;
+        foreach ($attributeOptionsByTaxonomy[$taxonomy] as $existingOption) {
+            if (($existingOption['slug'] ?? '') === $slugValue) {
+                $alreadyExists = true;
+                break;
+            }
+        }
+
+        if (!$alreadyExists && $slugValue !== '') {
+            $attributeOptionsByTaxonomy[$taxonomy][] = [
+                'slug' => $slugValue,
+                'name' => $name,
+            ];
         }
     }
 
@@ -503,6 +524,162 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         $sizeGuideUrl = $wpBaseUrl . '/size-guide/';
     }
 
+    $attributeLabelMap = [];
+    if (Schema::hasTable('wp_woocommerce_attribute_taxonomies')) {
+        $attributeLabelRows = DB::table('wp_woocommerce_attribute_taxonomies')
+            ->select('attribute_name', 'attribute_label')
+            ->get();
+
+        foreach ($attributeLabelRows as $attributeLabelRow) {
+            $attributeLabelMap['pa_' . (string) $attributeLabelRow->attribute_name] = (string) $attributeLabelRow->attribute_label;
+        }
+    }
+
+    $variationIds = DB::table('wp_posts')
+        ->where('post_parent', (int) $product->ID)
+        ->where('post_type', 'product_variation')
+        ->whereIn('post_status', ['publish', 'private'])
+        ->pluck('ID')
+        ->map(fn ($id) => (int) $id)
+        ->values();
+
+    $hasVariations = $variationIds->isNotEmpty();
+    $variationRules = [];
+    $variationTaxonomyKeys = [];
+
+    if ($hasVariations) {
+        $variationMetaRows = DB::table('wp_postmeta')
+            ->whereIn('post_id', $variationIds->all())
+            ->where(function ($query) {
+                $query->where('meta_key', 'like', 'attribute_pa\\_%')
+                    ->orWhereIn('meta_key', ['_price', '_regular_price', '_sale_price', '_stock_status']);
+            })
+            ->select('post_id', 'meta_key', 'meta_value')
+            ->get();
+
+        $variationMap = [];
+        foreach ($variationMetaRows as $variationMetaRow) {
+            $variationId = (int) $variationMetaRow->post_id;
+            $metaKey = (string) $variationMetaRow->meta_key;
+            $metaValue = (string) ($variationMetaRow->meta_value ?? '');
+
+            if (!isset($variationMap[$variationId])) {
+                $variationMap[$variationId] = [
+                    'variation_id' => $variationId,
+                    'attributes' => [],
+                    'price' => null,
+                    'regular_price' => null,
+                    'sale_price' => null,
+                    'stock_status' => 'instock',
+                ];
+            }
+
+            if (str_starts_with($metaKey, 'attribute_pa_')) {
+                $variationMap[$variationId]['attributes'][$metaKey] = trim($metaValue);
+                if (!in_array($metaKey, $variationTaxonomyKeys, true)) {
+                    $variationTaxonomyKeys[] = $metaKey;
+                }
+                continue;
+            }
+
+            if (in_array($metaKey, ['_price', '_regular_price', '_sale_price'], true)) {
+                $variationMap[$variationId][ltrim($metaKey, '_')] = $metaValue;
+                continue;
+            }
+
+            if ($metaKey === '_stock_status') {
+                $variationMap[$variationId]['stock_status'] = trim($metaValue) !== '' ? trim($metaValue) : 'instock';
+            }
+        }
+
+        foreach ($variationMap as $variationItem) {
+            if (empty($variationItem['attributes'])) {
+                continue;
+            }
+            $variationRules[] = $variationItem;
+        }
+    }
+
+    $selectionTaxonomies = $hasVariations ? $variationTaxonomyKeys : array_keys($attributeOptionsByTaxonomy);
+    $selectionTaxonomies = array_values(array_unique(array_filter($selectionTaxonomies, fn ($value) => is_string($value) && $value !== '')));
+
+    $productAttributesForSelection = [];
+    foreach ($selectionTaxonomies as $selectionTaxonomy) {
+        $options = $attributeOptionsByTaxonomy[$selectionTaxonomy] ?? [];
+        if (empty($options) && $hasVariations) {
+            $variationSlugs = [];
+            foreach ($variationRules as $variationRule) {
+                $candidateSlug = trim((string) ($variationRule['attributes'][$selectionTaxonomy] ?? ''));
+                if ($candidateSlug !== '' && !in_array($candidateSlug, $variationSlugs, true)) {
+                    $variationSlugs[] = $candidateSlug;
+                }
+            }
+            foreach ($variationSlugs as $variationSlug) {
+                $options[] = [
+                    'slug' => $variationSlug,
+                    'name' => strtoupper($variationSlug),
+                ];
+            }
+        }
+
+        if (empty($options)) {
+            continue;
+        }
+
+        $productAttributesForSelection[] = [
+            'taxonomy' => $selectionTaxonomy,
+            'label' => $attributeLabelMap[$selectionTaxonomy] ?? ucwords(str_replace(['pa_', '_', '-'], ['', ' ', ' '], $selectionTaxonomy)),
+            'options' => array_values($options),
+        ];
+    }
+
+    $productCategoryIds = DB::table('wp_term_relationships as tr')
+        ->join('wp_term_taxonomy as tt', 'tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+        ->where('tr.object_id', (int) $product->ID)
+        ->where('tt.taxonomy', 'product_cat')
+        ->pluck('tt.term_id')
+        ->map(fn ($id) => (int) $id)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values();
+
+    $relatedProducts = collect();
+    if ($productCategoryIds->isNotEmpty()) {
+        $relatedProducts = DB::table('wp_posts as p')
+            ->join('wp_term_relationships as tr', 'p.ID', '=', 'tr.object_id')
+            ->join('wp_term_taxonomy as tt', 'tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+            ->leftJoin('wp_postmeta as price', function ($join) {
+                $join->on('p.ID', '=', 'price.post_id')
+                    ->where('price.meta_key', '_price');
+            })
+            ->leftJoin('wp_postmeta as regular', function ($join) {
+                $join->on('p.ID', '=', 'regular.post_id')
+                    ->where('regular.meta_key', '_regular_price');
+            })
+            ->leftJoin('wp_postmeta as thumb', function ($join) {
+                $join->on('p.ID', '=', 'thumb.post_id')
+                    ->where('thumb.meta_key', '_thumbnail_id');
+            })
+            ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+            ->where('p.post_type', 'product')
+            ->where('p.post_status', 'publish')
+            ->where('p.ID', '!=', (int) $product->ID)
+            ->where('tt.taxonomy', 'product_cat')
+            ->whereIn('tt.term_id', $productCategoryIds->all())
+            ->select(
+                'p.ID',
+                'p.post_title',
+                'p.post_name',
+                'price.meta_value as price',
+                'regular.meta_value as regular_price',
+                'img.guid as image'
+            )
+            ->distinct('p.ID')
+            ->orderBy('p.post_date', 'desc')
+            ->limit(8)
+            ->get();
+    }
+
     return view('product-single', [
         'product' => $product,
         'currentLocale' => $currentLocale,
@@ -516,6 +693,10 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'readyDelivery' => $readyDelivery,
         'customDelivery' => $customDelivery,
         'sizeGuideUrl' => $sizeGuideUrl,
+        'hasVariations' => $hasVariations,
+        'variationRules' => $variationRules,
+        'productAttributesForSelection' => $productAttributesForSelection,
+        'relatedProducts' => $relatedProducts,
     ]);
 };
 
