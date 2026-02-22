@@ -411,3 +411,23 @@ require SHOPIRE_THEME_INC_DIR . '/customizer/controls/code/control-function/styl
  * Getting Started
  */
 require SHOPIRE_THEME_INC_DIR . '/admin/getting-started.php';
+
+add_action('template_redirect', function () {
+	if (is_admin() || wp_doing_ajax() || !is_singular('product')) {
+		return;
+	}
+
+	$slug = get_post_field('post_name', get_queried_object_id());
+	if (!$slug) {
+		return;
+	}
+
+	$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+	$locale = (strpos($request_uri, '/en/') === 0) ? 'en' : 'ar';
+
+	$target_path = '/' . $locale . '/item/' . rawurlencode((string) $slug);
+	$target_url = home_url($target_path);
+
+	wp_safe_redirect($target_url, 302);
+	exit;
+}, 1);
