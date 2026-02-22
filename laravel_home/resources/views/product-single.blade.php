@@ -569,7 +569,7 @@
             const addFailedText = @json($t('add_to_cart_failed'));
             const cartEmptyText = @json($t('cart_empty'));
             const removeText = @json($t('remove'));
-            const wcAjaxBase = @json($wpBaseUrl . '/?wc-ajax=');
+            const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
 
             const cartTrigger = document.getElementById('miniCartTrigger');
             const cartBadge = document.getElementById('cartCountBadge');
@@ -699,7 +699,7 @@
             };
 
             const getCartSummary = async () => {
-                const response = await fetch(`${wcAjaxBase}styliiiish_cart_summary`, {
+                const response = await fetch(`${adminAjaxUrl}?action=styliiiish_cart_summary`, {
                     method: 'GET',
                     credentials: 'same-origin',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -716,11 +716,12 @@
 
                 const formData = new FormData(addToCartForm);
                 const params = new URLSearchParams();
+                params.append('action', 'styliiiish_add_to_cart');
                 formData.forEach((value, key) => {
                     params.append(key, String(value));
                 });
 
-                const response = await fetch(`${wcAjaxBase}styliiiish_add_to_cart`, {
+                const response = await fetch(adminAjaxUrl, {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: {
@@ -791,9 +792,10 @@
                     if (!cartKey) return;
 
                     const params = new URLSearchParams();
+                    params.set('action', 'styliiiish_remove_from_cart');
                     params.set('cart_key', cartKey);
 
-                    const response = await fetch(`${wcAjaxBase}styliiiish_remove_from_cart`, {
+                    const response = await fetch(adminAjaxUrl, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {

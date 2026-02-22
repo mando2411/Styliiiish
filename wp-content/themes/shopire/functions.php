@@ -480,6 +480,8 @@ if (!function_exists('shopire_styliiiish_wc_ajax_summary')) {
 }
 add_action('wc_ajax_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
 add_action('wc_ajax_nopriv_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
+add_action('wp_ajax_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
+add_action('wp_ajax_nopriv_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax_summary');
 
 if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 	function shopire_styliiiish_wc_ajax_add_to_cart() {
@@ -515,6 +517,8 @@ if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 }
 add_action('wc_ajax_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
 add_action('wc_ajax_nopriv_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
+add_action('wp_ajax_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_add_to_cart');
 
 if (!function_exists('shopire_styliiiish_wc_ajax_remove_from_cart')) {
 	function shopire_styliiiish_wc_ajax_remove_from_cart() {
@@ -538,3 +542,5 @@ if (!function_exists('shopire_styliiiish_wc_ajax_remove_from_cart')) {
 }
 add_action('wc_ajax_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
 add_action('wc_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
+add_action('wp_ajax_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
+add_action('wp_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
