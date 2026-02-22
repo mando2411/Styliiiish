@@ -646,6 +646,7 @@
             const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
             let currentCartCount = Number((cartBadge && cartBadge.textContent) || 0) || 0;
             let cartPayloadCache = null;
+            let isAddingToCart = false;
 
             const setCartCount = (count) => {
                 currentCartCount = Math.max(0, Number(count) || 0);
@@ -832,25 +833,33 @@
                 addToCartBtn.disabled = false;
             }
 
-            if (addToCartForm) {
-                addToCartForm.addEventListener('submit', async (event) => {
-                    event.preventDefault();
+            const handleAddToCartSubmit = async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                if (isAddingToCart) return;
+
+                validateVariation();
+                if (addToCartBtn.disabled) return;
+
+                const originalText = addToCartBtn.textContent;
+                isAddingToCart = true;
+                addToCartBtn.disabled = true;
+                addToCartBtn.textContent = '...';
+
+                try {
+                    await addToCartAjax();
+                } catch (error) {
+                    helpText.textContent = (error && error.message) ? error.message : addFailedText;
+                } finally {
+                    isAddingToCart = false;
+                    addToCartBtn.textContent = originalText;
                     validateVariation();
-                    if (addToCartBtn.disabled) return;
+                }
+            };
 
-                    const originalText = addToCartBtn.textContent;
-                    addToCartBtn.disabled = true;
-                    addToCartBtn.textContent = '...';
-
-                    try {
-                        await addToCartAjax();
-                    } catch (error) {
-                        helpText.textContent = (error && error.message) ? error.message : addFailedText;
-                    } finally {
-                        addToCartBtn.textContent = originalText;
-                        validateVariation();
-                    }
-                });
+            if (addToCartForm) {
+                addToCartForm.addEventListener('submit', handleAddToCartSubmit);
             }
 
             if (cartTrigger) {
