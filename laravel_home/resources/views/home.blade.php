@@ -2229,7 +2229,7 @@
                     <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('shop_now') }}</a></li>
                     <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('nav_shop') }}</a></li>
                     <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
-                    <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
                     <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
                     <li><a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account') }}</a></li>
                 </ul>

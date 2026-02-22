@@ -684,7 +684,7 @@
                 <li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li>
                 <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
-                <li><a href="{{ $wpBaseUrl }}/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
                 <li><a href="{{ $wpBaseUrl }}/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
             </ul>
         </div>

@@ -501,7 +501,7 @@
                 <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                 <li><a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a></li>
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
-                <li><a href="{{ $wpBaseUrl }}/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
             </ul>
         </div>
 

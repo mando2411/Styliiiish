@@ -866,7 +866,7 @@
                 <li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li>
                 <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
                 <li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li>
-                <li><a href="https://styliiiish.com/categories/" target="_blank" rel="noopener">{{ $t('categories') }}</a></li>
+                <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
                 <li><a href="https://styliiiish.com/product-category/used-dress/" target="_blank" rel="noopener">{{ $t('nav_marketplace') }}</a></li>
                 <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
             </ul>

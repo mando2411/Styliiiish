@@ -677,6 +677,41 @@ Route::get('/en/cookie-policy', fn (Request $request) => $cookiePolicyHandler($r
 Route::get('/🍪-cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 Route::get('/🍪-cookie-policy/', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 
+$categoriesHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $categories = DB::table('wp_terms as t')
+        ->join('wp_term_taxonomy as tt', 't.term_id', '=', 'tt.term_id')
+        ->leftJoin('wp_termmeta as tm', function ($join) {
+            $join->on('t.term_id', '=', 'tm.term_id')
+                ->where('tm.meta_key', 'thumbnail_id');
+        })
+        ->leftJoin('wp_posts as img', 'tm.meta_value', '=', 'img.ID')
+        ->where('tt.taxonomy', 'product_cat')
+        ->where('tt.count', '>', 0)
+        ->where('t.slug', '!=', 'uncategorized')
+        ->orderByDesc('tt.count')
+        ->orderBy('t.name')
+        ->select(
+            't.term_id',
+            't.name',
+            't.slug',
+            'tt.description',
+            'tt.count as products_count',
+            'img.guid as image'
+        )
+        ->get();
+
+    return view('categories', compact('categories', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/categories', fn (Request $request) => $categoriesHandler($request, 'ar'));
+Route::get('/ar/categories', fn (Request $request) => $categoriesHandler($request, 'ar'));
+Route::get('/en/categories', fn (Request $request) => $categoriesHandler($request, 'en'));
+Route::get('/categories/', fn (Request $request) => $categoriesHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
