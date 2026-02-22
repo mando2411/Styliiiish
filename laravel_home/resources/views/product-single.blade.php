@@ -284,14 +284,52 @@
         .mini-cart-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); }
         .mini-cart-head h3 { margin: 0; font-size: 17px; color: var(--secondary); }
         .mini-cart-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; cursor: pointer; }
-        .mini-cart-list { overflow: auto; padding: 12px; display: grid; gap: 10px; }
-        .mini-cart-item { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
-        .mini-cart-item img { width: 64px; height: 84px; object-fit: cover; border-radius: 8px; background: #f2f2f5; }
-        .mini-cart-item h4 { margin: 0 0 4px; font-size: 13px; line-height: 1.45; color: var(--secondary); }
+        .mini-cart-list { overflow: auto; padding: 12px; display: grid; gap: 10px; align-content: start; }
+        .mini-cart-item {
+            display: grid;
+            grid-template-columns: 70px 1fr auto;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 8px;
+            background: #fff;
+            box-shadow: 0 8px 18px rgba(23,39,59,.05);
+        }
+        .mini-cart-item img { width: 70px; height: 92px; object-fit: cover; border-radius: 9px; background: #f2f2f5; }
+        .mini-cart-item h4 {
+            margin: 0 0 4px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: var(--secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
         .mini-cart-meta { font-size: 12px; color: var(--muted); }
         .mini-cart-price { font-size: 12px; color: var(--primary); font-weight: 800; margin-top: 4px; }
-        .mini-cart-remove { border: 0; background: transparent; color: var(--primary); font-size: 12px; cursor: pointer; padding: 2px; }
-        .mini-cart-empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+        .mini-cart-remove {
+            border: 1px solid rgba(213,21,34,.24);
+            background: #fff7f8;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 8px;
+            align-self: start;
+        }
+        .mini-cart-remove:hover { background: #ffeff1; }
+        .mini-cart-empty { color: var(--muted); font-size: 14px; padding: 8px 0; text-align: center; }
+        .mini-cart-loading {
+            color: var(--muted);
+            font-size: 13px;
+            border: 1px dashed var(--line);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            background: #fbfcff;
+        }
         .mini-cart-foot { border-top: 1px solid var(--line); padding: 12px; display: grid; gap: 8px; }
         .mini-cart-subtotal { font-size: 13px; color: var(--secondary); display: flex; justify-content: space-between; }
         .mini-cart-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -583,6 +621,14 @@
             const miniCartView = document.getElementById('miniCartView');
             const miniCartCheckout = document.getElementById('miniCartCheckout');
             const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
+            let currentCartCount = Number((cartBadge && cartBadge.textContent) || 0) || 0;
+
+            const setCartCount = (count) => {
+                currentCartCount = Math.max(0, Number(count) || 0);
+                if (!cartBadge) return;
+                cartBadge.textContent = String(currentCartCount);
+                cartBadge.style.display = currentCartCount > 0 ? 'inline-block' : 'none';
+            };
 
             const syncPostedAttributes = () => {
                 selectNodes.forEach((selectNode) => {
@@ -673,7 +719,7 @@
                 if (!payload) return;
 
                 const count = Number(payload.count || 0);
-                if (cartBadge) cartBadge.textContent = String(count);
+                setCartCount(count);
 
                 if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
                 if (miniCartView && payload.cart_url) miniCartView.href = payload.cart_url;
@@ -774,11 +820,12 @@
             }
 
             if (cartTrigger) {
-                cartTrigger.addEventListener('click', async () => {
-                    try {
-                        await getCartSummary();
-                    } catch (_error) {}
+                cartTrigger.addEventListener('click', () => {
                     openMiniCart();
+                    if (miniCartList && miniCartList.innerHTML.trim() === '') {
+                        miniCartList.innerHTML = '<div class="mini-cart-loading">Loading cart…</div>';
+                    }
+                    getCartSummary().catch(() => {});
                 });
             }
 
@@ -815,8 +862,9 @@
                 });
             }
 
+            setCartCount(currentCartCount);
             getCartSummary().catch(() => {
-                if (cartBadge) cartBadge.textContent = '0';
+                setCartCount(0);
             });
 
             const trigger = document.getElementById('open-size-guide');
