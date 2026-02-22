@@ -215,6 +215,244 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $product = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as price', function ($join) {
+            $join->on('p.ID', '=', 'price.post_id')
+                ->where('price.meta_key', '_price');
+        })
+        ->leftJoin('wp_postmeta as regular', function ($join) {
+            $join->on('p.ID', '=', 'regular.post_id')
+                ->where('regular.meta_key', '_regular_price');
+        })
+        ->leftJoin('wp_postmeta as sale', function ($join) {
+            $join->on('p.ID', '=', 'sale.post_id')
+                ->where('sale.meta_key', '_sale_price');
+        })
+        ->leftJoin('wp_postmeta as thumb', function ($join) {
+            $join->on('p.ID', '=', 'thumb.post_id')
+                ->where('thumb.meta_key', '_thumbnail_id');
+        })
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->where('p.post_name', $slug)
+        ->select(
+            'p.ID',
+            'p.post_title',
+            'p.post_name',
+            'p.post_content',
+            'p.post_excerpt',
+            'price.meta_value as price',
+            'regular.meta_value as regular_price',
+            'sale.meta_value as sale_price',
+            'img.guid as image'
+        )
+        ->first();
+
+    if (!$product) {
+        abort(404);
+    }
+
+    $metaRows = DB::table('wp_postmeta')
+        ->where('post_id', (int) $product->ID)
+        ->select('meta_key', 'meta_value')
+        ->get();
+
+    $metaByKey = [];
+    foreach ($metaRows as $metaRow) {
+        $metaKey = (string) $metaRow->meta_key;
+        $rawValue = (string) ($metaRow->meta_value ?? '');
+
+        if (!array_key_exists($metaKey, $metaByKey)) {
+            $metaByKey[$metaKey] = $rawValue;
+        }
+    }
+
+    $normalizeMeta = function (?string $value): string {
+        if ($value === null) {
+            return '';
+        }
+
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        $decoded = @unserialize($trimmed);
+        if ($decoded !== false || $trimmed === 'b:0;') {
+            if (is_array($decoded)) {
+                $flat = [];
+                array_walk_recursive($decoded, function ($item) use (&$flat) {
+                    if (is_scalar($item)) {
+                        $text = trim(strip_tags((string) $item));
+                        if ($text !== '') {
+                            $flat[] = $text;
+                        }
+                    }
+                });
+                return implode(', ', array_values(array_unique($flat)));
+            }
+
+            if (is_scalar($decoded)) {
+                return trim(strip_tags((string) $decoded));
+            }
+        }
+
+        return trim(strip_tags($trimmed));
+    };
+
+    $findMetaByNeedles = function (array $needles) use ($metaByKey, $normalizeMeta): string {
+        foreach ($metaByKey as $metaKey => $metaValue) {
+            $lowerKey = strtolower((string) $metaKey);
+            foreach ($needles as $needle) {
+                if (str_contains($lowerKey, strtolower($needle))) {
+                    $normalized = $normalizeMeta($metaValue);
+                    if ($normalized !== '') {
+                        return $normalized;
+                    }
+                }
+            }
+        }
+
+        return '';
+    };
+
+    $attributeRows = DB::table('wp_term_relationships as tr')
+        ->join('wp_term_taxonomy as tt', 'tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+        ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+        ->where('tr.object_id', (int) $product->ID)
+        ->where('tt.taxonomy', 'like', 'pa\\_%')
+        ->select('tt.taxonomy', 't.name')
+        ->get();
+
+    $attributesByTaxonomy = [];
+    foreach ($attributeRows as $attributeRow) {
+        $taxonomy = (string) $attributeRow->taxonomy;
+        $name = trim((string) $attributeRow->name);
+
+        if ($name === '') {
+            continue;
+        }
+
+        if (!isset($attributesByTaxonomy[$taxonomy])) {
+            $attributesByTaxonomy[$taxonomy] = [];
+        }
+
+        if (!in_array($name, $attributesByTaxonomy[$taxonomy], true)) {
+            $attributesByTaxonomy[$taxonomy][] = $name;
+        }
+    }
+
+    $findAttributeValues = function (array $needles) use ($attributesByTaxonomy): array {
+        $values = [];
+
+        foreach ($attributesByTaxonomy as $taxonomy => $items) {
+            $lowerTaxonomy = strtolower((string) $taxonomy);
+            $matched = false;
+
+            foreach ($needles as $needle) {
+                if (str_contains($lowerTaxonomy, strtolower($needle))) {
+                    $matched = true;
+                    break;
+                }
+            }
+
+            if (!$matched) {
+                continue;
+            }
+
+            foreach ($items as $item) {
+                if (!in_array($item, $values, true)) {
+                    $values[] = $item;
+                }
+            }
+        }
+
+        return $values;
+    };
+
+    $materialValues = $findAttributeValues(['material', 'fabric', 'matiere', 'qamash', 'khama']);
+    $colorValues = $findAttributeValues(['color', 'colour', 'لون', 'colorway']);
+    $sizeValues = $findAttributeValues(['size', 'sizes', 'مقاس']);
+    $conditionValues = $findAttributeValues(['condition', 'state', 'status', 'حاله']);
+
+    $material = !empty($materialValues) ? implode(', ', $materialValues) : $findMetaByNeedles(['material', 'fabric', 'khama']);
+    $color = !empty($colorValues) ? implode(', ', $colorValues) : $findMetaByNeedles(['color', 'colour', 'لون']);
+
+    if (empty($sizeValues)) {
+        $sizeFromMeta = $findMetaByNeedles(['size', 'sizes', 'available_size', 'available_sizes']);
+        if ($sizeFromMeta !== '') {
+            $splitSizes = preg_split('/\s*[,|\-]\s*/u', $sizeFromMeta) ?: [];
+            foreach ($splitSizes as $splitSize) {
+                $cleanSize = trim($splitSize);
+                if ($cleanSize !== '' && !in_array($cleanSize, $sizeValues, true)) {
+                    $sizeValues[] = $cleanSize;
+                }
+            }
+        }
+    }
+
+    $condition = !empty($conditionValues)
+        ? implode(', ', $conditionValues)
+        : $findMetaByNeedles(['condition', 'state', 'availability', 'certified']);
+
+    if ($condition === '') {
+        $condition = $currentLocale === 'en'
+            ? 'New — Styliiiish Certified🔥'
+            : 'جديد — معتمد من Styliiiish 🔥';
+    }
+
+    $deliveryIntro = $findMetaByNeedles(['delivery_intro', 'delivery_note', 'delivery_text', 'shipping_note', 'ready_size_note']);
+    if ($deliveryIntro === '') {
+        $deliveryIntro = $currentLocale === 'en'
+            ? 'This dress is available in one ready size. If another size is requested, the item will be made to order.'
+            : 'هذا الفستان متوفر بمقاس جاهز واحد، وإذا طُلب مقاس مختلف يتم تنفيذه حسب الطلب.';
+    }
+
+    $readyDelivery = $findMetaByNeedles(['ready_delivery', 'ready_size_delivery', 'delivery_ready', 'ready_time']);
+    if ($readyDelivery === '') {
+        $readyDelivery = $currentLocale === 'en'
+            ? 'Ready size: Delivery within 2–4 business days'
+            : 'المقاس الجاهز: التوصيل خلال 2–4 أيام عمل';
+    }
+
+    $customDelivery = $findMetaByNeedles(['custom_delivery', 'made_to_order_delivery', 'delivery_custom', 'custom_time']);
+    if ($customDelivery === '') {
+        $customDelivery = $currentLocale === 'en'
+            ? 'Custom size (Made-to-Order): Delivery within 7–10 business days'
+            : 'المقاس الخاص (تفصيل حسب الطلب): التوصيل خلال 7–10 أيام عمل';
+    }
+
+    $sizeGuideUrl = $findMetaByNeedles(['size_guide_url', 'size_guide_link', 'guide_url']);
+    if ($sizeGuideUrl === '' || !str_starts_with(strtolower($sizeGuideUrl), 'http')) {
+        $sizeGuideUrl = $wpBaseUrl . $localePrefix . '/shipping-delivery-policy';
+    }
+
+    return view('product-single', [
+        'product' => $product,
+        'currentLocale' => $currentLocale,
+        'localePrefix' => $localePrefix,
+        'wpBaseUrl' => $wpBaseUrl,
+        'material' => $material,
+        'color' => $color,
+        'condition' => $condition,
+        'sizeValues' => $sizeValues,
+        'deliveryIntro' => $deliveryIntro,
+        'readyDelivery' => $readyDelivery,
+        'customDelivery' => $customDelivery,
+        'sizeGuideUrl' => $sizeGuideUrl,
+    ]);
+};
+
+Route::get('/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
+Route::get('/ar/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
+Route::get('/en/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
+
 $adsHandler = function (string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';

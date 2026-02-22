@@ -333,8 +333,8 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="btn-buy" href="/product/{{ $product->post_name }}/">اشتري الآن</a>
-                                <a class="btn-view" href="/product/{{ $product->post_name }}/">معاينة</a>
+                                <a class="btn-buy" href="{{ $localePrefix }}/product/{{ $product->post_name }}">اشتري الآن</a>
+                                <a class="btn-view" href="{{ $localePrefix }}/product/{{ $product->post_name }}">معاينة</a>
                             </div>
                         </div>
                     </article>

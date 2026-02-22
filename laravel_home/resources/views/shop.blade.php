@@ -307,6 +307,7 @@
             sortSelect.value = state.sort;
 
             const fmt = new Intl.NumberFormat('en-US');
+            const localePrefix = @json($localePrefix);
 
             const buildQuery = () => {
                 const query = new URLSearchParams();
@@ -352,8 +353,8 @@
                             </div>
                             ${save}
                             <div class="actions">
-                                <a class="btn-buy" href="/product/${product.slug}/">اطلبي الآن</a>
-                                <a class="btn-view" href="/product/${product.slug}/">معاينة</a>
+                                <a class="btn-buy" href="${localePrefix}/product/${product.slug}">اطلبي الآن</a>
+                                <a class="btn-view" href="${localePrefix}/product/${product.slug}">معاينة</a>
                             </div>
                         </div>
                     </article>
