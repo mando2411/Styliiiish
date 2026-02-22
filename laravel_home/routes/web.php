@@ -428,9 +428,79 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             : 'المقاس الخاص (تفصيل حسب الطلب): التوصيل خلال 7–10 أيام عمل';
     }
 
-    $sizeGuideUrl = $findMetaByNeedles(['size_guide_url', 'size_guide_link', 'guide_url']);
-    if ($sizeGuideUrl === '' || !str_starts_with(strtolower($sizeGuideUrl), 'http')) {
-        $sizeGuideUrl = $wpBaseUrl . $localePrefix . '/shipping-delivery-policy';
+    $isAbsoluteUrl = function (string $value): bool {
+        $lower = strtolower(trim($value));
+        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
+    };
+
+    $sizeGuideUrl = trim($findMetaByNeedles(['size_guide_url', 'size_guide_link', 'guide_url', 'size_chart_url']));
+
+    if ($sizeGuideUrl !== '' && !$isAbsoluteUrl($sizeGuideUrl) && str_starts_with($sizeGuideUrl, '/')) {
+        $sizeGuideUrl = $wpBaseUrl . $sizeGuideUrl;
+    }
+
+    if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
+        $optionCandidates = DB::table('wp_options')
+            ->where(function ($query) {
+                $query->where('option_name', 'like', '%size%guide%')
+                    ->orWhere('option_name', 'like', '%size%chart%');
+            })
+            ->select('option_name', 'option_value')
+            ->limit(20)
+            ->get();
+
+        foreach ($optionCandidates as $optionCandidate) {
+            $optionValue = trim((string) ($optionCandidate->option_value ?? ''));
+            if ($optionValue === '') {
+                continue;
+            }
+
+            if ($isAbsoluteUrl($optionValue)) {
+                $sizeGuideUrl = $optionValue;
+                break;
+            }
+
+            if (ctype_digit($optionValue)) {
+                $guidePost = DB::table('wp_posts')
+                    ->where('ID', (int) $optionValue)
+                    ->where('post_status', 'publish')
+                    ->select('post_name')
+                    ->first();
+
+                if ($guidePost && !empty($guidePost->post_name)) {
+                    $sizeGuideUrl = $wpBaseUrl . '/' . trim((string) $guidePost->post_name, '/') . '/';
+                    break;
+                }
+            }
+
+            if (str_starts_with($optionValue, '/')) {
+                $sizeGuideUrl = $wpBaseUrl . $optionValue;
+                break;
+            }
+        }
+    }
+
+    if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
+        $guidePage = DB::table('wp_posts')
+            ->where('post_status', 'publish')
+            ->whereIn('post_type', ['page', 'post'])
+            ->where(function ($query) {
+                $query->whereIn('post_name', ['size-guide', 'size-chart', 'dlyl-almqasat'])
+                    ->orWhere('post_title', 'like', '%Size Guide%')
+                    ->orWhere('post_title', 'like', '%Size Chart%')
+                    ->orWhere('post_title', 'like', '%دليل المقاسات%');
+            })
+            ->orderByDesc('ID')
+            ->select('post_name')
+            ->first();
+
+        if ($guidePage && !empty($guidePage->post_name)) {
+            $sizeGuideUrl = $wpBaseUrl . '/' . trim((string) $guidePage->post_name, '/') . '/';
+        }
+    }
+
+    if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
+        $sizeGuideUrl = $wpBaseUrl . '/size-guide/';
     }
 
     return view('product-single', [
