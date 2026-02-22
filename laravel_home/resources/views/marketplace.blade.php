@@ -279,7 +279,7 @@
                         $isSale = $regular > 0 && $price > 0 && $regular > $price;
                         $discount = $isSale ? (int) round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
-                        $productLink = $wpBaseUrl . '/product/' . rawurlencode((string) $product->post_name) . '/';
+                        $productLink = $localePrefix . '/item/' . rawurlencode((string) $product->post_name);
                         $image = $product->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
                     @endphp
                     <article class="card" style="animation-delay: {{ (($loop->index % 8) * 0.04) }}s;">

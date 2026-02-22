@@ -4,7 +4,7 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
-    $canonicalPath = $localePrefix . '/product/' . rawurlencode((string) ($product->post_name ?? ''));
+    $canonicalPath = $localePrefix . '/item/' . rawurlencode((string) ($product->post_name ?? ''));
 
     $translations = [
         'ar' => [
@@ -64,9 +64,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="{{ strip_tags((string) ($product->post_excerpt ?: $product->post_title)) }}">
     <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
-    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/product/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
-    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/product/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
-    <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/product/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
+    <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
     <title>{{ $t('page_title') }}</title>
     <style>
         :root {

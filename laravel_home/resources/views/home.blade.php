@@ -2062,8 +2062,8 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="buy" href="{{ $localePrefix }}/product/{{ $product->post_name }}">{{ $t('order_now') }}</a>
-                                <a class="view-link" href="{{ $localePrefix }}/product/{{ $product->post_name }}">{{ $t('view_product') }}</a>
+                                <a class="buy" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('order_now') }}</a>
+                                <a class="view-link" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>

@@ -449,9 +449,9 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     ]);
 };
 
-Route::get('/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
-Route::get('/ar/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
-Route::get('/en/product/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
+Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
+Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
+Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
 $adsHandler = function (string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';

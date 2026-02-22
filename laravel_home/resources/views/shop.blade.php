@@ -353,8 +353,8 @@
                             </div>
                             ${save}
                             <div class="actions">
-                                <a class="btn-buy" href="${localePrefix}/product/${product.slug}">اطلبي الآن</a>
-                                <a class="btn-view" href="${localePrefix}/product/${product.slug}">معاينة</a>
+                                <a class="btn-buy" href="${localePrefix}/item/${product.slug}">اطلبي الآن</a>
+                                <a class="btn-view" href="${localePrefix}/item/${product.slug}">معاينة</a>
                             </div>
                         </div>
                     </article>
