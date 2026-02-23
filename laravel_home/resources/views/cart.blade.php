@@ -187,6 +187,7 @@
         .totals-row.total{padding-top:12px;border-top:1px dashed var(--line);font-size:16px}.totals-row.total strong{font-size:20px}
         .totals .btn{width:100%}
         .checkout-btn{background:var(--primary);color:#fff;border-color:var(--primary);min-height:46px;font-size:14px}
+        .checkout-btn:hover,.checkout-btn:focus-visible{background:var(--primary);border-color:var(--primary);color:#fff}
         .state{border:1px dashed var(--line);border-radius:14px;text-align:center;padding:30px 14px;color:#6b7280}.state h3{margin:0 0 8px;color:#111827;font-size:22px}
         .site-footer{margin-top:10px;background:#0f1a2a;color:#fff;border-top:4px solid var(--primary)}
         .footer-grid{padding:32px 0 20px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1.1fr;gap:20px}.footer-brand-logo{width:156px;max-width:100%;object-fit:contain;margin-bottom:10px;display:block}
