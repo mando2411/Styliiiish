@@ -592,7 +592,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         ->first();
 
     if ($product) {
-        $product = $localizeProductsCollectionByWpml([$product], $currentLocale, false)->first();
+        $product = $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
     }
 
     if ($isWpmlDebug) {
