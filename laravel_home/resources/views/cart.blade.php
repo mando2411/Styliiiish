@@ -38,6 +38,13 @@
             'shipping_unavailable' => 'سيتم احتساب الشحن عند إتمام الطلب',
             'total' => 'الإجمالي',
             'proceed_checkout' => 'المتابعة لإتمام الطلب',
+            'buy_tips_title' => 'نصائح قبل الشراء',
+            'buy_tips_subtitle' => 'خطوات بسيطة تساعدك على اختيار أدق وتفادي أي تأخير في التسليم.',
+            'buy_tip_1' => 'راجعي المقاس والتفاصيل بدقة داخل صفحة المنتج قبل الدفع.',
+            'buy_tip_2' => 'اكتبي عنوان الشحن ورقم الهاتف بشكل واضح لتسريع التوصيل.',
+            'buy_tip_3' => 'راجعي العناصر والكميات والسعر النهائي قبل تأكيد الطلب.',
+            'buy_tip_4' => 'تأكدي من مدة الشحن المتوقعة بحسب منطقتك.',
+            'policies_title' => 'السياسات المهمة',
             'continue_shopping' => 'متابعة التسوق',
             'view_product' => 'عرض المنتج',
             'load_failed' => 'تعذر تحميل العربة حالياً.',
@@ -90,6 +97,13 @@
             'shipping_unavailable' => 'Will be calculated at checkout',
             'total' => 'Total',
             'proceed_checkout' => 'Proceed to checkout',
+            'buy_tips_title' => 'Before You Buy',
+            'buy_tips_subtitle' => 'Simple steps to help you choose accurately and avoid delivery delays.',
+            'buy_tip_1' => 'Double-check size and product details before completing checkout.',
+            'buy_tip_2' => 'Provide a clear shipping address and phone number for faster delivery.',
+            'buy_tip_3' => 'Review items, quantities, and final total before confirming your order.',
+            'buy_tip_4' => 'Confirm expected shipping time based on your location.',
+            'policies_title' => 'Important Policies',
             'continue_shopping' => 'Continue shopping',
             'view_product' => 'View product',
             'load_failed' => 'Unable to load cart right now.',
@@ -188,6 +202,12 @@
         .totals .btn{width:100%}
         .checkout-btn{background:var(--primary);color:#fff;border-color:var(--primary);min-height:46px;font-size:14px}
         .checkout-btn:hover,.checkout-btn:focus-visible{background:var(--primary);border-color:var(--primary);color:#fff}
+        .tips-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 8px 24px rgba(23,39,59,.05);margin:4px 0 22px}
+        .tips-head{margin:0 0 6px;font-size:21px}.tips-sub{margin:0 0 12px;color:#5a6678}
+        .tips-list{margin:0;padding:0;list-style:none;display:grid;gap:8px}.tips-list li{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fbfcff;color:#1f2937}
+        .policies-title{margin:14px 0 8px;font-size:15px}
+        .policies-links{display:flex;flex-wrap:wrap;gap:8px}.policy-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;background:#fff}
+        .policy-link:hover{border-color:var(--primary);color:var(--primary)}
         .state{border:1px dashed var(--line);border-radius:14px;text-align:center;padding:30px 14px;color:#6b7280}.state h3{margin:0 0 8px;color:#111827;font-size:22px}
         .site-footer{margin-top:10px;background:#0f1a2a;color:#fff;border-top:4px solid var(--primary)}
         .footer-grid{padding:32px 0 20px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1.1fr;gap:20px}.footer-brand-logo{width:156px;max-width:100%;object-fit:contain;margin-bottom:10px;display:block}
@@ -231,6 +251,25 @@
                 <a class="btn" href="{{ $localePrefix }}/shop">{{ $t('continue_shopping') }}</a>
             </div>
         </aside>
+    </section>
+
+    <section class="tips-panel" aria-label="{{ $t('buy_tips_title') }}">
+        <h2 class="tips-head">{{ $t('buy_tips_title') }}</h2>
+        <p class="tips-sub">{{ $t('buy_tips_subtitle') }}</p>
+        <ul class="tips-list">
+            <li>{{ $t('buy_tip_1') }}</li>
+            <li>{{ $t('buy_tip_2') }}</li>
+            <li>{{ $t('buy_tip_3') }}</li>
+            <li>{{ $t('buy_tip_4') }}</li>
+        </ul>
+        <h3 class="policies-title">{{ $t('policies_title') }}</h3>
+        <div class="policies-links">
+            <a class="policy-link" href="{{ $localePrefix }}/privacy-policy">{{ $t('footer_privacy') }}</a>
+            <a class="policy-link" href="{{ $localePrefix }}/terms-conditions">{{ $t('footer_terms') }}</a>
+            <a class="policy-link" href="{{ $localePrefix }}/refund-return-policy">{{ $t('footer_refund') }}</a>
+            <a class="policy-link" href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('footer_shipping') }}</a>
+            <a class="policy-link" href="{{ $localePrefix }}/faq">{{ $t('footer_faq') }}</a>
+        </div>
     </section>
 </main>
 
