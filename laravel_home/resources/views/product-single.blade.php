@@ -33,7 +33,7 @@
             'currency' => 'ج.م',
             'qty' => 'الكمية',
             'select_option' => 'اختاري :label',
-            'add_to_cart' => 'Add to Cart',
+            'add_to_cart' => 'أضيفي إلى العربة',
             'choose_options_first' => 'اختاري المقاس/اللون أولاً',
             'out_of_stock' => 'هذا الاختيار غير متاح حالياً',
             'related' => 'منتجات مشابهة',
@@ -42,6 +42,27 @@
             'policies' => 'سياسات وقوانين',
             'contact_us' => 'تواصلي معنا',
             'direct_call' => 'اتصال مباشر',
+            'account' => 'حسابي',
+            'wishlist' => 'المفضلة',
+            'cart' => 'العربة',
+            'about' => 'من نحن',
+            'categories' => 'الأقسام',
+            'privacy' => 'الخصوصية',
+            'terms' => 'الشروط والأحكام',
+            'refund' => 'الاسترجاع',
+            'faq' => 'الأسئلة الشائعة',
+            'cookies' => 'الكوكيز',
+            'subtotal' => 'الإجمالي الفرعي',
+            'qty_short' => 'الكمية',
+            'loading_cart' => 'جاري تحميل العربة…',
+            'size_col' => 'المقاس',
+            'weight_col' => 'وزن الجسم (كجم)',
+            'bust_col' => 'الصدر (سم)',
+            'waist_col' => 'الخصر (سم)',
+            'hips_col' => 'الأرداف (سم)',
+            'size_guide_note' => 'المقاسات مبنية على قياسات الجسم. إذا كنتِ بين مقاسين، اختاري المقاس الأكبر.',
+            'image_with_number' => 'صورة :number',
+            'gallery_thumbs_label' => 'صور المنتج',
             'all_rights' => 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير',
             'view_product' => 'معاينة',
             'buy_now' => 'اطلبي الآن',
@@ -90,6 +111,27 @@
             'policies' => 'Policies',
             'contact_us' => 'Contact Us',
             'direct_call' => 'Direct Call',
+            'account' => 'Account',
+            'wishlist' => 'Wishlist',
+            'cart' => 'Cart',
+            'about' => 'About',
+            'categories' => 'Categories',
+            'privacy' => 'Privacy',
+            'terms' => 'Terms',
+            'refund' => 'Refund',
+            'faq' => 'FAQ',
+            'cookies' => 'Cookies',
+            'subtotal' => 'Subtotal',
+            'qty_short' => 'Qty',
+            'loading_cart' => 'Loading cart…',
+            'size_col' => 'Size',
+            'weight_col' => 'Body Weight (kg)',
+            'bust_col' => 'Bust (cm)',
+            'waist_col' => 'Waist (cm)',
+            'hips_col' => 'Hips (cm)',
+            'size_guide_note' => 'Sizes are based on body measurements. If you are between two sizes, choose the larger size.',
+            'image_with_number' => 'Image :number',
+            'gallery_thumbs_label' => 'Product gallery thumbnails',
             'all_rights' => 'All rights reserved © :year Styliiiish | Powered by',
             'view_product' => 'View',
             'buy_now' => 'Order Now',
@@ -528,10 +570,10 @@
             </nav>
 
             <div style="display:flex; gap:8px; justify-content:center;">
-                <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="Account" aria-label="Account">👤</a>
-                <a class="head-btn" href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener" title="Wishlist" aria-label="Wishlist">❤</a>
+                <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="{{ $t('account') }}" aria-label="{{ $t('account') }}">👤</a>
+                <a class="head-btn" href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}">❤</a>
                 <span class="cart-trigger-wrap">
-                    <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="Cart" aria-label="Cart">🛒
+                    <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="{{ $t('cart') }}" aria-label="{{ $t('cart') }}">🛒
                         <span class="cart-count" id="cartCountBadge">0</span>
                     </button>
                     <span class="cart-plus-one" id="cartPlusOne">+1</span>
@@ -545,9 +587,9 @@
             <article class="panel media">
                 <img id="mainProductImage" class="media-main" src="{{ $mainImage }}" alt="{{ $product->post_title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
                 @if($galleryImages->count() > 1)
-                    <div class="media-thumbs" id="productMediaThumbs" aria-label="Product gallery thumbnails">
+                    <div class="media-thumbs" id="productMediaThumbs" aria-label="{{ $t('gallery_thumbs_label') }}">
                         @foreach($galleryImages as $galleryIndex => $galleryImage)
-                            <button type="button" class="media-thumb{{ $galleryIndex === 0 ? ' is-active' : '' }}" data-gallery-src="{{ $galleryImage }}" aria-label="Image {{ $galleryIndex + 1 }}">
+                            <button type="button" class="media-thumb{{ $galleryIndex === 0 ? ' is-active' : '' }}" data-gallery-src="{{ $galleryImage }}" aria-label="{{ str_replace(':number', (string) ($galleryIndex + 1), $t('image_with_number')) }}">
                                 <img src="{{ $galleryImage }}" alt="{{ $product->post_title }} - {{ $galleryIndex + 1 }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
                             </button>
                         @endforeach
@@ -678,9 +720,9 @@
                     <li><a href="{{ $localePrefix }}">{{ $t('home') }}</a></li>
                     <li><a href="{{ $localePrefix }}/shop">{{ $t('shop') }}</a></li>
                     <li><a href="{{ $localePrefix }}/blog">{{ $t('blog') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/about-us">About</a></li>
+                    <li><a href="{{ $localePrefix }}/about-us">{{ $t('about') }}</a></li>
                     <li><a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/categories">Categories</a></li>
+                    <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
                 </ul>
             </div>
 
@@ -696,13 +738,13 @@
             <div class="footer-col">
                 <h5>{{ $t('policies') }}</h5>
                 <ul class="footer-links">
-                    <li><a href="{{ $localePrefix }}/about-us">About</a></li>
-                    <li><a href="{{ $localePrefix }}/privacy-policy">Privacy</a></li>
-                    <li><a href="{{ $localePrefix }}/terms-conditions">Terms</a></li>
-                    <li><a href="{{ $localePrefix }}/refund-return-policy">Refund</a></li>
-                    <li><a href="{{ $localePrefix }}/faq">FAQ</a></li>
+                    <li><a href="{{ $localePrefix }}/about-us">{{ $t('about') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('privacy') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('terms') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li>
                     <li><a href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('shipping_policy') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/cookie-policy">Cookies</a></li>
+                    <li><a href="{{ $localePrefix }}/cookie-policy">{{ $t('cookies') }}</a></li>
                 </ul>
             </div>
         </div>
@@ -722,7 +764,7 @@
             </div>
             <div class="mini-cart-list" id="miniCartList"></div>
             <div class="mini-cart-foot">
-                <div class="mini-cart-subtotal"><span>Subtotal</span><strong id="miniCartSubtotal">—</strong></div>
+                <div class="mini-cart-subtotal"><span>{{ $t('subtotal') }}</span><strong id="miniCartSubtotal">—</strong></div>
                 <div class="mini-cart-actions">
                     <a class="mini-cart-view" id="miniCartView" href="{{ $wpBaseUrl }}/cart/">{{ $t('view_cart') }}</a>
                     <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpBaseUrl }}/checkout/">{{ $t('checkout') }}</a>
@@ -743,11 +785,11 @@
                     <table class="sg-table" id="size-guide-table">
                         <thead>
                             <tr>
-                                <th>Size</th>
-                                <th>Body Weight (kg)</th>
-                                <th>Bust (cm)</th>
-                                <th>Waist (cm)</th>
-                                <th>Hips (cm)</th>
+                                <th>{{ $t('size_col') }}</th>
+                                <th>{{ $t('weight_col') }}</th>
+                                <th>{{ $t('bust_col') }}</th>
+                                <th>{{ $t('waist_col') }}</th>
+                                <th>{{ $t('hips_col') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -760,7 +802,7 @@
                             <tr data-size="3xl"><td>3XL</td><td>110 – 120</td><td>132 – 140</td><td>116 – 124</td><td>140 – 148</td></tr>
                         </tbody>
                     </table>
-                    <p class="sg-note">Sizes are based on body measurements. If you are between two sizes, choose the larger size.</p>
+                    <p class="sg-note">{{ $t('size_guide_note') }}</p>
                 </div>
             </div>
         </div>
@@ -784,6 +826,8 @@
             const addFailedText = @json($t('add_to_cart_failed'));
             const cartEmptyText = @json($t('cart_empty'));
             const removeText = @json($t('remove'));
+            const qtyShortText = @json($t('qty_short'));
+            const loadingCartText = @json($t('loading_cart'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
 
             const cartTrigger = document.getElementById('miniCartTrigger');
@@ -924,7 +968,7 @@
                             <a href="${item.url || '#'}"><img src="${item.image || ''}" alt="${item.name || ''}"></a>
                             <div class="mini-cart-info">
                                 <h4>${item.name || ''}</h4>
-                                <div class="mini-cart-meta"><span>Qty:</span><strong>${item.qty || 1}</strong></div>
+                                <div class="mini-cart-meta"><span>${qtyShortText}:</span><strong>${item.qty || 1}</strong></div>
                                 <div class="mini-cart-price">${item.line_total_html || item.price_html || ''}</div>
                             </div>
                             <button type="button" class="mini-cart-remove" data-remove-cart-key="${item.key || ''}">${removeText}</button>
@@ -1046,7 +1090,7 @@
                     if (cartPayloadCache) {
                         renderMiniCart(cartPayloadCache);
                     } else if (miniCartList && miniCartList.innerHTML.trim() === '') {
-                        miniCartList.innerHTML = '<div class="mini-cart-loading">Loading cart…</div>';
+                        miniCartList.innerHTML = `<div class="mini-cart-loading">${loadingCartText}</div>`;
                     }
                     getCartSummary().catch(() => {});
                 });
