@@ -537,6 +537,24 @@
 
         .guide-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-ghost { border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--secondary); padding: 10px 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+        .btn-accent {
+            border: 1px solid var(--primary);
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: .16s ease;
+        }
+        .btn-accent:hover {
+            filter: brightness(0.95);
+            transform: translateY(-1px);
+        }
 
         .description { margin-top: 14px; color: var(--muted); line-height: 1.7; }
 
@@ -1056,8 +1074,8 @@
 
                 <div class="guide-row">
                     <button type="button" class="btn-ghost" id="open-size-guide">{{ $t('size_guide') }}</button>
-                    <a class="btn-ghost" href="{{ $addToWishlistUrl }}" target="_blank" rel="noopener">{{ $t('add_to_wishlist') }}</a>
-                    <button type="button" class="btn-ghost" data-open-review-modal>{{ $t('leave_review') }}</button>
+                    <a class="btn-accent" href="{{ $addToWishlistUrl }}" target="_blank" rel="noopener">{{ $t('add_to_wishlist') }}</a>
+                    <button type="button" class="btn-accent" data-open-review-modal>{{ $t('leave_review') }}</button>
                 </div>
             </article>
         </section>
