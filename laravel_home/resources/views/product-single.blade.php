@@ -19,6 +19,7 @@
             'dress_details' => 'تفاصيل الفستان ✨',
             'material' => 'الخامة',
             'color' => 'اللون',
+            'category' => 'التصنيف',
             'condition' => 'الحالة المتاحة',
             'sizes' => 'المقاسات المتاحة',
             'delivery_title' => 'وقت التوصيل 🚚',
@@ -44,6 +45,7 @@
             'direct_call' => 'اتصال مباشر',
             'account' => 'حسابي',
             'wishlist' => 'المفضلة',
+            'add_to_wishlist' => 'أضيفي إلى المفضلة',
             'cart' => 'العربة',
             'about' => 'من نحن',
             'categories' => 'الأقسام',
@@ -109,6 +111,7 @@
             'dress_details' => 'Dress Details ✨',
             'material' => 'Material',
             'color' => 'Color',
+            'category' => 'Category',
             'condition' => 'Available Conditions',
             'sizes' => 'Available Sizes',
             'delivery_title' => 'Delivery Time 🚚',
@@ -134,6 +137,7 @@
             'direct_call' => 'Direct Call',
             'account' => 'Account',
             'wishlist' => 'Wishlist',
+            'add_to_wishlist' => 'Add to Wishlist',
             'cart' => 'Cart',
             'about' => 'About',
             'categories' => 'Categories',
@@ -242,6 +246,7 @@
     $variationRules = $variationRules ?? [];
     $productAttributesForSelection = $productAttributesForSelection ?? [];
     $relatedProducts = $relatedProducts ?? collect();
+    $productCategoryNames = collect($productCategoryNames ?? [])->map(fn ($name) => trim((string) $name))->filter(fn ($name) => $name !== '')->values();
 
     $normalizeColorKey = function (string $value): string {
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
@@ -293,6 +298,7 @@
     };
 
     $addToCartBase = $wpBaseUrl . '/cart/';
+    $addToWishlistUrl = $wpBaseUrl . '/?add_to_wishlist=' . (int) ($product->ID ?? 0);
     $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
@@ -968,6 +974,7 @@
 
                 <h2 class="section-title">{{ $t('dress_details') }}</h2>
                 <ul class="detail-list">
+                    <li><strong>{{ $t('category') }}:</strong> {{ $productCategoryNames->isNotEmpty() ? $productCategoryNames->implode(', ') : $t('na') }}</li>
                     <li><strong>{{ $t('material') }}:</strong> {{ $material ?: $t('na') }}</li>
                     <li><strong>{{ $t('color') }}:</strong> {{ $color ?: $t('na') }}</li>
                     <li><strong>{{ $t('condition') }}:</strong> {{ $condition ?: $t('na') }}</li>
@@ -1049,6 +1056,8 @@
 
                 <div class="guide-row">
                     <button type="button" class="btn-ghost" id="open-size-guide">{{ $t('size_guide') }}</button>
+                    <a class="btn-ghost" href="{{ $addToWishlistUrl }}" target="_blank" rel="noopener">{{ $t('add_to_wishlist') }}</a>
+                    <button type="button" class="btn-ghost" data-open-review-modal>{{ $t('leave_review') }}</button>
                 </div>
             </article>
         </section>
@@ -1620,14 +1629,12 @@
                 loadTabContent('description');
             }
 
-            if (tabsBody) {
-                tabsBody.addEventListener('click', (event) => {
-                    const trigger = event.target.closest('[data-open-review-modal]');
-                    if (!trigger) return;
-                    event.preventDefault();
-                    openReviewModal();
-                });
-            }
+            document.addEventListener('click', (event) => {
+                const trigger = event.target.closest('[data-open-review-modal]');
+                if (!trigger) return;
+                event.preventDefault();
+                openReviewModal();
+            });
 
             const setReportMessage = (message, isSuccess = false) => {
                 if (!reportMessage) return;

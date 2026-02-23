@@ -1372,6 +1372,17 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         ->unique()
         ->values();
 
+    $productCategoryNames = collect();
+    if ($productCategoryIds->isNotEmpty()) {
+        $productCategoryNames = DB::table('wp_terms')
+            ->whereIn('term_id', $productCategoryIds->all())
+            ->pluck('name')
+            ->map(fn ($name) => trim((string) $name))
+            ->filter(fn ($name) => $name !== '')
+            ->unique()
+            ->values();
+    }
+
     $relatedProducts = collect();
     if ($productCategoryIds->isNotEmpty()) {
         $relatedProducts = DB::table('wp_posts as p')
@@ -1419,6 +1430,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'material' => $material,
         'color' => $color,
         'condition' => $condition,
+        'productCategoryNames' => $productCategoryNames,
         'sizeValues' => $sizeValues,
         'deliveryIntro' => $deliveryIntro,
         'readyDelivery' => $readyDelivery,
