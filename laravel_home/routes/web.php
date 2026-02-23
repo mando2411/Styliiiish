@@ -370,6 +370,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $isWpmlDebug = $request->boolean('debug_wpml');
 
     $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
     $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
@@ -416,6 +417,49 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
     if ($product) {
         $product = $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+    }
+
+    if ($isWpmlDebug) {
+        $wpmlRows = collect();
+        if (!empty($wpmlResolution['trid']) && Schema::hasTable('wp_icl_translations')) {
+            $wpmlRows = DB::table('wp_icl_translations')
+                ->where('element_type', 'post_product')
+                ->where('trid', (int) $wpmlResolution['trid'])
+                ->orderBy('language_code')
+                ->get(['element_id', 'language_code', 'source_language_code', 'trid']);
+        }
+
+        $candidateIds = collect([
+            (int) ($wpmlResolution['base_product_id'] ?? 0),
+            (int) ($wpmlResolution['localized_product_id'] ?? 0),
+            (int) ($product->ID ?? 0),
+        ])->merge($wpmlRows->pluck('element_id')->map(fn ($id) => (int) $id))
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        $posts = collect();
+        if ($candidateIds->isNotEmpty()) {
+            $posts = DB::table('wp_posts')
+                ->whereIn('ID', $candidateIds->all())
+                ->select('ID', 'post_title', 'post_name', 'post_status', 'post_type')
+                ->orderBy('ID')
+                ->get();
+        }
+
+        return response()->json([
+            'locale' => $currentLocale,
+            'slug' => $slug,
+            'found_product' => (bool) $product,
+            'product' => $product ? [
+                'ID' => (int) ($product->ID ?? 0),
+                'post_title' => (string) ($product->post_title ?? ''),
+                'post_name' => (string) ($product->post_name ?? ''),
+            ] : null,
+            'resolution' => $wpmlResolution,
+            'wpml_rows' => $wpmlRows,
+            'posts' => $posts,
+        ], $product ? 200 : 404);
     }
 
     if (!$product) {
