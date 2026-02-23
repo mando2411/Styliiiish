@@ -117,6 +117,36 @@
         $image = $placeholderImage;
     }
 
+    $galleryImages = collect($galleryImages ?? [])
+        ->map(function ($url) use ($wpBaseUrl, $placeholderImage) {
+            $value = trim((string) $url);
+            if ($value === '') {
+                return null;
+            }
+
+            $normalized = str_replace(
+                ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+                [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+                $value
+            );
+
+            if (str_ends_with(strtolower($normalized), '.heic')) {
+                $normalized = $placeholderImage;
+            }
+
+            return $normalized;
+        })
+        ->filter(fn ($url) => is_string($url) && $url !== '')
+        ->prepend($image)
+        ->unique()
+        ->values();
+
+    if ($galleryImages->isEmpty()) {
+        $galleryImages = collect([$image]);
+    }
+
+    $mainImage = (string) $galleryImages->first();
+
     $contentHtml = trim((string) ($product->post_excerpt ?: $product->post_content));
     if ($contentHtml !== '') {
         $contentHtml = str_replace(
@@ -219,7 +249,40 @@
         .product-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 18px; }
         .panel { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
         .media { padding: 12px; }
-        .media img { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; background: #f2f2f5; }
+        .media-main {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #f2f2f5;
+            display: block;
+        }
+        .media-thumbs {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 8px;
+        }
+        .media-thumb {
+            width: 100%;
+            aspect-ratio: 3/4;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: #fff;
+            padding: 0;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .media-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .media-thumb.is-active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(var(--wf-main-rgb), 0.15);
+        }
         .details { padding: 14px; }
         .title { margin: 0 0 8px; font-size: clamp(24px, 4vw, 34px); line-height: 1.3; color: var(--secondary); }
         .prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
@@ -441,6 +504,7 @@
             .r-actions { grid-template-columns: 1fr; }
             .sg-table th,
             .sg-table td { font-size: 12px; padding: 8px; }
+            .media-thumbs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
         }
     </style>
 </head>
@@ -479,7 +543,16 @@
     <main class="container product-wrap">
         <section class="product-grid">
             <article class="panel media">
-                <img src="{{ $image }}" alt="{{ $product->post_title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
+                <img id="mainProductImage" class="media-main" src="{{ $mainImage }}" alt="{{ $product->post_title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
+                @if($galleryImages->count() > 1)
+                    <div class="media-thumbs" id="productMediaThumbs" aria-label="Product gallery thumbnails">
+                        @foreach($galleryImages as $galleryIndex => $galleryImage)
+                            <button type="button" class="media-thumb{{ $galleryIndex === 0 ? ' is-active' : '' }}" data-gallery-src="{{ $galleryImage }}" aria-label="Image {{ $galleryIndex + 1 }}">
+                                <img src="{{ $galleryImage }}" alt="{{ $product->post_title }} - {{ $galleryIndex + 1 }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
+                            </button>
+                        @endforeach
+                    </div>
+                @endif
             </article>
 
             <article class="panel details">
@@ -911,6 +984,31 @@
                 validateVariation();
             } else {
                 addToCartBtn.disabled = false;
+            }
+
+            const mainProductImage = document.getElementById('mainProductImage');
+            const productMediaThumbs = document.getElementById('productMediaThumbs');
+
+            if (mainProductImage && productMediaThumbs) {
+                productMediaThumbs.addEventListener('click', (event) => {
+                    const thumb = event.target.closest('.media-thumb[data-gallery-src]');
+                    if (!thumb) return;
+
+                    const nextSrc = (thumb.getAttribute('data-gallery-src') || '').trim();
+                    if (!nextSrc) return;
+
+                    mainProductImage.src = nextSrc;
+
+                    const thumbImage = thumb.querySelector('img');
+                    if (thumbImage && thumbImage.alt) {
+                        mainProductImage.alt = thumbImage.alt;
+                    }
+
+                    productMediaThumbs.querySelectorAll('.media-thumb.is-active').forEach((node) => {
+                        node.classList.remove('is-active');
+                    });
+                    thumb.classList.add('is-active');
+                });
             }
 
             const handleAddToCartSubmit = async (event) => {

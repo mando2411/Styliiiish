@@ -273,6 +273,44 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         }
     }
 
+    $isAbsoluteUrl = function (string $value): bool {
+        $lower = strtolower(trim($value));
+        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
+    };
+
+    $galleryImages = [];
+
+    if (!empty($product->image) && $isAbsoluteUrl((string) $product->image)) {
+        $galleryImages[] = (string) $product->image;
+    }
+
+    $galleryMetaValue = trim((string) ($metaByKey['_product_image_gallery'] ?? ''));
+    if ($galleryMetaValue !== '') {
+        $galleryIds = collect(explode(',', $galleryMetaValue))
+            ->map(fn ($value) => (int) trim((string) $value))
+            ->filter(fn ($value) => $value > 0)
+            ->values();
+
+        if ($galleryIds->isNotEmpty()) {
+            $galleryRows = DB::table('wp_posts')
+                ->whereIn('ID', $galleryIds->all())
+                ->where('post_type', 'attachment')
+                ->select('ID', 'guid')
+                ->get()
+                ->keyBy('ID');
+
+            foreach ($galleryIds as $galleryId) {
+                $galleryRow = $galleryRows->get($galleryId);
+                $url = trim((string) ($galleryRow->guid ?? ''));
+                if ($url !== '' && $isAbsoluteUrl($url)) {
+                    $galleryImages[] = $url;
+                }
+            }
+        }
+    }
+
+    $galleryImages = array_values(array_unique($galleryImages));
+
     $normalizeMeta = function (?string $value): string {
         if ($value === null) {
             return '';
@@ -448,11 +486,6 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             ? 'Custom size (Made-to-Order): Delivery within 7–10 business days'
             : 'المقاس الخاص (تفصيل حسب الطلب): التوصيل خلال 7–10 أيام عمل';
     }
-
-    $isAbsoluteUrl = function (string $value): bool {
-        $lower = strtolower(trim($value));
-        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
-    };
 
     $extractFirstUrl = function (?string $text): string {
         $raw = trim((string) ($text ?? ''));
@@ -752,6 +785,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'variationRules' => $variationRules,
         'productAttributesForSelection' => $productAttributesForSelection,
         'relatedProducts' => $relatedProducts,
+        'galleryImages' => $galleryImages,
     ];
 
     return response()
