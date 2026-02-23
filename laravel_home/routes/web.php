@@ -968,11 +968,32 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             return $value;
         }
 
-        $normalized = preg_replace('/styliiiish/i', 'ستايلش', $value) ?? $value;
-        $normalized = preg_replace('/\bused\b/ui', 'مستعمل', $normalized) ?? $normalized;
-        $normalized = preg_replace('/very\s+good/ui', 'جيد جدًا', $normalized) ?? $normalized;
-        $normalized = preg_replace('/\bcertified\b/ui', 'معتمد', $normalized) ?? $normalized;
-        $normalized = preg_replace('/\s*[–-]+\s*/u', ' — ', $normalized) ?? $normalized;
+        $normalized = trim($value);
+        $normalized = preg_replace('/\s*[–—-]+\s*/u', ' ', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\s+/u', ' ', $normalized) ?? $normalized;
+        $normalized = mb_strtolower(trim($normalized));
+
+        $hasBrand = str_contains($normalized, 'styliiiish') || str_contains($normalized, 'ستايلش');
+        $hasCertified = str_contains($normalized, 'certified') || str_contains($normalized, 'معتمد');
+        $hasNew = preg_match('/\bnew\b/u', $normalized) || str_contains($normalized, 'جديد');
+        $hasUsed = preg_match('/\bused\b/u', $normalized) || str_contains($normalized, 'مستعمل');
+        $hasVeryGood = preg_match('/very\s*good/u', $normalized) || str_contains($normalized, 'جيد جدًا') || str_contains($normalized, 'جيد جدا');
+
+        if ($hasNew && ($hasBrand || $hasCertified)) {
+            return 'جديد — معتمد من ستايلش 🔥';
+        }
+
+        if ($hasUsed && $hasVeryGood && ($hasBrand || $hasCertified)) {
+            return 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️';
+        }
+
+        $normalized = str_replace('styliiiish', 'ستايلش', $normalized);
+        $normalized = preg_replace('/\bused\b/u', 'مستعمل', $normalized) ?? $normalized;
+        $normalized = preg_replace('/very\s*good/u', 'جيد جدًا', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\bcertified\b/u', 'معتمد', $normalized) ?? $normalized;
+        $normalized = str_replace('ستايلش معتمد', 'معتمد من ستايلش', $normalized);
+        $normalized = preg_replace('/\s+/u', ' ', trim($normalized)) ?? $normalized;
+        $normalized = preg_replace('/\s*[–—-]+\s*/u', ' — ', $normalized) ?? $normalized;
 
         return trim($normalized);
     };
