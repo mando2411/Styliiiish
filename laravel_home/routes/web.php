@@ -1993,71 +1993,47 @@ $submitProductReviewHandler = function (Request $request, string $slug, string $
     ]);
 };
 
-$wishlistWordPressBootstrap = function (): bool {
-    static $booted = false;
+$wishlistBridgeCall = function (Request $request, array $payload): array {
+    $bridgeUrl = rtrim($request->getSchemeAndHttpHost(), '/') . '/wishlist-bridge.php';
 
-    if ($booted) {
-        return true;
-    }
+    try {
+        $bridgeResponse = Http::asForm()
+            ->timeout(12)
+            ->withHeaders([
+                'Cookie' => (string) $request->header('Cookie', ''),
+                'X-Forwarded-For' => (string) $request->ip(),
+                'User-Agent' => (string) ($request->userAgent() ?: 'Styliiiish-Laravel-Bridge'),
+            ])
+            ->post($bridgeUrl, $payload);
 
-    if (function_exists('fable_extra_woowishlist_add')) {
-        $booted = true;
-        return true;
-    }
-
-    $candidates = array_values(array_unique(array_filter([
-        base_path('../wp-load.php'),
-        base_path('../../wp-load.php'),
-        dirname(base_path()) . DIRECTORY_SEPARATOR . 'wp-load.php',
-        dirname(dirname(base_path())) . DIRECTORY_SEPARATOR . 'wp-load.php',
-        isset($_SERVER['DOCUMENT_ROOT']) ? rtrim((string) $_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'wp-load.php' : null,
-    ], fn ($path) => is_string($path) && trim($path) !== '')));
-
-    foreach ($candidates as $wpLoadPath) {
-        if (!is_file($wpLoadPath)) {
-            continue;
+        $json = $bridgeResponse->json();
+        if (!is_array($json)) {
+            $json = ['success' => false, 'message' => 'Invalid bridge response.'];
         }
 
-        try {
-            require_once $wpLoadPath;
+        return [
+            'ok' => $bridgeResponse->ok() && (bool) ($json['success'] ?? false),
+            'status' => $bridgeResponse->status(),
+            'json' => $json,
+            'set_cookie' => $bridgeResponse->header('Set-Cookie'),
+        ];
+    } catch (\Throwable $exception) {
+        logger()->error('Wishlist bridge call failed', [
+            'url' => $bridgeUrl,
+            'payload_action' => $payload['action'] ?? null,
+            'error' => $exception->getMessage(),
+        ]);
 
-            if (function_exists('fable_extra_woowishlist_add')) {
-                $booted = true;
-                return true;
-            }
-        } catch (\Throwable $exception) {
-            logger()->error('Wishlist WP bootstrap failed', [
-                'wp_load_path' => $wpLoadPath,
-                'error' => $exception->getMessage(),
-            ]);
-        }
+        return [
+            'ok' => false,
+            'status' => 500,
+            'json' => ['success' => false, 'message' => 'Bridge call failed.'],
+            'set_cookie' => null,
+        ];
     }
-
-    logger()->error('Wishlist WP bootstrap failed: wp-load.php not resolved', [
-        'candidates' => $candidates,
-    ]);
-
-    return false;
 };
 
-$wishlistCountForCurrentVisitor = function () use ($wishlistWordPressBootstrap): ?int {
-    if (!$wishlistWordPressBootstrap()) {
-        return null;
-    }
-
-    if (!function_exists('fable_extra_woowishlist_get_list')) {
-        return null;
-    }
-
-    $list = fable_extra_woowishlist_get_list();
-    if (!is_array($list)) {
-        return 0;
-    }
-
-    return count(array_unique(array_map('intval', $list)));
-};
-
-$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistWordPressBootstrap, $wishlistCountForCurrentVisitor) {
+$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $product = $resolveProductForAjaxSections($slug, $currentLocale);
 
@@ -2065,7 +2041,12 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
     }
 
-    if (!$wishlistWordPressBootstrap()) {
+    $bridge = $wishlistBridgeCall($request, [
+        'action' => 'add',
+        'pid' => (int) $product->ID,
+    ]);
+
+    if (!$bridge['ok']) {
         return response()->json([
             'success' => false,
             'message' => $currentLocale === 'en'
@@ -2074,32 +2055,29 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
         ], 500);
     }
 
-    if (!function_exists('fable_extra_woowishlist_add')) {
-        return response()->json([
-            'success' => false,
-            'message' => $currentLocale === 'en'
-                ? 'Wishlist plugin is not active.'
-                : 'إضافة المفضلة غير مفعلة حالياً.',
-        ], 500);
-    }
-
-    fable_extra_woowishlist_add((int) $product->ID);
-    $count = $wishlistCountForCurrentVisitor();
-
-    return response()->json([
+    $count = max(0, (int) ($bridge['json']['count'] ?? 0));
+    $response = response()->json([
         'success' => true,
-        'count' => max(0, (int) ($count ?? 0)),
+        'count' => $count,
         'message' => $currentLocale === 'en'
             ? 'Product added to wishlist.'
             : 'تمت إضافة المنتج إلى المفضلة.',
     ]);
+
+    if (!empty($bridge['set_cookie'])) {
+        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
+    }
+
+    return $response;
 };
 
-$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistCountForCurrentVisitor) {
+$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-    $count = $wishlistCountForCurrentVisitor();
+    $bridge = $wishlistBridgeCall($request, [
+        'action' => 'count',
+    ]);
 
-    if ($count === null) {
+    if (!$bridge['ok']) {
         return response()->json([
             'success' => false,
             'message' => $currentLocale === 'en'
@@ -2108,10 +2086,16 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
         ], 500);
     }
 
-    return response()->json([
+    $response = response()->json([
         'success' => true,
-        'count' => max(0, (int) $count),
+        'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
     ]);
+
+    if (!empty($bridge['set_cookie'])) {
+        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
+    }
+
+    return $response;
 };
 
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
