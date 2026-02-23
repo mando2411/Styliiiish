@@ -1833,6 +1833,35 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             $slugKey = trim((string) ($policyRow->slug_key ?? $policyRow->post_name ?? ''));
             $url = $wpBaseUrl . $localePrefix . '/' . trim($slugKey, '/') . '/';
 
+            if ($currentLocale === 'ar') {
+                $hasArabicText = preg_match('/[\x{0600}-\x{06FF}]/u', $title . ' ' . $plain) === 1;
+                if (!$hasArabicText) {
+                    $arabicFallbackMap = [
+                        'shipping-delivery-policy' => [
+                            'title' => 'سياسة الشحن والتوصيل',
+                            'excerpt' => 'نلتزم بتوصيل طلباتك بأسرع وقت وبأفضل تجربة ممكنة. توضّح هذه السياسة مناطق الشحن، أوقات التجهيز، المدد المتوقعة للتوصيل، وآلية المتابعة حتى الاستلام.',
+                        ],
+                        'refund-return-policy' => [
+                            'title' => 'سياسة الاسترجاع والاستبدال',
+                            'excerpt' => 'نحرص على رضاك الكامل عن الطلب. توضّح هذه السياسة شروط الاسترجاع والاستبدال، المدد المتاحة، الحالات المقبولة، وخطوات معالجة طلبات الاسترداد.',
+                        ],
+                        'privacy-policy' => [
+                            'title' => 'سياسة الخصوصية',
+                            'excerpt' => 'نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضّح هذه السياسة البيانات التي نجمعها، سبب جمعها، وكيفية استخدامها، والخيارات المتاحة للتحكم بها.',
+                        ],
+                        'terms-conditions' => [
+                            'title' => 'الشروط والأحكام',
+                            'excerpt' => 'تنظّم هذه الشروط والأحكام استخدامك للموقع وإتمام عمليات الشراء. باستخدامك للموقع فإنك توافق على البنود المنظمة للطلبات، الدفع، الشحن، وسياسات المتجر.',
+                        ],
+                    ];
+
+                    if (isset($arabicFallbackMap[$slugKey])) {
+                        $title = (string) $arabicFallbackMap[$slugKey]['title'];
+                        $excerpt = (string) $arabicFallbackMap[$slugKey]['excerpt'];
+                    }
+                }
+            }
+
             $cards[] = '<article style="border:1px solid rgba(189,189,189,.4);border-radius:12px;padding:12px;background:#fff;">'
                 . '<h4 style="margin:0 0 8px;font-size:15px;color:#17273B;">' . e($title) . '</h4>'
                 . '<p style="margin:0;color:#5a6678;line-height:1.8;">' . e($excerpt) . '</p>'
