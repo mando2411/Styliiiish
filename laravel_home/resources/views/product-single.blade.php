@@ -472,6 +472,19 @@
         }
         .btn-main:disabled { opacity: .55; cursor: not-allowed; }
         .help-text { margin-top: 8px; font-size: 13px; color: var(--muted); min-height: 18px; }
+        .attr-warning {
+            margin-top: 8px;
+            border: 1px solid rgba(213, 21, 34, 0.24);
+            background: #fff7f8;
+            color: var(--secondary);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 12px;
+            line-height: 1.6;
+            display: none;
+        }
+        .attr-warning.is-visible { display: block; }
+        .attr-warning strong { color: var(--primary); }
 
         .guide-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-ghost { border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--secondary); padding: 10px 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
@@ -801,6 +814,7 @@
                                 </div>
                             @endforeach
                         </div>
+                        <div class="attr-warning" id="conditionAvailabilityHint" aria-live="polite"></div>
                     @endif
 
                     <div class="cart-row">
@@ -979,12 +993,14 @@
             const removeText = @json($t('remove'));
             const qtyShortText = @json($t('qty_short'));
             const loadingCartText = @json($t('loading_cart'));
+            const currentLocale = @json($currentLocale);
             const currencyText = @json($t('currency'));
             const contactForPriceText = @json($t('contact_for_price'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
 
             const priceNode = document.getElementById('productPrice');
             const oldPriceNode = document.getElementById('productOldPrice');
+            const conditionAvailabilityHint = document.getElementById('conditionAvailabilityHint');
             const basePrice = Number(@json((float) ($price ?? 0))) || 0;
             const baseRegularPrice = Number(@json((float) ($regular ?? 0))) || 0;
 
@@ -1097,6 +1113,114 @@
                 });
             };
 
+            const normalizeLookupValue = (value) => String(value || '').trim().toLowerCase();
+
+            const findAttributeKey = (needles) => {
+                const normalizedNeedles = needles.map((needle) => normalizeLookupValue(needle));
+                const keys = [...new Set(attributeValueNodes.map((node) => String(node.getAttribute('data-attribute-key') || '').trim()).filter(Boolean))];
+                return keys.find((key) => {
+                    const normalizedKey = normalizeLookupValue(key);
+                    return normalizedNeedles.some((needle) => normalizedKey.includes(needle));
+                }) || null;
+            };
+
+            const getOptionLabelByValue = (attributeKey) => {
+                const map = new Map();
+                optionButtons
+                    .filter((button) => (button.getAttribute('data-attribute-key') || '').trim() === attributeKey)
+                    .forEach((button) => {
+                        const value = (button.getAttribute('data-option-value') || '').trim();
+                        const labelNode = button.querySelector('span:last-child');
+                        const label = (labelNode ? labelNode.textContent : button.textContent || '').trim();
+                        if (value !== '' && label !== '') {
+                            map.set(value, label);
+                        }
+                    });
+                return map;
+            };
+
+            const isUsedConditionOption = (label, value) => {
+                const normalizedLabel = normalizeLookupValue(label);
+                const normalizedValue = normalizeLookupValue(value);
+                return normalizedLabel.includes('مستعمل')
+                    || normalizedLabel.includes('used')
+                    || normalizedLabel.includes('pre-loved')
+                    || normalizedValue.includes('used')
+                    || normalizedValue.includes('pre-loved')
+                    || normalizedValue.includes('mosta')
+                    || normalizedValue.includes('musta');
+            };
+
+            const updateConditionAvailabilityHint = () => {
+                if (!conditionAvailabilityHint || !hasVariations) return;
+
+                const conditionKey = findAttributeKey(['condition', 'حاله', 'حالة']);
+                const sizeKey = findAttributeKey(['size', 'مقاس']);
+
+                if (!conditionKey || !sizeKey) {
+                    conditionAvailabilityHint.classList.remove('is-visible');
+                    conditionAvailabilityHint.innerHTML = '';
+                    return;
+                }
+
+                const sizeLabelMap = getOptionLabelByValue(sizeKey);
+                const usedConditionButtons = optionButtons.filter((button) => {
+                    if ((button.getAttribute('data-attribute-key') || '').trim() !== conditionKey) {
+                        return false;
+                    }
+                    const value = (button.getAttribute('data-option-value') || '').trim();
+                    const labelNode = button.querySelector('span:last-child');
+                    const label = (labelNode ? labelNode.textContent : button.textContent || '').trim();
+                    return isUsedConditionOption(label, value);
+                });
+
+                if (usedConditionButtons.length === 0) {
+                    conditionAvailabilityHint.classList.remove('is-visible');
+                    conditionAvailabilityHint.innerHTML = '';
+                    return;
+                }
+
+                const warnings = [];
+                usedConditionButtons.forEach((button) => {
+                    if (!button.disabled) return;
+
+                    const conditionValue = (button.getAttribute('data-option-value') || '').trim();
+                    if (!conditionValue) return;
+
+                    const labelNode = button.querySelector('span:last-child');
+                    const conditionLabel = (labelNode ? labelNode.textContent : button.textContent || '').trim();
+
+                    const availableSizes = variationRules
+                        .filter((rule) => {
+                            const stockStatus = String(rule.stock_status || 'instock').toLowerCase();
+                            if (stockStatus !== 'instock') return false;
+                            return getRuleAttributeValue(rule, conditionKey) === conditionValue;
+                        })
+                        .map((rule) => getRuleAttributeValue(rule, sizeKey))
+                        .filter((value) => value !== '')
+                        .filter((value, index, array) => array.indexOf(value) === index)
+                        .map((value) => sizeLabelMap.get(value) || value.toUpperCase());
+
+                    if (availableSizes.length === 0) return;
+
+                    if (currentLocale === 'en') {
+                        warnings.push(`<strong>${conditionLabel}</strong> is available only in: ${availableSizes.join(', ')}`);
+                    } else {
+                        warnings.push(`<strong>${conditionLabel}</strong> متاحة فقط في المقاسات: ${availableSizes.join('، ')}`);
+                    }
+                });
+
+                if (warnings.length === 0) {
+                    conditionAvailabilityHint.classList.remove('is-visible');
+                    conditionAvailabilityHint.innerHTML = '';
+                    return;
+                }
+
+                const intro = currentLocale === 'en' ? 'Note:' : 'تنبيه:';
+                conditionAvailabilityHint.innerHTML = `<strong>${intro}</strong> ${warnings.join('<br>')}`;
+                conditionAvailabilityHint.classList.add('is-visible');
+            };
+
             const refreshOptionAvailability = () => {
                 if (!selectorsWrap) return;
 
@@ -1149,6 +1273,7 @@
 
                 refreshOptionAvailability();
                 syncPostedAttributes();
+                updateConditionAvailabilityHint();
 
                 const selected = getSelected();
                 const selectedInStockRules = findCompatibleRules(selected);
