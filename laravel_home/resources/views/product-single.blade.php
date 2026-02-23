@@ -1554,7 +1554,7 @@
                 <div class="mini-cart-subtotal"><span>{{ $t('subtotal') }}</span><strong id="miniCartSubtotal">—</strong></div>
                 <div class="mini-cart-actions">
                     <a class="mini-cart-view" id="miniCartView" href="{{ $localePrefix }}/cart">{{ $t('view_cart') }}</a>
-                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $localePrefix }}/checkout">{{ $t('checkout') }}</a>
+                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpBaseUrl }}/checkout/">{{ $t('checkout') }}</a>
                 </div>
             </div>
         </aside>
@@ -2504,7 +2504,7 @@
 
                 if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
                 if (miniCartView) miniCartView.href = `${@json($localePrefix)}/cart`;
-                if (miniCartCheckout) miniCartCheckout.href = `${@json($localePrefix)}/checkout`;
+                if (miniCartCheckout && payload.checkout_url) miniCartCheckout.href = payload.checkout_url;
 
                 if (!miniCartList) return;
                 const items = Array.isArray(payload.items) ? payload.items : [];

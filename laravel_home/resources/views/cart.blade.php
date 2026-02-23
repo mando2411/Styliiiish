@@ -247,7 +247,7 @@
                     <a class="shipment-change" id="changeAddressLink" href="{{ $wpBaseUrl }}/cart/">{{ $t('change_address') }}</a>
                 </div>
                 <div class="totals-row total"><span>{{ $t('total') }}</span><strong id="cartTotal">—</strong></div>
-                <a class="btn checkout-btn" id="proceedCheckoutBtn" href="{{ $localePrefix }}/checkout">{{ $t('proceed_checkout') }}</a>
+                <a class="btn checkout-btn" id="proceedCheckoutBtn" href="{{ $wpBaseUrl }}/checkout/">{{ $t('proceed_checkout') }}</a>
                 <a class="btn" href="{{ $localePrefix }}/shop">{{ $t('continue_shopping') }}</a>
             </div>
         </aside>
@@ -317,7 +317,7 @@
     const renderTotals = (payload) => {
         cartSubtotal.innerHTML = payload.subtotal_html || '—';
         cartTotal.innerHTML = payload.total_html || payload.subtotal_html || '—';
-        if (proceedCheckoutBtn) proceedCheckoutBtn.href = `${localePrefix}/checkout`;
+        if (proceedCheckoutBtn && payload.checkout_url) proceedCheckoutBtn.href = payload.checkout_url;
 
         const lines = Array.isArray(payload.shipping_lines) ? payload.shipping_lines : [];
         const firstLine = lines.length ? lines[0] : null;
