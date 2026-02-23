@@ -967,7 +967,21 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return (string) ($localeMap[$taxonomyKey] ?? $fallbackLabel);
     };
 
-    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue): string {
+    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey): string {
+        $localeMap = $wooAttributeValueTranslations[$currentLocale] ?? [];
+        $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
+        $taxonomyMap = $localeMap[$taxonomyKey] ?? [];
+
+        $slugKey = $normalizeTranslationKey($slug);
+        if ($slugKey !== '' && array_key_exists($slugKey, $taxonomyMap)) {
+            return (string) $taxonomyMap[$slugKey];
+        }
+
+        $valueKey = $normalizeTranslationKey($fallbackValue);
+        if ($valueKey !== '' && array_key_exists($valueKey, $taxonomyMap)) {
+            return (string) $taxonomyMap[$valueKey];
+        }
+
         return $fallbackValue;
     };
 
