@@ -46,6 +46,8 @@
             'account' => 'حسابي',
             'wishlist' => 'المفضلة',
             'add_to_wishlist' => 'أضيفي إلى المفضلة',
+            'added_to_wishlist' => 'تمت إضافة المنتج إلى المفضلة',
+            'wishlist_add_failed' => 'تعذر إضافة المنتج إلى المفضلة',
             'cart' => 'العربة',
             'about' => 'من نحن',
             'categories' => 'الأقسام',
@@ -138,6 +140,8 @@
             'account' => 'Account',
             'wishlist' => 'Wishlist',
             'add_to_wishlist' => 'Add to Wishlist',
+            'added_to_wishlist' => 'Product added to wishlist',
+            'wishlist_add_failed' => 'Unable to add product to wishlist',
             'cart' => 'Cart',
             'about' => 'About',
             'categories' => 'Categories',
@@ -299,6 +303,7 @@
 
     $addToCartBase = $wpBaseUrl . '/cart/';
     $addToWishlistUrl = $wpBaseUrl . '/?add_to_wishlist=' . (int) ($product->ID ?? 0);
+    $wishlistPageUrl = $wpBaseUrl . '/wishlist/';
     $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
@@ -348,6 +353,38 @@
         .nav a { padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; white-space: nowrap; }
         .nav a.active, .nav a:hover { color: var(--primary); background: #fff4f5; }
         .head-btn { border: 1px solid var(--line); border-radius: 10px; min-width: 38px; min-height: 38px; display: inline-flex; align-items: center; justify-content: center; background: #fff; }
+        .wishlist-trigger-wrap { position: relative; }
+        .wishlist-trigger { position: relative; }
+        .wishlist-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 800;
+            padding: 0 4px;
+            display: none;
+        }
+        .wishlist-plus-one {
+            position: absolute;
+            top: -24px;
+            right: -4px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+        .wishlist-plus-one.show {
+            animation: cartPlusOne .8s ease;
+        }
         .cart-trigger-wrap { position: relative; }
         .cart-trigger { position: relative; }
         .cart-count {
@@ -943,7 +980,12 @@
 
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="{{ $t('account') }}" aria-label="{{ $t('account') }}">👤</a>
-                <a class="head-btn" href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}">❤</a>
+                <span class="wishlist-trigger-wrap">
+                    <a class="head-btn wishlist-trigger" id="wishlistTrigger" href="{{ $wishlistPageUrl }}" target="_blank" rel="noopener" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}">❤
+                        <span class="wishlist-count" id="wishlistCountBadge">0</span>
+                    </a>
+                    <span class="wishlist-plus-one" id="wishlistPlusOne">+1</span>
+                </span>
                 <span class="cart-trigger-wrap">
                     <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="{{ $t('cart') }}" aria-label="{{ $t('cart') }}">🛒
                         <span class="cart-count" id="cartCountBadge">0</span>
@@ -1074,7 +1116,7 @@
 
                 <div class="guide-row">
                     <button type="button" class="btn-ghost" id="open-size-guide">{{ $t('size_guide') }}</button>
-                    <a class="btn-accent" href="{{ $addToWishlistUrl }}" target="_blank" rel="noopener">{{ $t('add_to_wishlist') }}</a>
+                    <button type="button" class="btn-accent" id="addToWishlistBtn">{{ $t('add_to_wishlist') }}</button>
                     <button type="button" class="btn-accent" data-open-review-modal>{{ $t('leave_review') }}</button>
                 </div>
             </article>
@@ -1322,6 +1364,8 @@
             const outOfStockText = @json($t('out_of_stock'));
             const addedToCartText = @json($t('added_to_cart'));
             const addFailedText = @json($t('add_to_cart_failed'));
+            const addedToWishlistText = @json($t('added_to_wishlist'));
+            const wishlistAddFailedText = @json($t('wishlist_add_failed'));
             const cartEmptyText = @json($t('cart_empty'));
             const removeText = @json($t('remove'));
             const qtyShortText = @json($t('qty_short'));
@@ -1335,10 +1379,13 @@
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json((string) ($product->post_name ?? ''));
+            const addToWishlistUrl = @json($addToWishlistUrl);
+            const wishlistPageUrl = @json($wishlistPageUrl);
 
             const priceNode = document.getElementById('productPrice');
             const oldPriceNode = document.getElementById('productOldPrice');
             const conditionAvailabilityHint = document.getElementById('conditionAvailabilityHint');
+            const addToWishlistBtn = document.getElementById('addToWishlistBtn');
             const basePrice = Number(@json((float) ($price ?? 0))) || 0;
             const baseRegularPrice = Number(@json((float) ($regular ?? 0))) || 0;
 
@@ -1360,6 +1407,9 @@
             const reviewStars = reviewModal ? Array.from(reviewModal.querySelectorAll('[data-review-star]')) : [];
 
             const cartTrigger = document.getElementById('miniCartTrigger');
+            const wishlistTrigger = document.getElementById('wishlistTrigger');
+            const wishlistBadge = document.getElementById('wishlistCountBadge');
+            const wishlistPlusOne = document.getElementById('wishlistPlusOne');
             const cartBadge = document.getElementById('cartCountBadge');
             const plusOne = document.getElementById('cartPlusOne');
             const miniCart = document.getElementById('miniCart');
@@ -1369,8 +1419,10 @@
             const miniCartCheckout = document.getElementById('miniCartCheckout');
             const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
             let currentCartCount = Number((cartBadge && cartBadge.textContent) || 0) || 0;
+            let currentWishlistCount = Number((wishlistBadge && wishlistBadge.textContent) || 0) || 0;
             let cartPayloadCache = null;
             let isAddingToCart = false;
+            let isAddingToWishlist = false;
 
             const setCartCount = (count) => {
                 currentCartCount = Math.max(0, Number(count) || 0);
@@ -1386,6 +1438,71 @@
                     return items.reduce((total, item) => total + Math.max(0, Number(item.qty || 0)), 0);
                 }
                 return Math.max(0, Number(payload.count || 0));
+            };
+
+            const setWishlistCount = (count) => {
+                currentWishlistCount = Math.max(0, Number(count) || 0);
+                if (!wishlistBadge) return;
+                wishlistBadge.textContent = String(currentWishlistCount);
+                wishlistBadge.style.display = currentWishlistCount > 0 ? 'inline-block' : 'none';
+            };
+
+            const animateWishlistPlusOne = () => {
+                if (!wishlistPlusOne) return;
+                wishlistPlusOne.classList.remove('show');
+                void wishlistPlusOne.offsetWidth;
+                wishlistPlusOne.classList.add('show');
+            };
+
+            const fetchWishlistCount = async () => {
+                const response = await fetch(`${wishlistPageUrl}${wishlistPageUrl.includes('?') ? '&' : '?'}_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                if (!response.ok) {
+                    throw new Error('wishlist_count_failed');
+                }
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const removeButtons = doc.querySelectorAll('.fable-extra-woowishlist-remove');
+
+                if (removeButtons.length > 0) {
+                    return removeButtons.length;
+                }
+
+                const fallbackMatches = html.match(/fable-extra-woowishlist-remove/g);
+                return fallbackMatches ? fallbackMatches.length : 0;
+            };
+
+            const refreshWishlistCount = async (withAnimation = false) => {
+                try {
+                    const count = await fetchWishlistCount();
+                    const shouldAnimate = withAnimation && count > currentWishlistCount;
+                    setWishlistCount(count);
+                    if (shouldAnimate) {
+                        animateWishlistPlusOne();
+                    }
+                } catch (error) {
+                }
+            };
+
+            const addToWishlistAjax = async () => {
+                const response = await fetch(`${addToWishlistUrl}${addToWishlistUrl.includes('?') ? '&' : '?'}_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                if (!response.ok) {
+                    throw new Error(wishlistAddFailedText);
+                }
+
+                await refreshWishlistCount(true);
+                helpText.textContent = addedToWishlistText;
             };
 
             const syncPostedAttributes = () => {
@@ -2117,6 +2234,27 @@
                 addToCartForm.addEventListener('submit', handleAddToCartSubmit);
             }
 
+            if (addToWishlistBtn) {
+                addToWishlistBtn.addEventListener('click', async () => {
+                    if (isAddingToWishlist) return;
+
+                    const originalText = addToWishlistBtn.textContent;
+                    isAddingToWishlist = true;
+                    addToWishlistBtn.disabled = true;
+                    addToWishlistBtn.textContent = '...';
+
+                    try {
+                        await addToWishlistAjax();
+                    } catch (error) {
+                        helpText.textContent = (error && error.message) ? error.message : wishlistAddFailedText;
+                    } finally {
+                        isAddingToWishlist = false;
+                        addToWishlistBtn.disabled = false;
+                        addToWishlistBtn.textContent = originalText;
+                    }
+                });
+            }
+
             if (cartTrigger) {
                 cartTrigger.addEventListener('click', () => {
                     openMiniCart();
@@ -2166,6 +2304,8 @@
             getCartSummary().catch(() => {
                 setCartCount(0);
             });
+            setWishlistCount(currentWishlistCount);
+            refreshWishlistCount(false);
 
             const trigger = document.getElementById('open-size-guide');
             const modal = document.getElementById('size-guide-modal');
