@@ -406,6 +406,14 @@
             display: none;
             z-index: 80;
         }
+        [dir="rtl"] .wishlist-dropdown {
+            right: auto;
+            left: 0;
+        }
+        [dir="ltr"] .wishlist-dropdown {
+            left: auto;
+            right: 0;
+        }
         .wishlist-dropdown.is-open { display: block; }
         .wishlist-dropdown-list { display: grid; gap: 8px; max-height: 360px; overflow: auto; }
         .wishlist-dropdown-item {
