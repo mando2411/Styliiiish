@@ -1088,6 +1088,12 @@
             .sg-table th,
             .sg-table td { font-size: 12px; padding: 8px; }
             .media-thumbs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+            .wishlist-dropdown {
+                left: 50% !important;
+                right: auto !important;
+                transform: translateX(-50%);
+                width: min(360px, 92vw);
+            }
         }
     </style>
 </head>
