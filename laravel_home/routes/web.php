@@ -2098,6 +2098,51 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $bridge = $wishlistBridgeCall($request, [
+        'action' => 'list',
+        'limit' => 8,
+    ]);
+
+    if (!$bridge['ok']) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en'
+                ? 'Unable to load wishlist items.'
+                : 'تعذر تحميل عناصر المفضلة.',
+        ], 500);
+    }
+
+    $rawItems = collect($bridge['json']['items'] ?? [])->filter(fn ($item) => is_array($item))->values();
+    $localePrefix = '/' . $currentLocale;
+
+    $items = $rawItems->map(function (array $item) use ($localePrefix) {
+        $slug = trim((string) ($item['slug'] ?? ''));
+        $fallbackUrl = trim((string) ($item['url'] ?? ''));
+        $productUrl = $slug !== '' ? $localePrefix . '/item/' . rawurlencode($slug) : $fallbackUrl;
+
+        return [
+            'id' => (int) ($item['id'] ?? 0),
+            'name' => (string) ($item['name'] ?? ''),
+            'image' => (string) ($item['image'] ?? ''),
+            'url' => $productUrl,
+        ];
+    })->filter(fn ($item) => $item['id'] > 0 && $item['name'] !== '' && $item['url'] !== '')->values();
+
+    $response = response()->json([
+        'success' => true,
+        'count' => max(0, (int) ($bridge['json']['count'] ?? $items->count())),
+        'items' => $items,
+    ]);
+
+    if (!empty($bridge['set_cookie'])) {
+        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
+    }
+
+    return $response;
+};
+
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
@@ -2117,6 +2162,10 @@ Route::post('/en/item/{slug}/wishlist/add', fn (Request $request, string $slug) 
 Route::get('/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
 Route::get('/ar/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
 Route::get('/en/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'en'));
+
+Route::get('/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'ar'));
+Route::get('/ar/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'ar'));
+Route::get('/en/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'en'));
 
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));

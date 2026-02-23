@@ -35,6 +35,15 @@ if (!function_exists('fable_extra_woowishlist_get_list') || !function_exists('fa
     exit;
 }
 
+
+$normalizeList = static function ($list): array {
+    if (!is_array($list)) {
+        return [];
+    }
+
+    return array_values(array_unique(array_map('intval', array_filter($list, static fn ($value) => (int) $value > 0))));
+};
+
 $action = isset($_POST['action']) ? (string) $_POST['action'] : '';
 
 if ($action === 'add') {
@@ -50,7 +59,7 @@ if ($action === 'add') {
     }
 
     fable_extra_woowishlist_add($pid);
-} elseif ($action !== 'count') {
+} elseif (!in_array($action, ['count', 'list'], true)) {
     http_response_code(422);
     echo json_encode([
         'success' => false,
@@ -59,12 +68,57 @@ if ($action === 'add') {
     exit;
 }
 
-$list = fable_extra_woowishlist_get_list();
-if (!is_array($list)) {
-    $list = [];
-}
+$list = $normalizeList(fable_extra_woowishlist_get_list());
 
-$count = count(array_unique(array_map('intval', $list)));
+$count = count($list);
+
+if ($action === 'list') {
+    $limit = isset($_POST['limit']) ? (int) $_POST['limit'] : 8;
+    $limit = max(1, min(20, $limit));
+
+    $items = [];
+    $ids = array_slice(array_reverse($list), 0, $limit);
+
+    foreach ($ids as $productId) {
+        $id = (int) $productId;
+        if ($id <= 0) {
+            continue;
+        }
+
+        $post = get_post($id);
+        if (!$post || $post->post_type !== 'product') {
+            continue;
+        }
+
+        $name = trim((string) get_the_title($id));
+        $url = (string) get_permalink($id);
+        $slug = trim((string) ($post->post_name ?? ''));
+        $image = (string) get_the_post_thumbnail_url($id, 'woocommerce_thumbnail');
+
+        if ($image === '') {
+            $image = (string) wc_placeholder_img_src('woocommerce_thumbnail');
+        }
+
+        if ($name === '' || $url === '') {
+            continue;
+        }
+
+        $items[] = [
+            'id' => $id,
+            'name' => $name,
+            'url' => $url,
+            'slug' => $slug,
+            'image' => $image,
+        ];
+    }
+
+    echo json_encode([
+        'success' => true,
+        'count' => max(0, $count),
+        'items' => $items,
+    ]);
+    exit;
+}
 
 echo json_encode([
     'success' => true,

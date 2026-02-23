@@ -48,6 +48,10 @@
             'add_to_wishlist' => 'أضيفي إلى المفضلة',
             'added_to_wishlist' => 'تمت إضافة المنتج إلى المفضلة',
             'wishlist_add_failed' => 'تعذر إضافة المنتج إلى المفضلة',
+            'wishlist_loading' => 'جاري تحميل المفضلة…',
+            'wishlist_empty' => 'لا توجد منتجات في المفضلة حالياً.',
+            'go_to_product' => 'اذهب إلى المنتج',
+            'view_all_wishlist' => 'عرض كل المفضلة',
             'cart' => 'العربة',
             'about' => 'من نحن',
             'categories' => 'الأقسام',
@@ -142,6 +146,10 @@
             'add_to_wishlist' => 'Add to Wishlist',
             'added_to_wishlist' => 'Product added to wishlist',
             'wishlist_add_failed' => 'Unable to add product to wishlist',
+            'wishlist_loading' => 'Loading wishlist…',
+            'wishlist_empty' => 'No products in wishlist yet.',
+            'go_to_product' => 'Go to product',
+            'view_all_wishlist' => 'View full wishlist',
             'cart' => 'Cart',
             'about' => 'About',
             'categories' => 'Categories',
@@ -384,6 +392,78 @@
         }
         .wishlist-plus-one.show {
             animation: cartPlusOne .8s ease;
+        }
+        .wishlist-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(360px, 82vw);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(23, 39, 59, .14);
+            padding: 10px;
+            display: none;
+            z-index: 80;
+        }
+        .wishlist-dropdown.is-open { display: block; }
+        .wishlist-dropdown-list { display: grid; gap: 8px; max-height: 360px; overflow: auto; }
+        .wishlist-dropdown-item {
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px;
+            background: #fff;
+        }
+        .wishlist-dropdown-item img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f2f2f5;
+        }
+        .wishlist-dropdown-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--secondary);
+            margin: 0 0 6px;
+            line-height: 1.35;
+        }
+        .wishlist-dropdown-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            padding: 0 10px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .wishlist-dropdown-empty {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            padding: 12px 8px;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            background: #fbfcff;
+        }
+        .wishlist-dropdown-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--line);
+        }
+        .wishlist-dropdown-all {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 800;
         }
         .cart-trigger-wrap { position: relative; }
         .cart-trigger { position: relative; }
@@ -981,10 +1061,18 @@
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="{{ $t('account') }}" aria-label="{{ $t('account') }}">👤</a>
                 <span class="wishlist-trigger-wrap">
-                    <a class="head-btn wishlist-trigger" id="wishlistTrigger" href="{{ $wishlistPageUrl }}" target="_blank" rel="noopener" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}">❤
+                    <button class="head-btn wishlist-trigger" id="wishlistTrigger" type="button" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown">❤
                         <span class="wishlist-count" id="wishlistCountBadge">0</span>
-                    </a>
+                    </button>
                     <span class="wishlist-plus-one" id="wishlistPlusOne">+1</span>
+                    <div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="{{ $t('wishlist') }}" aria-hidden="true">
+                        <div class="wishlist-dropdown-list" id="wishlistDropdownList">
+                            <p class="wishlist-dropdown-empty" id="wishlistDropdownLoading">{{ $t('wishlist_loading') }}</p>
+                        </div>
+                        <div class="wishlist-dropdown-footer">
+                            <a class="wishlist-dropdown-all" href="{{ $wishlistPageUrl }}" target="_blank" rel="noopener">{{ $t('view_all_wishlist') }}</a>
+                        </div>
+                    </div>
                 </span>
                 <span class="cart-trigger-wrap">
                     <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="{{ $t('cart') }}" aria-label="{{ $t('cart') }}">🛒
@@ -1370,6 +1458,9 @@
             const removeText = @json($t('remove'));
             const qtyShortText = @json($t('qty_short'));
             const loadingCartText = @json($t('loading_cart'));
+            const wishlistLoadingText = @json($t('wishlist_loading'));
+            const wishlistEmptyText = @json($t('wishlist_empty'));
+            const goToProductText = @json($t('go_to_product'));
             const currentLocale = @json($currentLocale);
             const currencyText = @json($t('currency'));
             const contactForPriceText = @json($t('contact_for_price'));
@@ -1409,6 +1500,8 @@
             const wishlistTrigger = document.getElementById('wishlistTrigger');
             const wishlistBadge = document.getElementById('wishlistCountBadge');
             const wishlistPlusOne = document.getElementById('wishlistPlusOne');
+            const wishlistDropdown = document.getElementById('wishlistDropdown');
+            const wishlistDropdownList = document.getElementById('wishlistDropdownList');
             const cartBadge = document.getElementById('cartCountBadge');
             const plusOne = document.getElementById('cartPlusOne');
             const miniCart = document.getElementById('miniCart');
@@ -1420,6 +1513,7 @@
             let currentCartCount = Number((cartBadge && cartBadge.textContent) || 0) || 0;
             let currentWishlistCount = Number((wishlistBadge && wishlistBadge.textContent) || 0) || 0;
             let cartPayloadCache = null;
+            let wishlistItemsCache = [];
             let isAddingToCart = false;
             let isAddingToWishlist = false;
 
@@ -1515,7 +1609,90 @@
                 if (shouldAnimate) {
                     animateWishlistPlusOne();
                 }
+                loadWishlistItems(true).catch(() => {});
                 helpText.textContent = String(result.message || addedToWishlistText);
+            };
+
+            const renderWishlistDropdown = (items = []) => {
+                if (!wishlistDropdownList) return;
+                const safeItems = Array.isArray(items) ? items : [];
+
+                if (safeItems.length === 0) {
+                    wishlistDropdownList.innerHTML = `<p class="wishlist-dropdown-empty">${wishlistEmptyText}</p>`;
+                    return;
+                }
+
+                wishlistDropdownList.innerHTML = safeItems.map((item) => {
+                    const image = String(item.image || '').trim();
+                    const name = String(item.name || '').trim();
+                    const url = String(item.url || '#').trim();
+
+                    return `
+                        <article class="wishlist-dropdown-item">
+                            <a href="${url}"><img src="${image}" alt="${name}"></a>
+                            <div>
+                                <h4 class="wishlist-dropdown-name">${name}</h4>
+                                <a class="wishlist-dropdown-link" href="${url}">${goToProductText}</a>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+            };
+
+            const loadWishlistItems = async (forceReload = false) => {
+                if (!wishlistDropdownList) return wishlistItemsCache;
+
+                if (!forceReload && Array.isArray(wishlistItemsCache) && wishlistItemsCache.length > 0) {
+                    renderWishlistDropdown(wishlistItemsCache);
+                    return wishlistItemsCache;
+                }
+
+                wishlistDropdownList.innerHTML = `<p class="wishlist-dropdown-empty">${wishlistLoadingText}</p>`;
+
+                const response = await fetch(`${getWishlistItemsUrl()}?_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('wishlist_items_failed');
+                }
+
+                const result = await response.json();
+                if (!result || !result.success) {
+                    throw new Error('wishlist_items_failed');
+                }
+
+                const nextCount = Math.max(0, Number(result.count || 0));
+                setWishlistCount(nextCount);
+
+                wishlistItemsCache = Array.isArray(result.items) ? result.items : [];
+                renderWishlistDropdown(wishlistItemsCache);
+                return wishlistItemsCache;
+            };
+
+            const openWishlistDropdown = async () => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                wishlistDropdown.classList.add('is-open');
+                wishlistDropdown.setAttribute('aria-hidden', 'false');
+                wishlistTrigger.setAttribute('aria-expanded', 'true');
+
+                try {
+                    await loadWishlistItems(true);
+                } catch (error) {
+                    renderWishlistDropdown([]);
+                }
+            };
+
+            const closeWishlistDropdown = () => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                wishlistDropdown.classList.remove('is-open');
+                wishlistDropdown.setAttribute('aria-hidden', 'true');
+                wishlistTrigger.setAttribute('aria-expanded', 'false');
             };
 
             const syncPostedAttributes = () => {
@@ -1713,6 +1890,7 @@
             const getReviewUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/review`;
             const getWishlistAddUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/wishlist/add`;
             const getWishlistCountUrl = () => `${@json($localePrefix)}/item/wishlist/count`;
+            const getWishlistItemsUrl = () => `${@json($localePrefix)}/item/wishlist/items`;
 
             const renderTabLoading = () => {
                 if (!tabsBody) return;
@@ -2270,6 +2448,29 @@
                 });
             }
 
+            if (wishlistTrigger) {
+                wishlistTrigger.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    if (!wishlistDropdown) return;
+
+                    if (wishlistDropdown.classList.contains('is-open')) {
+                        closeWishlistDropdown();
+                        return;
+                    }
+
+                    await openWishlistDropdown();
+                });
+            }
+
+            document.addEventListener('click', (event) => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                const insideTrigger = wishlistTrigger.contains(event.target);
+                const insideDropdown = wishlistDropdown.contains(event.target);
+                if (!insideTrigger && !insideDropdown) {
+                    closeWishlistDropdown();
+                }
+            });
+
             if (cartTrigger) {
                 cartTrigger.addEventListener('click', () => {
                     openMiniCart();
@@ -2400,6 +2601,10 @@
 
                     if (reviewModal && reviewModal.classList.contains('is-open')) {
                         closeReviewModal();
+                    }
+
+                    if (wishlistDropdown && wishlistDropdown.classList.contains('is-open')) {
+                        closeWishlistDropdown();
                     }
 
                     const modal = document.getElementById('size-guide-modal');
