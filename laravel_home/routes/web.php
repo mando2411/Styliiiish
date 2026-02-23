@@ -961,34 +961,12 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
     };
 
-    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey, $normalizeBrandByLocale): string {
-        $localeMap = $wooAttributeLabelTranslations[$currentLocale] ?? [];
-        $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
-        $resolved = (string) ($localeMap[$taxonomyKey] ?? $fallbackLabel);
-        return $normalizeBrandByLocale($resolved, $currentLocale);
+    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel): string {
+        return $fallbackLabel;
     };
 
-    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey, $normalizeBrandByLocale): string {
-        $localeMap = $wooAttributeValueTranslations[$currentLocale] ?? [];
-        $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
-        $taxonomyMap = $localeMap[$taxonomyKey] ?? [];
-
-        $slugKey = $normalizeTranslationKey($slug);
-        if ($slugKey !== '' && array_key_exists($slugKey, $taxonomyMap)) {
-            return $normalizeBrandByLocale((string) $taxonomyMap[$slugKey], $currentLocale);
-        }
-
-        $valueKey = $normalizeTranslationKey($fallbackValue);
-        if ($valueKey !== '' && array_key_exists($valueKey, $taxonomyMap)) {
-            return $normalizeBrandByLocale((string) $taxonomyMap[$valueKey], $currentLocale);
-        }
-
-        $globalMap = $localeMap['global'] ?? [];
-        if ($valueKey !== '' && array_key_exists($valueKey, $globalMap)) {
-            return $normalizeBrandByLocale((string) $globalMap[$valueKey], $currentLocale);
-        }
-
-        return $normalizeBrandByLocale($fallbackValue, $currentLocale);
+    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue): string {
+        return $fallbackValue;
     };
 
     $materialValues = $findAttributeValues(['material', 'fabric', 'matiere', 'qamash', 'khama']);
