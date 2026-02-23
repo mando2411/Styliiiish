@@ -2098,7 +2098,7 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
-$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale) {
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $resolveTranslatePressLanguageCodes) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'list',
@@ -2191,6 +2191,90 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
             'url' => $productUrl,
         ];
     })->filter(fn ($item) => $item['id'] > 0 && $item['name'] !== '' && $item['url'] !== '')->values();
+
+    if ($currentLocale === 'ar' && $items->isNotEmpty()) {
+        $languageCodes = $resolveTranslatePressLanguageCodes('ar');
+        $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
+        $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
+
+        if ($defaultLanguage !== '' && $targetLanguage !== '') {
+            $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+
+            if (Schema::hasTable($dictionaryTable)) {
+                $nameVariants = [];
+
+                $normalizeNameVariant = function (string $value): string {
+                    $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $decoded = str_replace(["\u{00A0}", "\r", "\n", "\t"], ' ', $decoded);
+                    $decoded = preg_replace('/\s+/u', ' ', $decoded);
+                    return trim((string) $decoded);
+                };
+
+                foreach ($items as $item) {
+                    $name = trim((string) ($item['name'] ?? ''));
+                    if ($name === '') {
+                        continue;
+                    }
+
+                    $nameVariants[] = $name;
+
+                    $normalized = $normalizeNameVariant($name);
+                    if ($normalized !== '' && $normalized !== $name) {
+                        $nameVariants[] = $normalized;
+                    }
+                }
+
+                $nameVariants = array_values(array_unique(array_filter($nameVariants, fn ($value) => is_string($value) && trim($value) !== '')));
+
+                if (!empty($nameVariants)) {
+                    $dictionaryRows = DB::table($dictionaryTable)
+                        ->whereIn('original', $nameVariants)
+                        ->whereNotNull('translated')
+                        ->where('translated', '!=', '')
+                        ->select('original', 'translated')
+                        ->get();
+
+                    if ($dictionaryRows->isNotEmpty()) {
+                        $translationMap = [];
+
+                        foreach ($dictionaryRows as $dictionaryRow) {
+                            $original = trim((string) ($dictionaryRow->original ?? ''));
+                            $translated = trim((string) ($dictionaryRow->translated ?? ''));
+
+                            if ($original === '' || $translated === '') {
+                                continue;
+                            }
+
+                            if (!array_key_exists($original, $translationMap)) {
+                                $translationMap[$original] = $translated;
+                            }
+
+                            $normalizedOriginal = $normalizeNameVariant($original);
+                            if ($normalizedOriginal !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
+                                $translationMap[$normalizedOriginal] = $translated;
+                            }
+                        }
+
+                        $items = $items->map(function ($item) use ($translationMap, $normalizeNameVariant, $normalizeBrandByLocale) {
+                            $currentName = trim((string) ($item['name'] ?? ''));
+                            if ($currentName === '') {
+                                return $item;
+                            }
+
+                            $normalizedName = $normalizeNameVariant($currentName);
+                            $translatedName = $translationMap[$currentName] ?? $translationMap[$normalizedName] ?? null;
+
+                            if (is_string($translatedName) && trim($translatedName) !== '') {
+                                $item['name'] = $normalizeBrandByLocale(trim($translatedName), 'ar');
+                            }
+
+                            return $item;
+                        })->values();
+                    }
+                }
+            }
+        }
+    }
 
     $response = response()->json([
         'success' => true,
