@@ -425,6 +425,14 @@
             border-color: var(--primary);
             color: var(--primary);
         }
+        .attr-option-btn:disabled,
+        .attr-option-btn.is-disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            border-color: var(--line);
+            color: var(--muted);
+            background: #f3f4f7;
+        }
         .attr-option-btn.is-active {
             border-color: var(--primary);
             background: rgba(var(--wf-main-rgb), 0.08);
@@ -712,16 +720,14 @@
                 <h1 class="title">{{ $product->post_title }}</h1>
 
                 <div class="prices">
-                    <span class="price">
+                    <span class="price" id="productPrice">
                         @if($price > 0)
                             {{ number_format($price) }} {{ $t('currency') }}
                         @else
                             {{ $t('contact_for_price') }}
                         @endif
                     </span>
-                    @if($isSale)
-                        <span class="old">{{ number_format($regular) }} {{ $t('currency') }}</span>
-                    @endif
+                    <span class="old" id="productOldPrice" style="{{ $isSale ? '' : 'display:none;' }}">{{ $isSale ? number_format($regular) . ' ' . $t('currency') : '' }}</span>
                 </div>
 
                 <h2 class="section-title">{{ $t('dress_details') }}</h2>
@@ -973,7 +979,14 @@
             const removeText = @json($t('remove'));
             const qtyShortText = @json($t('qty_short'));
             const loadingCartText = @json($t('loading_cart'));
+            const currencyText = @json($t('currency'));
+            const contactForPriceText = @json($t('contact_for_price'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
+
+            const priceNode = document.getElementById('productPrice');
+            const oldPriceNode = document.getElementById('productOldPrice');
+            const basePrice = Number(@json((float) ($price ?? 0))) || 0;
+            const baseRegularPrice = Number(@json((float) ($regular ?? 0))) || 0;
 
             const cartTrigger = document.getElementById('miniCartTrigger');
             const cartBadge = document.getElementById('cartCountBadge');
@@ -1031,19 +1044,121 @@
                 });
             };
 
+            const formatMoney = (amount) => {
+                const value = Number(amount) || 0;
+                return `${Math.round(value).toLocaleString()} ${currencyText}`;
+            };
+
+            const updateDisplayedPrice = (rule = null) => {
+                if (!priceNode || !oldPriceNode) return;
+
+                const sourcePrice = rule ? Number(rule.price || 0) : basePrice;
+                const sourceRegular = rule ? Number(rule.regular_price || 0) : baseRegularPrice;
+
+                if (sourcePrice > 0) {
+                    priceNode.textContent = formatMoney(sourcePrice);
+                } else {
+                    priceNode.textContent = contactForPriceText;
+                }
+
+                const hasSale = sourceRegular > 0 && sourcePrice > 0 && sourceRegular > sourcePrice;
+                if (hasSale) {
+                    oldPriceNode.textContent = formatMoney(sourceRegular);
+                    oldPriceNode.style.display = '';
+                } else {
+                    oldPriceNode.textContent = '';
+                    oldPriceNode.style.display = 'none';
+                }
+            };
+
+            const getRuleAttributeValue = (rule, key) => {
+                const attrs = rule && rule.attributes ? rule.attributes : {};
+                return String(attrs[key] || '').trim();
+            };
+
+            const findCompatibleRules = (selected, forcedKey = null, forcedValue = '') => {
+                return variationRules.filter((rule) => {
+                    const stockStatus = String(rule.stock_status || 'instock').toLowerCase();
+                    if (stockStatus !== 'instock') return false;
+
+                    for (const [key, selectedValue] of Object.entries(selected)) {
+                        if (key === forcedKey) continue;
+                        if (!selectedValue) continue;
+                        if (getRuleAttributeValue(rule, key) !== selectedValue) {
+                            return false;
+                        }
+                    }
+
+                    if (forcedKey && forcedValue) {
+                        return getRuleAttributeValue(rule, forcedKey) === forcedValue;
+                    }
+
+                    return true;
+                });
+            };
+
+            const refreshOptionAvailability = () => {
+                if (!selectorsWrap) return;
+
+                const selected = getSelected();
+                const keys = [...new Set(optionButtons.map((button) => (button.getAttribute('data-attribute-key') || '').trim()).filter(Boolean))];
+
+                keys.forEach((attributeKey) => {
+                    const groupButtons = optionButtons.filter((button) => (button.getAttribute('data-attribute-key') || '').trim() === attributeKey);
+                    groupButtons.forEach((button) => {
+                        const optionValue = (button.getAttribute('data-option-value') || '').trim();
+                        const hasCompatible = findCompatibleRules(selected, attributeKey, optionValue).length > 0;
+                        button.disabled = !hasCompatible;
+                        button.classList.toggle('is-disabled', !hasCompatible);
+                    });
+
+                    const inputNode = selectorsWrap.querySelector(`input[data-attribute-key="${CSS.escape(attributeKey)}"]`);
+                    if (!inputNode) return;
+
+                    const currentValue = (inputNode.value || '').trim();
+                    if (!currentValue) {
+                        const enabledButtons = groupButtons.filter((button) => !button.disabled);
+                        if (enabledButtons.length === 1) {
+                            const autoValue = (enabledButtons[0].getAttribute('data-option-value') || '').trim();
+                            inputNode.value = autoValue;
+                            setActiveOptionButton(attributeKey, autoValue);
+                        }
+                        return;
+                    }
+
+                    const currentButton = groupButtons.find((button) => (button.getAttribute('data-option-value') || '').trim() === currentValue);
+                    if (!currentButton || currentButton.disabled) {
+                        inputNode.value = '';
+                        setActiveOptionButton(attributeKey, '');
+                    }
+                });
+            };
+
             const validateVariation = () => {
                 syncPostedAttributes();
 
                 if (!hasVariations) {
                     addToCartBtn.disabled = false;
                     variationIdInput.value = '0';
+                    updateDisplayedPrice();
                     if (helpText.textContent === chooseOptionsText || helpText.textContent === outOfStockText) {
                         helpText.textContent = '';
                     }
                     return;
                 }
 
+                refreshOptionAvailability();
+                syncPostedAttributes();
+
                 const selected = getSelected();
+                const selectedInStockRules = findCompatibleRules(selected);
+
+                if (selectedInStockRules.length === 1) {
+                    updateDisplayedPrice(selectedInStockRules[0]);
+                } else {
+                    updateDisplayedPrice();
+                }
+
                 const hasEmpty = Object.values(selected).some((value) => value === '');
                 if (hasEmpty) {
                     addToCartBtn.disabled = true;
@@ -1068,11 +1183,13 @@
                     addToCartBtn.disabled = true;
                     variationIdInput.value = String(matched.variation_id || 0);
                     helpText.textContent = outOfStockText;
+                    updateDisplayedPrice(matched);
                     return;
                 }
 
                 variationIdInput.value = String(matched.variation_id || 0);
                 addToCartBtn.disabled = false;
+                updateDisplayedPrice(matched);
                 if (helpText.textContent === chooseOptionsText || helpText.textContent === outOfStockText) {
                     helpText.textContent = '';
                 }
