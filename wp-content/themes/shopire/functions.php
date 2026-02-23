@@ -466,6 +466,7 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 		return [
 			'count' => (int) WC()->cart->get_cart_contents_count(),
 			'subtotal_html' => WC()->cart->get_cart_subtotal(),
+			'total_html' => WC()->cart->get_total(),
 			'items' => $items,
 			'cart_url' => wc_get_cart_url(),
 			'checkout_url' => wc_get_checkout_url(),
@@ -596,3 +597,30 @@ add_action('wc_ajax_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_re
 add_action('wc_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
 add_action('wp_ajax_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
 add_action('wp_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_ajax_remove_from_cart');
+
+if (!function_exists('shopire_styliiiish_wc_ajax_update_cart_qty')) {
+	function shopire_styliiiish_wc_ajax_update_cart_qty() {
+		if (!function_exists('WC') || !WC()->cart) {
+			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
+		}
+
+		$cart_key = isset($_REQUEST['cart_key']) ? wc_clean(wp_unslash((string) $_REQUEST['cart_key'])) : '';
+		$qty = isset($_REQUEST['qty']) ? max(1, absint($_REQUEST['qty'])) : 1;
+
+		if ($cart_key === '') {
+			wp_send_json_error(['message' => 'Missing cart key'], 400);
+		}
+
+		$updated = WC()->cart->set_quantity($cart_key, $qty, true);
+		if ($updated === false) {
+			wp_send_json_error(['message' => 'Unable to update quantity'], 422);
+		}
+
+		WC()->cart->calculate_totals();
+		wp_send_json_success(shopire_styliiiish_build_cart_payload());
+	}
+}
+add_action('wc_ajax_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
+add_action('wc_ajax_nopriv_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
+add_action('wp_ajax_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
+add_action('wp_ajax_nopriv_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');

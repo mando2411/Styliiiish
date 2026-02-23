@@ -2506,6 +2506,14 @@ $wishlistPageHandler = function (Request $request, string $locale = 'ar') {
     return view('wishlist', compact('currentLocale', 'localePrefix', 'isEnglish'));
 };
 
+$cartPageHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $isEnglish = $currentLocale === 'en';
+
+    return view('cart', compact('currentLocale', 'localePrefix', 'isEnglish'));
+};
+
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
@@ -2537,6 +2545,10 @@ Route::get('/en/item/wishlist/items', fn (Request $request) => $wishlistItemsHan
 Route::get('/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'ar'));
 Route::get('/ar/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'ar'));
 Route::get('/en/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'en'));
+
+Route::get('/cart', fn (Request $request) => $cartPageHandler($request, 'ar'));
+Route::get('/ar/cart', fn (Request $request) => $cartPageHandler($request, 'ar'));
+Route::get('/en/cart', fn (Request $request) => $cartPageHandler($request, 'en'));
 
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));

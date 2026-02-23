@@ -269,7 +269,7 @@
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" title="Account" aria-label="Account">👤</a>
                 <a class="head-btn active" href="{{ $localePrefix }}/wishlist" title="Wishlist" aria-label="Wishlist">❤</a>
-                <a class="head-btn" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" title="Cart" aria-label="Cart">🛒</a>
+                <a class="head-btn" href="{{ $localePrefix }}/cart" title="Cart" aria-label="Cart">🛒</a>
             </div>
         </div>
     </header>
