@@ -53,6 +53,7 @@
             'remove' => 'حذف',
             'added_to_cart' => 'تمت إضافة المنتج للعربة',
             'add_to_cart_failed' => 'تعذر إضافة المنتج للعربة',
+            'size_guide_missing' => 'دليل المقاسات غير متاح لهذا المنتج حالياً.',
         ],
         'en' => [
             'page_title' => (($product->post_title ?? 'Product') . ' | Styliiiish'),
@@ -100,6 +101,7 @@
             'remove' => 'Remove',
             'added_to_cart' => 'Product added to cart',
             'add_to_cart_failed' => 'Unable to add product to cart',
+            'size_guide_missing' => 'Size guide is not available for this product yet.',
         ],
     ];
 
@@ -277,6 +279,16 @@
         .sg-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
         .sg-body { width: 100%; height: 100%; }
         .sg-frame { width: 100%; height: 100%; border: 0; }
+        .sg-empty {
+            display: none;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+            padding: 20px;
+        }
 
         .mini-cart {
             position: fixed;
@@ -626,6 +638,7 @@
             </div>
             <div class="sg-body">
                 <iframe class="sg-frame" id="size-guide-frame" src="about:blank" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                <div class="sg-empty" id="size-guide-empty">{{ $t('size_guide_missing') }}</div>
             </div>
         </div>
     </div>
@@ -932,14 +945,22 @@
             const trigger = document.getElementById('open-size-guide');
             const modal = document.getElementById('size-guide-modal');
             const frame = document.getElementById('size-guide-frame');
+            const emptyGuideNode = document.getElementById('size-guide-empty');
 
-            if (trigger && modal && frame) {
+            if (trigger && modal && frame && emptyGuideNode) {
                 const guideUrl = (trigger.getAttribute('data-size-guide-url') || '').trim();
                 const closeNodes = modal.querySelectorAll('[data-close-size-guide]');
 
                 const openModal = () => {
-                    if (!guideUrl) return;
-                    frame.src = guideUrl;
+                    if (guideUrl) {
+                        frame.style.display = 'block';
+                        emptyGuideNode.style.display = 'none';
+                        frame.src = guideUrl;
+                    } else {
+                        frame.style.display = 'none';
+                        emptyGuideNode.style.display = 'flex';
+                        frame.src = 'about:blank';
+                    }
                     modal.classList.add('is-open');
                     modal.setAttribute('aria-hidden', 'false');
                     document.body.style.overflow = 'hidden';

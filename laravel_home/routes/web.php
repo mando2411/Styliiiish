@@ -454,6 +454,19 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
     };
 
+    $extractFirstUrl = function (?string $text): string {
+        $raw = trim((string) ($text ?? ''));
+        if ($raw === '') {
+            return '';
+        }
+
+        if (preg_match('/https?:\/\/[^\s"\'<>]+/i', $raw, $matches)) {
+            return trim((string) ($matches[0] ?? ''));
+        }
+
+        return '';
+    };
+
     $sizeGuideUrl = trim($findMetaByNeedles(['size_guide_url', 'size_guide_link', 'guide_url', 'size_chart_url']));
 
     if ($sizeGuideUrl !== '' && !$isAbsoluteUrl($sizeGuideUrl) && str_starts_with($sizeGuideUrl, '/')) {
@@ -498,6 +511,48 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 $sizeGuideUrl = $wpBaseUrl . $optionValue;
                 break;
             }
+
+            $candidateUrl = $extractFirstUrl($optionValue);
+            if ($candidateUrl !== '') {
+                $sizeGuideUrl = $candidateUrl;
+                break;
+            }
+        }
+    }
+
+    if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
+        $guideAttachment = DB::table('wp_posts')
+            ->where('post_type', 'attachment')
+            ->where('post_status', 'inherit')
+            ->where(function ($query) {
+                $query->where('post_title', 'like', '%size%guide%')
+                    ->orWhere('post_title', 'like', '%size%chart%')
+                    ->orWhere('post_title', 'like', '%دليل%المقاس%')
+                    ->orWhere('post_name', 'like', '%size%guide%')
+                    ->orWhere('post_name', 'like', '%size%chart%');
+            })
+            ->orderByDesc('ID')
+            ->select('guid')
+            ->first();
+
+        if ($guideAttachment && !empty($guideAttachment->guid) && $isAbsoluteUrl((string) $guideAttachment->guid)) {
+            $sizeGuideUrl = (string) $guideAttachment->guid;
+        }
+    }
+
+    if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
+        $metaUrlCandidate = DB::table('wp_postmeta')
+            ->where('post_id', (int) $product->ID)
+            ->where(function ($query) {
+                $query->where('meta_key', 'like', '%size%guide%')
+                    ->orWhere('meta_key', 'like', '%size%chart%');
+            })
+            ->orderByDesc('meta_id')
+            ->value('meta_value');
+
+        $candidateUrl = $extractFirstUrl(is_scalar($metaUrlCandidate) ? (string) $metaUrlCandidate : '');
+        if ($candidateUrl !== '') {
+            $sizeGuideUrl = $candidateUrl;
         }
     }
 
@@ -521,7 +576,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     }
 
     if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
-        $sizeGuideUrl = $wpBaseUrl . $localePrefix . '/shipping-delivery-policy';
+        $sizeGuideUrl = '';
     }
 
     $attributeLabelMap = [];
