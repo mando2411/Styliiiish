@@ -116,6 +116,7 @@
     $relatedProducts = $relatedProducts ?? collect();
 
     $addToCartBase = $wpBaseUrl . '/cart/';
+    $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 @endphp
@@ -391,6 +392,7 @@
     </style>
 </head>
 <body>
+    <!-- {{ $buildMarker }} -->
     <div class="topbar"><div class="container">{{ $t('topbar') }}</div></div>
 
     <header class="header">
@@ -618,6 +620,7 @@
 
     <script>
         (() => {
+            console.info('Styliiiish build:', @json($buildMarker));
             const variationRules = @json($variationRules);
             const hasVariations = @json((bool) ($hasVariations ?? false));
             const selectorsWrap = document.getElementById('attributeSelectors');
