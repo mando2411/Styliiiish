@@ -278,16 +278,42 @@
         .sg-title { margin: 0; font-size: 16px; color: var(--secondary); }
         .sg-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
         .sg-body { width: 100%; height: 100%; }
-        .sg-frame { width: 100%; height: 100%; border: 0; }
-        .sg-empty {
-            display: none;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: var(--muted);
+        .sg-table-wrap { height: 100%; overflow: auto; padding: 12px; }
+        .sg-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .sg-table th,
+        .sg-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
             font-size: 14px;
-            padding: 20px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .sg-table th {
+            background: #f8fafc;
+            color: var(--secondary);
+            font-weight: 800;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .sg-table tr:last-child td { border-bottom: 0; }
+        .sg-table tr.sg-active-size td {
+            background: #fff4f5;
+            color: var(--secondary);
+            font-weight: 800;
+        }
+        .sg-note {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
         }
 
         .mini-cart {
@@ -412,6 +438,8 @@
             .cart-row { grid-template-columns: 1fr; }
             .related-grid { grid-template-columns: 1fr; gap: 10px; }
             .r-actions { grid-template-columns: 1fr; }
+            .sg-table th,
+            .sg-table td { font-size: 12px; padding: 8px; }
         }
     </style>
 </head>
@@ -517,7 +545,7 @@
                 </form>
 
                 <div class="guide-row">
-                    <button type="button" class="btn-ghost" id="open-size-guide" data-size-guide-url="{{ $sizeGuideUrl }}">{{ $t('size_guide') }}</button>
+                    <button type="button" class="btn-ghost" id="open-size-guide">{{ $t('size_guide') }}</button>
                 </div>
 
                 @if($contentHtml !== '')
@@ -637,8 +665,29 @@
                 <button type="button" class="sg-close" data-close-size-guide>{{ $t('close') }}</button>
             </div>
             <div class="sg-body">
-                <iframe class="sg-frame" id="size-guide-frame" src="about:blank" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-                <div class="sg-empty" id="size-guide-empty">{{ $t('size_guide_missing') }}</div>
+                <div class="sg-table-wrap">
+                    <table class="sg-table" id="size-guide-table">
+                        <thead>
+                            <tr>
+                                <th>Size</th>
+                                <th>Body Weight (kg)</th>
+                                <th>Bust (cm)</th>
+                                <th>Waist (cm)</th>
+                                <th>Hips (cm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-size="xs"><td>XS</td><td>40 – 48</td><td>78 – 82</td><td>60 – 64</td><td>86 – 90</td></tr>
+                            <tr data-size="s"><td>S</td><td>48 – 60</td><td>84 – 90</td><td>66 – 72</td><td>92 – 98</td></tr>
+                            <tr data-size="m"><td>M</td><td>60 – 72</td><td>92 – 100</td><td>74 – 82</td><td>100 – 108</td></tr>
+                            <tr data-size="l"><td>L</td><td>72 – 85</td><td>102 – 110</td><td>84 – 92</td><td>110 – 118</td></tr>
+                            <tr data-size="xl"><td>XL</td><td>85 – 100</td><td>112 – 120</td><td>94 – 104</td><td>120 – 128</td></tr>
+                            <tr data-size="xxl"><td>XXL</td><td>100 – 110</td><td>122 – 130</td><td>106 – 114</td><td>130 – 138</td></tr>
+                            <tr data-size="3xl"><td>3XL</td><td>110 – 120</td><td>132 – 140</td><td>116 – 124</td><td>140 – 148</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="sg-note">Sizes are based on body measurements. If you are between two sizes, choose the larger size.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -944,23 +993,53 @@
 
             const trigger = document.getElementById('open-size-guide');
             const modal = document.getElementById('size-guide-modal');
-            const frame = document.getElementById('size-guide-frame');
-            const emptyGuideNode = document.getElementById('size-guide-empty');
+            const sizeGuideTable = document.getElementById('size-guide-table');
 
-            if (trigger && modal && frame && emptyGuideNode) {
-                const guideUrl = (trigger.getAttribute('data-size-guide-url') || '').trim();
+            const normalizeSizeValue = (value) => {
+                const cleaned = String(value || '').trim().toLowerCase().replace(/\s+/g, '').replace(/_/g, '-');
+                if (!cleaned) return '';
+                const aliases = {
+                    'xsmall': 'xs',
+                    'x-small': 'xs',
+                    'small': 's',
+                    'medium': 'm',
+                    'med': 'm',
+                    'large': 'l',
+                    'xlarge': 'xl',
+                    'x-large': 'xl',
+                    '2xl': 'xxl',
+                    'xx-large': 'xxl',
+                    'xxlarge': 'xxl',
+                    '3xlarge': '3xl',
+                    'xxxlarge': '3xl',
+                    'xxx-large': '3xl'
+                };
+                return aliases[cleaned] || cleaned;
+            };
+
+            const getSelectedSizeSlug = () => {
+                const sizeNode = selectNodes.find((node) => {
+                    const attrKey = String(node.getAttribute('data-attribute-key') || '').toLowerCase();
+                    return attrKey.includes('size') || attrKey.includes('مقاس');
+                });
+                return normalizeSizeValue(sizeNode ? sizeNode.value : '');
+            };
+
+            const highlightSizeGuideRow = () => {
+                if (!sizeGuideTable) return;
+                const selectedSize = getSelectedSizeSlug();
+                const rows = sizeGuideTable.querySelectorAll('tbody tr[data-size]');
+                rows.forEach((row) => {
+                    const rowSize = normalizeSizeValue(row.getAttribute('data-size') || '');
+                    row.classList.toggle('sg-active-size', !!selectedSize && rowSize === selectedSize);
+                });
+            };
+
+            if (trigger && modal) {
                 const closeNodes = modal.querySelectorAll('[data-close-size-guide]');
 
                 const openModal = () => {
-                    if (guideUrl) {
-                        frame.style.display = 'block';
-                        emptyGuideNode.style.display = 'none';
-                        frame.src = guideUrl;
-                    } else {
-                        frame.style.display = 'none';
-                        emptyGuideNode.style.display = 'flex';
-                        frame.src = 'about:blank';
-                    }
+                    highlightSizeGuideRow();
                     modal.classList.add('is-open');
                     modal.setAttribute('aria-hidden', 'false');
                     document.body.style.overflow = 'hidden';
@@ -970,11 +1049,14 @@
                     modal.classList.remove('is-open');
                     modal.setAttribute('aria-hidden', 'true');
                     document.body.style.overflow = miniCart && miniCart.classList.contains('is-open') ? 'hidden' : '';
-                    frame.src = 'about:blank';
                 };
 
                 trigger.addEventListener('click', openModal);
                 closeNodes.forEach((node) => node.addEventListener('click', closeModal));
+            }
+
+            if (selectNodes.length > 0) {
+                selectNodes.forEach((node) => node.addEventListener('change', highlightSizeGuideRow));
             }
 
             document.addEventListener('keydown', (event) => {
@@ -984,12 +1066,10 @@
                     }
 
                     const modal = document.getElementById('size-guide-modal');
-                    const frame = document.getElementById('size-guide-frame');
                     if (modal && modal.classList.contains('is-open')) {
                         modal.classList.remove('is-open');
                         modal.setAttribute('aria-hidden', 'true');
                         document.body.style.overflow = '';
-                        if (frame) frame.src = 'about:blank';
                     }
                 }
             });
