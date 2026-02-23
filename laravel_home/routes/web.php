@@ -20,19 +20,10 @@ $normalizeBrandByLocale = function (?string $text, string $locale): string {
     $currentLocale = strtolower(trim($locale));
 
     if ($currentLocale === 'en') {
-        return str_replace('ستايلش', 'Styliiiish', $value);
+        return preg_replace('/(?<![@.\\w-])ستايلش(?![\\w.-])/u', 'Styliiiish', $value) ?? $value;
     }
 
-    if (stripos($value, 'styliiiish') === false) {
-        return $value;
-    }
-
-    $normalized = @preg_replace('/(?<![@.\\w-])styliiiish(?![\\w.-])/i', 'ستايلش', $value);
-    if (!is_string($normalized) || $normalized === '') {
-        return $value;
-    }
-
-    return $normalized;
+    return preg_replace('/(?<![@.\\w-])styliiiish(?![\\w.-])/iu', 'ستايلش', $value) ?? $value;
 };
 
 $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
