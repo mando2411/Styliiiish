@@ -518,14 +518,65 @@
 
         .description { margin-top: 14px; color: var(--muted); line-height: 1.7; }
 
-        .report-box {
+        .report-trigger-wrap {
             margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .report-trigger-text { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
+        .report-trigger-btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--secondary);
+            border-radius: 999px;
+            min-height: 36px;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .report-trigger-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+        .report-modal { position: fixed; inset: 0; z-index: 130; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .report-modal.is-open { display: flex; }
+        .report-modal-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
+        .report-modal-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(760px, 96vw);
+            max-height: 88vh;
+            overflow: auto;
             background: #fff;
             border: 1px solid var(--line);
             border-radius: 14px;
             padding: 14px;
             display: grid;
             gap: 10px;
+        }
+        .report-modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 8px;
+        }
+        .report-modal-close {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--secondary);
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
         }
         .report-title { margin: 0; font-size: 18px; color: var(--secondary); }
         .report-subtitle { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
@@ -788,6 +839,7 @@
         @media (max-width: 640px) {
             .nav { overflow-x: auto; justify-content: flex-start; }
             .cart-row { grid-template-columns: 1fr; }
+            .report-trigger-wrap { flex-direction: column; align-items: flex-start; }
             .report-grid { grid-template-columns: 1fr; }
             .related-grid { grid-template-columns: 1fr; gap: 10px; }
             .r-actions { grid-template-columns: 1fr; }
@@ -952,29 +1004,40 @@
             </article>
         </section>
 
-        <section class="report-box" id="productReportSection">
-            <h2 class="report-title">{{ $t('report_title') }}</h2>
-            <p class="report-subtitle">{{ $t('report_subtitle') }}</p>
-
-            <form id="productReportForm" novalidate>
-                <div class="report-grid">
-                    <div class="report-field">
-                        <label for="reportName">{{ $t('report_name') }}</label>
-                        <input type="text" id="reportName" name="name" maxlength="120" required>
-                    </div>
-                    <div class="report-field">
-                        <label for="reportEmail">{{ $t('report_email') }}</label>
-                        <input type="email" id="reportEmail" name="email" maxlength="190">
-                    </div>
-                </div>
-                <div class="report-field">
-                    <label for="reportReason">{{ $t('report_reason') }}</label>
-                    <textarea id="reportReason" name="reason" maxlength="2000" required placeholder="{{ $t('report_placeholder') }}"></textarea>
-                </div>
-                <button class="report-submit" id="reportSubmitBtn" type="submit">{{ $t('report_submit') }}</button>
-                <p class="report-message" id="reportMessage"></p>
-            </form>
+        <section class="report-trigger-wrap" id="productReportSection">
+            <p class="report-trigger-text">{{ $t('report_subtitle') }}</p>
+            <button type="button" class="report-trigger-btn" id="openReportModal">{{ $t('report_title') }}</button>
         </section>
+
+        <div class="report-modal" id="productReportModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="{{ $t('report_title') }}">
+            <div class="report-modal-backdrop" data-close-report-modal></div>
+            <div class="report-modal-dialog">
+                <div class="report-modal-head">
+                    <h2 class="report-title">{{ $t('report_title') }}</h2>
+                    <button type="button" class="report-modal-close" data-close-report-modal>{{ $t('close') }}</button>
+                </div>
+                <p class="report-subtitle">{{ $t('report_subtitle') }}</p>
+
+                <form id="productReportForm" novalidate>
+                    <div class="report-grid">
+                        <div class="report-field">
+                            <label for="reportName">{{ $t('report_name') }}</label>
+                            <input type="text" id="reportName" name="name" maxlength="120" required>
+                        </div>
+                        <div class="report-field">
+                            <label for="reportEmail">{{ $t('report_email') }}</label>
+                            <input type="email" id="reportEmail" name="email" maxlength="190">
+                        </div>
+                    </div>
+                    <div class="report-field">
+                        <label for="reportReason">{{ $t('report_reason') }}</label>
+                        <textarea id="reportReason" name="reason" maxlength="2000" required placeholder="{{ $t('report_placeholder') }}"></textarea>
+                    </div>
+                    <button class="report-submit" id="reportSubmitBtn" type="submit">{{ $t('report_submit') }}</button>
+                    <p class="report-message" id="reportMessage"></p>
+                </form>
+            </div>
+        </div>
 
         <section class="product-tabs" id="productAjaxTabs">
             <div class="product-tabs-head" role="tablist" aria-label="Product Sections">
@@ -1165,6 +1228,9 @@
             const reportForm = document.getElementById('productReportForm');
             const reportSubmitBtn = document.getElementById('reportSubmitBtn');
             const reportMessage = document.getElementById('reportMessage');
+            const reportModal = document.getElementById('productReportModal');
+            const reportOpenBtn = document.getElementById('openReportModal');
+            const reportModalClosers = reportModal ? reportModal.querySelectorAll('[data-close-report-modal]') : [];
 
             const cartTrigger = document.getElementById('miniCartTrigger');
             const cartBadge = document.getElementById('cartCountBadge');
@@ -1459,6 +1525,30 @@
                 reportMessage.style.color = isSuccess ? '#197A3A' : 'var(--muted)';
             };
 
+            const openReportModal = () => {
+                if (!reportModal) return;
+                reportModal.classList.add('is-open');
+                reportModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeReportModal = () => {
+                if (!reportModal) return;
+                reportModal.classList.remove('is-open');
+                reportModal.setAttribute('aria-hidden', 'true');
+                const keepLocked = (miniCart && miniCart.classList.contains('is-open'))
+                    || (modal && modal.classList.contains('is-open'));
+                document.body.style.overflow = keepLocked ? 'hidden' : '';
+            };
+
+            if (reportOpenBtn) {
+                reportOpenBtn.addEventListener('click', openReportModal);
+            }
+
+            if (reportModalClosers.length > 0) {
+                reportModalClosers.forEach((node) => node.addEventListener('click', closeReportModal));
+            }
+
             if (reportForm) {
                 reportForm.addEventListener('submit', async (event) => {
                     event.preventDefault();
@@ -1492,6 +1582,9 @@
 
                         setReportMessage(String(result.message || ''), true);
                         reportForm.reset();
+                        setTimeout(() => {
+                            closeReportModal();
+                        }, 900);
                     } catch (error) {
                         const message = (error && error.message) ? error.message : tabLoadFailedText;
                         setReportMessage(message, false);
@@ -1905,6 +1998,10 @@
                 if (event.key === 'Escape') {
                     if (miniCart && miniCart.classList.contains('is-open')) {
                         closeMiniCart();
+                    }
+
+                    if (reportModal && reportModal.classList.contains('is-open')) {
+                        closeReportModal();
                     }
 
                     const modal = document.getElementById('size-guide-modal');
