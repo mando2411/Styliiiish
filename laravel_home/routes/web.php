@@ -57,6 +57,29 @@ $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, b
         return $collection;
     }
 
+    $getField = function ($row, string $field): string {
+        if (is_array($row)) {
+            return trim((string) ($row[$field] ?? ''));
+        }
+
+        if (is_object($row)) {
+            return trim((string) ($row->{$field} ?? ''));
+        }
+
+        return '';
+    };
+
+    $setField = function (&$row, string $field, string $value): void {
+        if (is_array($row)) {
+            $row[$field] = $value;
+            return;
+        }
+
+        if (is_object($row)) {
+            $row->{$field} = $value;
+        }
+    };
+
     $languageCodes = $resolveTranslatePressLanguageCodes($locale);
     if (!$languageCodes) {
         return $collection;
@@ -74,20 +97,20 @@ $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, b
         return $collection;
     }
 
-    $lookupStrings = $collection->flatMap(function ($row) use ($includeContentFields) {
+    $lookupStrings = $collection->flatMap(function ($row) use ($includeContentFields, $getField) {
         $strings = [];
-        $title = trim((string) ($row->post_title ?? ''));
+        $title = $getField($row, 'post_title');
         if ($title !== '') {
             $strings[] = $title;
         }
 
         if ($includeContentFields) {
-            $excerpt = trim((string) ($row->post_excerpt ?? ''));
+            $excerpt = $getField($row, 'post_excerpt');
             if ($excerpt !== '') {
                 $strings[] = $excerpt;
             }
 
-            $content = trim((string) ($row->post_content ?? ''));
+            $content = $getField($row, 'post_content');
             if ($content !== '') {
                 $strings[] = $content;
             }
@@ -125,21 +148,21 @@ $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, b
         return $collection;
     }
 
-    return $collection->map(function ($row) use ($translationMap, $includeContentFields) {
-        $title = trim((string) ($row->post_title ?? ''));
+    return $collection->map(function ($row) use ($translationMap, $includeContentFields, $getField, $setField) {
+        $title = $getField($row, 'post_title');
         if ($title !== '' && isset($translationMap[$title])) {
-            $row->post_title = (string) $translationMap[$title];
+            $setField($row, 'post_title', (string) $translationMap[$title]);
         }
 
         if ($includeContentFields) {
-            $excerpt = trim((string) ($row->post_excerpt ?? ''));
+            $excerpt = $getField($row, 'post_excerpt');
             if ($excerpt !== '' && isset($translationMap[$excerpt])) {
-                $row->post_excerpt = (string) $translationMap[$excerpt];
+                $setField($row, 'post_excerpt', (string) $translationMap[$excerpt]);
             }
 
-            $content = trim((string) ($row->post_content ?? ''));
+            $content = $getField($row, 'post_content');
             if ($content !== '' && isset($translationMap[$content])) {
-                $row->post_content = (string) $translationMap[$content];
+                $setField($row, 'post_content', (string) $translationMap[$content]);
             }
         }
 
