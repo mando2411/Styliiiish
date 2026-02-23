@@ -2098,7 +2098,7 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
-$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall) {
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'list',
@@ -2116,15 +2116,67 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
 
     $rawItems = collect($bridge['json']['items'] ?? [])->filter(fn ($item) => is_array($item))->values();
     $localePrefix = '/' . $currentLocale;
+    $wpmlCode = $mapLocaleToWpmlCode($currentLocale);
 
-    $items = $rawItems->map(function (array $item) use ($localePrefix) {
-        $slug = trim((string) ($item['slug'] ?? ''));
+    $sourceProductIds = $rawItems
+        ->map(fn ($item) => (int) ($item['id'] ?? 0))
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values();
+
+    $localizedIdBySourceId = [];
+    $localizedPostsById = collect();
+
+    if ($sourceProductIds->isNotEmpty() && Schema::hasTable('wp_icl_translations')) {
+        $translationRows = DB::table('wp_icl_translations as base')
+            ->join('wp_icl_translations as localized', function ($join) {
+                $join->on('base.trid', '=', 'localized.trid')
+                    ->where('localized.element_type', 'post_product');
+            })
+            ->where('base.element_type', 'post_product')
+            ->whereIn('base.element_id', $sourceProductIds->all())
+            ->where('localized.language_code', 'like', $wpmlCode . '%')
+            ->select('base.element_id as source_id', 'localized.element_id as localized_id')
+            ->get();
+
+        foreach ($translationRows as $translationRow) {
+            $sourceId = (int) ($translationRow->source_id ?? 0);
+            $localizedId = (int) ($translationRow->localized_id ?? 0);
+            if ($sourceId > 0 && $localizedId > 0 && !array_key_exists($sourceId, $localizedIdBySourceId)) {
+                $localizedIdBySourceId[$sourceId] = $localizedId;
+            }
+        }
+
+        $localizedPostIds = collect($sourceProductIds)
+            ->map(fn ($sourceId) => (int) ($localizedIdBySourceId[(int) $sourceId] ?? (int) $sourceId))
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($localizedPostIds->isNotEmpty()) {
+            $localizedPostsById = DB::table('wp_posts')
+                ->whereIn('ID', $localizedPostIds->all())
+                ->where('post_type', 'product')
+                ->where('post_status', 'publish')
+                ->select('ID', 'post_title', 'post_name')
+                ->get()
+                ->keyBy('ID');
+        }
+    }
+
+    $items = $rawItems->map(function (array $item) use ($localePrefix, $localizedIdBySourceId, $localizedPostsById, $normalizeBrandByLocale, $currentLocale) {
+        $sourceId = (int) ($item['id'] ?? 0);
+        $localizedId = (int) ($localizedIdBySourceId[$sourceId] ?? $sourceId);
+        $localizedPost = $localizedPostsById->get($localizedId);
+
+        $slug = trim((string) (($localizedPost->post_name ?? null) ?: ($item['slug'] ?? '')));
         $fallbackUrl = trim((string) ($item['url'] ?? ''));
         $productUrl = $slug !== '' ? $localePrefix . '/item/' . rawurlencode($slug) : $fallbackUrl;
+        $resolvedName = $normalizeBrandByLocale((string) (($localizedPost->post_title ?? null) ?: ($item['name'] ?? '')), $currentLocale);
 
         return [
-            'id' => (int) ($item['id'] ?? 0),
-            'name' => (string) ($item['name'] ?? ''),
+            'id' => $localizedId > 0 ? $localizedId : $sourceId,
+            'name' => $resolvedName,
             'image' => (string) ($item['image'] ?? ''),
             'url' => $productUrl,
         ];
