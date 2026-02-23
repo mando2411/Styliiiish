@@ -11,6 +11,142 @@ $mapLocaleToWpmlCode = function (string $locale): string {
     return strtolower($locale) === 'en' ? 'en' : 'ar';
 };
 
+$resolveTranslatePressLanguageCodes = function (string $locale): ?array {
+    static $cachedSettings = null;
+
+    if ($cachedSettings === null) {
+        $settingsOption = DB::table('wp_options')
+            ->where('option_name', 'trp_settings')
+            ->value('option_value');
+
+        $parsed = @unserialize((string) $settingsOption);
+        $cachedSettings = is_array($parsed) ? $parsed : [];
+    }
+
+    $defaultLanguage = (string) ($cachedSettings['default-language'] ?? '');
+    $translationLanguages = collect($cachedSettings['translation-languages'] ?? [])
+        ->filter(fn ($value) => is_string($value) && trim($value) !== '')
+        ->map(fn ($value) => trim((string) $value))
+        ->values();
+
+    if ($defaultLanguage === '' || $translationLanguages->isEmpty()) {
+        return null;
+    }
+
+    $locale = strtolower(trim($locale));
+    $preferredPrefix = $locale === 'en' ? 'en' : 'ar';
+
+    $targetLanguage = $translationLanguages->first(function ($languageCode) use ($preferredPrefix) {
+        $code = strtolower((string) $languageCode);
+        return str_starts_with($code, $preferredPrefix);
+    });
+
+    if (!$targetLanguage) {
+        return null;
+    }
+
+    return [
+        'default' => strtolower($defaultLanguage),
+        'target' => strtolower((string) $targetLanguage),
+    ];
+};
+
+$localizeProductsCollectionByTranslatePress = function ($rows, string $locale, bool $includeContentFields = false) use ($resolveTranslatePressLanguageCodes) {
+    $collection = collect($rows);
+    if ($collection->isEmpty()) {
+        return $collection;
+    }
+
+    $languageCodes = $resolveTranslatePressLanguageCodes($locale);
+    if (!$languageCodes) {
+        return $collection;
+    }
+
+    $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+    $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+    if ($defaultLanguage === '' || $targetLanguage === '' || $defaultLanguage === $targetLanguage) {
+        return $collection;
+    }
+
+    $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+    if (!Schema::hasTable($dictionaryTable)) {
+        return $collection;
+    }
+
+    $lookupStrings = $collection->flatMap(function ($row) use ($includeContentFields) {
+        $strings = [];
+        $title = trim((string) ($row->post_title ?? ''));
+        if ($title !== '') {
+            $strings[] = $title;
+        }
+
+        if ($includeContentFields) {
+            $excerpt = trim((string) ($row->post_excerpt ?? ''));
+            if ($excerpt !== '') {
+                $strings[] = $excerpt;
+            }
+
+            $content = trim((string) ($row->post_content ?? ''));
+            if ($content !== '') {
+                $strings[] = $content;
+            }
+        }
+
+        return $strings;
+    })->map(fn ($value) => (string) $value)->filter(fn ($value) => $value !== '')->unique()->values();
+
+    if ($lookupStrings->isEmpty()) {
+        return $collection;
+    }
+
+    $dictionaryRows = DB::table($dictionaryTable)
+        ->whereIn('original', $lookupStrings->all())
+        ->where('status', '!=', 0)
+        ->whereNotNull('translated')
+        ->where('translated', '!=', '')
+        ->select('original', 'translated')
+        ->get();
+
+    if ($dictionaryRows->isEmpty()) {
+        return $collection;
+    }
+
+    $translationMap = [];
+    foreach ($dictionaryRows as $dictionaryRow) {
+        $original = trim((string) ($dictionaryRow->original ?? ''));
+        $translated = trim((string) ($dictionaryRow->translated ?? ''));
+        if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
+            $translationMap[$original] = $translated;
+        }
+    }
+
+    if (empty($translationMap)) {
+        return $collection;
+    }
+
+    return $collection->map(function ($row) use ($translationMap, $includeContentFields) {
+        $title = trim((string) ($row->post_title ?? ''));
+        if ($title !== '' && isset($translationMap[$title])) {
+            $row->post_title = (string) $translationMap[$title];
+        }
+
+        if ($includeContentFields) {
+            $excerpt = trim((string) ($row->post_excerpt ?? ''));
+            if ($excerpt !== '' && isset($translationMap[$excerpt])) {
+                $row->post_excerpt = (string) $translationMap[$excerpt];
+            }
+
+            $content = trim((string) ($row->post_content ?? ''));
+            if ($content !== '' && isset($translationMap[$content])) {
+                $row->post_content = (string) $translationMap[$content];
+            }
+        }
+
+        return $row;
+    });
+};
+
 $resolveWpmlProductLocalization = function (string $slug, string $locale) use ($mapLocaleToWpmlCode): array {
     $result = [
         'has_wpml_table' => Schema::hasTable('wp_icl_translations'),
@@ -63,11 +199,11 @@ $resolveWpmlProductLocalization = function (string $slug, string $locale) use ($
     return $result;
 };
 
-$localizeProductsCollectionByWpml = function ($rows, string $locale, bool $includeContentFields = false) use ($mapLocaleToWpmlCode) {
+$localizeProductsCollectionByWpml = function ($rows, string $locale, bool $includeContentFields = false) use ($mapLocaleToWpmlCode, $localizeProductsCollectionByTranslatePress) {
     $collection = collect($rows);
 
     if ($collection->isEmpty() || !Schema::hasTable('wp_icl_translations')) {
-        return $collection;
+        return $localizeProductsCollectionByTranslatePress($collection, $locale, $includeContentFields);
     }
 
     $productIds = $collection
@@ -95,7 +231,7 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
         ->get();
 
     if ($translationRows->isEmpty()) {
-        return $collection;
+        return $localizeProductsCollectionByTranslatePress($collection, $locale, $includeContentFields);
     }
 
     $localizedIdBySourceId = [];
@@ -108,7 +244,7 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
     }
 
     if (empty($localizedIdBySourceId)) {
-        return $collection;
+        return $localizeProductsCollectionByTranslatePress($collection, $locale, $includeContentFields);
     }
 
     $localizedIds = array_values(array_unique(array_map(fn ($id) => (int) $id, $localizedIdBySourceId)));
@@ -122,7 +258,7 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
         ->keyBy('ID');
 
     if ($localizedPosts->isEmpty()) {
-        return $collection;
+        return $localizeProductsCollectionByTranslatePress($collection, $locale, $includeContentFields);
     }
 
     return $collection->map(function ($row) use ($localizedIdBySourceId, $localizedPosts, $includeContentFields) {
