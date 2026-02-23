@@ -56,6 +56,7 @@
             'cart' => 'العربة',
             'about' => 'من نحن',
             'categories' => 'الأقسام',
+            'categories_intro' => 'تصفحي أقسام المنتجات للوصول السريع لكل الفئات المتاحة.',
             'privacy' => 'الخصوصية',
             'terms' => 'الشروط والأحكام',
             'refund' => 'الاسترجاع',
@@ -155,6 +156,7 @@
             'cart' => 'Cart',
             'about' => 'About',
             'categories' => 'Categories',
+            'categories_intro' => 'Browse product categories for quick access to all available collections.',
             'privacy' => 'Privacy',
             'terms' => 'Terms',
             'refund' => 'Refund',
@@ -874,24 +876,38 @@
         .r-buy { background: var(--primary); color: #fff; }
         .r-view { border: 1px solid var(--line); color: var(--secondary); background: #fff; }
 
-        .category-section { margin-top: 16px; }
-        .category-chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .category-section {
+            margin-top: 16px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+        }
+        .category-intro {
+            margin: -4px 0 12px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .category-chip-list { display: flex; flex-wrap: wrap; gap: 10px; }
         .category-chip {
             display: inline-flex;
             align-items: center;
-            min-height: 34px;
+            min-height: 36px;
             padding: 0 12px;
             border-radius: 999px;
             border: 1px solid var(--line);
-            background: #fff;
+            background: #fbfcff;
             color: var(--secondary);
             font-size: 13px;
             font-weight: 700;
+            transition: .16s ease;
         }
         .category-chip:hover {
             border-color: var(--primary);
             color: var(--primary);
-            background: #fff4f5;
+            background: #fff;
+            transform: translateY(-1px);
         }
 
         .sg-modal { position: fixed; inset: 0; z-index: 120; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -1366,6 +1382,7 @@
         @if($allProductCategories->isNotEmpty())
             <section class="category-section">
                 <h2 class="section-title">{{ $t('categories') }}</h2>
+                <p class="category-intro">{{ $t('categories_intro') }}</p>
                 <div class="category-chip-list">
                     @foreach($allProductCategories as $category)
                         <a class="category-chip" href="{{ $localePrefix }}/categories">{{ $category['name'] }}</a>

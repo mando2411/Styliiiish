@@ -532,7 +532,7 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale) {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -1435,6 +1435,60 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         })
         ->filter(fn ($row) => trim((string) ($row->name ?? '')) !== '' && trim((string) ($row->slug ?? '')) !== '')
         ->values();
+
+    if ($allProductCategories->isNotEmpty() && Schema::hasTable('wp_icl_translations')) {
+        $wpmlCode = $mapLocaleToWpmlCode($currentLocale);
+        $baseTermIds = $allProductCategories
+            ->pluck('term_id')
+            ->map(fn ($id) => (int) $id)
+            ->filter(fn ($id) => $id > 0)
+            ->unique()
+            ->values();
+
+        if ($baseTermIds->isNotEmpty()) {
+            $translationRows = DB::table('wp_icl_translations as base')
+                ->join('wp_icl_translations as localized', function ($join) {
+                    $join->on('base.trid', '=', 'localized.trid')
+                        ->where('localized.element_type', 'tax_product_cat');
+                })
+                ->where('base.element_type', 'tax_product_cat')
+                ->whereIn('base.element_id', $baseTermIds->all())
+                ->where('localized.language_code', 'like', $wpmlCode . '%')
+                ->select('base.element_id as source_id', 'localized.element_id as localized_id')
+                ->get();
+
+            $localizedIdBySourceId = [];
+            foreach ($translationRows as $translationRow) {
+                $sourceId = (int) ($translationRow->source_id ?? 0);
+                $localizedId = (int) ($translationRow->localized_id ?? 0);
+                if ($sourceId > 0 && $localizedId > 0 && !array_key_exists($sourceId, $localizedIdBySourceId)) {
+                    $localizedIdBySourceId[$sourceId] = $localizedId;
+                }
+            }
+
+            if (!empty($localizedIdBySourceId)) {
+                $localizedTermIds = array_values(array_unique(array_map('intval', array_values($localizedIdBySourceId))));
+                $localizedTerms = DB::table('wp_terms')
+                    ->whereIn('term_id', $localizedTermIds)
+                    ->select('term_id', 'name', 'slug')
+                    ->get()
+                    ->keyBy('term_id');
+
+                $allProductCategories = $allProductCategories->map(function ($row) use ($localizedIdBySourceId, $localizedTerms, $normalizeBrandByLocale, $currentLocale) {
+                    $sourceId = (int) ($row->term_id ?? 0);
+                    $localizedId = (int) ($localizedIdBySourceId[$sourceId] ?? 0);
+                    $localizedTerm = $localizedTerms->get($localizedId);
+
+                    if ($localizedTerm) {
+                        $row->name = $normalizeBrandByLocale((string) ($localizedTerm->name ?? $row->name ?? ''), $currentLocale);
+                        $row->slug = (string) ($localizedTerm->slug ?? $row->slug ?? '');
+                    }
+
+                    return $row;
+                })->values();
+            }
+        }
+    }
 
     $viewData = [
         'product' => $product,
