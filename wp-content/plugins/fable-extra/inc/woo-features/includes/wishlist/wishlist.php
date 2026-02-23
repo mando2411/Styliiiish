@@ -172,8 +172,17 @@ function fable_extra_woowishlist_process_button_action() {
 function fable_extra_woowishlist_empty_message() {
 
 	$empty_text = get_option( 'fable_extra_woowishlist_empty_text', __( 'No products added to wishlist.', 'fable-extra' ) );
+	$shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
 
-	return apply_filters( 'fable_extra_woowishlist_empty_message', sprintf( '<p class="fable-extra-woowishlist-empty">%s</p>', $empty_text ), $empty_text );
+	$message = sprintf(
+		'<div class="fable-extra-woowishlist-empty"><div class="fable-extra-woowishlist-empty__icon">❤</div><h3 class="fable-extra-woowishlist-empty__title">%s</h3><p class="fable-extra-woowishlist-empty__desc">%s</p><a class="button fable-extra-woowishlist-empty__cta" href="%s">%s</a></div>',
+		esc_html__( 'Your wishlist is empty', 'fable-extra' ),
+		esc_html( $empty_text ),
+		esc_url( $shop_url ),
+		esc_html__( 'Start shopping', 'fable-extra' )
+	);
+
+	return apply_filters( 'fable_extra_woowishlist_empty_message', $message, $empty_text );
 }
 
 /**
@@ -334,6 +343,9 @@ function fable_extra_woowishlist_get_products( $list ) {
 function fable_extra_woowishlist_render( $atts = array() ) {
 
     $content = array();
+	$list    = fable_extra_woowishlist_get_list();
+	$count   = is_array( $list ) ? count( $list ) : 0;
+	$shop_url = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/' );
 
     // Sanitize class attribute
     $class = isset( $atts['class'] ) && ! empty( $atts['class'] ) ? esc_attr( $atts['class'] ) : '';
@@ -344,6 +356,16 @@ function fable_extra_woowishlist_render( $atts = array() ) {
 
     // Build the HTML output
     $content[] = '<div class="woocommerce fable-extra-woowishlist ' . $class . '"' . $data_atts . '>';
+	$content[] = '<div class="fable-extra-woowishlist-header">';
+	$content[] = '<div class="fable-extra-woowishlist-header__meta">';
+	$content[] = '<span class="fable-extra-woowishlist-header__kicker">' . esc_html__( 'Saved for later', 'fable-extra' ) . '</span>';
+	$content[] = '<h2 class="fable-extra-woowishlist-header__title">' . esc_html__( 'Your Wishlist', 'fable-extra' ) . '</h2>';
+	$content[] = '</div>';
+	$content[] = '<div class="fable-extra-woowishlist-header__actions">';
+	$content[] = '<span class="fable-extra-woowishlist-header__count">' . sprintf( esc_html__( '%d Items', 'fable-extra' ), intval( $count ) ) . '</span>';
+	$content[] = '<a class="button fable-extra-woowishlist-header__shop" href="' . esc_url( $shop_url ) . '">' . esc_html__( 'Continue shopping', 'fable-extra' ) . '</a>';
+	$content[] = '</div>';
+	$content[] = '</div>';
     $content[] = '<div class="woocommerce fable-extra-woowishlist-wrapper">';
     $content[] = fable_extra_woowishlist_render_table( $atts );
     $content[] = '</div>';
@@ -394,14 +416,11 @@ function fable_extra_woowishlist_render_table( $atts = array() ) {
         $template_path = $templater->get_template_by_name( 'page.tmpl', 'fable-extra-woowishlist' );
     }
 
-    // Begin the output HTML
-    $html[] = '<div class="wf-row">';
-    $html[] = sprintf(
-        __('<div class="wf-col-lg-12 wf-col-xs-12"><div class="fable-extra-woowishlist-item wishlist-head"><div><h5>Product Image</h5></div><div class="product-name"><h5>Product Name</h5></div><div class="product-price"><h5>Unit price</h5></div><div class="product-stock-status"><h5>Stock status</h5></div><div class="product-add-to-cart"><h5>Action</h5></div></div></div>', 'fable-extra')
-    );
+	// Begin the output HTML
+	$html[] = '<div class="wf-row fable-extra-woowishlist-grid">';
 
     // Determine the column class based on the number of columns
-    $class = apply_filters( 'fable_extra_woowishlist_column_class', 'col-lg-' . round( 12 / $cols ) . ' col-xs-12', $cols );
+	$class = apply_filters( 'fable_extra_woowishlist_column_class', 'wf-col-lg-' . round( 12 / $cols ) . ' wf-col-xs-12 fable-extra-woowishlist-col', $cols );
 
     // Loop through the products and generate the output for each
     while ( $products->have_posts() ) {
@@ -420,7 +439,7 @@ function fable_extra_woowishlist_render_table( $atts = array() ) {
 
         // Output product details and template rendering
         $html[] = '<div class="' . esc_attr( $class ) . '">';
-        $html[] = '<div class="fable-extra-woowishlist-item">';
+		$html[] = '<div class="fable-extra-woowishlist-item fable-extra-woowishlist-card">';
         $html[] = '<div class="fable-extra-woowishlist-remove" data-id="' . esc_attr( $pid ) . '" data-nonce="' . esc_attr( $nonce ) . '">' . $dismiss_icon . '</div>';
         $html[] = $templater->parse_template( $template_path, $atts );
         $html[] = '</div>';

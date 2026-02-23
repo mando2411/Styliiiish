@@ -156,3 +156,170 @@
         margin-top: 3px;
     }
 }
+
+.woocommerce.fable-extra-woowishlist {
+    border: 1px solid rgba(189, 189, 189, 0.35);
+    border-radius: 16px;
+    padding: 2rem;
+    background: #fff;
+}
+
+.fable-extra-woowishlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.8rem;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(189, 189, 189, 0.35);
+}
+
+.fable-extra-woowishlist-header__kicker {
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--wf-main-color);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.fable-extra-woowishlist-header__title {
+    margin: 0.4rem 0 0;
+    font-size: 2.4rem;
+    line-height: 1.2;
+}
+
+.fable-extra-woowishlist-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.fable-extra-woowishlist-header__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.8rem;
+    padding: 0 1.2rem;
+    border-radius: 999px;
+    background: rgba(114, 14, 236, 0.08);
+    color: var(--wf-main-color);
+    font-weight: 600;
+}
+
+.fable-extra-woowishlist-header__shop.button {
+    min-height: 3.8rem;
+    padding: 0 1.4rem;
+    border-radius: 999px;
+    font-size: 1.4rem;
+}
+
+.fable-extra-woowishlist-grid {
+    row-gap: 1.2rem;
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card {
+    grid-template-columns: 120px 1.4fr auto auto auto;
+    align-items: center;
+    gap: 1.2rem;
+    border: 1px solid rgba(189, 189, 189, 0.35);
+    border-radius: 12px;
+    border-bottom: 1px solid rgba(189, 189, 189, 0.35);
+    background: #fff;
+    padding: 1.4rem;
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card .fable-extra-woocomerce-list__product-image img {
+    max-width: 100%;
+    width: 100px;
+    border-radius: 10px;
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card .fable-extra-woocomerce-list__product-title {
+    margin: 0;
+    font-size: 1.7rem;
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card .price {
+    font-weight: 600;
+    color: var(--wf-main-color);
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card .stock {
+    margin: 0;
+}
+
+.fable-extra-woowishlist-item.fable-extra-woowishlist-card a.button {
+    margin: 0;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.fable-extra-woowishlist-remove {
+    top: 8px;
+    left: 8px;
+    right: auto;
+    width: 24px;
+    height: 24px;
+    max-width: 24px;
+    max-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid rgba(212, 47, 47, 0.2);
+}
+
+.fable-extra-woowishlist-empty {
+    text-align: center;
+    border: 1px dashed rgba(189, 189, 189, 0.6);
+    border-radius: 16px;
+    padding: 3.2rem 1.6rem;
+    margin: 0;
+}
+
+.fable-extra-woowishlist-empty__icon {
+    font-size: 3rem;
+    color: var(--wf-main-color);
+    line-height: 1;
+    margin-bottom: 1rem;
+}
+
+.fable-extra-woowishlist-empty__title {
+    margin: 0 0 0.6rem;
+    font-size: 2.2rem;
+}
+
+.fable-extra-woowishlist-empty__desc {
+    margin: 0;
+    color: #666;
+}
+
+.fable-extra-woowishlist-empty__cta.button {
+    margin-top: 1.4rem;
+    border-radius: 999px;
+    padding: 0.9rem 1.6rem;
+}
+
+@media (max-width: 991px) {
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card {
+        grid-template-columns: 90px 1fr;
+        grid-auto-rows: auto;
+        align-items: start;
+    }
+
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card .fable-extra-woocomerce-list__product-image {
+        grid-row: span 4;
+    }
+
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card .price,
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card .stock,
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card .fable-extra-woocomerce-list__product-title,
+    .fable-extra-woowishlist-item.fable-extra-woowishlist-card a.button {
+        width: 100%;
+        text-align: start;
+        justify-self: start;
+    }
+}
