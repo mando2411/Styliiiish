@@ -196,8 +196,8 @@
     ];
 
     $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
-        ? (preg_replace('/(?<![@.\w-])ستايلش(?![\w.-])/u', 'Styliiiish', $value) ?? $value)
-        : (preg_replace('/(?<![@.\w-])styliiiish(?![\w.-])/iu', 'ستايلش', $value) ?? $value);
+        ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
+        : (preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value);
     $t = fn (string $key) => $normalizeBrandText((string) ($translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key));
 
     $canonicalPath = $localePrefix . '/about-us';

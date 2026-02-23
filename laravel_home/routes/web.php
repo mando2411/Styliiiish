@@ -20,10 +20,10 @@ $normalizeBrandByLocale = function (?string $text, string $locale): string {
     $currentLocale = strtolower(trim($locale));
 
     if ($currentLocale === 'en') {
-        return preg_replace('/(?<![@.\\w-])ستايلش(?![\\w.-])/u', 'Styliiiish', $value) ?? $value;
+        return preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value;
     }
 
-    return preg_replace('/(?<![@.\\w-])styliiiish(?![\\w.-])/iu', 'ستايلش', $value) ?? $value;
+    return preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value;
 };
 
 $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
