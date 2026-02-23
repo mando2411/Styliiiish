@@ -13,17 +13,7 @@ $mapLocaleToWpmlCode = function (string $locale): string {
 
 $normalizeBrandByLocale = function (?string $text, string $locale): string {
     $value = (string) ($text ?? '');
-    if ($value === '') {
-        return $value;
-    }
-
-    $currentLocale = strtolower(trim($locale));
-
-    if ($currentLocale === 'en') {
-        return preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value;
-    }
-
-    return preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value;
+    return $value;
 };
 
 $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
