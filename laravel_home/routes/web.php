@@ -2098,11 +2098,12 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
-$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $localizeProductsCollectionByTranslatePress) {
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'list',
         'limit' => 8,
+        'locale' => $currentLocale,
     ]);
 
     if (!$bridge['ok']) {
@@ -2172,7 +2173,16 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
         $slug = trim((string) (($localizedPost->post_name ?? null) ?: ($item['slug'] ?? '')));
         $fallbackUrl = trim((string) ($item['url'] ?? ''));
         $productUrl = $slug !== '' ? $localePrefix . '/item/' . rawurlencode($slug) : $fallbackUrl;
-        $resolvedName = $normalizeBrandByLocale((string) (($localizedPost->post_title ?? null) ?: ($item['name'] ?? '')), $currentLocale);
+        $bridgeName = trim((string) ($item['name'] ?? ''));
+        $wpmlName = trim((string) ($localizedPost->post_title ?? ''));
+
+        if ($currentLocale === 'ar') {
+            $resolvedName = $bridgeName !== '' ? $bridgeName : $wpmlName;
+        } else {
+            $resolvedName = $wpmlName !== '' ? $wpmlName : $bridgeName;
+        }
+
+        $resolvedName = $normalizeBrandByLocale($resolvedName, $currentLocale);
 
         return [
             'id' => $localizedId > 0 ? $localizedId : $sourceId,
@@ -2181,32 +2191,6 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
             'url' => $productUrl,
         ];
     })->filter(fn ($item) => $item['id'] > 0 && $item['name'] !== '' && $item['url'] !== '')->values();
-
-    if ($items->isNotEmpty()) {
-        $nameRows = $items->map(function ($item) {
-            return (object) [
-                'ID' => (int) ($item['id'] ?? 0),
-                'post_title' => (string) ($item['name'] ?? ''),
-                'post_name' => '',
-            ];
-        })->values();
-
-        $translatedRows = $localizeProductsCollectionByTranslatePress($nameRows, $currentLocale, false)
-            ->values()
-            ->keyBy(fn ($row) => (int) ($row->ID ?? 0));
-
-        $items = $items->map(function ($item) use ($translatedRows, $normalizeBrandByLocale, $currentLocale) {
-            $id = (int) ($item['id'] ?? 0);
-            $translated = $translatedRows->get($id);
-            $translatedName = trim((string) ($translated->post_title ?? ''));
-
-            if ($translatedName !== '') {
-                $item['name'] = $normalizeBrandByLocale($translatedName, $currentLocale);
-            }
-
-            return $item;
-        })->values();
-    }
 
     $response = response()->json([
         'success' => true,

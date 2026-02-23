@@ -1478,6 +1478,7 @@
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json((string) ($product->post_name ?? ''));
+            const productId = Number(@json((int) ($product->ID ?? 0))) || 0;
             const wishlistPageUrl = @json($wishlistPageUrl);
 
             const priceNode = document.getElementById('productPrice');
@@ -1899,6 +1900,47 @@
             const getWishlistAddUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/wishlist/add`;
             const getWishlistCountUrl = () => `${@json($localePrefix)}/item/wishlist/count`;
             const getWishlistItemsUrl = () => `${@json($localePrefix)}/item/wishlist/items`;
+            const getWishlistBridgeUrl = () => '/wishlist-bridge.php';
+
+            const addToWishlistViaBridge = async () => {
+                if (productId <= 0) {
+                    throw new Error(wishlistAddFailedText);
+                }
+
+                const params = new URLSearchParams();
+                params.set('action', 'add');
+                params.set('pid', String(productId));
+
+                const response = await fetch(getWishlistBridgeUrl(), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    body: params.toString(),
+                });
+
+                if (!response.ok) {
+                    throw new Error(wishlistAddFailedText);
+                }
+
+                const result = await response.json();
+                if (!result || !result.success) {
+                    throw new Error((result && result.message) ? result.message : wishlistAddFailedText);
+                }
+
+                const nextCount = Math.max(0, Number(result.count || 0));
+                const shouldAnimate = nextCount > currentWishlistCount;
+                setWishlistCount(nextCount);
+                if (shouldAnimate) {
+                    animateWishlistPlusOne();
+                }
+
+                loadWishlistItems(true).catch(() => {});
+                helpText.textContent = String(result.message || addedToWishlistText);
+            };
 
             const renderTabLoading = () => {
                 if (!tabsBody) return;
@@ -2447,7 +2489,11 @@
                     try {
                         await addToWishlistAjax();
                     } catch (error) {
-                        helpText.textContent = (error && error.message) ? error.message : wishlistAddFailedText;
+                        try {
+                            await addToWishlistViaBridge();
+                        } catch (fallbackError) {
+                            helpText.textContent = (fallbackError && fallbackError.message) ? fallbackError.message : wishlistAddFailedText;
+                        }
                     } finally {
                         isAddingToWishlist = false;
                         addToWishlistBtn.disabled = false;
