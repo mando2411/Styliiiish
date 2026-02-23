@@ -1479,7 +1479,7 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
     $tab = strtolower(trim($tab));
 
     if ($tab === 'description') {
-        $contentHtml = trim((string) ($product->post_excerpt ?: $product->post_content));
+        $contentHtml = trim((string) ($product->post_content ?: $product->post_excerpt));
         $contentHtml = str_replace(
             ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
             [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
