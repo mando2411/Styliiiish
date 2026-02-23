@@ -1993,6 +1993,97 @@ $submitProductReviewHandler = function (Request $request, string $slug, string $
     ]);
 };
 
+$wishlistWordPressBootstrap = function (): bool {
+    static $booted = false;
+
+    if ($booted) {
+        return true;
+    }
+
+    $wpLoadPath = base_path('../wp-load.php');
+    if (!is_file($wpLoadPath)) {
+        return false;
+    }
+
+    require_once $wpLoadPath;
+    $booted = true;
+    return true;
+};
+
+$wishlistCountForCurrentVisitor = function () use ($wishlistWordPressBootstrap): ?int {
+    if (!$wishlistWordPressBootstrap()) {
+        return null;
+    }
+
+    if (!function_exists('fable_extra_woowishlist_get_list')) {
+        return null;
+    }
+
+    $list = fable_extra_woowishlist_get_list();
+    if (!is_array($list)) {
+        return 0;
+    }
+
+    return count(array_unique(array_map('intval', $list)));
+};
+
+$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistWordPressBootstrap, $wishlistCountForCurrentVisitor) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+
+    if (!$product) {
+        return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+    }
+
+    if (!$wishlistWordPressBootstrap()) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en'
+                ? 'Wishlist service is temporarily unavailable.'
+                : 'خدمة المفضلة غير متاحة حالياً.',
+        ], 500);
+    }
+
+    if (!function_exists('fable_extra_woowishlist_add')) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en'
+                ? 'Wishlist plugin is not active.'
+                : 'إضافة المفضلة غير مفعلة حالياً.',
+        ], 500);
+    }
+
+    fable_extra_woowishlist_add((int) $product->ID);
+    $count = $wishlistCountForCurrentVisitor();
+
+    return response()->json([
+        'success' => true,
+        'count' => max(0, (int) ($count ?? 0)),
+        'message' => $currentLocale === 'en'
+            ? 'Product added to wishlist.'
+            : 'تمت إضافة المنتج إلى المفضلة.',
+    ]);
+};
+
+$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistCountForCurrentVisitor) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $count = $wishlistCountForCurrentVisitor();
+
+    if ($count === null) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en'
+                ? 'Unable to load wishlist count.'
+                : 'تعذر تحميل عدد المفضلة.',
+        ], 500);
+    }
+
+    return response()->json([
+        'success' => true,
+        'count' => max(0, (int) $count),
+    ]);
+};
+
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
@@ -2004,6 +2095,14 @@ Route::post('/en/item/{slug}/report', fn (Request $request, string $slug) => $re
 Route::post('/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
 Route::post('/ar/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
 Route::post('/en/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'en'));
+
+Route::post('/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'));
+Route::post('/ar/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'));
+Route::post('/en/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'en'));
+
+Route::get('/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
+Route::get('/ar/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
+Route::get('/en/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'en'));
 
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));

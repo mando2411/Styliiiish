@@ -1379,7 +1379,6 @@
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json((string) ($product->post_name ?? ''));
-            const addToWishlistUrl = @json($addToWishlistUrl);
             const wishlistPageUrl = @json($wishlistPageUrl);
 
             const priceNode = document.getElementById('productPrice');
@@ -1455,27 +1454,25 @@
             };
 
             const fetchWishlistCount = async () => {
-                const response = await fetch(`${wishlistPageUrl}${wishlistPageUrl.includes('?') ? '&' : '?'}_=${Date.now()}`, {
+                const response = await fetch(`${getWishlistCountUrl()}?_=${Date.now()}`, {
                     method: 'GET',
                     credentials: 'same-origin',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
                 });
 
                 if (!response.ok) {
                     throw new Error('wishlist_count_failed');
                 }
 
-                const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const removeButtons = doc.querySelectorAll('.fable-extra-woowishlist-remove');
-
-                if (removeButtons.length > 0) {
-                    return removeButtons.length;
+                const result = await response.json();
+                if (!result || !result.success) {
+                    throw new Error('wishlist_count_failed');
                 }
 
-                const fallbackMatches = html.match(/fable-extra-woowishlist-remove/g);
-                return fallbackMatches ? fallbackMatches.length : 0;
+                return Math.max(0, Number(result.count || 0));
             };
 
             const refreshWishlistCount = async (withAnimation = false) => {
@@ -1491,18 +1488,34 @@
             };
 
             const addToWishlistAjax = async () => {
-                const response = await fetch(`${addToWishlistUrl}${addToWishlistUrl.includes('?') ? '&' : '?'}_=${Date.now()}`, {
-                    method: 'GET',
+                const response = await fetch(getWishlistAddUrl(), {
+                    method: 'POST',
                     credentials: 'same-origin',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: '',
                 });
 
                 if (!response.ok) {
                     throw new Error(wishlistAddFailedText);
                 }
 
-                await refreshWishlistCount(true);
-                helpText.textContent = addedToWishlistText;
+                const result = await response.json();
+                if (!result || !result.success) {
+                    throw new Error((result && result.message) ? result.message : wishlistAddFailedText);
+                }
+
+                const nextCount = Math.max(0, Number(result.count || 0));
+                const shouldAnimate = nextCount > currentWishlistCount;
+                setWishlistCount(nextCount);
+                if (shouldAnimate) {
+                    animateWishlistPlusOne();
+                }
+                helpText.textContent = String(result.message || addedToWishlistText);
             };
 
             const syncPostedAttributes = () => {
@@ -1698,6 +1711,8 @@
             const getTabUrl = (tab) => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/tabs/${encodeURIComponent(tab)}`;
             const getReportUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/report`;
             const getReviewUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/review`;
+            const getWishlistAddUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/wishlist/add`;
+            const getWishlistCountUrl = () => `${@json($localePrefix)}/item/wishlist/count`;
 
             const renderTabLoading = () => {
                 if (!tabsBody) return;
