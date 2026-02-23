@@ -11,6 +11,21 @@ $mapLocaleToWpmlCode = function (string $locale): string {
     return strtolower($locale) === 'en' ? 'en' : 'ar';
 };
 
+$normalizeBrandByLocale = function (?string $text, string $locale): string {
+    $value = (string) ($text ?? '');
+    if ($value === '') {
+        return $value;
+    }
+
+    $currentLocale = strtolower(trim($locale));
+
+    if ($currentLocale === 'en') {
+        return preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value;
+    }
+
+    return preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value;
+};
+
 $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
     static $cachedSettings = null;
 
@@ -51,7 +66,7 @@ $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
     ];
 };
 
-$localizeProductsCollectionByTranslatePress = function ($rows, string $locale, bool $includeContentFields = false) use ($resolveTranslatePressLanguageCodes) {
+$localizeProductsCollectionByTranslatePress = function ($rows, string $locale, bool $includeContentFields = false) use ($resolveTranslatePressLanguageCodes, $normalizeBrandByLocale) {
     $collection = collect($rows);
     if ($collection->isEmpty()) {
         return $collection;
@@ -148,21 +163,23 @@ $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, b
         return $collection;
     }
 
-    return $collection->map(function ($row) use ($translationMap, $includeContentFields, $getField, $setField) {
+    return $collection->map(function ($row) use ($translationMap, $includeContentFields, $getField, $setField, $normalizeBrandByLocale, $locale) {
         $title = $getField($row, 'post_title');
         if ($title !== '' && isset($translationMap[$title])) {
-            $setField($row, 'post_title', (string) $translationMap[$title]);
+            $setField($row, 'post_title', $normalizeBrandByLocale((string) $translationMap[$title], $locale));
+        } elseif ($title !== '') {
+            $setField($row, 'post_title', $normalizeBrandByLocale($title, $locale));
         }
 
         if ($includeContentFields) {
             $excerpt = $getField($row, 'post_excerpt');
             if ($excerpt !== '' && isset($translationMap[$excerpt])) {
-                $setField($row, 'post_excerpt', (string) $translationMap[$excerpt]);
+                $setField($row, 'post_excerpt', $normalizeBrandByLocale((string) $translationMap[$excerpt], $locale));
             }
 
             $content = $getField($row, 'post_content');
             if ($content !== '' && isset($translationMap[$content])) {
-                $setField($row, 'post_content', (string) $translationMap[$content]);
+                $setField($row, 'post_content', $normalizeBrandByLocale((string) $translationMap[$content], $locale));
             }
         }
 
@@ -222,7 +239,7 @@ $resolveWpmlProductLocalization = function (string $slug, string $locale) use ($
     return $result;
 };
 
-$localizeProductsCollectionByWpml = function ($rows, string $locale, bool $includeContentFields = false) use ($mapLocaleToWpmlCode, $localizeProductsCollectionByTranslatePress) {
+$localizeProductsCollectionByWpml = function ($rows, string $locale, bool $includeContentFields = false) use ($mapLocaleToWpmlCode, $localizeProductsCollectionByTranslatePress, $normalizeBrandByLocale) {
     $collection = collect($rows);
 
     if ($collection->isEmpty() || !Schema::hasTable('wp_icl_translations')) {
@@ -297,15 +314,15 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
         }
 
         $row->ID = (int) $localizedPost->ID;
-        $row->post_title = (string) ($localizedPost->post_title ?? $row->post_title ?? '');
+        $row->post_title = $normalizeBrandByLocale((string) ($localizedPost->post_title ?? $row->post_title ?? ''), $locale);
         $row->post_name = (string) ($localizedPost->post_name ?? $row->post_name ?? '');
 
         if ($includeContentFields) {
             if (property_exists($row, 'post_excerpt')) {
-                $row->post_excerpt = (string) ($localizedPost->post_excerpt ?? $row->post_excerpt ?? '');
+                $row->post_excerpt = $normalizeBrandByLocale((string) ($localizedPost->post_excerpt ?? $row->post_excerpt ?? ''), $locale);
             }
             if (property_exists($row, 'post_content')) {
-                $row->post_content = (string) ($localizedPost->post_content ?? $row->post_content ?? '');
+                $row->post_content = $normalizeBrandByLocale((string) ($localizedPost->post_content ?? $row->post_content ?? ''), $locale);
             }
         }
 
@@ -954,33 +971,34 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
     };
 
-    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey): string {
+    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey, $normalizeBrandByLocale): string {
         $localeMap = $wooAttributeLabelTranslations[$currentLocale] ?? [];
         $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
-        return $localeMap[$taxonomyKey] ?? $fallbackLabel;
+        $resolved = (string) ($localeMap[$taxonomyKey] ?? $fallbackLabel);
+        return $normalizeBrandByLocale($resolved, $currentLocale);
     };
 
-    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey): string {
+    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey, $normalizeBrandByLocale): string {
         $localeMap = $wooAttributeValueTranslations[$currentLocale] ?? [];
         $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
         $taxonomyMap = $localeMap[$taxonomyKey] ?? [];
 
         $slugKey = $normalizeTranslationKey($slug);
         if ($slugKey !== '' && array_key_exists($slugKey, $taxonomyMap)) {
-            return (string) $taxonomyMap[$slugKey];
+            return $normalizeBrandByLocale((string) $taxonomyMap[$slugKey], $currentLocale);
         }
 
         $valueKey = $normalizeTranslationKey($fallbackValue);
         if ($valueKey !== '' && array_key_exists($valueKey, $taxonomyMap)) {
-            return (string) $taxonomyMap[$valueKey];
+            return $normalizeBrandByLocale((string) $taxonomyMap[$valueKey], $currentLocale);
         }
 
         $globalMap = $localeMap['global'] ?? [];
         if ($valueKey !== '' && array_key_exists($valueKey, $globalMap)) {
-            return (string) $globalMap[$valueKey];
+            return $normalizeBrandByLocale((string) $globalMap[$valueKey], $currentLocale);
         }
 
-        return $fallbackValue;
+        return $normalizeBrandByLocale($fallbackValue, $currentLocale);
     };
 
     $materialValues = $findAttributeValues(['material', 'fabric', 'matiere', 'qamash', 'khama']);
@@ -1902,7 +1920,7 @@ Route::get('/en/cookie-policy', fn (Request $request) => $cookiePolicyHandler($r
 Route::get('/🍪-cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 Route::get('/🍪-cookie-policy/', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 
-$categoriesHandler = function (Request $request, string $locale = 'ar') {
+$categoriesHandler = function (Request $request, string $locale = 'ar') use ($normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -1927,7 +1945,12 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') {
             'tt.count as products_count',
             'img.guid as image'
         )
-        ->get();
+        ->get()
+        ->map(function ($category) use ($currentLocale, $normalizeBrandByLocale) {
+            $category->name = $normalizeBrandByLocale((string) ($category->name ?? ''), $currentLocale);
+            $category->description = $normalizeBrandByLocale((string) ($category->description ?? ''), $currentLocale);
+            return $category;
+        });
 
     return view('categories', compact('categories', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };

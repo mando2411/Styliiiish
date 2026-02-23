@@ -195,7 +195,10 @@
         ],
     ];
 
-    $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
+    $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
+        ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
+        : (preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value);
+    $t = fn (string $key) => $normalizeBrandText((string) ($translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key));
 
     $canonicalPath = $localePrefix . '/about-us';
     $wpDisplayHost = preg_replace('#^https?://#', '', $wpBaseUrl);

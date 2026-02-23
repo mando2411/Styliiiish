@@ -230,7 +230,10 @@
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
 
-    $t = fn (string $key) => $translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key;
+    $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
+        ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
+        : (preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value);
+    $t = fn (string $key) => $normalizeBrandText((string) ($translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key));
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
