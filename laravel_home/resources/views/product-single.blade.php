@@ -75,6 +75,19 @@
             'added_to_cart' => 'تمت إضافة المنتج للعربة',
             'add_to_cart_failed' => 'تعذر إضافة المنتج للعربة',
             'size_guide_missing' => 'دليل المقاسات غير متاح لهذا المنتج حالياً.',
+            'report_title' => 'الإبلاغ عن هذا المنتج',
+            'report_subtitle' => 'لو في أي ملاحظة تخص جودة المحتوى أو السعر أو الوصف، أرسلي بلاغك وسيتم مراجعته سريعًا.',
+            'report_name' => 'الاسم',
+            'report_email' => 'البريد الإلكتروني (اختياري)',
+            'report_reason' => 'سبب البلاغ',
+            'report_submit' => 'إرسال البلاغ',
+            'report_placeholder' => 'اكتبي تفاصيل البلاغ بشكل واضح...',
+            'tab_description' => 'الوصف',
+            'tab_specifications' => 'المواصفات',
+            'tab_reviews' => 'المراجعات والتعليقات',
+            'tab_policies' => 'السياسات',
+            'tab_loading' => 'جاري تحميل المحتوى...',
+            'tab_load_failed' => 'تعذر تحميل المحتوى حالياً. حاولي مرة أخرى.',
         ],
         'en' => [
             'page_title' => (($product->post_title ?? 'Product') . ' | Styliiiish'),
@@ -144,6 +157,19 @@
             'added_to_cart' => 'Product added to cart',
             'add_to_cart_failed' => 'Unable to add product to cart',
             'size_guide_missing' => 'Size guide is not available for this product yet.',
+            'report_title' => 'Report this product',
+            'report_subtitle' => 'If you notice any issue with product content, pricing, or details, send a report and our team will review it quickly.',
+            'report_name' => 'Name',
+            'report_email' => 'Email (optional)',
+            'report_reason' => 'Report reason',
+            'report_submit' => 'Send report',
+            'report_placeholder' => 'Write your report details clearly...',
+            'tab_description' => 'Description',
+            'tab_specifications' => 'Specifications',
+            'tab_reviews' => 'Reviews & Comments',
+            'tab_policies' => 'Policies',
+            'tab_loading' => 'Loading content...',
+            'tab_load_failed' => 'Unable to load content right now. Please try again.',
         ],
     ];
 
@@ -259,6 +285,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -491,6 +518,93 @@
 
         .description { margin-top: 14px; color: var(--muted); line-height: 1.7; }
 
+        .report-box {
+            margin-top: 16px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+            display: grid;
+            gap: 10px;
+        }
+        .report-title { margin: 0; font-size: 18px; color: var(--secondary); }
+        .report-subtitle { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.7; }
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .report-field { display: grid; gap: 6px; }
+        .report-field label { font-size: 12px; font-weight: 700; color: var(--secondary); }
+        .report-field input,
+        .report-field textarea {
+            width: 100%;
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fff;
+            padding: 10px;
+            font-size: 13px;
+            color: var(--secondary);
+            font-family: inherit;
+        }
+        .report-field textarea { min-height: 100px; resize: vertical; }
+        .report-submit {
+            border: 0;
+            border-radius: 10px;
+            min-height: 42px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 0 14px;
+            justify-self: start;
+        }
+        .report-submit:disabled { opacity: .6; cursor: not-allowed; }
+        .report-message { margin: 0; font-size: 12px; min-height: 18px; color: var(--muted); }
+
+        .product-tabs {
+            margin-top: 16px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .product-tabs-head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+            background: #fcfdff;
+        }
+        .product-tab-btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--secondary);
+            border-radius: 999px;
+            min-height: 36px;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .product-tab-btn.is-active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(var(--wf-main-rgb), .08);
+        }
+        .product-tabs-body {
+            padding: 14px;
+            color: var(--secondary);
+            line-height: 1.8;
+        }
+        .product-tabs-loading {
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            background: #fbfcff;
+        }
+
         .related { margin-top: 18px; }
         .related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
         .r-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
@@ -674,6 +788,7 @@
         @media (max-width: 640px) {
             .nav { overflow-x: auto; justify-content: flex-start; }
             .cart-row { grid-template-columns: 1fr; }
+            .report-grid { grid-template-columns: 1fr; }
             .related-grid { grid-template-columns: 1fr; gap: 10px; }
             .r-actions { grid-template-columns: 1fr; }
             .sg-table th,
@@ -837,6 +952,42 @@
             </article>
         </section>
 
+        <section class="report-box" id="productReportSection">
+            <h2 class="report-title">{{ $t('report_title') }}</h2>
+            <p class="report-subtitle">{{ $t('report_subtitle') }}</p>
+
+            <form id="productReportForm" novalidate>
+                <div class="report-grid">
+                    <div class="report-field">
+                        <label for="reportName">{{ $t('report_name') }}</label>
+                        <input type="text" id="reportName" name="name" maxlength="120" required>
+                    </div>
+                    <div class="report-field">
+                        <label for="reportEmail">{{ $t('report_email') }}</label>
+                        <input type="email" id="reportEmail" name="email" maxlength="190">
+                    </div>
+                </div>
+                <div class="report-field">
+                    <label for="reportReason">{{ $t('report_reason') }}</label>
+                    <textarea id="reportReason" name="reason" maxlength="2000" required placeholder="{{ $t('report_placeholder') }}"></textarea>
+                </div>
+                <button class="report-submit" id="reportSubmitBtn" type="submit">{{ $t('report_submit') }}</button>
+                <p class="report-message" id="reportMessage"></p>
+            </form>
+        </section>
+
+        <section class="product-tabs" id="productAjaxTabs">
+            <div class="product-tabs-head" role="tablist" aria-label="Product Sections">
+                <button type="button" class="product-tab-btn is-active" data-product-tab="description" role="tab" aria-selected="true">{{ $t('tab_description') }}</button>
+                <button type="button" class="product-tab-btn" data-product-tab="specifications" role="tab" aria-selected="false">{{ $t('tab_specifications') }}</button>
+                <button type="button" class="product-tab-btn" data-product-tab="reviews" role="tab" aria-selected="false">{{ $t('tab_reviews') }}</button>
+                <button type="button" class="product-tab-btn" data-product-tab="policies" role="tab" aria-selected="false">{{ $t('tab_policies') }}</button>
+            </div>
+            <div class="product-tabs-body" id="productTabsBody">
+                <div class="product-tabs-loading">{{ $t('tab_loading') }}</div>
+            </div>
+        </section>
+
         @if(($relatedProducts instanceof \Illuminate\Support\Collection && $relatedProducts->isNotEmpty()) || (is_array($relatedProducts) && !empty($relatedProducts)))
             <section class="related">
                 <h2 class="section-title">{{ $t('related') }}</h2>
@@ -996,13 +1147,24 @@
             const currentLocale = @json($currentLocale);
             const currencyText = @json($t('currency'));
             const contactForPriceText = @json($t('contact_for_price'));
+            const tabLoadingText = @json($t('tab_loading'));
+            const tabLoadFailedText = @json($t('tab_load_failed'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const productSlug = @json((string) ($product->post_name ?? ''));
 
             const priceNode = document.getElementById('productPrice');
             const oldPriceNode = document.getElementById('productOldPrice');
             const conditionAvailabilityHint = document.getElementById('conditionAvailabilityHint');
             const basePrice = Number(@json((float) ($price ?? 0))) || 0;
             const baseRegularPrice = Number(@json((float) ($regular ?? 0))) || 0;
+
+            const tabsWrap = document.getElementById('productAjaxTabs');
+            const tabButtons = tabsWrap ? Array.from(tabsWrap.querySelectorAll('[data-product-tab]')) : [];
+            const tabsBody = document.getElementById('productTabsBody');
+            const reportForm = document.getElementById('productReportForm');
+            const reportSubmitBtn = document.getElementById('reportSubmitBtn');
+            const reportMessage = document.getElementById('reportMessage');
 
             const cartTrigger = document.getElementById('miniCartTrigger');
             const cartBadge = document.getElementById('cartCountBadge');
@@ -1220,6 +1382,124 @@
                 conditionAvailabilityHint.innerHTML = `<strong>${intro}</strong> ${warnings.join('<br>')}`;
                 conditionAvailabilityHint.classList.add('is-visible');
             };
+
+            const tabCache = new Map();
+
+            const getTabUrl = (tab) => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/tabs/${encodeURIComponent(tab)}`;
+            const getReportUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/report`;
+
+            const renderTabLoading = () => {
+                if (!tabsBody) return;
+                tabsBody.innerHTML = `<div class="product-tabs-loading">${tabLoadingText}</div>`;
+            };
+
+            const renderTabError = () => {
+                if (!tabsBody) return;
+                tabsBody.innerHTML = `<div class="product-tabs-loading">${tabLoadFailedText}</div>`;
+            };
+
+            const setActiveTabButton = (tab) => {
+                tabButtons.forEach((button) => {
+                    const isActive = (button.getAttribute('data-product-tab') || '') === tab;
+                    button.classList.toggle('is-active', isActive);
+                    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+            };
+
+            const loadTabContent = async (tab, forceReload = false) => {
+                if (!tabsBody) return;
+
+                setActiveTabButton(tab);
+
+                if (!forceReload && tabCache.has(tab)) {
+                    tabsBody.innerHTML = tabCache.get(tab) || '';
+                    return;
+                }
+
+                renderTabLoading();
+
+                try {
+                    const response = await fetch(getTabUrl(tab), {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok || !result || !result.success) {
+                        throw new Error('tab_failed');
+                    }
+
+                    const html = String(result.html || '').trim();
+                    tabCache.set(tab, html);
+                    tabsBody.innerHTML = html !== '' ? html : `<div class="product-tabs-loading">${tabLoadFailedText}</div>`;
+                } catch (error) {
+                    renderTabError();
+                }
+            };
+
+            if (tabButtons.length > 0) {
+                tabButtons.forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const tab = (button.getAttribute('data-product-tab') || '').trim();
+                        if (!tab) return;
+                        loadTabContent(tab);
+                    });
+                });
+
+                loadTabContent('description');
+            }
+
+            const setReportMessage = (message, isSuccess = false) => {
+                if (!reportMessage) return;
+                reportMessage.textContent = message;
+                reportMessage.style.color = isSuccess ? '#197A3A' : 'var(--muted)';
+            };
+
+            if (reportForm) {
+                reportForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+
+                    if (!reportSubmitBtn) return;
+
+                    const formData = new FormData(reportForm);
+                    const params = new URLSearchParams();
+                    formData.forEach((value, key) => params.append(key, String(value || '').trim()));
+
+                    reportSubmitBtn.disabled = true;
+                    setReportMessage(tabLoadingText, false);
+
+                    try {
+                        const response = await fetch(getReportUrl(), {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: params.toString(),
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok || !result || !result.success) {
+                            throw new Error((result && result.message) ? result.message : tabLoadFailedText);
+                        }
+
+                        setReportMessage(String(result.message || ''), true);
+                        reportForm.reset();
+                    } catch (error) {
+                        const message = (error && error.message) ? error.message : tabLoadFailedText;
+                        setReportMessage(message, false);
+                    } finally {
+                        reportSubmitBtn.disabled = false;
+                    }
+                });
+            }
 
             const refreshOptionAvailability = () => {
                 if (!selectorsWrap) return;

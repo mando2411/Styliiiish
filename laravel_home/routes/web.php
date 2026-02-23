@@ -1442,6 +1442,267 @@ Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProduct
 Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
 Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
+$resolveProductForAjaxSections = function (string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
+    $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
+
+    $product = DB::table('wp_posts as p')
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->where(function ($query) use ($slug, $localizedProductId) {
+            if ($localizedProductId > 0) {
+                $query->where('p.ID', $localizedProductId);
+            } else {
+                $query->where('p.post_name', $slug);
+            }
+        })
+        ->select('p.ID', 'p.post_title', 'p.post_name', 'p.post_content', 'p.post_excerpt', 'p.post_date')
+        ->first();
+
+    if (!$product) {
+        return null;
+    }
+
+    return $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+};
+
+$renderAjaxTabHtml = function (Request $request, string $slug, string $tab, string $locale = 'ar') use ($resolveProductForAjaxSections) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+
+    if (!$product) {
+        return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+    }
+
+    $tab = strtolower(trim($tab));
+
+    if ($tab === 'description') {
+        $contentHtml = trim((string) ($product->post_excerpt ?: $product->post_content));
+        $contentHtml = str_replace(
+            ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+            [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $contentHtml
+        );
+
+        if ($contentHtml === '') {
+            $contentHtml = $currentLocale === 'en' ? '<p>No description available yet.</p>' : '<p>لا يوجد وصف متاح حالياً.</p>';
+        }
+
+        return response()->json([
+            'success' => true,
+            'tab' => 'description',
+            'html' => $contentHtml,
+        ]);
+    }
+
+    if ($tab === 'specifications') {
+        $attributeRows = DB::table('wp_term_relationships as tr')
+            ->join('wp_term_taxonomy as tt', 'tr.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+            ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+            ->where('tr.object_id', (int) $product->ID)
+            ->where('tt.taxonomy', 'like', 'pa\_%')
+            ->select('tt.taxonomy', 't.name')
+            ->get();
+
+        $grouped = [];
+        foreach ($attributeRows as $row) {
+            $taxonomy = (string) ($row->taxonomy ?? '');
+            $value = trim((string) ($row->name ?? ''));
+            if ($taxonomy === '' || $value === '') {
+                continue;
+            }
+            if (!isset($grouped[$taxonomy])) {
+                $grouped[$taxonomy] = [];
+            }
+            if (!in_array($value, $grouped[$taxonomy], true)) {
+                $grouped[$taxonomy][] = $value;
+            }
+        }
+
+        $labelMap = [
+            'ar' => [
+                'pa_size' => 'المقاس',
+                'pa_color' => 'اللون',
+                'pa_colour' => 'اللون',
+                'pa_material' => 'الخامة',
+                'pa_fabric' => 'الخامة',
+                'pa_product-condition' => 'الحالة',
+                'pa_condition' => 'الحالة',
+            ],
+            'en' => [
+                'pa_size' => 'Size',
+                'pa_color' => 'Color',
+                'pa_colour' => 'Color',
+                'pa_material' => 'Material',
+                'pa_fabric' => 'Material',
+                'pa_product-condition' => 'Condition',
+                'pa_condition' => 'Condition',
+            ],
+        ];
+
+        $items = [];
+        foreach ($grouped as $taxonomy => $values) {
+            $label = $labelMap[$currentLocale][$taxonomy] ?? ucwords(str_replace(['pa_', '_', '-'], ['', ' ', ' '], $taxonomy));
+            $items[] = '<li><strong>' . e($label) . ':</strong> ' . e(implode(', ', $values)) . '</li>';
+        }
+
+        $html = empty($items)
+            ? ($currentLocale === 'en' ? '<p>No specifications available yet.</p>' : '<p>لا توجد مواصفات متاحة حالياً.</p>')
+            : '<ul class="detail-list" style="margin-top:0;">' . implode('', $items) . '</ul>';
+
+        return response()->json([
+            'success' => true,
+            'tab' => 'specifications',
+            'html' => $html,
+        ]);
+    }
+
+    if ($tab === 'reviews') {
+        $rows = DB::table('wp_comments as c')
+            ->leftJoin('wp_commentmeta as cm', function ($join) {
+                $join->on('c.comment_ID', '=', 'cm.comment_id')
+                    ->where('cm.meta_key', 'rating');
+            })
+            ->where('c.comment_post_ID', (int) $product->ID)
+            ->where('c.comment_approved', '1')
+            ->whereIn('c.comment_type', ['', 'review'])
+            ->orderByDesc('c.comment_date_gmt')
+            ->select('c.comment_author', 'c.comment_content', 'c.comment_date', 'cm.meta_value as rating')
+            ->limit(20)
+            ->get();
+
+        if ($rows->isEmpty()) {
+            $html = $currentLocale === 'en'
+                ? '<p>No reviews yet. Be the first to share your feedback.</p>'
+                : '<p>لا توجد مراجعات بعد. كوني أول من يشارك رأيه.</p>';
+
+            return response()->json(['success' => true, 'tab' => 'reviews', 'html' => $html]);
+        }
+
+        $cards = [];
+        foreach ($rows as $row) {
+            $author = trim((string) ($row->comment_author ?? ''));
+            $author = $author !== '' ? $author : ($currentLocale === 'en' ? 'Customer' : 'عميل');
+            $content = nl2br(e(trim((string) ($row->comment_content ?? ''))));
+            $rating = max(0, min(5, (int) ($row->rating ?? 0)));
+            $stars = $rating > 0 ? str_repeat('★', $rating) . str_repeat('☆', max(0, 5 - $rating)) : '';
+            $date = trim((string) ($row->comment_date ?? ''));
+
+            $cards[] = '<article style="border:1px solid rgba(189,189,189,.4);border-radius:12px;padding:12px;background:#fff;">'
+                . '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;">'
+                . '<strong>' . e($author) . '</strong>'
+                . '<span style="font-size:12px;color:#5a6678;">' . e($date) . '</span>'
+                . '</div>'
+                . ($stars !== '' ? '<div style="margin-top:6px;font-size:14px;color:#D4AF37;">' . e($stars) . '</div>' : '')
+                . '<div style="margin-top:8px;color:#17273B;line-height:1.8;">' . $content . '</div>'
+                . '</article>';
+        }
+
+        return response()->json([
+            'success' => true,
+            'tab' => 'reviews',
+            'html' => '<div style="display:grid;gap:10px;">' . implode('', $cards) . '</div>',
+        ]);
+    }
+
+    if ($tab === 'policies') {
+        $policySlugs = [
+            'shipping-delivery-policy',
+            'refund-return-policy',
+            'privacy-policy',
+            'terms-conditions',
+        ];
+
+        $policyRows = DB::table('wp_posts')
+            ->where('post_type', 'page')
+            ->where('post_status', 'publish')
+            ->whereIn('post_name', $policySlugs)
+            ->select('post_name', 'post_title', 'post_content')
+            ->get();
+
+        if ($policyRows->isEmpty()) {
+            $html = $currentLocale === 'en'
+                ? '<p>Policies are not available right now.</p>'
+                : '<p>السياسات غير متاحة حالياً.</p>';
+            return response()->json(['success' => true, 'tab' => 'policies', 'html' => $html]);
+        }
+
+        $cards = [];
+        foreach ($policyRows as $policyRow) {
+            $title = trim((string) ($policyRow->post_title ?? ''));
+            $content = trim((string) ($policyRow->post_content ?? ''));
+            $plain = trim(strip_tags($content));
+            $excerpt = mb_substr($plain, 0, 240) . (mb_strlen($plain) > 240 ? '…' : '');
+            $url = $wpBaseUrl . '/' . trim((string) ($policyRow->post_name ?? ''), '/') . '/';
+
+            $cards[] = '<article style="border:1px solid rgba(189,189,189,.4);border-radius:12px;padding:12px;background:#fff;">'
+                . '<h4 style="margin:0 0 8px;font-size:15px;color:#17273B;">' . e($title) . '</h4>'
+                . '<p style="margin:0;color:#5a6678;line-height:1.8;">' . e($excerpt) . '</p>'
+                . '<a href="' . e($url) . '" target="_blank" rel="noopener" style="display:inline-flex;margin-top:8px;font-size:13px;font-weight:700;color:#D51522;">'
+                . ($currentLocale === 'en' ? 'Read policy' : 'قراءة السياسة')
+                . '</a>'
+                . '</article>';
+        }
+
+        return response()->json([
+            'success' => true,
+            'tab' => 'policies',
+            'html' => '<div style="display:grid;gap:10px;">' . implode('', $cards) . '</div>',
+        ]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Unsupported tab'], 422);
+};
+
+$reportProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+
+    if (!$product) {
+        return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+    }
+
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:120'],
+        'email' => ['nullable', 'email', 'max:190'],
+        'reason' => ['required', 'string', 'min:8', 'max:2000'],
+    ]);
+
+    DB::table('wp_comments')->insert([
+        'comment_post_ID' => (int) $product->ID,
+        'comment_author' => (string) ($validated['name'] ?? ''),
+        'comment_author_email' => (string) ($validated['email'] ?? ''),
+        'comment_author_url' => '',
+        'comment_author_IP' => (string) $request->ip(),
+        'comment_date' => now()->format('Y-m-d H:i:s'),
+        'comment_date_gmt' => now('UTC')->format('Y-m-d H:i:s'),
+        'comment_content' => (string) ($validated['reason'] ?? ''),
+        'comment_karma' => 0,
+        'comment_approved' => '0',
+        'comment_agent' => mb_substr((string) $request->userAgent(), 0, 250),
+        'comment_type' => 'product_report',
+        'comment_parent' => 0,
+        'user_id' => 0,
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => $currentLocale === 'en'
+            ? 'Your report has been received and will be reviewed shortly.'
+            : 'تم استلام البلاغ بنجاح وسيتم مراجعته قريبًا.',
+    ]);
+};
+
+Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
+Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
+Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
+
+Route::post('/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
+Route::post('/ar/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
+Route::post('/en/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'en'));
+
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));
     $locale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
