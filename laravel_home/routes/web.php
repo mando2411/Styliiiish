@@ -896,6 +896,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 'used' => 'مستعمل',
                 'pre-loved' => 'مستعمل',
                 'new — styliiiish certified🔥' => 'جديد — معتمد من ستايلش 🔥',
+                'used – very good — styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
+                'used - very good - styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
             ],
         ],
         'en' => [
@@ -958,7 +960,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     };
 
     $normalizeTranslationKey = function (string $value): string {
-        return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
+        return trim(mb_strtolower(str_replace(['_', '-', '–', '—'], ' ', $value)));
     };
 
     $normalizeConditionBrandValue = function (string $value) use ($currentLocale): string {
@@ -966,7 +968,13 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             return $value;
         }
 
-        return preg_replace('/styliiiish/i', 'ستايلش', $value) ?? $value;
+        $normalized = preg_replace('/styliiiish/i', 'ستايلش', $value) ?? $value;
+        $normalized = preg_replace('/\bused\b/ui', 'مستعمل', $normalized) ?? $normalized;
+        $normalized = preg_replace('/very\s+good/ui', 'جيد جدًا', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\bcertified\b/ui', 'معتمد', $normalized) ?? $normalized;
+        $normalized = preg_replace('/\s*[–-]+\s*/u', ' — ', $normalized) ?? $normalized;
+
+        return trim($normalized);
     };
 
     $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey): string {
