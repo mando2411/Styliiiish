@@ -270,15 +270,16 @@
         .sg-modal.is-open { display: block; }
         .sg-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
         .sg-dialog {
-            position: relative; z-index: 1; width: min(980px, 94vw); height: min(86vh, 820px); margin: 6vh auto 0;
+            position: relative; z-index: 1; width: min(980px, 94vw); margin: 6vh auto 0;
             background: #fff; border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
-            display: grid; grid-template-rows: auto 1fr;
+            display: flex; flex-direction: column;
+            max-height: 86vh;
         }
         .sg-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); }
         .sg-title { margin: 0; font-size: 16px; color: var(--secondary); }
         .sg-close { border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--secondary); padding: 6px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
-        .sg-body { width: 100%; height: 100%; }
-        .sg-table-wrap { height: 100%; overflow: auto; padding: 12px; }
+        .sg-body { width: 100%; height: auto; }
+        .sg-table-wrap { overflow: auto; padding: 12px; max-height: calc(86vh - 64px); }
         .sg-table {
             width: 100%;
             border-collapse: collapse;
