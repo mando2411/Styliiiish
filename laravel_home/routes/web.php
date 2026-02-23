@@ -532,7 +532,7 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode) {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -1383,6 +1383,57 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             ->values();
     }
 
+    if ($currentLocale === 'ar' && $productCategoryNames->isNotEmpty()) {
+        $languageCodes = $resolveTranslatePressLanguageCodes('ar');
+        $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
+        $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
+
+        if ($defaultLanguage !== '' && $targetLanguage !== '') {
+            $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+
+            if (Schema::hasTable($dictionaryTable)) {
+                $categoryNames = $productCategoryNames
+                    ->map(fn ($value) => trim((string) $value))
+                    ->filter(fn ($value) => $value !== '')
+                    ->values();
+
+                if ($categoryNames->isNotEmpty()) {
+                    $dictionaryRows = DB::table($dictionaryTable)
+                        ->whereIn('original', $categoryNames->all())
+                        ->whereNotNull('translated')
+                        ->where('translated', '!=', '')
+                        ->select('original', 'translated')
+                        ->get();
+
+                    $translationMap = [];
+                    foreach ($dictionaryRows as $dictionaryRow) {
+                        $original = trim((string) ($dictionaryRow->original ?? ''));
+                        $translated = trim((string) ($dictionaryRow->translated ?? ''));
+                        if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
+                            $translationMap[$original] = $translated;
+                        }
+                    }
+
+                    if (!empty($translationMap)) {
+                        $productCategoryNames = $productCategoryNames
+                            ->map(function ($name) use ($translationMap, $normalizeBrandByLocale) {
+                                $value = trim((string) $name);
+                                if ($value === '') {
+                                    return $value;
+                                }
+
+                                $translated = (string) ($translationMap[$value] ?? $value);
+                                return $normalizeBrandByLocale($translated, 'ar');
+                            })
+                            ->filter(fn ($name) => $name !== '')
+                            ->unique()
+                            ->values();
+                    }
+                }
+            }
+        }
+    }
+
     $relatedProducts = collect();
     if ($productCategoryIds->isNotEmpty()) {
         $relatedProducts = DB::table('wp_posts as p')
@@ -1486,6 +1537,57 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
                     return $row;
                 })->values();
+            }
+        }
+    }
+
+    if ($currentLocale === 'ar' && $allProductCategories->isNotEmpty()) {
+        $languageCodes = $resolveTranslatePressLanguageCodes('ar');
+        $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
+        $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
+
+        if ($defaultLanguage !== '' && $targetLanguage !== '') {
+            $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+
+            if (Schema::hasTable($dictionaryTable)) {
+                $categoryNames = $allProductCategories
+                    ->map(fn ($row) => trim((string) ($row->name ?? '')))
+                    ->filter(fn ($value) => $value !== '')
+                    ->unique()
+                    ->values();
+
+                if ($categoryNames->isNotEmpty()) {
+                    $dictionaryRows = DB::table($dictionaryTable)
+                        ->whereIn('original', $categoryNames->all())
+                        ->whereNotNull('translated')
+                        ->where('translated', '!=', '')
+                        ->select('original', 'translated')
+                        ->get();
+
+                    $translationMap = [];
+                    foreach ($dictionaryRows as $dictionaryRow) {
+                        $original = trim((string) ($dictionaryRow->original ?? ''));
+                        $translated = trim((string) ($dictionaryRow->translated ?? ''));
+                        if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
+                            $translationMap[$original] = $translated;
+                        }
+                    }
+
+                    if (!empty($translationMap)) {
+                        $allProductCategories = $allProductCategories
+                            ->map(function ($row) use ($translationMap, $normalizeBrandByLocale) {
+                                $name = trim((string) ($row->name ?? ''));
+                                if ($name !== '') {
+                                    $translated = (string) ($translationMap[$name] ?? $name);
+                                    $row->name = $normalizeBrandByLocale($translated, 'ar');
+                                }
+
+                                return $row;
+                            })
+                            ->filter(fn ($row) => trim((string) ($row->name ?? '')) !== '' && trim((string) ($row->slug ?? '')) !== '')
+                            ->values();
+                    }
+                }
             }
         }
     }
