@@ -532,7 +532,7 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization) {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -1422,6 +1422,20 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             $relatedProducts = $localizeProductsCollectionByWpml($relatedProducts, $currentLocale);
     }
 
+    $allProductCategories = DB::table('wp_terms as t')
+        ->join('wp_term_taxonomy as tt', 't.term_id', '=', 'tt.term_id')
+        ->where('tt.taxonomy', 'product_cat')
+        ->where('tt.count', '>', 0)
+        ->select('t.term_id', 't.name', 't.slug')
+        ->orderBy('t.name')
+        ->get()
+        ->map(function ($row) use ($normalizeBrandByLocale, $currentLocale) {
+            $row->name = $normalizeBrandByLocale((string) ($row->name ?? ''), $currentLocale);
+            return $row;
+        })
+        ->filter(fn ($row) => trim((string) ($row->name ?? '')) !== '' && trim((string) ($row->slug ?? '')) !== '')
+        ->values();
+
     $viewData = [
         'product' => $product,
         'currentLocale' => $currentLocale,
@@ -1440,6 +1454,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'variationRules' => $variationRules,
         'productAttributesForSelection' => $productAttributesForSelection,
         'relatedProducts' => $relatedProducts,
+        'allProductCategories' => $allProductCategories,
         'galleryImages' => $galleryImages,
     ];
 

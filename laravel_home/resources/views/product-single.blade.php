@@ -261,6 +261,12 @@
     $productAttributesForSelection = $productAttributesForSelection ?? [];
     $relatedProducts = $relatedProducts ?? collect();
     $productCategoryNames = collect($productCategoryNames ?? [])->map(fn ($name) => trim((string) $name))->filter(fn ($name) => $name !== '')->values();
+    $allProductCategories = collect($allProductCategories ?? [])->map(function ($row) {
+        return [
+            'name' => trim((string) (is_array($row) ? ($row['name'] ?? '') : ($row->name ?? ''))),
+            'slug' => trim((string) (is_array($row) ? ($row['slug'] ?? '') : ($row->slug ?? ''))),
+        ];
+    })->filter(fn ($row) => $row['name'] !== '' && $row['slug'] !== '')->values();
 
     $normalizeColorKey = function (string $value): string {
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
@@ -868,6 +874,26 @@
         .r-buy { background: var(--primary); color: #fff; }
         .r-view { border: 1px solid var(--line); color: var(--secondary); background: #fff; }
 
+        .category-section { margin-top: 16px; }
+        .category-chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .category-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0 12px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--secondary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .category-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff4f5;
+        }
+
         .sg-modal { position: fixed; inset: 0; z-index: 120; display: none; align-items: center; justify-content: center; padding: 20px; }
         .sg-modal.is-open { display: flex; }
         .sg-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
@@ -1332,6 +1358,17 @@
                                 </div>
                             </div>
                         </article>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
+        @if($allProductCategories->isNotEmpty())
+            <section class="category-section">
+                <h2 class="section-title">{{ $t('categories') }}</h2>
+                <div class="category-chip-list">
+                    @foreach($allProductCategories as $category)
+                        <a class="category-chip" href="{{ $localePrefix }}/categories">{{ $category['name'] }}</a>
                     @endforeach
                 </div>
             </section>
