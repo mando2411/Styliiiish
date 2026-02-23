@@ -266,11 +266,11 @@
         .r-buy { background: var(--primary); color: #fff; }
         .r-view { border: 1px solid var(--line); color: var(--secondary); background: #fff; }
 
-        .sg-modal { position: fixed; inset: 0; z-index: 120; display: none; }
-        .sg-modal.is-open { display: block; }
+        .sg-modal { position: fixed; inset: 0; z-index: 120; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .sg-modal.is-open { display: flex; }
         .sg-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
         .sg-dialog {
-            position: relative; z-index: 1; width: min(980px, 94vw); margin: 6vh auto 0;
+            position: relative; z-index: 1; width: min(980px, 94vw); margin: 0;
             background: #fff; border-radius: 14px; border: 1px solid var(--line); overflow: hidden;
             display: flex; flex-direction: column;
             max-height: 86vh;
