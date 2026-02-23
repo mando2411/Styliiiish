@@ -1467,7 +1467,7 @@ $resolveProductForAjaxSections = function (string $slug, string $locale = 'ar') 
     return $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
 };
 
-$renderAjaxTabHtml = function (Request $request, string $slug, string $tab, string $locale = 'ar') use ($resolveProductForAjaxSections) {
+$renderAjaxTabHtml = function (Request $request, string $slug, string $tab, string $locale = 'ar') use ($resolveProductForAjaxSections, $localizeProductsCollectionByTranslatePress) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     $product = $resolveProductForAjaxSections($slug, $currentLocale);
@@ -1480,6 +1480,28 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
 
     if ($tab === 'description') {
         $contentHtml = trim((string) ($product->post_content ?: $product->post_excerpt));
+
+        if ($currentLocale === 'ar') {
+            $translatedCollection = $localizeProductsCollectionByTranslatePress([
+                (object) [
+                    'post_title' => (string) ($product->post_title ?? ''),
+                    'post_excerpt' => (string) ($product->post_excerpt ?? ''),
+                    'post_content' => (string) ($product->post_content ?? ''),
+                ],
+            ], 'ar', true);
+
+            $translatedRow = $translatedCollection->first();
+            if ($translatedRow) {
+                $translatedContent = trim((string) ($translatedRow->post_content ?? ''));
+                $translatedExcerpt = trim((string) ($translatedRow->post_excerpt ?? ''));
+                if ($translatedContent !== '') {
+                    $contentHtml = $translatedContent;
+                } elseif ($translatedExcerpt !== '') {
+                    $contentHtml = $translatedExcerpt;
+                }
+            }
+        }
+
         $contentHtml = str_replace(
             ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
             [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
