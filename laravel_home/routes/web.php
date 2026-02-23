@@ -1564,10 +1564,101 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             ],
         ];
 
+        $valueMap = [
+            'ar' => [
+                'pa_color' => [
+                    'olive green' => 'زيتي',
+                    'olive-green' => 'زيتي',
+                    'olivegreen' => 'زيتي',
+                    'olive' => 'زيتي',
+                    'black' => 'أسود',
+                    'white' => 'أبيض',
+                    'red' => 'أحمر',
+                    'blue' => 'أزرق',
+                    'green' => 'أخضر',
+                    'pink' => 'وردي',
+                    'gold' => 'ذهبي',
+                    'silver' => 'فضي',
+                    'ivory' => 'عاجي',
+                    'nude' => 'نيود',
+                    'cream' => 'كريمي',
+                    'purple' => 'بنفسجي',
+                    'gray' => 'رمادي',
+                    'grey' => 'رمادي',
+                    'brown' => 'بني',
+                    'beige' => 'بيج',
+                ],
+                'pa_colour' => [
+                    'olive green' => 'زيتي',
+                    'olive-green' => 'زيتي',
+                    'olivegreen' => 'زيتي',
+                    'olive' => 'زيتي',
+                ],
+                'pa_material' => [
+                    'chiffon' => 'شيفون',
+                    'satin' => 'ساتان',
+                    'silk' => 'حرير',
+                    'tulle' => 'تول',
+                    'lace' => 'دانتيل',
+                    'crepe' => 'كريب',
+                    'velvet' => 'مخمل',
+                ],
+                'pa_fabric' => [
+                    'chiffon' => 'شيفون',
+                    'satin' => 'ساتان',
+                    'silk' => 'حرير',
+                    'tulle' => 'تول',
+                    'lace' => 'دانتيل',
+                    'crepe' => 'كريب',
+                    'velvet' => 'مخمل',
+                ],
+                'pa_product-condition' => [
+                    'new' => 'جديد',
+                    'new — styliiiish certified🔥' => 'جديد — معتمد من ستايلش 🔥',
+                    'new-styliiiish-certified' => 'جديد — معتمد من ستايلش 🔥',
+                    'used – very good — styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
+                    'used - very good - styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
+                ],
+                'pa_condition' => [
+                    'new' => 'جديد',
+                    'new — styliiiish certified🔥' => 'جديد — معتمد من ستايلش 🔥',
+                    'new-styliiiish-certified' => 'جديد — معتمد من ستايلش 🔥',
+                    'used – very good — styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
+                    'used - very good - styliiiish certified ❤️' => 'مستعمل — جيد جدًا — معتمد من ستايلش ❤️',
+                ],
+            ],
+        ];
+
+        $normalizeValueKey = function (string $value): string {
+            return trim(mb_strtolower(str_replace(['_', '-', '–', '—'], ' ', $value)));
+        };
+
+        $translateSpecValue = function (string $taxonomy, string $value) use ($currentLocale, $valueMap, $normalizeValueKey): string {
+            if ($currentLocale !== 'ar') {
+                return $value;
+            }
+
+            $taxonomyMap = $valueMap['ar'][$taxonomy] ?? [];
+            $key = $normalizeValueKey($value);
+            if ($key !== '' && array_key_exists($key, $taxonomyMap)) {
+                return (string) $taxonomyMap[$key];
+            }
+
+            $normalized = preg_replace('/styliiiish/i', 'ستايلش', $value) ?? $value;
+            $normalized = preg_replace('/\bused\b/ui', 'مستعمل', $normalized) ?? $normalized;
+            $normalized = preg_replace('/very\s+good/ui', 'جيد جدًا', $normalized) ?? $normalized;
+            $normalized = preg_replace('/\bcertified\b/ui', 'معتمد', $normalized) ?? $normalized;
+            $normalized = str_replace('ستايلش معتمد', 'معتمد من ستايلش', $normalized);
+            return trim((string) $normalized);
+        };
+
         $items = [];
         foreach ($grouped as $taxonomy => $values) {
             $label = $labelMap[$currentLocale][$taxonomy] ?? ucwords(str_replace(['pa_', '_', '-'], ['', ' ', ' '], $taxonomy));
-            $items[] = '<li><strong>' . e($label) . ':</strong> ' . e(implode(', ', $values)) . '</li>';
+            $translatedValues = array_values(array_unique(array_map(function ($value) use ($taxonomy, $translateSpecValue) {
+                return $translateSpecValue((string) $taxonomy, (string) $value);
+            }, $values)));
+            $items[] = '<li><strong>' . e($label) . ':</strong> ' . e(implode(', ', $translatedValues)) . '</li>';
         }
 
         $html = empty($items)
