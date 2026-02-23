@@ -456,9 +456,20 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 				continue;
 			}
 
+			$product_name = html_entity_decode(wp_strip_all_tags($product->get_name()), ENT_QUOTES, 'UTF-8');
+			if (function_exists('trp_translate')) {
+				$target_locale = shopire_styliiiish_resolve_requested_locale();
+				if ($target_locale !== '') {
+					$translated_name = trp_translate($product_name, $target_locale, false);
+					if (is_string($translated_name) && $translated_name !== '') {
+						$product_name = html_entity_decode(wp_strip_all_tags($translated_name), ENT_QUOTES, 'UTF-8');
+					}
+				}
+			}
+
 			$items[] = [
 				'key' => $cart_key,
-				'name' => html_entity_decode(wp_strip_all_tags($product->get_name()), ENT_QUOTES, 'UTF-8'),
+				'name' => $product_name,
 				'qty' => (int) ($cart_item['quantity'] ?? 1),
 				'price_html' => wc_price((float) $product->get_price()),
 				'line_total_html' => wc_price((float) ($cart_item['line_total'] ?? 0)),
@@ -543,10 +554,10 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 	}
 }
 
-if (!function_exists('shopire_styliiiish_apply_request_locale')) {
-	function shopire_styliiiish_apply_request_locale() {
-		if (!function_exists('switch_to_locale') || !function_exists('determine_locale')) {
-			return;
+if (!function_exists('shopire_styliiiish_resolve_requested_locale')) {
+	function shopire_styliiiish_resolve_requested_locale() {
+		if (!function_exists('determine_locale')) {
+			return '';
 		}
 
 		$lang = isset($_REQUEST['lang']) ? sanitize_key(wp_unslash((string) $_REQUEST['lang'])) : '';
@@ -561,12 +572,25 @@ if (!function_exists('shopire_styliiiish_apply_request_locale')) {
 			}
 		}
 
-		$target_locale = '';
 		if ($lang === 'ar') {
-			$target_locale = 'ar';
-		} elseif ($lang === 'en') {
-			$target_locale = 'en_US';
+			return 'ar';
 		}
+
+		if ($lang === 'en') {
+			return 'en_US';
+		}
+
+		return '';
+	}
+}
+
+if (!function_exists('shopire_styliiiish_apply_request_locale')) {
+	function shopire_styliiiish_apply_request_locale() {
+		if (!function_exists('switch_to_locale') || !function_exists('determine_locale')) {
+			return;
+		}
+
+		$target_locale = shopire_styliiiish_resolve_requested_locale();
 
 		if ($target_locale === '') {
 			return;
