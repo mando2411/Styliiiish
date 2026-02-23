@@ -838,8 +838,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 'excellent' => 'ممتاز',
                 'very good' => 'جيد جدًا',
                 'good' => 'جيد',
-                'new — styliiiish certified🔥' => 'جديد — معتمد من Styliiiish 🔥',
-                'new-styliiiish-certified' => 'جديد — معتمد من Styliiiish 🔥',
+                'new — styliiiish certified🔥' => 'جديد — معتمد من ستايلش 🔥',
+                'new-styliiiish-certified' => 'جديد — معتمد من ستايلش 🔥',
             ],
             'pa_size' => [
                 'xsmall' => 'XS',
@@ -895,7 +895,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 'brand-new' => 'جديد',
                 'used' => 'مستعمل',
                 'pre-loved' => 'مستعمل',
-                'new — styliiiish certified🔥' => 'جديد — معتمد من Styliiiish 🔥',
+                'new — styliiiish certified🔥' => 'جديد — معتمد من ستايلش 🔥',
             ],
         ],
         'en' => [
@@ -961,28 +961,39 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
     };
 
+    $normalizeConditionBrandValue = function (string $value) use ($currentLocale): string {
+        if ($currentLocale !== 'ar') {
+            return $value;
+        }
+
+        return preg_replace('/styliiiish/i', 'ستايلش', $value) ?? $value;
+    };
+
     $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey): string {
         $localeMap = $wooAttributeLabelTranslations[$currentLocale] ?? [];
         $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
         return (string) ($localeMap[$taxonomyKey] ?? $fallbackLabel);
     };
 
-    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey): string {
+    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey, $normalizeWooTaxonomyKey, $normalizeConditionBrandValue): string {
         $localeMap = $wooAttributeValueTranslations[$currentLocale] ?? [];
         $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
         $taxonomyMap = $localeMap[$taxonomyKey] ?? [];
+        $isConditionTaxonomy = in_array($taxonomyKey, ['pa_product-condition', 'pa_condition'], true);
 
         $slugKey = $normalizeTranslationKey($slug);
         if ($slugKey !== '' && array_key_exists($slugKey, $taxonomyMap)) {
-            return (string) $taxonomyMap[$slugKey];
+            $translated = (string) $taxonomyMap[$slugKey];
+            return $isConditionTaxonomy ? $normalizeConditionBrandValue($translated) : $translated;
         }
 
         $valueKey = $normalizeTranslationKey($fallbackValue);
         if ($valueKey !== '' && array_key_exists($valueKey, $taxonomyMap)) {
-            return (string) $taxonomyMap[$valueKey];
+            $translated = (string) $taxonomyMap[$valueKey];
+            return $isConditionTaxonomy ? $normalizeConditionBrandValue($translated) : $translated;
         }
 
-        return $fallbackValue;
+        return $isConditionTaxonomy ? $normalizeConditionBrandValue($fallbackValue) : $fallbackValue;
     };
 
     $materialValues = $findAttributeValues(['material', 'fabric', 'matiere', 'qamash', 'khama']);
@@ -1050,7 +1061,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     if ($condition === '') {
         $condition = $currentLocale === 'en'
             ? 'New — Styliiiish Certified🔥'
-            : 'جديد — معتمد من Styliiiish 🔥';
+            : 'جديد — معتمد من ستايلش 🔥';
     }
 
     $deliveryIntro = $findMetaByNeedles(['delivery_intro', 'delivery_note', 'delivery_text', 'shipping_note', 'ready_size_note']);
