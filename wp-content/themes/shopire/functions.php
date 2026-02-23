@@ -757,3 +757,52 @@ add_action('wc_ajax_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_upd
 add_action('wc_ajax_nopriv_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
 add_action('wp_ajax_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
 add_action('wp_ajax_nopriv_styliiiish_update_cart_qty', 'shopire_styliiiish_wc_ajax_update_cart_qty');
+
+if (!function_exists('shopire_styliiiish_fix_woocommerce_ajax_endpoint')) {
+	function shopire_styliiiish_fix_woocommerce_ajax_endpoint($endpoint, $request) {
+		if (!is_string($request) || $request === '') {
+			return $endpoint;
+		}
+
+		$action = $request === '%%endpoint%%' ? '%%endpoint%%' : sanitize_key($request);
+		return add_query_arg('action', $action, admin_url('admin-ajax.php'));
+	}
+}
+add_filter('woocommerce_ajax_get_endpoint', 'shopire_styliiiish_fix_woocommerce_ajax_endpoint', 20, 2);
+
+if (!function_exists('shopire_styliiiish_rewrite_broken_checkout_domains')) {
+	function shopire_styliiiish_rewrite_broken_checkout_domains($html) {
+		if (!is_string($html) || $html === '') {
+			return $html;
+		}
+
+		$siteBase = rtrim((string) home_url('/'), '/');
+		return str_replace(
+			['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+			$siteBase,
+			$html
+		);
+	}
+}
+
+if (!function_exists('shopire_styliiiish_checkout_output_buffer')) {
+	function shopire_styliiiish_checkout_output_buffer() {
+		if (is_admin() || wp_doing_ajax() || !function_exists('is_checkout') || !is_checkout()) {
+			return;
+		}
+
+		ob_start('shopire_styliiiish_rewrite_broken_checkout_domains');
+	}
+}
+add_action('template_redirect', 'shopire_styliiiish_checkout_output_buffer', 0);
+
+if (!function_exists('shopire_styliiiish_checkout_permissions_policy')) {
+	function shopire_styliiiish_checkout_permissions_policy() {
+		if (is_admin() || !function_exists('is_checkout') || !is_checkout()) {
+			return;
+		}
+
+		header('Permissions-Policy: payment=(self "https://pay.google.com")', true);
+	}
+}
+add_action('send_headers', 'shopire_styliiiish_checkout_permissions_policy', 20);
