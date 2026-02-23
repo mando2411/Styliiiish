@@ -47,6 +47,7 @@
             'wishlist' => 'المفضلة',
             'add_to_wishlist' => 'أضيفي إلى المفضلة',
             'added_to_wishlist' => 'تمت إضافة المنتج إلى المفضلة',
+            'wishlist_already_added' => 'هذا المنتج مضاف إلى المفضلة بالفعل.',
             'wishlist_add_failed' => 'تعذر إضافة المنتج إلى المفضلة',
             'wishlist_loading' => 'جاري تحميل المفضلة…',
             'wishlist_empty' => 'لا توجد منتجات في المفضلة حالياً.',
@@ -145,6 +146,7 @@
             'wishlist' => 'Wishlist',
             'add_to_wishlist' => 'Add to Wishlist',
             'added_to_wishlist' => 'Product added to wishlist',
+            'wishlist_already_added' => 'This product is already in your wishlist.',
             'wishlist_add_failed' => 'Unable to add product to wishlist',
             'wishlist_loading' => 'Loading wishlist…',
             'wishlist_empty' => 'No products in wishlist yet.',
@@ -1461,6 +1463,7 @@
             const addedToCartText = @json($t('added_to_cart'));
             const addFailedText = @json($t('add_to_cart_failed'));
             const addedToWishlistText = @json($t('added_to_wishlist'));
+            const wishlistAlreadyAddedText = @json($t('wishlist_already_added'));
             const wishlistAddFailedText = @json($t('wishlist_add_failed'));
             const cartEmptyText = @json($t('cart_empty'));
             const removeText = @json($t('remove'));
@@ -1619,7 +1622,36 @@
                     animateWishlistPlusOne();
                 }
                 loadWishlistItems(true).catch(() => {});
-                helpText.textContent = String(result.message || addedToWishlistText);
+                if (nextCount <= currentWishlistCount) {
+                    helpText.textContent = wishlistAlreadyAddedText;
+                } else {
+                    helpText.textContent = String(result.message || addedToWishlistText);
+                }
+            };
+
+            const isCurrentProductAlreadyInWishlist = async () => {
+                if (productId <= 0) return false;
+
+                try {
+                    const items = await loadWishlistItems(false);
+                    const normalizedSlug = String(productSlug || '').trim().toLowerCase();
+
+                    return (Array.isArray(items) ? items : []).some((item) => {
+                        const itemId = Number(item && item.id ? item.id : 0) || 0;
+                        if (itemId > 0 && itemId === productId) {
+                            return true;
+                        }
+
+                        const url = String(item && item.url ? item.url : '').toLowerCase();
+                        if (!normalizedSlug || !url) {
+                            return false;
+                        }
+
+                        return url.includes(`/item/${normalizedSlug}`) || decodeURIComponent(url).includes(`/item/${normalizedSlug}`);
+                    });
+                } catch (error) {
+                    return false;
+                }
             };
 
             const renderWishlistDropdown = (items = []) => {
@@ -2480,6 +2512,12 @@
             if (addToWishlistBtn) {
                 addToWishlistBtn.addEventListener('click', async () => {
                     if (isAddingToWishlist) return;
+
+                    const alreadyAdded = await isCurrentProductAlreadyInWishlist();
+                    if (alreadyAdded) {
+                        helpText.textContent = wishlistAlreadyAddedText;
+                        return;
+                    }
 
                     const originalText = addToWishlistBtn.textContent;
                     isAddingToWishlist = true;
