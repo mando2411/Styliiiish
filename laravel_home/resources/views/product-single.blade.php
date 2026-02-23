@@ -727,6 +727,13 @@
                         @endforeach
                     </div>
                 @endif
+
+                @if($contentHtml !== '')
+                    <section class="description" style="margin-top: 14px;">
+                        <h3 class="section-title" style="font-size:18px;">{{ $t('description') }}</h3>
+                        {!! $contentHtml !!}
+                    </section>
+                @endif
             </article>
 
             <article class="panel details">
@@ -827,13 +834,6 @@
                 <div class="guide-row">
                     <button type="button" class="btn-ghost" id="open-size-guide">{{ $t('size_guide') }}</button>
                 </div>
-
-                @if($contentHtml !== '')
-                    <section class="description">
-                        <h3 class="section-title" style="font-size:18px;">{{ $t('description') }}</h3>
-                        {!! $contentHtml !!}
-                    </section>
-                @endif
             </article>
         </section>
 
