@@ -165,22 +165,28 @@
         .nav a{padding:8px 12px;border-radius:8px;font-size:14px;font-weight:700;white-space:nowrap}.nav a.active,.nav a:hover{color:var(--primary);background:#fff4f5}
         .head-btn{border:1px solid var(--line);border-radius:10px;min-width:38px;min-height:38px;display:inline-flex;align-items:center;justify-content:center;background:#fff}.head-btn.active{color:var(--primary);border-color:rgba(213,21,34,.3);background:#fff4f5}
         .cart-head{padding:24px 0 14px}.cart-head h1{margin:0 0 6px;font-size:clamp(25px,4vw,35px)}.cart-head p{margin:0;color:#5a6678}
-        .cart-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:16px;margin-bottom:28px}
-        .panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}.panel-title{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:800}
-        .cart-list{padding:12px;display:grid;gap:10px}.cart-item{display:grid;grid-template-columns:92px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:10px}
+        .cart-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:20px;margin-bottom:34px;align-items:start}
+        .panel{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(23,39,59,.05)}.panel-title{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:800;background:#fbfcff}
+        .cart-list{padding:12px;display:grid;gap:12px}.cart-item{display:grid;grid-template-columns:92px 1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff;transition:border-color .15s ease,transform .15s ease}.cart-item:hover{border-color:rgba(213,21,34,.28);transform:translateY(-1px)}
         .thumb{width:92px;height:92px;border-radius:10px;object-fit:cover;border:1px solid var(--line);background:#f2f2f5}
-        .name{margin:0 0 6px;font-size:15px;line-height:1.45}
+        .name{margin:0 0 6px;font-size:16px;line-height:1.45}
         .item-meta{display:flex;gap:14px;flex-wrap:wrap;color:#5a6678;font-size:12px}
+        .item-side{display:grid;gap:8px;justify-items:end;align-self:stretch;min-width:120px}
+        .item-side-box{border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-width:120px;text-align:center;background:#fbfcff}
+        .item-side-label{display:block;color:#6b7280;font-size:11px;margin-bottom:2px}
+        .item-side-value{font-weight:800;color:#111827;font-size:13px}
         .qty-wrap{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
         .qty-btn{width:32px;height:32px;border:0;background:#fff;cursor:pointer;font-weight:900;color:#17273B}.qty-btn:disabled{opacity:.45;cursor:not-allowed}
         .qty-val{min-width:36px;text-align:center;font-weight:800}
         .item-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
         .btn{border:1px solid var(--line);border-radius:10px;min-height:38px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#fff;cursor:pointer}
         .btn:hover{border-color:var(--primary);color:var(--primary)}.btn-danger{color:var(--danger);border-color:rgba(220,38,38,.28)}
-        .totals{padding:14px;display:grid;gap:10px}.totals-row{display:flex;justify-content:space-between;gap:12px;color:#4b5563}.totals-row strong{color:#111827}
-        .shipment-block{border:1px dashed var(--line);border-radius:10px;padding:10px}.shipment-line{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.shipment-line strong{color:#111827}
+        .totals{padding:16px;display:grid;gap:12px;position:sticky;top:92px}.totals-row{display:flex;justify-content:space-between;gap:12px;color:#4b5563;font-size:14px}.totals-row strong{color:#111827;font-size:15px}
+        .shipment-block{border:1px dashed var(--line);border-radius:10px;padding:10px;background:#fcfdff}.shipment-line{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.shipment-line strong{color:#111827}
         .shipment-destination{margin-top:6px;color:#6b7280;font-size:13px;line-height:1.6}.shipment-change{margin-top:6px;display:inline-flex;color:var(--primary);font-weight:700;font-size:13px}
-        .totals-row.total{padding-top:10px;border-top:1px dashed var(--line);font-size:16px}.checkout-btn{background:var(--primary);color:#fff;border-color:var(--primary);min-height:44px}
+        .totals-row.total{padding-top:12px;border-top:1px dashed var(--line);font-size:16px}.totals-row.total strong{font-size:20px}
+        .totals .btn{width:100%}
+        .checkout-btn{background:var(--primary);color:#fff;border-color:var(--primary);min-height:46px;font-size:14px}
         .state{border:1px dashed var(--line);border-radius:14px;text-align:center;padding:30px 14px;color:#6b7280}.state h3{margin:0 0 8px;color:#111827;font-size:22px}
         .site-footer{margin-top:10px;background:#0f1a2a;color:#fff;border-top:4px solid var(--primary)}
         .footer-grid{padding:32px 0 20px;display:grid;grid-template-columns:1.5fr 1fr 1fr 1.1fr;gap:20px}.footer-brand-logo{width:156px;max-width:100%;object-fit:contain;margin-bottom:10px;display:block}
@@ -188,8 +194,8 @@
         .footer-contact-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.footer-contact-row a{color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 10px;font-size:12px}
         .footer-col h5{margin:0 0 10px;font-size:15px}.footer-links{list-style:none;margin:0;padding:0;display:grid;gap:8px}.footer-links a{color:#d7e0ed;font-size:14px}.footer-links a:hover{color:#fff}
         .footer-bottom{border-top:1px solid rgba(255,255,255,.18);padding:12px 0;display:flex;justify-content:space-between;gap:10px;color:#b8c5d8;font-size:13px;flex-wrap:wrap}.footer-bottom a{color:#fff}
-        @media (max-width:980px){.header-inner{grid-template-columns:1fr;padding:10px 0}.brand,.nav{justify-content:center;text-align:center}.cart-layout{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
-        @media (max-width:720px){.cart-item{grid-template-columns:78px 1fr}.thumb{width:78px;height:78px}.item-actions{grid-column:1/-1;justify-content:stretch}.item-actions .btn{flex:1 1 100%}.nav{overflow-x:auto;justify-content:flex-start}}
+        @media (max-width:980px){.header-inner{grid-template-columns:1fr;padding:10px 0}.brand,.nav{justify-content:center;text-align:center}.cart-layout{grid-template-columns:1fr}.totals{position:static}.footer-grid{grid-template-columns:1fr 1fr}}
+        @media (max-width:720px){.cart-item{grid-template-columns:78px 1fr}.thumb{width:78px;height:78px}.item-side{grid-column:1/-1;grid-template-columns:1fr 1fr;justify-items:stretch}.item-side-box{min-width:0}.item-actions{grid-column:1/-1;justify-content:stretch}.item-actions .btn{flex:1 1 100%}.nav{overflow-x:auto;justify-content:flex-start}}
         @media (max-width:390px){.footer-grid{grid-template-columns:1fr}}
     </style>
 </head>
@@ -326,7 +332,7 @@
                     <a href="${url}"><img class="thumb" src="${image}" alt="${name}" loading="lazy"></a>
                     <div>
                         <h3 class="name">${name}</h3>
-                        <div class="item-meta"><span>${escapeHtml(texts.unitPrice)}: <strong>${unitPrice}</strong></span><span>${escapeHtml(texts.lineTotal)}: <strong>${lineTotal}</strong></span></div>
+                        <div class="item-meta"><span>${escapeHtml(texts.qty)}: <strong>${qty}</strong></span></div>
                         <div style="margin-top:8px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;">
                             <div class="qty-wrap" data-qty-wrap>
                                 <button class="qty-btn" type="button" data-qty-change="-1">−</button>
@@ -338,6 +344,10 @@
                                 <button class="btn btn-danger" type="button" data-remove-item>${escapeHtml(texts.remove)}</button>
                             </div>
                         </div>
+                    </div>
+                    <div class="item-side">
+                        <div class="item-side-box"><span class="item-side-label">${escapeHtml(texts.unitPrice)}</span><span class="item-side-value">${unitPrice}</span></div>
+                        <div class="item-side-box"><span class="item-side-label">${escapeHtml(texts.lineTotal)}</span><span class="item-side-value">${lineTotal}</span></div>
                     </div>
                 </article>
             `;
