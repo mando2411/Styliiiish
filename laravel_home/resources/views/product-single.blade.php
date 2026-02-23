@@ -147,7 +147,10 @@
         ],
     ];
 
-   
+    $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
+        ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
+        : (preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value);
+    $t = fn (string $key) => $normalizeBrandText((string) ($translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key));
 
     $price = (float) ($product->price ?? 0);
     $regular = (float) ($product->regular_price ?? 0);
