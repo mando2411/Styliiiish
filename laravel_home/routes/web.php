@@ -1083,7 +1083,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         ? implode(', ', $conditionValues)
         : $findMetaByNeedles(['condition', 'state', 'availability', 'certified']);
 
-    if ($condition !== '') {
+    if ($condition !== '' && empty($conditionValues)) {
         $condition = $translateWooAttributeValue('pa_product-condition', $condition, $condition);
     }
 
