@@ -109,8 +109,20 @@
     $regular = (float) ($product->regular_price ?? 0);
     $isSale = $regular > 0 && $price > 0 && $regular > $price;
 
-    $image = $product->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
+    $placeholderImage = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png';
+    $image = $product->image ?: $placeholderImage;
+    if (str_ends_with(strtolower((string) $image), '.heic')) {
+        $image = $placeholderImage;
+    }
+
     $contentHtml = trim((string) ($product->post_excerpt ?: $product->post_content));
+    if ($contentHtml !== '') {
+        $contentHtml = str_replace(
+            ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+            [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $contentHtml
+        );
+    }
     $variationRules = $variationRules ?? [];
     $productAttributesForSelection = $productAttributesForSelection ?? [];
     $relatedProducts = $relatedProducts ?? collect();
@@ -426,7 +438,7 @@
     <main class="container product-wrap">
         <section class="product-grid">
             <article class="panel media">
-                <img src="{{ $image }}" alt="{{ $product->post_title }}" loading="eager">
+                <img src="{{ $image }}" alt="{{ $product->post_title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $placeholderImage }}';">
             </article>
 
             <article class="panel details">

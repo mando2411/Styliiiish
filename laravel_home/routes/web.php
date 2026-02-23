@@ -521,7 +521,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     }
 
     if ($sizeGuideUrl === '' || !$isAbsoluteUrl($sizeGuideUrl)) {
-        $sizeGuideUrl = $wpBaseUrl . '/size-guide/';
+        $sizeGuideUrl = $wpBaseUrl . $localePrefix . '/shipping-delivery-policy';
     }
 
     $attributeLabelMap = [];
