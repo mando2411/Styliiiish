@@ -7,7 +7,102 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 
-$homeHandler = function (string $locale = 'ar') {
+$mapLocaleToWpmlCode = function (string $locale): string {
+    return strtolower($locale) === 'en' ? 'en' : 'ar';
+};
+
+$localizeProductsCollectionByWpml = function ($rows, string $locale, bool $includeContentFields = false) use ($mapLocaleToWpmlCode) {
+    $collection = collect($rows);
+
+    if ($collection->isEmpty() || !Schema::hasTable('wp_icl_translations')) {
+        return $collection;
+    }
+
+    $productIds = $collection
+        ->pluck('ID')
+        ->map(fn ($id) => (int) $id)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values();
+
+    if ($productIds->isEmpty()) {
+        return $collection;
+    }
+
+    $wpmlCode = $mapLocaleToWpmlCode($locale);
+
+    $translationRows = DB::table('wp_icl_translations as base')
+        ->join('wp_icl_translations as localized', function ($join) {
+            $join->on('base.trid', '=', 'localized.trid')
+                ->where('localized.element_type', 'post_product');
+        })
+        ->where('base.element_type', 'post_product')
+        ->whereIn('base.element_id', $productIds->all())
+        ->where('localized.language_code', 'like', $wpmlCode . '%')
+        ->select('base.element_id as source_id', 'localized.element_id as localized_id')
+        ->get();
+
+    if ($translationRows->isEmpty()) {
+        return $collection;
+    }
+
+    $localizedIdBySourceId = [];
+    foreach ($translationRows as $translationRow) {
+        $sourceId = (int) ($translationRow->source_id ?? 0);
+        $localizedId = (int) ($translationRow->localized_id ?? 0);
+        if ($sourceId > 0 && $localizedId > 0 && !array_key_exists($sourceId, $localizedIdBySourceId)) {
+            $localizedIdBySourceId[$sourceId] = $localizedId;
+        }
+    }
+
+    if (empty($localizedIdBySourceId)) {
+        return $collection;
+    }
+
+    $localizedIds = array_values(array_unique(array_map(fn ($id) => (int) $id, $localizedIdBySourceId)));
+
+    $localizedPosts = DB::table('wp_posts')
+        ->whereIn('ID', $localizedIds)
+        ->where('post_type', 'product')
+        ->where('post_status', 'publish')
+        ->select('ID', 'post_title', 'post_name', 'post_excerpt', 'post_content')
+        ->get()
+        ->keyBy('ID');
+
+    if ($localizedPosts->isEmpty()) {
+        return $collection;
+    }
+
+    return $collection->map(function ($row) use ($localizedIdBySourceId, $localizedPosts, $includeContentFields) {
+        $sourceId = (int) ($row->ID ?? 0);
+        $localizedId = $localizedIdBySourceId[$sourceId] ?? null;
+        if (!$localizedId) {
+            return $row;
+        }
+
+        $localizedPost = $localizedPosts->get((int) $localizedId);
+        if (!$localizedPost) {
+            return $row;
+        }
+
+        $row->ID = (int) $localizedPost->ID;
+        $row->post_title = (string) ($localizedPost->post_title ?? $row->post_title ?? '');
+        $row->post_name = (string) ($localizedPost->post_name ?? $row->post_name ?? '');
+
+        if ($includeContentFields) {
+            if (property_exists($row, 'post_excerpt')) {
+                $row->post_excerpt = (string) ($localizedPost->post_excerpt ?? $row->post_excerpt ?? '');
+            }
+            if (property_exists($row, 'post_content')) {
+                $row->post_content = (string) ($localizedPost->post_content ?? $row->post_content ?? '');
+            }
+        }
+
+        return $row;
+    });
+};
+
+$homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
@@ -27,9 +122,9 @@ $homeHandler = function (string $locale = 'ar') {
         })
         ->values();
 
-    $products = Cache::remember('home_products', 300, function () {
+    $products = Cache::remember('home_products_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml) {
 
-        return DB::table('wp_posts as p')
+        $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
                 $join->on('p.ID', '=', 'price.post_id')
                      ->where('price.meta_key', '_price');
@@ -61,6 +156,8 @@ $homeHandler = function (string $locale = 'ar') {
             )
             ->limit(12)
             ->get();
+
+            return $localizeProductsCollectionByWpml($rows, $currentLocale);
 
     });
 
@@ -111,7 +208,7 @@ Route::get('/', fn () => $homeHandler('ar'));
 Route::get('/ar', fn () => $homeHandler('ar'));
 Route::get('/en', fn () => $homeHandler('en'));
 
-$shopDataHandler = function (Request $request) {
+$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'newest');
 
@@ -159,6 +256,8 @@ $shopDataHandler = function (Request $request) {
         'img.guid as image'
     )->paginate(16)->withQueryString();
 
+    $products->setCollection($localizeProductsCollectionByWpml($products->getCollection(), $locale));
+
     return [$products, $search, $sort];
 };
 
@@ -166,7 +265,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
-    [$products, $search, $sort] = $shopDataHandler($request);
+    [$products, $search, $sort] = $shopDataHandler($request, $currentLocale);
 
     if ($request->expectsJson() || $request->wantsJson() || strtolower((string) $request->header('X-Requested-With')) === 'xmlhttprequest') {
         $items = $products->getCollection()->map(function ($product) {
@@ -215,10 +314,34 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $mapLocaleToWpmlCode) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $localizedProductId = null;
+    if (Schema::hasTable('wp_icl_translations')) {
+        $baseProductId = DB::table('wp_posts')
+            ->where('post_type', 'product')
+            ->where('post_status', 'publish')
+            ->where('post_name', $slug)
+            ->value('ID');
+
+        if ($baseProductId) {
+            $trid = DB::table('wp_icl_translations')
+                ->where('element_type', 'post_product')
+                ->where('element_id', (int) $baseProductId)
+                ->value('trid');
+
+            if ($trid) {
+                $localizedProductId = DB::table('wp_icl_translations')
+                    ->where('element_type', 'post_product')
+                    ->where('trid', (int) $trid)
+                    ->where('language_code', 'like', $mapLocaleToWpmlCode($currentLocale) . '%')
+                    ->value('element_id');
+            }
+        }
+    }
 
     $product = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as price', function ($join) {
@@ -240,7 +363,13 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish')
-        ->where('p.post_name', $slug)
+        ->where(function ($query) use ($slug, $localizedProductId) {
+            if (!empty($localizedProductId)) {
+                $query->where('p.ID', (int) $localizedProductId);
+            } else {
+                $query->where('p.post_name', $slug);
+            }
+        })
         ->select(
             'p.ID',
             'p.post_title',
@@ -253,6 +382,10 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             'img.guid as image'
         )
         ->first();
+
+    if ($product) {
+        $product = $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+    }
 
     if (!$product) {
         abort(404);
@@ -993,6 +1126,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             ->orderBy('p.post_date', 'desc')
             ->limit(8)
             ->get();
+
+            $relatedProducts = $localizeProductsCollectionByWpml($relatedProducts, $currentLocale);
     }
 
     $viewData = [
@@ -1026,12 +1161,12 @@ Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProduct
 Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
 Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
-$adsHandler = function (string $locale = 'ar') {
+$adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
-    $products = Cache::remember('ads_products', 300, function () {
-        return DB::table('wp_posts as p')
+    $products = Cache::remember('ads_products_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml) {
+        $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
                 $join->on('p.ID', '=', 'price.post_id')
                     ->where('price.meta_key', '_price');
@@ -1058,6 +1193,8 @@ $adsHandler = function (string $locale = 'ar') {
             )
             ->limit(12)
             ->get();
+
+            return $localizeProductsCollectionByWpml($rows, $currentLocale);
     });
 
     $total = Cache::remember('ads_total_products', 300, function () {
@@ -1523,7 +1660,7 @@ Route::get('/ar/categories', fn (Request $request) => $categoriesHandler($reques
 Route::get('/en/categories', fn (Request $request) => $categoriesHandler($request, 'en'));
 Route::get('/categories/', fn (Request $request) => $categoriesHandler($request, 'en'));
 
-$marketplaceHandler = function (Request $request, string $locale = 'ar') {
+$marketplaceHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -1619,6 +1756,8 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') {
         ->distinct('p.ID')
         ->paginate(16)
         ->withQueryString();
+
+    $products->setCollection($localizeProductsCollectionByWpml($products->getCollection(), $currentLocale));
 
     return view('marketplace', compact('products', 'search', 'sort', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
