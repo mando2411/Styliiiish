@@ -2000,14 +2000,44 @@ $wishlistWordPressBootstrap = function (): bool {
         return true;
     }
 
-    $wpLoadPath = base_path('../wp-load.php');
-    if (!is_file($wpLoadPath)) {
-        return false;
+    if (function_exists('fable_extra_woowishlist_add')) {
+        $booted = true;
+        return true;
     }
 
-    require_once $wpLoadPath;
-    $booted = true;
-    return true;
+    $candidates = array_values(array_unique(array_filter([
+        base_path('../wp-load.php'),
+        base_path('../../wp-load.php'),
+        dirname(base_path()) . DIRECTORY_SEPARATOR . 'wp-load.php',
+        dirname(dirname(base_path())) . DIRECTORY_SEPARATOR . 'wp-load.php',
+        isset($_SERVER['DOCUMENT_ROOT']) ? rtrim((string) $_SERVER['DOCUMENT_ROOT'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'wp-load.php' : null,
+    ], fn ($path) => is_string($path) && trim($path) !== '')));
+
+    foreach ($candidates as $wpLoadPath) {
+        if (!is_file($wpLoadPath)) {
+            continue;
+        }
+
+        try {
+            require_once $wpLoadPath;
+
+            if (function_exists('fable_extra_woowishlist_add')) {
+                $booted = true;
+                return true;
+            }
+        } catch (\Throwable $exception) {
+            logger()->error('Wishlist WP bootstrap failed', [
+                'wp_load_path' => $wpLoadPath,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    logger()->error('Wishlist WP bootstrap failed: wp-load.php not resolved', [
+        'candidates' => $candidates,
+    ]);
+
+    return false;
 };
 
 $wishlistCountForCurrentVisitor = function () use ($wishlistWordPressBootstrap): ?int {
