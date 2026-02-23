@@ -435,10 +435,130 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return $values;
     };
 
+    $wooAttributeLabelTranslations = [
+        'ar' => [
+            'pa_size' => 'المقاس',
+            'pa_color' => 'اللون',
+            'pa_colour' => 'اللون',
+            'pa_material' => 'الخامة',
+            'pa_fabric' => 'الخامة',
+            'pa_product-condition' => 'الحالة',
+            'pa_condition' => 'الحالة',
+        ],
+        'en' => [
+            'pa_size' => 'Size',
+            'pa_color' => 'Color',
+            'pa_colour' => 'Color',
+            'pa_material' => 'Material',
+            'pa_fabric' => 'Material',
+            'pa_product-condition' => 'Condition',
+            'pa_condition' => 'Condition',
+        ],
+    ];
+
+    $wooAttributeValueTranslations = [
+        'ar' => [
+            'global' => [
+                'new' => 'جديد',
+                'used' => 'مستعمل',
+                'excellent' => 'ممتاز',
+                'very good' => 'جيد جدًا',
+                'good' => 'جيد',
+            ],
+            'pa_size' => [
+                'xsmall' => 'XS',
+                'x-small' => 'XS',
+                'xs' => 'XS',
+                'small' => 'S',
+                's' => 'S',
+                'medium' => 'M',
+                'med' => 'M',
+                'm' => 'M',
+                'large' => 'L',
+                'l' => 'L',
+                'xlarge' => 'XL',
+                'x-large' => 'XL',
+                'xl' => 'XL',
+                '2xl' => 'XXL',
+                'xxl' => 'XXL',
+                '3xl' => '3XL',
+            ],
+            'pa_product-condition' => [
+                'new' => 'جديد',
+                'brand-new' => 'جديد',
+                'used' => 'مستعمل',
+                'pre-loved' => 'مستعمل',
+            ],
+        ],
+        'en' => [
+            'global' => [
+                'جديد' => 'New',
+                'مستعمل' => 'Used',
+                'ممتاز' => 'Excellent',
+                'جيد جدًا' => 'Very Good',
+                'جيد' => 'Good',
+            ],
+            'pa_size' => [
+                'اكس سمول' => 'XS',
+                'سمول' => 'S',
+                'ميديم' => 'M',
+                'لارج' => 'L',
+                'اكس لارج' => 'XL',
+            ],
+            'pa_product-condition' => [
+                'جديد' => 'New',
+                'مستعمل' => 'Used',
+            ],
+        ],
+    ];
+
+    $normalizeTranslationKey = function (string $value): string {
+        return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
+    };
+
+    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations): string {
+        $localeMap = $wooAttributeLabelTranslations[$currentLocale] ?? [];
+        $taxonomyKey = strtolower(trim($taxonomy));
+        return $localeMap[$taxonomyKey] ?? $fallbackLabel;
+    };
+
+    $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue) use ($currentLocale, $wooAttributeValueTranslations, $normalizeTranslationKey): string {
+        $localeMap = $wooAttributeValueTranslations[$currentLocale] ?? [];
+        $taxonomyKey = strtolower(trim($taxonomy));
+        $taxonomyMap = $localeMap[$taxonomyKey] ?? [];
+
+        $slugKey = $normalizeTranslationKey($slug);
+        if ($slugKey !== '' && array_key_exists($slugKey, $taxonomyMap)) {
+            return (string) $taxonomyMap[$slugKey];
+        }
+
+        $valueKey = $normalizeTranslationKey($fallbackValue);
+        if ($valueKey !== '' && array_key_exists($valueKey, $taxonomyMap)) {
+            return (string) $taxonomyMap[$valueKey];
+        }
+
+        $globalMap = $localeMap['global'] ?? [];
+        if ($valueKey !== '' && array_key_exists($valueKey, $globalMap)) {
+            return (string) $globalMap[$valueKey];
+        }
+
+        return $fallbackValue;
+    };
+
     $materialValues = $findAttributeValues(['material', 'fabric', 'matiere', 'qamash', 'khama']);
     $colorValues = $findAttributeValues(['color', 'colour', 'لون', 'colorway']);
     $sizeValues = $findAttributeValues(['size', 'sizes', 'مقاس']);
     $conditionValues = $findAttributeValues(['condition', 'state', 'status', 'حاله']);
+
+    $sizeValues = array_values(array_unique(array_map(function ($value) use ($translateWooAttributeValue) {
+        $raw = (string) $value;
+        return $translateWooAttributeValue('pa_size', $raw, $raw);
+    }, $sizeValues)));
+
+    $conditionValues = array_values(array_unique(array_map(function ($value) use ($translateWooAttributeValue) {
+        $raw = (string) $value;
+        return $translateWooAttributeValue('pa_product-condition', $raw, $raw);
+    }, $conditionValues)));
 
     $material = !empty($materialValues) ? implode(', ', $materialValues) : $findMetaByNeedles(['material', 'fabric', 'khama']);
     $color = !empty($colorValues) ? implode(', ', $colorValues) : $findMetaByNeedles(['color', 'colour', 'لون']);
@@ -456,9 +576,18 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         }
     }
 
+    $sizeValues = array_values(array_unique(array_map(function ($value) use ($translateWooAttributeValue) {
+        $raw = (string) $value;
+        return $translateWooAttributeValue('pa_size', $raw, $raw);
+    }, $sizeValues)));
+
     $condition = !empty($conditionValues)
         ? implode(', ', $conditionValues)
         : $findMetaByNeedles(['condition', 'state', 'availability', 'certified']);
+
+    if ($condition !== '') {
+        $condition = $translateWooAttributeValue('pa_product-condition', $condition, $condition);
+    }
 
     if ($condition === '') {
         $condition = $currentLocale === 'en'
@@ -714,10 +843,23 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             continue;
         }
 
+        $localizedOptions = array_values(array_map(function ($option) use ($selectionTaxonomy, $translateWooAttributeValue) {
+            $slug = trim((string) ($option['slug'] ?? ''));
+            $name = trim((string) ($option['name'] ?? ''));
+            $displayName = $translateWooAttributeValue($selectionTaxonomy, $slug, $name !== '' ? $name : strtoupper($slug));
+
+            return [
+                'slug' => $slug,
+                'name' => $displayName,
+            ];
+        }, $options));
+
+        $baseLabel = $attributeLabelMap[$selectionTaxonomy] ?? ucwords(str_replace(['pa_', '_', '-'], ['', ' ', ' '], $selectionTaxonomy));
+
         $productAttributesForSelection[] = [
             'taxonomy' => $selectionTaxonomy,
-            'label' => $attributeLabelMap[$selectionTaxonomy] ?? ucwords(str_replace(['pa_', '_', '-'], ['', ' ', ' '], $selectionTaxonomy)),
-            'options' => array_values($options),
+            'label' => $translateWooAttributeLabel($selectionTaxonomy, $baseLabel),
+            'options' => $localizedOptions,
         ];
     }
 
