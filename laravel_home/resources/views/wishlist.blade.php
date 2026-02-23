@@ -96,24 +96,59 @@
 
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $seoUrl = $wpBaseUrl . $canonicalPath;
+    $ogLocale = $isEnglish ? 'en_US' : 'ar_AR';
+    $ogAltLocale = $isEnglish ? 'ar_AR' : 'en_US';
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="author" content="Styliiiish">
     <meta name="description" content="{{ $t('meta_desc') }}">
-    <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <link rel="canonical" href="{{ $seoUrl }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/wishlist">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/wishlist">
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/wishlist">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="{{ $ogLocale }}">
+    <meta property="og:locale:alternate" content="{{ $ogAltLocale }}">
     <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
     <meta property="og:title" content="{{ $t('page_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
-    <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <meta property="og:url" content="{{ $seoUrl }}">
     <meta property="og:image" content="{{ $wpIcon }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $t('page_title') }}">
+    <meta name="twitter:description" content="{{ $t('meta_desc') }}">
+    <meta name="twitter:image" content="{{ $wpIcon }}">
+    <meta name="theme-color" content="#d51522">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ $wpIcon }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
+    <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('page_title') }}</title>
+    <script type="application/ld+json">
+    {!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'WebPage',
+        'name' => $t('page_title'),
+        'description' => $t('meta_desc'),
+        'url' => $seoUrl,
+        'inLanguage' => $isEnglish ? 'en' : 'ar',
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => 'Styliiiish',
+            'url' => $wpBaseUrl,
+            'logo' => [
+                '@type' => 'ImageObject',
+                'url' => $wpIcon,
+            ],
+        ],
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;
