@@ -26,7 +26,7 @@ if (!is_file($wpLoadPath)) {
 
 require_once $wpLoadPath;
 
-if (!function_exists('fable_extra_woowishlist_get_list') || !function_exists('fable_extra_woowishlist_add')) {
+if (!function_exists('fable_extra_woowishlist_get_list') || !function_exists('fable_extra_woowishlist_add') || !function_exists('fable_extra_woowishlist_remove')) {
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -141,7 +141,7 @@ $translateNamesByTranslatePress = static function (array $names, string $locale)
 
 $action = isset($_POST['action']) ? (string) $_POST['action'] : '';
 
-if ($action === 'add') {
+if ($action === 'add' || $action === 'remove') {
     $pid = isset($_POST['pid']) ? (int) $_POST['pid'] : 0;
 
     if ($pid <= 0) {
@@ -153,7 +153,11 @@ if ($action === 'add') {
         exit;
     }
 
-    fable_extra_woowishlist_add($pid);
+    if ($action === 'add') {
+        fable_extra_woowishlist_add($pid);
+    } else {
+        fable_extra_woowishlist_remove($pid);
+    }
 } elseif (!in_array($action, ['count', 'list'], true)) {
     http_response_code(422);
     echo json_encode([

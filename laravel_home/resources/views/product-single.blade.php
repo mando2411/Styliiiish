@@ -321,7 +321,7 @@
 
     $addToCartBase = $wpBaseUrl . '/cart/';
     $addToWishlistUrl = $wpBaseUrl . '/?add_to_wishlist=' . (int) ($product->ID ?? 0);
-    $wishlistPageUrl = $wpBaseUrl . '/wishlist/';
+    $wishlistPageUrl = $localePrefix . '/wishlist';
     $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';

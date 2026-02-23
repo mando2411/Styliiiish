@@ -2242,6 +2242,44 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
     return $response;
 };
 
+$wishlistRemoveHandler = function (Request $request, int $id, string $locale = 'ar') use ($wishlistBridgeCall) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $productId = max(0, (int) $id);
+
+    if ($productId <= 0) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en' ? 'Invalid product id.' : 'معرّف المنتج غير صالح.',
+        ], 422);
+    }
+
+    $bridge = $wishlistBridgeCall($request, [
+        'action' => 'remove',
+        'pid' => $productId,
+    ]);
+
+    if (!$bridge['ok']) {
+        return response()->json([
+            'success' => false,
+            'message' => $currentLocale === 'en'
+                ? 'Unable to remove wishlist item.'
+                : 'تعذر حذف المنتج من المفضلة.',
+        ], 500);
+    }
+
+    $response = response()->json([
+        'success' => true,
+        'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
+        'message' => $currentLocale === 'en' ? 'Item removed from wishlist.' : 'تم حذف المنتج من المفضلة.',
+    ]);
+
+    if (!empty($bridge['set_cookie'])) {
+        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
+    }
+
+    return $response;
+};
+
 $wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
@@ -2460,6 +2498,14 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
+$wishlistPageHandler = function (Request $request, string $locale = 'ar') {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $isEnglish = $currentLocale === 'en';
+
+    return view('wishlist', compact('currentLocale', 'localePrefix', 'isEnglish'));
+};
+
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
@@ -2476,6 +2522,10 @@ Route::post('/item/{slug}/wishlist/add', fn (Request $request, string $slug) => 
 Route::post('/ar/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'));
 Route::post('/en/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'en'));
 
+Route::delete('/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'));
+Route::delete('/ar/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'));
+Route::delete('/en/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'en'));
+
 Route::get('/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
 Route::get('/ar/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
 Route::get('/en/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'en'));
@@ -2483,6 +2533,10 @@ Route::get('/en/item/wishlist/count', fn (Request $request) => $wishlistCountHan
 Route::get('/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'ar'));
 Route::get('/ar/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'ar'));
 Route::get('/en/item/wishlist/items', fn (Request $request) => $wishlistItemsHandler($request, 'en'));
+
+Route::get('/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'ar'));
+Route::get('/ar/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'ar'));
+Route::get('/en/wishlist', fn (Request $request) => $wishlistPageHandler($request, 'en'));
 
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));
