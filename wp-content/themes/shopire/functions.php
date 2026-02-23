@@ -493,9 +493,17 @@ if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 		$variation_id = isset($_REQUEST['variation_id']) ? absint($_REQUEST['variation_id']) : 0;
 		$quantity = isset($_REQUEST['quantity']) ? max(1, absint($_REQUEST['quantity'])) : 1;
 		$request_token = isset($_REQUEST['_sty_add_token']) ? wc_clean(wp_unslash((string) $_REQUEST['_sty_add_token'])) : '';
+		$legacy_add_to_cart = isset($_REQUEST['add-to-cart']) ? absint($_REQUEST['add-to-cart']) : 0;
 
 		if (!$product_id) {
 			wp_send_json_error(['message' => 'Invalid product'], 400);
+		}
+
+		if ($legacy_add_to_cart > 0 && $legacy_add_to_cart === $product_id) {
+			if (WC()->cart) {
+				WC()->cart->calculate_totals();
+			}
+			wp_send_json_success(shopire_styliiiish_build_cart_payload());
 		}
 
 		if ($request_token !== '' && WC()->session) {
