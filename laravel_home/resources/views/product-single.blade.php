@@ -201,6 +201,55 @@
     $productAttributesForSelection = $productAttributesForSelection ?? [];
     $relatedProducts = $relatedProducts ?? collect();
 
+    $normalizeColorKey = function (string $value): string {
+        return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
+    };
+
+    $isColorAttribute = function (array $attribute) use ($normalizeColorKey): bool {
+        $taxonomy = $normalizeColorKey((string) ($attribute['taxonomy'] ?? ''));
+        $label = $normalizeColorKey((string) ($attribute['label'] ?? ''));
+
+        return str_contains($taxonomy, 'color')
+            || str_contains($taxonomy, 'colour')
+            || str_contains($label, 'color')
+            || str_contains($label, 'colour')
+            || str_contains($label, 'لون');
+    };
+
+    $colorSwatchMap = [
+        'black' => '#17273B', 'أسود' => '#17273B',
+        'white' => '#FFFFFF', 'أبيض' => '#FFFFFF',
+        'red' => '#D51522', 'أحمر' => '#D51522',
+        'blue' => '#2563EB', 'أزرق' => '#2563EB',
+        'green' => '#16A34A', 'أخضر' => '#16A34A',
+        'olive' => '#6B7A3A', 'olive green' => '#6B7A3A', 'زيتي' => '#6B7A3A',
+        'pink' => '#EC4899', 'وردي' => '#EC4899',
+        'gold' => '#D4AF37', 'ذهبي' => '#D4AF37',
+        'silver' => '#9CA3AF', 'فضي' => '#9CA3AF',
+        'ivory' => '#F8F4E8', 'عاجي' => '#F8F4E8',
+        'nude' => '#C8A98E', 'نيود' => '#C8A98E',
+        'cream' => '#F5E6C8', 'كريمي' => '#F5E6C8',
+        'purple' => '#7C3AED', 'بنفسجي' => '#7C3AED',
+        'gray' => '#6B7280', 'grey' => '#6B7280', 'رمادي' => '#6B7280',
+        'brown' => '#8B5E3C', 'بني' => '#8B5E3C',
+        'beige' => '#D6C3A5', 'بيج' => '#D6C3A5',
+    ];
+
+    $resolveColorSwatch = function (string $slug, string $name) use ($normalizeColorKey, $colorSwatchMap): string {
+        $slugKey = $normalizeColorKey($slug);
+        $nameKey = $normalizeColorKey($name);
+
+        if ($slugKey !== '' && isset($colorSwatchMap[$slugKey])) {
+            return (string) $colorSwatchMap[$slugKey];
+        }
+
+        if ($nameKey !== '' && isset($colorSwatchMap[$nameKey])) {
+            return (string) $colorSwatchMap[$nameKey];
+        }
+
+        return '#D9DCE3';
+    };
+
     $addToCartBase = $wpBaseUrl . '/cart/';
     $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
@@ -339,9 +388,71 @@
         .delivery p { margin: 0 0 8px; color: var(--muted); }
         .delivery ul { margin: 0; padding-inline-start: 18px; color: var(--secondary); }
 
-        .selectors { margin-top: 14px; display: grid; gap: 10px; }
-        .selector label { display: block; font-size: 13px; font-weight: 700; color: var(--secondary); margin-bottom: 6px; }
-        .selector select, .qty-input {
+        .selectors { margin-top: 14px; display: grid; gap: 12px; }
+        .selector {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 10px;
+        }
+        .selector label { display: block; font-size: 13px; font-weight: 800; color: var(--secondary); margin-bottom: 8px; }
+        .selector-single {
+            min-height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--bg);
+            display: inline-flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        .attr-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .attr-option-btn {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #fff;
+            color: var(--secondary);
+            min-height: 38px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .16s ease;
+        }
+        .attr-option-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .attr-option-btn.is-active {
+            border-color: var(--primary);
+            background: rgba(var(--wf-main-rgb), 0.08);
+            color: var(--primary);
+        }
+        .attr-options.colors { gap: 10px; }
+        .attr-option-btn.color {
+            border-radius: 10px;
+            min-height: 44px;
+            padding: 6px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .swatch-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            border: 1px solid rgba(23, 39, 59, 0.18);
+            background: var(--swatch-color, #D9DCE3);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+        }
+        .attr-option-btn.color.is-active .swatch-dot {
+            box-shadow:
+                0 0 0 2px #fff,
+                0 0 0 4px rgba(var(--wf-main-rgb), 0.35);
+        }
+        .qty-input {
             width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
             padding: 0 10px; font-size: 14px; color: var(--secondary);
         }
@@ -639,15 +750,48 @@
                     @if(!empty($productAttributesForSelection))
                         <div class="selectors" id="attributeSelectors" data-has-variations="{{ !empty($hasVariations) ? '1' : '0' }}">
                             @foreach($productAttributesForSelection as $attribute)
+                                @php
+                                    $options = collect($attribute['options'] ?? [])->values();
+                                    $optionCount = $options->count();
+                                    $isColorGroup = $isColorAttribute($attribute);
+                                    $taxonomyKey = (string) ($attribute['taxonomy'] ?? '');
+                                    $singleOption = $optionCount === 1 ? $options->first() : null;
+                                @endphp
                                 <div class="selector">
-                                    <label for="attr_{{ $attribute['taxonomy'] }}">{{ $attribute['label'] }}</label>
-                                    <select id="attr_{{ $attribute['taxonomy'] }}" name="{{ $attribute['taxonomy'] }}" data-attribute-key="{{ $attribute['taxonomy'] }}">
-                                        <option value="">{{ str_replace(':label', $attribute['label'], $t('select_option')) }}</option>
-                                        @foreach($attribute['options'] as $option)
-                                            <option value="{{ $option['slug'] }}">{{ $option['name'] }}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type="hidden" name="attribute_{{ $attribute['taxonomy'] }}" id="posted_{{ $attribute['taxonomy'] }}" value="">
+                                    <label>{{ $attribute['label'] }}</label>
+
+                                    @if($optionCount <= 1)
+                                        <div class="selector-single">
+                                            {{ (string) ($singleOption['name'] ?? $t('na')) }}
+                                        </div>
+                                        <input type="hidden" data-attribute-key="{{ $taxonomyKey }}" value="{{ (string) ($singleOption['slug'] ?? '') }}">
+                                        <input type="hidden" name="attribute_{{ $taxonomyKey }}" id="posted_{{ $taxonomyKey }}" value="{{ (string) ($singleOption['slug'] ?? '') }}">
+                                    @else
+                                        <div class="attr-options {{ $isColorGroup ? 'colors' : '' }}" role="group" aria-label="{{ $attribute['label'] }}">
+                                            @foreach($options as $option)
+                                                @php
+                                                    $optionSlug = (string) ($option['slug'] ?? '');
+                                                    $optionName = (string) ($option['name'] ?? '');
+                                                    $swatchColor = $resolveColorSwatch($optionSlug, $optionName);
+                                                @endphp
+                                                <button
+                                                    type="button"
+                                                    class="attr-option-btn {{ $isColorGroup ? 'color' : '' }}"
+                                                    data-attr-option
+                                                    data-attribute-key="{{ $taxonomyKey }}"
+                                                    data-option-value="{{ $optionSlug }}"
+                                                    aria-pressed="false"
+                                                >
+                                                    @if($isColorGroup)
+                                                        <span class="swatch-dot" style="--swatch-color: {{ $swatchColor }}"></span>
+                                                    @endif
+                                                    <span>{{ $optionName }}</span>
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                        <input type="hidden" data-attribute-key="{{ $taxonomyKey }}" id="attr_{{ $taxonomyKey }}" value="">
+                                        <input type="hidden" name="attribute_{{ $taxonomyKey }}" id="posted_{{ $taxonomyKey }}" value="">
+                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -818,7 +962,8 @@
             const addToCartForm = document.getElementById('addToCartForm');
             const variationIdInput = document.getElementById('variationIdInput');
             const helpText = document.getElementById('cartHelpText');
-            const selectNodes = selectorsWrap ? Array.from(selectorsWrap.querySelectorAll('select[data-attribute-key]')) : [];
+            const attributeValueNodes = selectorsWrap ? Array.from(selectorsWrap.querySelectorAll('input[data-attribute-key]')) : [];
+            const optionButtons = selectorsWrap ? Array.from(selectorsWrap.querySelectorAll('button[data-attr-option]')) : [];
 
             const chooseOptionsText = @json($t('choose_options_first'));
             const outOfStockText = @json($t('out_of_stock'));
@@ -860,20 +1005,30 @@
             };
 
             const syncPostedAttributes = () => {
-                selectNodes.forEach((selectNode) => {
-                    const key = selectNode.getAttribute('data-attribute-key');
+                attributeValueNodes.forEach((inputNode) => {
+                    const key = inputNode.getAttribute('data-attribute-key');
                     const hidden = document.getElementById('posted_' + key);
-                    if (hidden) hidden.value = selectNode.value || '';
+                    if (hidden) hidden.value = inputNode.value || '';
                 });
             };
 
             const getSelected = () => {
                 const values = {};
-                selectNodes.forEach((selectNode) => {
-                    const key = selectNode.getAttribute('data-attribute-key');
-                    values[key] = (selectNode.value || '').trim();
+                attributeValueNodes.forEach((inputNode) => {
+                    const key = inputNode.getAttribute('data-attribute-key');
+                    values[key] = (inputNode.value || '').trim();
                 });
                 return values;
+            };
+
+            const setActiveOptionButton = (attributeKey, value) => {
+                if (!selectorsWrap) return;
+
+                selectorsWrap.querySelectorAll(`button[data-attr-option][data-attribute-key="${CSS.escape(attributeKey)}"]`).forEach((button) => {
+                    const isActive = (button.getAttribute('data-option-value') || '') === value;
+                    button.classList.toggle('is-active', isActive);
+                    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
             };
 
             const validateVariation = () => {
@@ -1023,8 +1178,32 @@
                 openMiniCart();
             };
 
-            if (selectNodes.length > 0) {
-                selectNodes.forEach((node) => node.addEventListener('change', validateVariation));
+            if (optionButtons.length > 0) {
+                optionButtons.forEach((button) => {
+                    button.addEventListener('click', () => {
+                        const attributeKey = (button.getAttribute('data-attribute-key') || '').trim();
+                        const optionValue = (button.getAttribute('data-option-value') || '').trim();
+                        if (!attributeKey) return;
+
+                        const inputNode = selectorsWrap ? selectorsWrap.querySelector(`input[data-attribute-key="${CSS.escape(attributeKey)}"]`) : null;
+                        if (!inputNode) return;
+
+                        inputNode.value = optionValue;
+                        setActiveOptionButton(attributeKey, optionValue);
+                        validateVariation();
+                        highlightSizeGuideRow();
+                    });
+                });
+            }
+
+            if (attributeValueNodes.length > 0) {
+                attributeValueNodes.forEach((node) => {
+                    const key = (node.getAttribute('data-attribute-key') || '').trim();
+                    const value = (node.value || '').trim();
+                    if (key && value) {
+                        setActiveOptionButton(key, value);
+                    }
+                });
                 validateVariation();
             } else {
                 addToCartBtn.disabled = false;
@@ -1161,7 +1340,7 @@
             };
 
             const getSelectedSizeSlug = () => {
-                const sizeNode = selectNodes.find((node) => {
+                const sizeNode = attributeValueNodes.find((node) => {
                     const attrKey = String(node.getAttribute('data-attribute-key') || '').toLowerCase();
                     return attrKey.includes('size') || attrKey.includes('مقاس');
                 });
@@ -1198,9 +1377,7 @@
                 closeNodes.forEach((node) => node.addEventListener('click', closeModal));
             }
 
-            if (selectNodes.length > 0) {
-                selectNodes.forEach((node) => node.addEventListener('change', highlightSizeGuideRow));
-            }
+            highlightSizeGuideRow();
 
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') {
