@@ -18,8 +18,8 @@
     ];
 
     $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
-        ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
-        : (preg_replace('/styliiiish/iu', 'ستايلش', $value) ?? $value);
+        ? (preg_replace('/(?<![@.\w-])ستايلش(?![\w.-])/u', 'Styliiiish', $value) ?? $value)
+        : (preg_replace('/(?<![@.\w-])styliiiish(?![\w.-])/iu', 'ستايلش', $value) ?? $value);
     $t = fn (string $key) => $normalizeBrandText((string) ($translations[$currentLocale][$key] ?? $translations['ar'][$key] ?? $key));
 
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
