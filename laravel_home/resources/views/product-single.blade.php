@@ -88,6 +88,14 @@
             'tab_policies' => 'السياسات',
             'tab_loading' => 'جاري تحميل المحتوى...',
             'tab_load_failed' => 'تعذر تحميل المحتوى حالياً. حاولي مرة أخرى.',
+            'leave_review' => 'اترك تعليق',
+            'review_title' => 'إضافة تقييم وتعليق',
+            'review_name' => 'الاسم',
+            'review_email' => 'البريد الإلكتروني',
+            'review_rating' => 'التقييم',
+            'review_comment' => 'التعليق',
+            'review_submit' => 'إرسال المراجعة',
+            'review_placeholder' => 'اكتبي تجربتك مع المنتج...',
         ],
         'en' => [
             'page_title' => (($product->post_title ?? 'Product') . ' | Styliiiish'),
@@ -170,6 +178,14 @@
             'tab_policies' => 'Policies',
             'tab_loading' => 'Loading content...',
             'tab_load_failed' => 'Unable to load content right now. Please try again.',
+            'leave_review' => 'Leave a review',
+            'review_title' => 'Add rating & review',
+            'review_name' => 'Name',
+            'review_email' => 'Email',
+            'review_rating' => 'Rating',
+            'review_comment' => 'Comment',
+            'review_submit' => 'Submit review',
+            'review_placeholder' => 'Write your product feedback...',
         ],
     ];
 
@@ -611,6 +627,39 @@
         .report-submit:disabled { opacity: .6; cursor: not-allowed; }
         .report-message { margin: 0; font-size: 12px; min-height: 18px; color: var(--muted); }
 
+        .review-modal { position: fixed; inset: 0; z-index: 131; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .review-modal.is-open { display: flex; }
+        .review-modal-backdrop { position: absolute; inset: 0; background: rgba(15, 26, 42, 0.66); }
+        .review-modal-dialog {
+            position: relative;
+            z-index: 1;
+            width: min(700px, 96vw);
+            max-height: 88vh;
+            overflow: auto;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+            display: grid;
+            gap: 10px;
+        }
+        .review-rating-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .review-star {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: #D4AF37;
+            border-radius: 8px;
+            min-width: 36px;
+            min-height: 36px;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .review-star.is-active {
+            border-color: #D4AF37;
+            background: #FFF9E8;
+        }
+
         .product-tabs {
             margin-top: 16px;
             background: #fff;
@@ -1039,6 +1088,49 @@
             </div>
         </div>
 
+        <div class="review-modal" id="productReviewModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="{{ $t('review_title') }}">
+            <div class="review-modal-backdrop" data-close-review-modal></div>
+            <div class="review-modal-dialog">
+                <div class="report-modal-head">
+                    <h2 class="report-title">{{ $t('review_title') }}</h2>
+                    <button type="button" class="report-modal-close" data-close-review-modal>{{ $t('close') }}</button>
+                </div>
+
+                <form id="productReviewForm" novalidate>
+                    <div class="report-grid">
+                        <div class="report-field">
+                            <label for="reviewName">{{ $t('review_name') }}</label>
+                            <input type="text" id="reviewName" name="name" maxlength="120" required>
+                        </div>
+                        <div class="report-field">
+                            <label for="reviewEmail">{{ $t('review_email') }}</label>
+                            <input type="email" id="reviewEmail" name="email" maxlength="190" required>
+                        </div>
+                    </div>
+
+                    <div class="report-field">
+                        <label>{{ $t('review_rating') }}</label>
+                        <div class="review-rating-row" id="reviewStarsRow">
+                            <button type="button" class="review-star" data-review-star="1" aria-label="1 star">☆</button>
+                            <button type="button" class="review-star" data-review-star="2" aria-label="2 stars">☆</button>
+                            <button type="button" class="review-star" data-review-star="3" aria-label="3 stars">☆</button>
+                            <button type="button" class="review-star" data-review-star="4" aria-label="4 stars">☆</button>
+                            <button type="button" class="review-star" data-review-star="5" aria-label="5 stars">☆</button>
+                        </div>
+                        <input type="hidden" id="reviewRatingInput" name="rating" value="0">
+                    </div>
+
+                    <div class="report-field">
+                        <label for="reviewComment">{{ $t('review_comment') }}</label>
+                        <textarea id="reviewComment" name="comment" maxlength="2000" required placeholder="{{ $t('review_placeholder') }}"></textarea>
+                    </div>
+
+                    <button class="report-submit" id="reviewSubmitBtn" type="submit">{{ $t('review_submit') }}</button>
+                    <p class="report-message" id="reviewMessage"></p>
+                </form>
+            </div>
+        </div>
+
         <section class="product-tabs" id="productAjaxTabs">
             <div class="product-tabs-head" role="tablist" aria-label="Product Sections">
                 <button type="button" class="product-tab-btn is-active" data-product-tab="description" role="tab" aria-selected="true">{{ $t('tab_description') }}</button>
@@ -1212,6 +1304,7 @@
             const contactForPriceText = @json($t('contact_for_price'));
             const tabLoadingText = @json($t('tab_loading'));
             const tabLoadFailedText = @json($t('tab_load_failed'));
+            const leaveReviewText = @json($t('leave_review'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json((string) ($product->post_name ?? ''));
@@ -1231,6 +1324,13 @@
             const reportModal = document.getElementById('productReportModal');
             const reportOpenBtn = document.getElementById('openReportModal');
             const reportModalClosers = reportModal ? reportModal.querySelectorAll('[data-close-report-modal]') : [];
+            const reviewModal = document.getElementById('productReviewModal');
+            const reviewModalClosers = reviewModal ? reviewModal.querySelectorAll('[data-close-review-modal]') : [];
+            const reviewForm = document.getElementById('productReviewForm');
+            const reviewSubmitBtn = document.getElementById('reviewSubmitBtn');
+            const reviewMessage = document.getElementById('reviewMessage');
+            const reviewRatingInput = document.getElementById('reviewRatingInput');
+            const reviewStars = reviewModal ? Array.from(reviewModal.querySelectorAll('[data-review-star]')) : [];
 
             const cartTrigger = document.getElementById('miniCartTrigger');
             const cartBadge = document.getElementById('cartCountBadge');
@@ -1453,6 +1553,7 @@
 
             const getTabUrl = (tab) => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/tabs/${encodeURIComponent(tab)}`;
             const getReportUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/report`;
+            const getReviewUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/review`;
 
             const renderTabLoading = () => {
                 if (!tabsBody) return;
@@ -1519,6 +1620,15 @@
                 loadTabContent('description');
             }
 
+            if (tabsBody) {
+                tabsBody.addEventListener('click', (event) => {
+                    const trigger = event.target.closest('[data-open-review-modal]');
+                    if (!trigger) return;
+                    event.preventDefault();
+                    openReviewModal();
+                });
+            }
+
             const setReportMessage = (message, isSuccess = false) => {
                 if (!reportMessage) return;
                 reportMessage.textContent = message;
@@ -1548,6 +1658,110 @@
             if (reportModalClosers.length > 0) {
                 reportModalClosers.forEach((node) => node.addEventListener('click', closeReportModal));
             }
+
+            const setReviewMessage = (message, isSuccess = false) => {
+                if (!reviewMessage) return;
+                reviewMessage.textContent = message;
+                reviewMessage.style.color = isSuccess ? '#197A3A' : 'var(--muted)';
+            };
+
+            const paintReviewStars = (rating) => {
+                const value = Math.max(0, Math.min(5, Number(rating) || 0));
+                reviewStars.forEach((starButton) => {
+                    const starValue = Number(starButton.getAttribute('data-review-star') || 0);
+                    const active = starValue <= value;
+                    starButton.classList.toggle('is-active', active);
+                    starButton.textContent = active ? '★' : '☆';
+                });
+                if (reviewRatingInput) {
+                    reviewRatingInput.value = String(value);
+                }
+            };
+
+            const openReviewModal = () => {
+                if (!reviewModal) return;
+                reviewModal.classList.add('is-open');
+                reviewModal.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeReviewModal = () => {
+                if (!reviewModal) return;
+                reviewModal.classList.remove('is-open');
+                reviewModal.setAttribute('aria-hidden', 'true');
+                const keepLocked = (miniCart && miniCart.classList.contains('is-open'))
+                    || (modal && modal.classList.contains('is-open'))
+                    || (reportModal && reportModal.classList.contains('is-open'));
+                document.body.style.overflow = keepLocked ? 'hidden' : '';
+            };
+
+            if (reviewModalClosers.length > 0) {
+                reviewModalClosers.forEach((node) => node.addEventListener('click', closeReviewModal));
+            }
+
+            if (reviewStars.length > 0) {
+                reviewStars.forEach((starButton) => {
+                    starButton.addEventListener('click', () => {
+                        const value = Number(starButton.getAttribute('data-review-star') || 0);
+                        paintReviewStars(value);
+                    });
+                });
+            }
+
+            if (reviewForm) {
+                reviewForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    if (!reviewSubmitBtn) return;
+
+                    const ratingValue = Number(reviewRatingInput ? reviewRatingInput.value : 0) || 0;
+                    if (ratingValue < 1) {
+                        setReviewMessage(currentLocale === 'en' ? 'Please select a rating first.' : 'يرجى اختيار التقييم أولاً.', false);
+                        return;
+                    }
+
+                    const formData = new FormData(reviewForm);
+                    const params = new URLSearchParams();
+                    formData.forEach((value, key) => params.append(key, String(value || '').trim()));
+
+                    reviewSubmitBtn.disabled = true;
+                    setReviewMessage(tabLoadingText, false);
+
+                    try {
+                        const response = await fetch(getReviewUrl(), {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            body: params.toString(),
+                        });
+
+                        const result = await response.json();
+                        if (!response.ok || !result || !result.success) {
+                            throw new Error((result && result.message) ? result.message : tabLoadFailedText);
+                        }
+
+                        setReviewMessage(String(result.message || ''), true);
+                        reviewForm.reset();
+                        paintReviewStars(0);
+                        tabCache.delete('reviews');
+                        await loadTabContent('reviews', true);
+                        setTimeout(() => {
+                            closeReviewModal();
+                        }, 900);
+                    } catch (error) {
+                        const message = (error && error.message) ? error.message : tabLoadFailedText;
+                        setReviewMessage(message, false);
+                    } finally {
+                        reviewSubmitBtn.disabled = false;
+                    }
+                });
+            }
+
+            paintReviewStars(0);
 
             if (reportForm) {
                 reportForm.addEventListener('submit', async (event) => {
@@ -2002,6 +2216,10 @@
 
                     if (reportModal && reportModal.classList.contains('is-open')) {
                         closeReportModal();
+                    }
+
+                    if (reviewModal && reviewModal.classList.contains('is-open')) {
+                        closeReviewModal();
                     }
 
                     const modal = document.getElementById('size-guide-modal');

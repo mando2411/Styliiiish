@@ -1673,6 +1673,7 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
     }
 
     if ($tab === 'reviews') {
+        $leaveReviewLabel = $currentLocale === 'en' ? 'Leave a review' : 'اترك تعليق';
         $rows = DB::table('wp_comments as c')
             ->leftJoin('wp_commentmeta as cm', function ($join) {
                 $join->on('c.comment_ID', '=', 'cm.comment_id')
@@ -1687,9 +1688,12 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             ->get();
 
         if ($rows->isEmpty()) {
-            $html = $currentLocale === 'en'
-                ? '<p>No reviews yet. Be the first to share your feedback.</p>'
-                : '<p>لا توجد مراجعات بعد. كوني أول من يشارك رأيه.</p>';
+            $html = '<p>' . ($currentLocale === 'en'
+                ? 'No reviews yet. Be the first to share your feedback.'
+                : 'لا توجد مراجعات بعد. كوني أول من يشارك رأيه.') . '</p>'
+                . '<button type="button" data-open-review-modal style="margin-top:10px;border:1px solid rgba(213,21,34,.22);background:#fff;border-radius:999px;min-height:36px;padding:0 14px;font-size:13px;font-weight:700;color:#D51522;cursor:pointer;">'
+                . e($leaveReviewLabel)
+                . '</button>';
 
             return response()->json(['success' => true, 'tab' => 'reviews', 'html' => $html]);
         }
@@ -1716,7 +1720,12 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
         return response()->json([
             'success' => true,
             'tab' => 'reviews',
-            'html' => '<div style="display:grid;gap:10px;">' . implode('', $cards) . '</div>',
+            'html' => '<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">'
+                . '<button type="button" data-open-review-modal style="border:1px solid rgba(213,21,34,.22);background:#fff;border-radius:999px;min-height:36px;padding:0 14px;font-size:13px;font-weight:700;color:#D51522;cursor:pointer;">'
+                . e($leaveReviewLabel)
+                . '</button>'
+                . '</div>'
+                . '<div style="display:grid;gap:10px;">' . implode('', $cards) . '</div>',
         ]);
     }
 
@@ -1920,6 +1929,58 @@ $reportProductHandler = function (Request $request, string $slug, string $locale
     ]);
 };
 
+$submitProductReviewHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+
+    if (!$product) {
+        return response()->json(['success' => false, 'message' => 'Product not found'], 404);
+    }
+
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:120'],
+        'email' => ['required', 'email', 'max:190'],
+        'comment' => ['required', 'string', 'min:8', 'max:2000'],
+        'rating' => ['required', 'integer', 'min:1', 'max:5'],
+    ]);
+
+    $requiresModeration = (string) DB::table('wp_options')
+        ->where('option_name', 'comment_moderation')
+        ->value('option_value') === '1';
+
+    $approvedState = $requiresModeration ? '0' : '1';
+
+    $commentId = DB::table('wp_comments')->insertGetId([
+        'comment_post_ID' => (int) $product->ID,
+        'comment_author' => (string) ($validated['name'] ?? ''),
+        'comment_author_email' => (string) ($validated['email'] ?? ''),
+        'comment_author_url' => '',
+        'comment_author_IP' => (string) $request->ip(),
+        'comment_date' => now()->format('Y-m-d H:i:s'),
+        'comment_date_gmt' => now('UTC')->format('Y-m-d H:i:s'),
+        'comment_content' => (string) ($validated['comment'] ?? ''),
+        'comment_karma' => 0,
+        'comment_approved' => $approvedState,
+        'comment_agent' => mb_substr((string) $request->userAgent(), 0, 250),
+        'comment_type' => 'review',
+        'comment_parent' => 0,
+        'user_id' => 0,
+    ]);
+
+    DB::table('wp_commentmeta')->insert([
+        'comment_id' => (int) $commentId,
+        'meta_key' => 'rating',
+        'meta_value' => (string) ((int) ($validated['rating'] ?? 0)),
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'message' => $approvedState === '1'
+            ? ($currentLocale === 'en' ? 'Your review was published successfully.' : 'تم نشر مراجعتك بنجاح.')
+            : ($currentLocale === 'en' ? 'Your review was submitted and is awaiting approval.' : 'تم إرسال مراجعتك وهي بانتظار الموافقة.'),
+    ]);
+};
+
 Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
@@ -1927,6 +1988,10 @@ Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, str
 Route::post('/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
 Route::post('/ar/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
 Route::post('/en/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'en'));
+
+Route::post('/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
+Route::post('/ar/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
+Route::post('/en/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'en'));
 
 Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
     $locale = strtolower((string) $request->query('locale', 'ar'));
