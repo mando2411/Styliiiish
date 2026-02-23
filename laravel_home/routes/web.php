@@ -1721,6 +1721,7 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
     }
 
     if ($tab === 'policies') {
+        $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
         $policySlugs = [
             'shipping-delivery-policy',
             'refund-return-policy',
@@ -1728,27 +1729,109 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             'terms-conditions',
         ];
 
-        $policyRows = DB::table('wp_posts')
+        $basePolicyRows = DB::table('wp_posts')
             ->where('post_type', 'page')
             ->where('post_status', 'publish')
             ->whereIn('post_name', $policySlugs)
-            ->select('post_name', 'post_title', 'post_content')
-            ->get();
+            ->select('ID', 'post_name', 'post_title', 'post_content')
+            ->get()
+            ->keyBy('post_name');
 
-        if ($policyRows->isEmpty()) {
+        if ($basePolicyRows->isEmpty()) {
             $html = $currentLocale === 'en'
                 ? '<p>Policies are not available right now.</p>'
                 : '<p>السياسات غير متاحة حالياً.</p>';
             return response()->json(['success' => true, 'tab' => 'policies', 'html' => $html]);
         }
 
+        $policyRows = collect();
+        foreach ($policySlugs as $policySlug) {
+            $baseRow = $basePolicyRows->get($policySlug);
+            if ($baseRow) {
+                $baseRow->slug_key = (string) $policySlug;
+                $policyRows->push($baseRow);
+            }
+        }
+
+        if ($currentLocale === 'ar' && $policyRows->isNotEmpty() && Schema::hasTable('wp_icl_translations')) {
+            $baseIds = $policyRows->pluck('ID')->map(fn ($id) => (int) $id)->filter(fn ($id) => $id > 0)->values();
+
+            if ($baseIds->isNotEmpty()) {
+                $baseTranslations = DB::table('wp_icl_translations')
+                    ->where('element_type', 'post_page')
+                    ->whereIn('element_id', $baseIds->all())
+                    ->select('element_id', 'trid')
+                    ->get();
+
+                $tridByBaseId = [];
+                foreach ($baseTranslations as $translationRow) {
+                    $baseId = (int) ($translationRow->element_id ?? 0);
+                    $trid = (int) ($translationRow->trid ?? 0);
+                    if ($baseId > 0 && $trid > 0 && !array_key_exists($baseId, $tridByBaseId)) {
+                        $tridByBaseId[$baseId] = $trid;
+                    }
+                }
+
+                if (!empty($tridByBaseId)) {
+                    $localizedTranslationRows = DB::table('wp_icl_translations')
+                        ->where('element_type', 'post_page')
+                        ->whereIn('trid', array_values($tridByBaseId))
+                        ->where('language_code', 'like', 'ar%')
+                        ->select('trid', 'element_id')
+                        ->get();
+
+                    $localizedIdsByTrid = [];
+                    foreach ($localizedTranslationRows as $localizedTranslationRow) {
+                        $trid = (int) ($localizedTranslationRow->trid ?? 0);
+                        $elementId = (int) ($localizedTranslationRow->element_id ?? 0);
+                        if ($trid > 0 && $elementId > 0 && !array_key_exists($trid, $localizedIdsByTrid)) {
+                            $localizedIdsByTrid[$trid] = $elementId;
+                        }
+                    }
+
+                    if (!empty($localizedIdsByTrid)) {
+                        $localizedPosts = DB::table('wp_posts')
+                            ->whereIn('ID', array_values($localizedIdsByTrid))
+                            ->where('post_type', 'page')
+                            ->where('post_status', 'publish')
+                            ->select('ID', 'post_name', 'post_title', 'post_content')
+                            ->get()
+                            ->keyBy('ID');
+
+                        $policyRows = $policyRows->map(function ($policyRow) use ($tridByBaseId, $localizedIdsByTrid, $localizedPosts) {
+                            $baseId = (int) ($policyRow->ID ?? 0);
+                            $trid = $tridByBaseId[$baseId] ?? null;
+                            $localizedId = $trid ? ($localizedIdsByTrid[$trid] ?? null) : null;
+                            if (!$localizedId) {
+                                return $policyRow;
+                            }
+
+                            $localizedPost = $localizedPosts->get((int) $localizedId);
+                            if (!$localizedPost) {
+                                return $policyRow;
+                            }
+
+                            $policyRow->ID = (int) ($localizedPost->ID ?? $policyRow->ID ?? 0);
+                            $policyRow->post_name = (string) ($localizedPost->post_name ?? $policyRow->post_name ?? '');
+                            $policyRow->post_title = (string) ($localizedPost->post_title ?? $policyRow->post_title ?? '');
+                            $policyRow->post_content = (string) ($localizedPost->post_content ?? $policyRow->post_content ?? '');
+                            return $policyRow;
+                        })->values();
+                    }
+                }
+            }
+
+            $policyRows = $localizeProductsCollectionByTranslatePress($policyRows, 'ar', true)->values();
+        }
+
         $cards = [];
         foreach ($policyRows as $policyRow) {
-            $title = trim((string) ($policyRow->post_title ?? ''));
+            $title = html_entity_decode(trim((string) ($policyRow->post_title ?? '')), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $content = trim((string) ($policyRow->post_content ?? ''));
-            $plain = trim(strip_tags($content));
+            $plain = trim(html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
             $excerpt = mb_substr($plain, 0, 240) . (mb_strlen($plain) > 240 ? '…' : '');
-            $url = $wpBaseUrl . '/' . trim((string) ($policyRow->post_name ?? ''), '/') . '/';
+            $slugKey = trim((string) ($policyRow->slug_key ?? $policyRow->post_name ?? ''));
+            $url = $wpBaseUrl . $localePrefix . '/' . trim($slugKey, '/') . '/';
 
             $cards[] = '<article style="border:1px solid rgba(189,189,189,.4);border-radius:12px;padding:12px;background:#fff;">'
                 . '<h4 style="margin:0 0 8px;font-size:15px;color:#17273B;">' . e($title) . '</h4>'
