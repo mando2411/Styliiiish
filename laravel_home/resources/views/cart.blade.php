@@ -242,6 +242,7 @@
 <script>
 (() => {
     const localePrefix = @json($localePrefix);
+    const currentLocale = @json($currentLocale);
     const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
     const texts = {
         loading: @json($t('loading')), emptyTitle: @json($t('empty_title')), emptyDesc: @json($t('empty_desc')), goShop: @json($t('go_shop')),
@@ -357,7 +358,8 @@
     const fetchSummary = async () => {
         cartList.innerHTML = `<div class="state">${escapeHtml(texts.loading)}</div>`;
         try {
-            const response = await fetch(`${adminAjaxUrl}?action=styliiiish_cart_summary`, { method: 'GET', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            const query = new URLSearchParams({ action: 'styliiiish_cart_summary', lang: currentLocale });
+            const response = await fetch(`${adminAjaxUrl}?${query.toString()}`, { method: 'GET', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
             const result = await response.json();
             if (!response.ok || !result || !result.success) throw new Error('summary_failed');
             renderCart(result.data || {});
@@ -376,6 +378,7 @@
             const params = new URLSearchParams();
             params.set('action', 'styliiiish_remove_from_cart');
             params.set('cart_key', cartKey);
+            params.set('lang', currentLocale);
             const response = await fetch(adminAjaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' }, body: params.toString() });
             const result = await response.json();
             if (!response.ok || !result || !result.success) throw new Error('remove_failed');
@@ -396,6 +399,7 @@
             params.set('action', 'styliiiish_update_cart_qty');
             params.set('cart_key', cartKey);
             params.set('qty', String(qty));
+            params.set('lang', currentLocale);
             const response = await fetch(adminAjaxUrl, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' }, body: params.toString() });
             const result = await response.json();
             if (!response.ok || !result || !result.success) throw new Error('qty_failed');

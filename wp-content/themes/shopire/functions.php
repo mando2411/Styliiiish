@@ -519,7 +519,7 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 				$rate_taxes = method_exists($rate, 'get_taxes') ? array_sum(array_map('floatval', (array) $rate->get_taxes())) : 0.0;
 
 				$shipping_lines[] = [
-					'label' => html_entity_decode(wp_strip_all_tags((string) $rate->get_label()), ENT_QUOTES, 'UTF-8'),
+					'label' => html_entity_decode(wp_strip_all_tags((string) __((string) $rate->get_label(), 'woocommerce')), ENT_QUOTES, 'UTF-8'),
 					'cost_html' => wc_price($rate_cost + $rate_taxes),
 				];
 			}
@@ -543,8 +543,45 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 	}
 }
 
+if (!function_exists('shopire_styliiiish_apply_request_locale')) {
+	function shopire_styliiiish_apply_request_locale() {
+		if (!function_exists('switch_to_locale') || !function_exists('determine_locale')) {
+			return;
+		}
+
+		$lang = isset($_REQUEST['lang']) ? sanitize_key(wp_unslash((string) $_REQUEST['lang'])) : '';
+		if ($lang !== 'ar' && $lang !== 'en') {
+			$referer = isset($_SERVER['HTTP_REFERER']) ? (string) $_SERVER['HTTP_REFERER'] : '';
+			if (is_string($referer) && $referer !== '') {
+				if (strpos($referer, '/en/') !== false) {
+					$lang = 'en';
+				} elseif (strpos($referer, '/ar/') !== false) {
+					$lang = 'ar';
+				}
+			}
+		}
+
+		$target_locale = '';
+		if ($lang === 'ar') {
+			$target_locale = 'ar';
+		} elseif ($lang === 'en') {
+			$target_locale = 'en_US';
+		}
+
+		if ($target_locale === '') {
+			return;
+		}
+
+		$current_locale = determine_locale();
+		if ($current_locale !== $target_locale) {
+			switch_to_locale($target_locale);
+		}
+	}
+}
+
 if (!function_exists('shopire_styliiiish_wc_ajax_summary')) {
 	function shopire_styliiiish_wc_ajax_summary() {
+		shopire_styliiiish_apply_request_locale();
 		wp_send_json_success(shopire_styliiiish_build_cart_payload());
 	}
 }
@@ -555,6 +592,7 @@ add_action('wp_ajax_nopriv_styliiiish_cart_summary', 'shopire_styliiiish_wc_ajax
 
 if (!function_exists('shopire_styliiiish_wc_ajax_add_to_cart')) {
 	function shopire_styliiiish_wc_ajax_add_to_cart() {
+		shopire_styliiiish_apply_request_locale();
 		if (!function_exists('WC') || !WC()->cart) {
 			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
 		}
@@ -644,6 +682,7 @@ add_action('wp_ajax_nopriv_styliiiish_add_to_cart', 'shopire_styliiiish_wc_ajax_
 
 if (!function_exists('shopire_styliiiish_wc_ajax_remove_from_cart')) {
 	function shopire_styliiiish_wc_ajax_remove_from_cart() {
+		shopire_styliiiish_apply_request_locale();
 		if (!function_exists('WC') || !WC()->cart) {
 			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
 		}
@@ -669,6 +708,7 @@ add_action('wp_ajax_nopriv_styliiiish_remove_from_cart', 'shopire_styliiiish_wc_
 
 if (!function_exists('shopire_styliiiish_wc_ajax_update_cart_qty')) {
 	function shopire_styliiiish_wc_ajax_update_cart_qty() {
+		shopire_styliiiish_apply_request_locale();
 		if (!function_exists('WC') || !WC()->cart) {
 			wp_send_json_error(['message' => 'Cart is unavailable'], 500);
 		}
