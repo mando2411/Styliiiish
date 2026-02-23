@@ -474,8 +474,8 @@
         .help-text { margin-top: 8px; font-size: 13px; color: var(--muted); min-height: 18px; }
         .attr-warning {
             margin-top: 8px;
-            border: 1px solid rgba(213, 21, 34, 0.24);
-            background: #fff7f8;
+            border: 1px solid #F2D58A;
+            background: #FFF9E8;
             color: var(--secondary);
             border-radius: 10px;
             padding: 8px 10px;
@@ -484,7 +484,7 @@
             display: none;
         }
         .attr-warning.is-visible { display: block; }
-        .attr-warning strong { color: var(--primary); }
+        .attr-warning strong { color: #9A6B00; }
 
         .guide-row { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
         .btn-ghost { border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--secondary); padding: 10px 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
