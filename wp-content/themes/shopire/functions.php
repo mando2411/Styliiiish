@@ -438,6 +438,11 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 			return [
 				'count' => 0,
 				'subtotal_html' => '',
+				'total_html' => '',
+				'shipping_lines' => [],
+				'shipping_total_html' => '',
+				'shipping_destination' => '',
+				'change_address_url' => home_url('/cart/'),
 				'items' => [],
 				'cart_url' => home_url('/cart/'),
 				'checkout_url' => home_url('/checkout/'),
@@ -463,10 +468,74 @@ if (!function_exists('shopire_styliiiish_build_cart_payload')) {
 			];
 		}
 
+		$shipping_lines = [];
+		$shipping_destination = '';
+
+		if (WC()->customer && is_object(WC()->customer)) {
+			$destination_parts = array_filter([
+				trim((string) WC()->customer->get_shipping_address()),
+				trim((string) WC()->customer->get_shipping_address_2()),
+				trim((string) WC()->customer->get_shipping_city()),
+				trim((string) WC()->customer->get_shipping_state()),
+			]);
+
+			if (empty($destination_parts)) {
+				$destination_parts = array_filter([
+					trim((string) WC()->customer->get_billing_address()),
+					trim((string) WC()->customer->get_billing_address_2()),
+					trim((string) WC()->customer->get_billing_city()),
+					trim((string) WC()->customer->get_billing_state()),
+				]);
+			}
+
+			$shipping_destination = implode(', ', $destination_parts);
+		}
+
+		if (WC()->cart->needs_shipping()) {
+			$chosen_methods = WC()->session ? (array) WC()->session->get('chosen_shipping_methods', []) : [];
+			$packages = WC()->shipping() ? WC()->shipping()->get_packages() : [];
+
+			foreach ($packages as $package_index => $package) {
+				$rates = isset($package['rates']) && is_array($package['rates']) ? $package['rates'] : [];
+				if (empty($rates)) {
+					continue;
+				}
+
+				$chosen_rate_id = isset($chosen_methods[$package_index]) ? (string) $chosen_methods[$package_index] : '';
+				$rate = null;
+
+				if ($chosen_rate_id !== '' && isset($rates[$chosen_rate_id])) {
+					$rate = $rates[$chosen_rate_id];
+				} else {
+					$first_rate = reset($rates);
+					$rate = $first_rate ?: null;
+				}
+
+				if (!$rate || !is_object($rate) || !method_exists($rate, 'get_label')) {
+					continue;
+				}
+
+				$rate_cost = (float) $rate->get_cost();
+				$rate_taxes = method_exists($rate, 'get_taxes') ? array_sum(array_map('floatval', (array) $rate->get_taxes())) : 0.0;
+
+				$shipping_lines[] = [
+					'label' => html_entity_decode(wp_strip_all_tags((string) $rate->get_label()), ENT_QUOTES, 'UTF-8'),
+					'cost_html' => wc_price($rate_cost + $rate_taxes),
+				];
+			}
+		}
+
+		$shipping_total_value = (float) WC()->cart->get_shipping_total() + (float) WC()->cart->get_shipping_tax();
+		$shipping_total_html = $shipping_total_value > 0 ? wc_price($shipping_total_value) : '';
+
 		return [
 			'count' => (int) WC()->cart->get_cart_contents_count(),
 			'subtotal_html' => WC()->cart->get_cart_subtotal(),
 			'total_html' => WC()->cart->get_total(),
+			'shipping_lines' => $shipping_lines,
+			'shipping_total_html' => $shipping_total_html,
+			'shipping_destination' => $shipping_destination,
+			'change_address_url' => wc_get_cart_url(),
 			'items' => $items,
 			'cart_url' => wc_get_cart_url(),
 			'checkout_url' => wc_get_checkout_url(),

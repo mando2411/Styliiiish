@@ -32,6 +32,10 @@
             'updating' => 'جاري التحديث…',
             'cart_totals' => 'Cart totals',
             'subtotal' => 'Subtotal',
+            'shipment' => 'Shipment',
+            'shipping_to' => 'Shipping to',
+            'change_address' => 'Change address',
+            'shipping_unavailable' => 'Will be calculated at checkout',
             'total' => 'Total',
             'proceed_checkout' => 'Proceed to checkout',
             'continue_shopping' => 'متابعة التسوق',
@@ -80,6 +84,10 @@
             'updating' => 'Updating…',
             'cart_totals' => 'Cart totals',
             'subtotal' => 'Subtotal',
+            'shipment' => 'Shipment',
+            'shipping_to' => 'Shipping to',
+            'change_address' => 'Change address',
+            'shipping_unavailable' => 'Will be calculated at checkout',
             'total' => 'Total',
             'proceed_checkout' => 'Proceed to checkout',
             'continue_shopping' => 'Continue shopping',
@@ -170,6 +178,8 @@
         .btn{border:1px solid var(--line);border-radius:10px;min-height:38px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#fff;cursor:pointer}
         .btn:hover{border-color:var(--primary);color:var(--primary)}.btn-danger{color:var(--danger);border-color:rgba(220,38,38,.28)}
         .totals{padding:14px;display:grid;gap:10px}.totals-row{display:flex;justify-content:space-between;gap:12px;color:#4b5563}.totals-row strong{color:#111827}
+        .shipment-block{border:1px dashed var(--line);border-radius:10px;padding:10px}.shipment-line{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.shipment-line strong{color:#111827}
+        .shipment-destination{margin-top:6px;color:#6b7280;font-size:13px;line-height:1.6}.shipment-change{margin-top:6px;display:inline-flex;color:var(--primary);font-weight:700;font-size:13px}
         .totals-row.total{padding-top:10px;border-top:1px dashed var(--line);font-size:16px}.checkout-btn{background:var(--primary);color:#fff;border-color:var(--primary);min-height:44px}
         .state{border:1px dashed var(--line);border-radius:14px;text-align:center;padding:30px 14px;color:#6b7280}.state h3{margin:0 0 8px;color:#111827;font-size:22px}
         .site-footer{margin-top:10px;background:#0f1a2a;color:#fff;border-top:4px solid var(--primary)}
@@ -204,6 +214,11 @@
             <div class="panel-title">{{ $t('cart_totals') }}</div>
             <div class="totals">
                 <div class="totals-row"><span>{{ $t('subtotal') }}</span><strong id="cartSubtotal">—</strong></div>
+                <div class="shipment-block" id="shipmentBlock" hidden>
+                    <div class="shipment-line"><span>{{ $t('shipment') }}</span><strong id="shipmentMethod">—</strong></div>
+                    <div class="shipment-destination" id="shippingDestination"></div>
+                    <a class="shipment-change" id="changeAddressLink" href="{{ $wpBaseUrl }}/cart/">{{ $t('change_address') }}</a>
+                </div>
                 <div class="totals-row total"><span>{{ $t('total') }}</span><strong id="cartTotal">—</strong></div>
                 <a class="btn checkout-btn" id="proceedCheckoutBtn" href="{{ $wpBaseUrl }}/checkout/">{{ $t('proceed_checkout') }}</a>
                 <a class="btn" href="{{ $localePrefix }}/shop">{{ $t('continue_shopping') }}</a>
@@ -227,13 +242,19 @@
         qty: @json($t('qty')), unitPrice: @json($t('unit_price')), lineTotal: @json($t('line_total')),
         remove: @json($t('remove')), removing: @json($t('removing')), updating: @json($t('updating')),
         removeFailed: @json($t('remove_failed')), loadFailed: @json($t('load_failed')), updateFailed: @json($t('update_failed')),
-        viewProduct: @json($t('view_product'))
+        viewProduct: @json($t('view_product')),
+        shippingTo: @json($t('shipping_to')),
+        shippingUnavailable: @json($t('shipping_unavailable'))
     };
 
     const cartList = document.getElementById('cartList');
     const cartSubtotal = document.getElementById('cartSubtotal');
     const cartTotal = document.getElementById('cartTotal');
     const proceedCheckoutBtn = document.getElementById('proceedCheckoutBtn');
+    const shipmentBlock = document.getElementById('shipmentBlock');
+    const shipmentMethod = document.getElementById('shipmentMethod');
+    const shippingDestination = document.getElementById('shippingDestination');
+    const changeAddressLink = document.getElementById('changeAddressLink');
 
     const escapeHtml = (value) => String(value || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
 
@@ -241,12 +262,46 @@
         cartList.innerHTML = `<div class="state"><h3>${escapeHtml(texts.emptyTitle)}</h3><p>${escapeHtml(texts.emptyDesc)}</p><a class="btn" href="${localePrefix}/shop" style="margin-top:12px;">${escapeHtml(texts.goShop)}</a></div>`;
         cartSubtotal.textContent = '—';
         cartTotal.textContent = '—';
+        if (shipmentBlock) shipmentBlock.hidden = true;
+        if (shipmentMethod) shipmentMethod.textContent = '—';
+        if (shippingDestination) shippingDestination.textContent = '';
     };
 
     const renderTotals = (payload) => {
         cartSubtotal.innerHTML = payload.subtotal_html || '—';
         cartTotal.innerHTML = payload.total_html || payload.subtotal_html || '—';
         if (proceedCheckoutBtn && payload.checkout_url) proceedCheckoutBtn.href = payload.checkout_url;
+
+        const lines = Array.isArray(payload.shipping_lines) ? payload.shipping_lines : [];
+        const firstLine = lines.length ? lines[0] : null;
+        const methodLabel = firstLine && firstLine.label ? String(firstLine.label) : '';
+        const methodCost = firstLine && firstLine.cost_html ? firstLine.cost_html : (payload.shipping_total_html || '');
+
+        if (shipmentBlock) {
+            const hasShippingInfo = Boolean(methodLabel || methodCost || payload.shipping_destination);
+            shipmentBlock.hidden = !hasShippingInfo;
+        }
+
+        if (shipmentMethod) {
+            if (methodLabel && methodCost) {
+                shipmentMethod.innerHTML = `${escapeHtml(methodLabel)}: ${methodCost}`;
+            } else if (methodLabel) {
+                shipmentMethod.textContent = methodLabel;
+            } else if (methodCost) {
+                shipmentMethod.innerHTML = methodCost;
+            } else {
+                shipmentMethod.textContent = texts.shippingUnavailable;
+            }
+        }
+
+        if (shippingDestination) {
+            const destination = payload.shipping_destination ? String(payload.shipping_destination) : '';
+            shippingDestination.textContent = destination ? `${texts.shippingTo} ${destination}.` : '';
+        }
+
+        if (changeAddressLink && payload.change_address_url) {
+            changeAddressLink.href = String(payload.change_address_url);
+        }
     };
 
     const renderCart = (payload) => {
