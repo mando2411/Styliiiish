@@ -961,8 +961,10 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return trim(mb_strtolower(str_replace(['_', '-'], ' ', $value)));
     };
 
-    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel): string {
-        return $fallbackLabel;
+    $translateWooAttributeLabel = function (string $taxonomy, string $fallbackLabel) use ($currentLocale, $wooAttributeLabelTranslations, $normalizeWooTaxonomyKey): string {
+        $localeMap = $wooAttributeLabelTranslations[$currentLocale] ?? [];
+        $taxonomyKey = $normalizeWooTaxonomyKey($taxonomy);
+        return (string) ($localeMap[$taxonomyKey] ?? $fallbackLabel);
     };
 
     $translateWooAttributeValue = function (string $taxonomy, string $slug, string $fallbackValue): string {
