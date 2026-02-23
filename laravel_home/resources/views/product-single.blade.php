@@ -325,6 +325,68 @@
     $buildMarker = 'PRODUCT_SINGLE_BUILD_2026-02-23_01';
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+
+    $seoProductName = trim((string) ($product->post_title ?? ($isEnglish ? 'Product' : 'المنتج')));
+    $seoTitle = $seoProductName !== '' ? ($seoProductName . ' | Styliiiish') : 'Styliiiish';
+
+    $seoDescriptionSource = trim((string) ($product->post_excerpt ?: $product->post_content ?: $seoProductName));
+    $seoDescriptionSource = html_entity_decode(strip_tags($seoDescriptionSource), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $seoDescriptionSource = preg_replace('/\s+/u', ' ', $seoDescriptionSource);
+    $seoDescriptionSource = trim((string) $seoDescriptionSource);
+    if ($seoDescriptionSource === '') {
+        $seoDescriptionSource = $isEnglish
+            ? 'Discover this elegant dress on Styliiiish with premium quality and fast shipping in Egypt.'
+            : 'اكتشفي هذا الفستان الأنيق على Styliiiish بجودة عالية وتوصيل سريع داخل مصر.';
+    }
+    $seoDescription = mb_strlen($seoDescriptionSource) > 165
+        ? rtrim(mb_substr($seoDescriptionSource, 0, 162)) . '…'
+        : $seoDescriptionSource;
+
+    $seoUrl = $wpBaseUrl . $canonicalPath;
+    $seoImage = trim((string) ($mainImage ?: $image ?: $placeholderImage));
+    if (!str_starts_with($seoImage, 'http://') && !str_starts_with($seoImage, 'https://')) {
+        $seoImage = rtrim($wpBaseUrl, '/') . '/' . ltrim($seoImage, '/');
+    }
+
+    $seoKeywords = collect([$seoProductName, $material, $color, $condition])
+        ->merge($productCategoryNames)
+        ->map(fn ($value) => trim((string) $value))
+        ->filter(fn ($value) => $value !== '')
+        ->unique()
+        ->values()
+        ->implode(', ');
+
+    $hasAnyInStockVariation = collect($variationRules)
+        ->contains(fn ($rule) => strtolower((string) ($rule['stock_status'] ?? '')) === 'instock');
+    $productStockStatus = strtolower(trim((string) ($product->stock_status ?? '')));
+    $isInStock = !empty($hasVariations)
+        ? $hasAnyInStockVariation
+        : ($productStockStatus === '' || $productStockStatus === 'instock');
+
+    $schemaProduct = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Product',
+        'name' => $seoProductName,
+        'description' => $seoDescription,
+        'image' => [$seoImage],
+        'sku' => (string) ((int) ($product->ID ?? 0)),
+        'url' => $seoUrl,
+        'brand' => [
+            '@type' => 'Brand',
+            'name' => 'Styliiiish',
+        ],
+        'offers' => [
+            '@type' => 'Offer',
+            'url' => $seoUrl,
+            'priceCurrency' => 'EGP',
+            'price' => $price > 0 ? number_format($price, 2, '.', '') : '0.00',
+            'availability' => $isInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'itemCondition' => 'https://schema.org/NewCondition',
+        ],
+    ];
+
+    $seoLocale = $isEnglish ? 'en_US' : 'ar_EG';
+    $seoAlternateLocale = $isEnglish ? 'ar_EG' : 'en_US';
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -334,12 +396,40 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="description" content="{{ strip_tags((string) ($product->post_excerpt ?: $product->post_title)) }}">
-    <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
+    <title>{{ $seoTitle }}</title>
+    <meta name="description" content="{{ $seoDescription }}">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    @if($seoKeywords !== '')
+        <meta name="keywords" content="{{ $seoKeywords }}">
+    @endif
+    <meta name="author" content="Styliiiish">
+    <meta name="theme-color" content="#17273B">
+
+    <link rel="canonical" href="{{ $seoUrl }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
-    <title>{{ $t('page_title') }}</title>
+
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:locale" content="{{ $seoLocale }}">
+    <meta property="og:locale:alternate" content="{{ $seoAlternateLocale }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:url" content="{{ $seoUrl }}">
+    <meta property="og:image" content="{{ $seoImage }}">
+    <meta property="og:image:alt" content="{{ $seoProductName }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $seoImage }}">
+
+    <link rel="icon" type="image/png" href="{{ $wpIcon }}">
+    <link rel="shortcut icon" href="{{ $wpIcon }}">
+    <link rel="apple-touch-icon" href="{{ $wpIcon }}">
+
+    <script type="application/ld+json">{!! json_encode($schemaProduct, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;
