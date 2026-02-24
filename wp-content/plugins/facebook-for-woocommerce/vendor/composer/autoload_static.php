@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
+class ComposerStaticInit11ca85ea0e870d096a6e757d9e6583a6
 {
     public static $prefixLengthsPsr4 = array (
         'W' =>
@@ -14,7 +14,6 @@ class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
         ),
         'F' =>
         array (
-            'Firebase\\JWT\\' => 13,
             'FacebookAds\\' => 12,
         ),
         'C' =>
@@ -40,10 +39,6 @@ class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
         'WooCommerce\\Facebook\\' =>
         array (
             0 => __DIR__ . '/../..' . '/includes',
-        ),
-        'Firebase\\JWT\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
         'FacebookAds\\' =>
         array (
@@ -182,14 +177,6 @@ class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
         'Composer\\Installers\\ZikulaInstaller' => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers/ZikulaInstaller.php',
         'FacebookAds\\ETLDPlus1Resolver' => __DIR__ . '/..' . '/facebook/capi-param-builder-php/php/capi-param-builder/src/ETLDPlus1Resolver.php',
         'FacebookAds\\ParamBuilder' => __DIR__ . '/..' . '/facebook/capi-param-builder-php/php/capi-param-builder/src/ParamBuilder.php',
-        'Firebase\\JWT\\BeforeValidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/BeforeValidException.php',
-        'Firebase\\JWT\\CachedKeySet' => __DIR__ . '/..' . '/firebase/php-jwt/src/CachedKeySet.php',
-        'Firebase\\JWT\\ExpiredException' => __DIR__ . '/..' . '/firebase/php-jwt/src/ExpiredException.php',
-        'Firebase\\JWT\\JWK' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWK.php',
-        'Firebase\\JWT\\JWT' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWT.php',
-        'Firebase\\JWT\\JWTExceptionWithPayloadInterface' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php',
-        'Firebase\\JWT\\Key' => __DIR__ . '/..' . '/firebase/php-jwt/src/Key.php',
-        'Firebase\\JWT\\SignatureInvalidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/SignatureInvalidException.php',
         'WooCommerce\\Facebook\\AJAX' => __DIR__ . '/../..' . '/includes/AJAX.php',
         'WooCommerce\\Facebook\\API' => __DIR__ . '/../..' . '/includes/API.php',
         'WooCommerce\\Facebook\\API\\Catalog\\Request' => __DIR__ . '/../..' . '/includes/API/Catalog/Request.php',
@@ -305,6 +292,9 @@ class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
         'WooCommerce\\Facebook\\Events\\Normalizer' => __DIR__ . '/../..' . '/includes/Events/Normalizer.php',
         'WooCommerce\\Facebook\\ExternalVersionUpdate\\Update' => __DIR__ . '/../..' . '/includes/ExternalVersionUpdate/Update.php',
         'WooCommerce\\Facebook\\FBSignedData\\FBPublicKey' => __DIR__ . '/../..' . '/includes/FBSignedData/FBPublicKey.php',
+        'WooCommerce\\Facebook\\FBSignedData\\JWTCodec' => __DIR__ . '/../..' . '/includes/FBSignedData/JWTCodec.php',
+        'WooCommerce\\Facebook\\FBSignedData\\JWTExpiredException' => __DIR__ . '/../..' . '/includes/FBSignedData/JWTExpiredException.php',
+        'WooCommerce\\Facebook\\FBSignedData\\JWTSignatureInvalidException' => __DIR__ . '/../..' . '/includes/FBSignedData/JWTSignatureInvalidException.php',
         'WooCommerce\\Facebook\\FBSignedData\\PublicKeyStorageHelper' => __DIR__ . '/../..' . '/includes/FBSignedData/PublicKeyStorageHelper.php',
         'WooCommerce\\Facebook\\Feed\\AbstractFeed' => __DIR__ . '/../..' . '/includes/Feed/AbstractFeed.php',
         'WooCommerce\\Facebook\\Feed\\AbstractFeedFileWriter' => __DIR__ . '/../..' . '/includes/Feed/AbstractFeedFileWriter.php',
@@ -407,9 +397,9 @@ class ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitf00dd971333271f8ef332cbdc2063d5f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit11ca85ea0e870d096a6e757d9e6583a6::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit11ca85ea0e870d096a6e757d9e6583a6::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit11ca85ea0e870d096a6e757d9e6583a6::$classMap;
 
         }, null, ClassLoader::class);
     }

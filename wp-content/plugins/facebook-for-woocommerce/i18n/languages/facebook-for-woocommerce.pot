@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Facebook for WooCommerce plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: Facebook for WooCommerce 3.5.16\n"
+"Project-Id-Version: Facebook for WooCommerce 3.5.17\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/facebook-for-woocommerce\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-04T08:50:09+00:00\n"
+"POT-Creation-Date: 2026-02-19T17:01:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: facebook-for-woocommerce\n"
@@ -1291,42 +1291,42 @@ msgid ""
 msgstr ""
 
 #. translators: Placeholders: %s - user-friendly error message
-#: includes/Framework/Utilities/BackgroundJobHandler.php:625
-#: includes/Products/Sync/Background.php:59
+#: includes/Framework/Utilities/BackgroundJobHandler.php:698
+#: includes/Products/Sync/Background.php:60
 #, php-format
 msgid "Job data key \"%s\" not set"
 msgstr ""
 
 #. translators: Placeholders: %s - user-friendly error message
-#: includes/Framework/Utilities/BackgroundJobHandler.php:630
-#: includes/Products/Sync/Background.php:64
+#: includes/Framework/Utilities/BackgroundJobHandler.php:703
+#: includes/Products/Sync/Background.php:65
 #, php-format
 msgid "Job data key \"%s\" is not an array"
 msgstr ""
 
 #. translators: %d - interval in minutes.
-#: includes/Framework/Utilities/BackgroundJobHandler.php:840
+#: includes/Framework/Utilities/BackgroundJobHandler.php:934
 #, php-format
 msgid "Every %d Minutes"
 msgstr ""
 
-#: includes/Framework/Utilities/BackgroundJobHandler.php:988
+#: includes/Framework/Utilities/BackgroundJobHandler.php:1082
 msgid "Background Processing Test"
 msgstr ""
 
-#: includes/Framework/Utilities/BackgroundJobHandler.php:989
+#: includes/Framework/Utilities/BackgroundJobHandler.php:1083
 msgid "Run Test"
 msgstr ""
 
-#: includes/Framework/Utilities/BackgroundJobHandler.php:990
+#: includes/Framework/Utilities/BackgroundJobHandler.php:1084
 msgid "This tool will test whether your server is capable of processing background jobs."
 msgstr ""
 
-#: includes/Framework/Utilities/BackgroundJobHandler.php:1007
+#: includes/Framework/Utilities/BackgroundJobHandler.php:1101
 msgid "Success! You should be able to process background jobs."
 msgstr ""
 
-#: includes/Framework/Utilities/BackgroundJobHandler.php:1010
+#: includes/Framework/Utilities/BackgroundJobHandler.php:1104
 msgid "Could not connect. Please ask your hosting company to ensure your server has loopback connections enabled."
 msgstr ""
 
@@ -1358,38 +1358,38 @@ msgstr ""
 msgid "You do not have permission to finish App Store login."
 msgstr ""
 
-#: includes/Handlers/WhatsAppExtension.php:57
+#: includes/Handlers/WhatsAppExtension.php:58
 msgid "WhatsApp Utility Messages Iframe Splash Url Fetched."
 msgstr ""
 
-#: includes/Handlers/WhatsAppExtension.php:87
+#: includes/Handlers/WhatsAppExtension.php:88
 msgid "WhatsApp Utility Messages Iframe Management Url failed to fetch due to failed WhatsApp connection"
 msgstr ""
 
 #. translators: %s $wa_installation_id %s $error_message
-#: includes/Handlers/WhatsAppExtension.php:118
+#: includes/Handlers/WhatsAppExtension.php:119
 #, php-format
 msgid "Failed to fetch iframe Management URI. wa_installation_id: %1$s, error message: %2$s"
 msgstr ""
 
-#: includes/Handlers/WhatsAppExtension.php:127
+#: includes/Handlers/WhatsAppExtension.php:128
 msgid "WhatsApp Utility Messages Iframe Management Url successfully fetched"
 msgstr ""
 
 #. translators: %s $order_id
-#: includes/Handlers/WhatsAppExtension.php:167
+#: includes/Handlers/WhatsAppExtension.php:172
 #, php-format
 msgid "Customer Events Post API call for Order id %1$s Failed due to failed connection "
 msgstr ""
 
 #. translators: %s $order_id %s $error_message
-#: includes/Handlers/WhatsAppExtension.php:217
+#: includes/Handlers/WhatsAppExtension.php:233
 #, php-format
 msgid "Customer Events Post API call for Order id %1$s Failed %2$s "
 msgstr ""
 
 #. translators: %s $order_id
-#: includes/Handlers/WhatsAppExtension.php:226
+#: includes/Handlers/WhatsAppExtension.php:242
 #, php-format
 msgid "Customer Events Post API call for Order id %1$s Succeeded."
 msgstr ""
@@ -1406,7 +1406,7 @@ msgid "Language Feed not supported for override value: %s"
 msgstr ""
 
 #. translators: Placeholders: %1$s - <string  job ID, %2$s - <strong> error message
-#: includes/Products/Sync/Background.php:139
+#: includes/Products/Sync/Background.php:140
 #, php-format
 msgid "There was an error trying sync products using the Catalog Batch API for job %1$s: %2$s"
 msgstr ""
@@ -1491,15 +1491,15 @@ msgstr ""
 msgid "This tool will reset Facebook settings for all products on your WooCommerce store."
 msgstr ""
 
-#: includes/Utilities/DebugTools.php:73
+#: includes/Utilities/DebugTools.php:79
 msgid "Background sync jobs have been deleted."
 msgstr ""
 
-#: includes/Utilities/DebugTools.php:87
+#: includes/Utilities/DebugTools.php:93
 msgid "Cleared all Facebook settings!"
 msgstr ""
 
-#: includes/Utilities/DebugTools.php:99
+#: includes/Utilities/DebugTools.php:105
 msgid "Reset products Facebook settings job started!"
 msgstr ""
 
