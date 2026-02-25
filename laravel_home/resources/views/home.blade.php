@@ -229,6 +229,8 @@
     $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
+    $reviewsPrevArrow = $isEnglish ? '‹' : '›';
+    $reviewsNextArrow = $isEnglish ? '›' : '‹';
 
     $normalizeBrandText = fn (string $value) => $currentLocale === 'en'
         ? (preg_replace('/ستايلش/iu', 'Styliiiish', $value) ?? $value)
@@ -2100,8 +2102,8 @@
             </div>
 
             <div class="reviews-slider-wrap">
-                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="{{ $t('prev') }}">‹</button>
-                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="{{ $t('next') }}">›</button>
+                <button type="button" class="reviews-nav prev" id="reviewsPrev" aria-label="{{ $t('prev') }}">{{ $reviewsPrevArrow }}</button>
+                <button type="button" class="reviews-nav next" id="reviewsNext" aria-label="{{ $t('next') }}">{{ $reviewsNextArrow }}</button>
 
                 <div class="reviews-slider" id="reviewsSlider">
                 @php
