@@ -806,11 +806,22 @@ if (!function_exists('shopire_styliiiish_rewrite_broken_checkout_domains')) {
 		}
 
 		$siteBase = rtrim((string) home_url('/'), '/');
-		return str_replace(
+		$html = str_replace(
 			['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
 			$siteBase,
 			$html
 		);
+
+		$checkoutBannerMap = [
+			'"banner-img-1.webp"' => '"' . $siteBase . '/wp-content/uploads/2025/12/banner-img-1.webp"',
+			'"banner-img-2.webp"' => '"' . $siteBase . '/wp-content/uploads/2025/12/banner-img-2.webp"',
+			'"banner-img-3.webp"' => '"' . $siteBase . '/wp-content/uploads/2025/12/banner-img-3.webp"',
+			"'banner-img-1.webp'" => "'" . $siteBase . "/wp-content/uploads/2025/12/banner-img-1.webp'",
+			"'banner-img-2.webp'" => "'" . $siteBase . "/wp-content/uploads/2025/12/banner-img-2.webp'",
+			"'banner-img-3.webp'" => "'" . $siteBase . "/wp-content/uploads/2025/12/banner-img-3.webp'",
+		];
+
+		return str_replace(array_keys($checkoutBannerMap), array_values($checkoutBannerMap), $html);
 	}
 }
 
@@ -827,11 +838,17 @@ add_action('template_redirect', 'shopire_styliiiish_checkout_output_buffer', 0);
 
 if (!function_exists('shopire_styliiiish_checkout_permissions_policy')) {
 	function shopire_styliiiish_checkout_permissions_policy() {
-		if (is_admin() || !function_exists('is_checkout') || !is_checkout()) {
+		if (is_admin()) {
 			return;
 		}
 
-		header('Permissions-Policy: payment=(self "https://pay.google.com")', true);
+		$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+		$is_checkout_path = strpos($request_uri, '/checkout') !== false || strpos($request_uri, '/الدفع') !== false;
+		if ((!function_exists('is_checkout') || !is_checkout()) && !$is_checkout_path) {
+			return;
+		}
+
+		header('Permissions-Policy: payment=(self "https://pay.google.com" "https://accept.paymob.com")', true);
 	}
 }
 add_action('send_headers', 'shopire_styliiiish_checkout_permissions_policy', 20);

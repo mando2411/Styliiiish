@@ -109,9 +109,28 @@ $wordpress_exact_routes = [
     '/ara/الدفع/',
 ];
 
+$wordpress_prefix_routes = [
+    '/ar/wp-json/',
+    '/en/wp-json/',
+    '/ara/wp-json/',
+];
+
+$send_to_laravel = null;
+
 if (in_array($request_uri, $wordpress_exact_routes, true) || in_array($path, $wordpress_exact_routes, true)) {
     $send_to_laravel = false;
-} else {
+}
+
+if ($send_to_laravel === null) {
+    foreach ($wordpress_prefix_routes as $wp_prefix) {
+        if (strpos($request_uri, $wp_prefix) === 0) {
+            $send_to_laravel = false;
+            break;
+        }
+    }
+}
+
+if ($send_to_laravel === null) {
     $send_to_laravel = in_array($path, $laravel_exact_routes, true);
 
     if (!$send_to_laravel) {
