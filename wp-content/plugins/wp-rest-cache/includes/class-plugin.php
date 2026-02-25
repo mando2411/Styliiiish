@@ -55,7 +55,7 @@ class Plugin {
 	 */
 	public function __construct() {
 		$this->plugin_name = 'wp-rest-cache';
-		$this->version     = '2026.1.1';
+		$this->version     = '2026.1.2';
 
 		$this->define_admin_hooks();
 		$this->define_api_hooks();
@@ -163,6 +163,7 @@ class Plugin {
 		add_action( 'edited_term', [ $caching, 'edited_term' ], 999, 3 );
 		add_action( 'delete_term', [ $caching, 'delete_term' ], 10, 3 );
 		add_action( 'updated_term_meta', [ $caching, 'updated_term_meta' ], 10, 4 );
+		add_action( 'set_object_terms', [ $caching, 'set_object_terms' ], 10, 6 );
 
 		add_action( 'profile_update', [ $caching, 'profile_update' ], 999 );
 		add_action( 'user_register', [ $caching, 'user_register' ], 999 );
