@@ -326,6 +326,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
 
     $reviewFiles = collect(array_merge(
         glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
+        glob(public_path('google-reviews/*/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
         glob(base_path('Google Reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: []
     ))
         ->filter(fn ($path) => is_file($path))
@@ -333,9 +334,19 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         ->sortBy(fn ($path) => basename($path), SORT_NATURAL | SORT_FLAG_CASE)
         ->values();
 
+    $publicRoot = realpath(public_path());
+
     $reviewImages = $reviewFiles
-        ->map(function ($path) {
+        ->map(function ($path) use ($publicRoot) {
             $version = @filemtime($path) ?: time();
+
+            $realPath = realpath($path);
+            if ($publicRoot !== false && $realPath !== false && strpos($realPath, $publicRoot) === 0) {
+                $relative = ltrim(str_replace('\\', '/', substr($realPath, strlen($publicRoot))), '/');
+                $encodedRelative = implode('/', array_map('rawurlencode', explode('/', $relative)));
+                return '/' . $encodedRelative . '?v=' . $version;
+            }
+
             return '/google-reviews/' . rawurlencode(basename($path)) . '?v=' . $version;
         })
         ->values();
