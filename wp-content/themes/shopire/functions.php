@@ -876,8 +876,7 @@ if (!function_exists('shopire_styliiiish_checkout_permissions_policy')) {
 			return;
 		}
 
-		header('Permissions-Policy: payment=(self "https://pay.google.com" "https://accept.paymob.com")', true);
-		header('Feature-Policy: payment "self" https://pay.google.com https://accept.paymob.com', true);
+		header('Permissions-Policy: payment=*', true);
 	}
 }
 add_action('send_headers', 'shopire_styliiiish_checkout_permissions_policy', 20);
