@@ -413,6 +413,35 @@ require SHOPIRE_THEME_INC_DIR . '/customizer/controls/code/control-function/styl
 require SHOPIRE_THEME_INC_DIR . '/admin/getting-started.php';
 
 add_action('template_redirect', function () {
+	if (is_admin() || wp_doing_ajax()) {
+		return;
+	}
+
+	$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+	$path = trim((string) parse_url($request_uri, PHP_URL_PATH), '/');
+	$decoded_path = trim(urldecode($path), '/');
+
+	if ($decoded_path === '') {
+		return;
+	}
+
+	$aliases = [
+		'ar/الدفع' => '/ar/checkout/',
+		'الدفع' => '/ar/checkout/',
+		'en/payment' => '/en/checkout/',
+		'payment' => '/en/checkout/',
+	];
+
+	$target_path = $aliases[$decoded_path] ?? null;
+	if (!$target_path) {
+		return;
+	}
+
+	wp_safe_redirect(home_url($target_path), 301);
+	exit;
+}, 0);
+
+add_action('template_redirect', function () {
 	if (is_admin() || wp_doing_ajax() || !is_singular('product')) {
 		return;
 	}
