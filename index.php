@@ -7,6 +7,44 @@ $request_uri = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? 
 $path = rtrim($request_uri, '/');
 $path = $path === '' ? '/' : $path;
 
+// Fix localized static asset URLs like /ar/wp-content/... -> /wp-content/...
+if (preg_match('#^/(ar|en|ara)/wp-content/(.+)$#u', $request_uri, $matches)) {
+    $normalized_asset_path = '/wp-content/' . $matches[2];
+    $normalized_asset_file = realpath(__DIR__ . $normalized_asset_path);
+
+    if ($normalized_asset_file !== false && strpos($normalized_asset_file, realpath(__DIR__ . '/wp-content')) === 0 && is_file($normalized_asset_file)) {
+        $ext = strtolower(pathinfo($normalized_asset_file, PATHINFO_EXTENSION));
+        $mime_types = [
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'svg' => 'image/svg+xml',
+            'ico' => 'image/x-icon',
+            'webp' => 'image/webp',
+            'css' => 'text/css; charset=UTF-8',
+            'js' => 'application/javascript; charset=UTF-8',
+            'json' => 'application/json; charset=UTF-8',
+            'txt' => 'text/plain; charset=UTF-8',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'map' => 'application/json; charset=UTF-8',
+        ];
+
+        if (isset($mime_types[$ext])) {
+            header('Content-Type: ' . $mime_types[$ext]);
+        }
+
+        header('Cache-Control: public, max-age=604800');
+        readfile($normalized_asset_file);
+        exit;
+    }
+
+    header('Location: ' . $normalized_asset_path, true, 302);
+    exit;
+}
+
 // Exact routes handled by Laravel
 $laravel_exact_routes = [
     '/',
