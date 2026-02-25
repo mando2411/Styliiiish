@@ -233,23 +233,7 @@
     </style>
 </head>
 <body>
-<header class="main-header">
-    <div class="container main-header-inner">
-        <a class="brand" href="{{ $localePrefix }}"><img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';"><span class="brand-tag">{{ $t('brand_tag') }}</span></a>
-        <nav class="main-nav" aria-label="Main Navigation">
-            <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
-            <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-            <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-            <a href="{{ $localePrefix }}/about-us">{{ $t('nav_about') }}</a>
-            <a class="active" href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
-            <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-            <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
-        </nav>
-        <div class="header-tools">
-            <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}"><span class="lang-indicator" aria-hidden="true"></span><a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/marketplace">AR</a><a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/marketplace">EN</a></div>
-        </div>
-    </div>
-</header>
+@include('partials.site-header')
 
 <section class="hero">
     <div class="container hero-box">

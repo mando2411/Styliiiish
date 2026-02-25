@@ -1870,55 +1870,7 @@
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="container topbar-inner">
-            <div class="topbar-right">
-                <strong>{{ $t('contact_anytime') }}</strong>
-                <a href="tel:+201050874255">+20 010 5087 4255</a>
-            </div>
-            <div class="topbar-left">
-                <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
-                    <span class="lang-indicator" aria-hidden="true"></span>
-                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar">AR</a>
-                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en">EN</a>
-                </div>
-                <span class="topbar-note">{{ $t('daily_deals') }}</span>
-                <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">{{ $t('facebook') }}</a>
-                <a href="https://www.instagram.com/styliiish.egypt/" target="_blank" rel="noopener">{{ $t('instagram') }}</a>
-                <a href="https://g.page/styliish" target="_blank" rel="noopener">{{ $t('google') }}</a>
-            </div>
-        </div>
-    </div>
-
-    <header class="main-header">
-        <div class="container main-header-inner">
-            <a class="brand" href="{{ $localePrefix }}">
-                <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <span class="brand-tag">{{ $t('brand_tag') }}</span>
-            </a>
-
-            <nav class="main-nav" aria-label="Main Navigation">
-                <a class="active" href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
-                <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-                <a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a>
-                <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
-                <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-                <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-                <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
-            </nav>
-
-            <div class="header-actions">
-                <form class="search-form" action="https://styliiiish.com/" method="get" target="_blank">
-                    <input class="search-input" type="search" name="s" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
-                    <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
-                </form>
-                <a class="icon-btn action-account" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
-                <a class="icon-btn action-wishlist" href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}"><span class="icon" aria-hidden="true">❤</span></a>
-                <a class="icon-btn action-cart" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" aria-label="{{ $t('cart') }}" title="{{ $t('cart') }}"><span class="icon" aria-hidden="true">🛒</span></a>
-                <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
-            </div>
-        </div>
-    </header>
+    @include('partials.site-header')
 
     <div class="promo">{{ $t('promo_line') }}</div>
 
