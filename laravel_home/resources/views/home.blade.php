@@ -2298,6 +2298,5 @@
         </div>
     </footer>
 
-    <div class="footer-note">{{ $t('footer_note') }}</div>
 </body>
 </html>

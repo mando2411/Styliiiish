@@ -390,6 +390,8 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
 
     });
 
+            $products = collect($products)->shuffle()->values();
+
     $stats = Cache::remember('home_stats', 300, function () {
         $base = DB::table('wp_posts')
             ->where('post_type', 'product')
