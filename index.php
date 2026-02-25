@@ -101,13 +101,25 @@ $laravel_prefix_routes = [
     '/storage/',
 ];
 
-$send_to_laravel = in_array($path, $laravel_exact_routes, true);
+// Routes that must stay on WordPress (e.g. translated plugin endpoints)
+$wordpress_exact_routes = [
+    '/ar/الدفع',
+    '/ar/الدفع/',
+    '/ara/الدفع',
+    '/ara/الدفع/',
+];
 
-if (!$send_to_laravel) {
-    foreach ($laravel_prefix_routes as $prefix) {
-        if (strpos($request_uri, $prefix) === 0) {
-            $send_to_laravel = true;
-            break;
+if (in_array($request_uri, $wordpress_exact_routes, true) || in_array($path, $wordpress_exact_routes, true)) {
+    $send_to_laravel = false;
+} else {
+    $send_to_laravel = in_array($path, $laravel_exact_routes, true);
+
+    if (!$send_to_laravel) {
+        foreach ($laravel_prefix_routes as $prefix) {
+            if (strpos($request_uri, $prefix) === 0) {
+                $send_to_laravel = true;
+                break;
+            }
         }
     }
 }
