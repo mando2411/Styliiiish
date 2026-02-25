@@ -3,7 +3,7 @@ Contributors: sujaypawar, wpcrafter
 Tags: woocommerce, cart abandonment, cart recovery
 Requires at least: 5.4
 Tested up to: 6.9
-Stable tag: 2.0.7
+Stable tag: 2.1.0
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -163,6 +163,10 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 4. General settings for Email, Webhook (Coupon Code), GDPR
 
 == Changelog ==
+
+= Version 2.1.0 - Tuesday, 24th February 2026 =
+- Security Fix: Hardened the security of the plugin suggested by PatchStack.
+- Improvement: Enhanced TinyMCE configuration for better compatibility with email templates and an improved editor UI.
 
 = Version 2.0.7 - Monday, 2nd February 2026 =
 - Fix: Resolved an issue where some address fields were not captured for abandoned carts in block-based checkout.

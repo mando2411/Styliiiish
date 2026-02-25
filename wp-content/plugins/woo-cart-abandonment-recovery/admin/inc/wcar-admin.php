@@ -269,7 +269,7 @@ class Wcar_Admin {
 			$settings[ $option_key ] = get_option( $option_key, $default_value );
 		}
 
-		$settings['cf_analytics_optin'] = wcf_ca()->utils->wcar_get_option( 'cf_analytics_optin' );
+		$settings['wcar_usage_optin'] = wcf_ca()->utils->wcar_get_option( 'wcar_usage_optin' );
 
 		/**
 		 * Filter cart abandonment settings
@@ -357,6 +357,15 @@ class Wcar_Admin {
 				'path'   => 'suretriggers/suretriggers.php',
 				'logo'   => esc_url( $base_url . 'ottokit.svg' ),
 			],
+			[
+				'title'   => __( 'Power Coupons', 'woo-cart-abandonment-recovery' ),
+				'desc'    => __( 'Power Coupons helps shop owners create smart discounts and auto-apply coupons to reduce friction and boost conversions.', 'woo-cart-abandonment-recovery' ),
+				'status'  => $this->get_plugin_status( 'power-coupons/power-coupons.php' ),
+				'slug'    => 'power-coupons',
+				'path'    => 'power-coupons/power-coupons.php',
+				'logo'    => esc_url( $base_url . 'power-coupons.svg' ),
+				'feature' => 'NEW',
+			],
 		];
 	}
 
@@ -389,12 +398,13 @@ class Wcar_Admin {
 				'user_detail_firstname' => wp_get_current_user()->first_name,
 				'user_detail_lastname'  => wp_get_current_user()->last_name,
 				'user_detail_email'     => wp_get_current_user()->user_email,
-				'cf_analytics_optin'    => false,
+				'wcar_usage_optin'      => false,
 			],
 			'plugins'      => [
-				'cartflows'    => true,
-				'modern-cart'  => true,
-				'suretriggers' => true,
+				'cartflows'     => true,
+				'modern-cart'   => true,
+				'suretriggers'  => true,
+				'power-coupons' => true,
 			],
 		];
 	}
@@ -442,13 +452,13 @@ class Wcar_Admin {
 		}
 		
 		// Convert analytics optin value to 'yes' if it's truthy, otherwise keep as is.
-		$analytics_optin_value = $onboarding_data['userDetails']['cf_analytics_optin'];
+		$analytics_optin_value = $onboarding_data['userDetails']['wcar_usage_optin'];
 		
 		if ( true === $analytics_optin_value ) {
 			$analytics_optin_value = 'yes';
 		}
 		
-		wcf_ca()->helper->save_meta_fields( 'cf_analytics_optin', $analytics_optin_value );
+		wcf_ca()->helper->save_meta_fields( 'wcar_usage_optin', $analytics_optin_value );
 
 		$installable_plugin_slugs = [];
 		if ( ! empty( $plugin_slugs ) && is_array( $plugin_slugs ) ) {

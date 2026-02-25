@@ -293,6 +293,10 @@ class Cartflows_Ca_Default_Meta {
 				'default'  => 'off',
 				'sanitize' => 'FILTER_SANITIZE_STRING',
 			],
+			'wcar_usage_optin'                            => [
+				'default'  => 'off',
+				'sanitize' => 'FILTER_SANITIZE_STRING',
+			],
 			// TODO: Remove this after new UI is enabled by default.
 			'cartflows_ca_use_new_ui'                     => [
 				'default'  => false,
@@ -593,6 +597,22 @@ class Cartflows_Ca_Default_Meta {
 		}
 
 		return __( 'Admin', 'woo-cart-abandonment-recovery' );
+	}
+
+	/**
+	 * Checks if plugin option exists
+	 *
+	 * @param string $setting_key Setting key to check.
+	 * @return bool
+	 * @since 2.0.8
+	 */
+	public function plugin_option_exist( $setting_key ) {
+		$plugin_options = $this->get_plugin_options();
+
+		if ( isset( $plugin_options[ $setting_key ] ) ) {
+			return true;
+		}
+		return false;
 	}
 }
 

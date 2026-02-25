@@ -343,6 +343,12 @@ class Cartflows_Ca_Helper {
 	 * @since 1.3.3
 	 */
 	public function save_meta_fields( $option_key, $value, $network = false ) {
+
+		// Check if option is part of the plugin.
+		if ( ! wcf_ca()->options->plugin_option_exist( $option_key ) ) {
+			return false;
+		}
+
 		// Sanitize the value using universal sanitization.
 		$sanitized_value = wcf_ca()->options->sanitize_setting_value( $option_key, $value );
 

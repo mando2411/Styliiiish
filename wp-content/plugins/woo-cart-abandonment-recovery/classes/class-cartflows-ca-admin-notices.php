@@ -241,7 +241,7 @@ class Cartflows_Ca_Admin_Notices {
 				'show_if'              => true,
 				/* translators: %1$s white label plugin name and %2$s deactivation link */
 				'message'              => sprintf(
-					'<div class="notice-image" style="display: flex;">
+					'<div class="notice-image">
                         <img src="%1$s" class="custom-logo" alt="Cart Abandonment Recovery for WooCommerce Icon" itemprop="logo"></div>
                         <div class="notice-content">
                             <div class="notice-heading" style="font-weight: 700;">

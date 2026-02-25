@@ -85,8 +85,8 @@ class Ajax_Setting extends Ajax_Base {
 			wp_send_json_error( $response_data );
 		}
 
-		// Add special case for cf_analytics_optin.
-		if ( 'cf_analytics_optin' === $option && 'on' === $value ) {
+		// Add special case for wcar_usage_optin.
+		if ( 'wcar_usage_optin' === $option && 'on' === $value ) {
 			$value = 'yes'; // We have to change the value of Analytics toggle to Yes or blank as per the library requirement.
 		}
 

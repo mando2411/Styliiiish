@@ -320,6 +320,7 @@ const RenderFields = ( {
 					name={ data.name }
 					value={ value }
 					options={ data?.options || [] }
+					search={ data?.search || false }
 					countLimit={ data?.count_limit || null }
 					{ ...( handleChange && { handleChange } ) }
 					{ ...( errors &&

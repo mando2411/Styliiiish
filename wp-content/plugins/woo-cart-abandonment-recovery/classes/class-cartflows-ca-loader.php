@@ -95,8 +95,8 @@ if ( ! class_exists( 'CARTFLOWS_CA_Loader' ) ) {
 			define( 'CARTFLOWS_CA_BASE', plugin_basename( CARTFLOWS_CA_FILE ) );
 			define( 'CARTFLOWS_CA_DIR', plugin_dir_path( CARTFLOWS_CA_FILE ) );
 			define( 'CARTFLOWS_CA_URL', plugins_url( '/', CARTFLOWS_CA_FILE ) );
-			define( 'CARTFLOWS_CA_VER', '2.0.7' );
-			define( 'CARTFLOWS_CA_REQ_PRO_VER', '1.1.0' );
+			define( 'CARTFLOWS_CA_VER', '2.1.0' );
+			define( 'CARTFLOWS_CA_REQ_PRO_VER', '1.2.0' );
 
 			define( 'CARTFLOWS_CA_SLUG', 'cartflows_ca' );
 
@@ -301,7 +301,7 @@ if ( ! class_exists( 'CARTFLOWS_CA_Loader' ) ) {
 
 			$bsf_analytics->set_entity(
 				[
-					'cf' => [
+					'wcar' => [
 						'hide_optin_checkbox' => true,
 						'product_name'        => 'Woocommerce Cart Abandonment Recovery',
 						'usage_doc_link'      => 'https://my.cartflows.com/usage-tracking/',
