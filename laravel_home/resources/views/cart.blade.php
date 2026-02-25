@@ -222,7 +222,14 @@
     </style>
 </head>
 <body>
-    @include('partials.site-header')
+<div class="topbar"><div class="container">{{ $t('topbar') }}</div></div>
+<header class="header"><div class="container header-inner">
+    <a class="brand" href="{{ $localePrefix }}"><img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';"><span class="brand-sub">{{ $t('slogan') }}</span></a>
+    <nav class="nav" aria-label="Main Navigation">
+        <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a><a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a><a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a>
+    </nav>
+    <div style="display:flex;gap:8px;justify-content:center;"><a class="head-btn" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">👤</a><a class="head-btn" href="{{ $localePrefix }}/wishlist">❤</a><a class="head-btn active" href="{{ $localePrefix }}/cart">🛒</a></div>
+</div></header>
 
 <main class="container">
     <section class="cart-head"><h1>{{ $t('title') }}</h1><p>{{ $t('subtitle') }}</p></section>

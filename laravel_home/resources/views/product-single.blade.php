@@ -1190,7 +1190,48 @@
 </head>
 <body>
     <!-- {{ $buildMarker }} -->
-    @include('partials.site-header')
+    <div class="topbar"><div class="container">{{ $t('topbar') }}</div></div>
+
+    <header class="header">
+        <div class="container header-inner">
+            <a class="brand" href="{{ $localePrefix }}">
+                <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
+                <span class="brand-sub">{{ $t('brand_sub') }}</span>
+            </a>
+
+            <nav class="nav" aria-label="Main Navigation">
+                <a href="{{ $localePrefix }}">{{ $t('home') }}</a>
+                <a class="active" href="{{ $localePrefix }}/shop">{{ $t('shop') }}</a>
+                <a href="{{ $localePrefix }}/marketplace">{{ $t('marketplace') }}</a>
+                <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('sell_dress') }}</a>
+                <a href="{{ $wpBaseUrl }}/blog/" target="_blank" rel="noopener">{{ $t('blog') }}</a>
+            </nav>
+
+            <div style="display:flex; gap:8px; justify-content:center;">
+                <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="{{ $t('account') }}" aria-label="{{ $t('account') }}">👤</a>
+                <span class="wishlist-trigger-wrap">
+                    <button class="head-btn wishlist-trigger" id="wishlistTrigger" type="button" title="{{ $t('wishlist') }}" aria-label="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown">❤
+                        <span class="wishlist-count" id="wishlistCountBadge">0</span>
+                    </button>
+                    <span class="wishlist-plus-one" id="wishlistPlusOne">+1</span>
+                    <div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="{{ $t('wishlist') }}" aria-hidden="true">
+                        <div class="wishlist-dropdown-list" id="wishlistDropdownList">
+                            <p class="wishlist-dropdown-empty" id="wishlistDropdownLoading">{{ $t('wishlist_loading') }}</p>
+                        </div>
+                        <div class="wishlist-dropdown-footer">
+                            <a class="wishlist-dropdown-all" href="{{ $wishlistPageUrl }}" target="_blank" rel="noopener">{{ $t('view_all_wishlist') }}</a>
+                        </div>
+                    </div>
+                </span>
+                <span class="cart-trigger-wrap">
+                    <button class="head-btn cart-trigger" type="button" id="miniCartTrigger" title="{{ $t('cart') }}" aria-label="{{ $t('cart') }}">🛒
+                        <span class="cart-count" id="cartCountBadge">0</span>
+                    </button>
+                    <span class="cart-plus-one" id="cartPlusOne">+1</span>
+                </span>
+            </div>
+        </div>
+    </header>
 
     <main class="container product-wrap">
         <section class="product-grid">
