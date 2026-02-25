@@ -19,9 +19,6 @@ class PaymobOrder {
 		}
 
 		$this->config->amount_cents = round( $this->order->get_total(), $round ) * $cents;
-		//$total = (float) wc_format_decimal( $this->order->get_total(), 2 );
-        //$this->config->amount_cents = intval( round( $total, 2 ) * 100 );
-
 
 		$this->billing = array(
 			'email'        => $this->order->get_billing_email(),
