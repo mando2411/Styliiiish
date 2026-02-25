@@ -141,9 +141,18 @@
 
         .empty { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 24px; }
 
-        .pager { margin: 20px 0 34px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-        .page-link { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: #fff; font-weight: 700; cursor: pointer; }
-        .page-link[disabled] { opacity: .5; cursor: not-allowed; }
+        .load-status {
+            margin: 18px 0 34px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        #lazySentinel {
+            width: 100%;
+            height: 1px;
+        }
 
         .site-footer { margin-top: 10px; background: #0f1a2a; color: #fff; border-top: 4px solid var(--primary); }
         .footer-grid { padding: 32px 0 20px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.1fr; gap: 20px; }
@@ -220,7 +229,7 @@
             </form>
 
             <select class="sort" id="sortSelect" name="sort" aria-label="ترتيب المنتجات">
-                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>الأحدث</option>
+                <option value="random" {{ $sort === 'random' ? 'selected' : '' }}>ترتيب عشوائي</option>
                 <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>السعر: من الأقل للأعلى</option>
                 <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>السعر: من الأعلى للأقل</option>
             </select>
@@ -231,8 +240,8 @@
         <section class="grid" id="productsGrid"></section>
 
         <div class="empty" id="emptyState" style="display:none;">لا توجد منتجات مطابقة الآن. جرّبي البحث بكلمات مختلفة.</div>
-
-        <div class="pager" id="pager"></div>
+        <div class="load-status" id="loadStatus"></div>
+        <div id="lazySentinel" aria-hidden="true"></div>
     </main>
 
     <footer class="site-footer">
@@ -292,9 +301,10 @@
     <script>
         (() => {
             const grid = document.getElementById('productsGrid');
-            const pager = document.getElementById('pager');
             const resultsMeta = document.getElementById('resultsMeta');
             const emptyState = document.getElementById('emptyState');
+            const loadStatus = document.getElementById('loadStatus');
+            const lazySentinel = document.getElementById('lazySentinel');
             const qInput = document.getElementById('qInput');
             const sortSelect = document.getElementById('sortSelect');
             const searchForm = document.getElementById('searchForm');
@@ -302,8 +312,14 @@
             const params = new URLSearchParams(window.location.search);
             const state = {
                 q: params.get('q') ?? qInput.value ?? '',
-                sort: params.get('sort') ?? sortSelect.value ?? 'newest',
-                page: Number(params.get('page') || 1),
+                sort: params.get('sort') ?? sortSelect.value ?? 'random',
+            };
+
+            const renderState = {
+                allProducts: [],
+                renderedCount: 0,
+                chunkSize: 12,
+                observer: null,
             };
 
             qInput.value = state.q;
@@ -315,14 +331,13 @@
             const buildQuery = () => {
                 const query = new URLSearchParams();
                 if (state.q.trim() !== '') query.set('q', state.q.trim());
-                if (state.sort !== 'newest') query.set('sort', state.sort);
-                if (state.page > 1) query.set('page', String(state.page));
+                if (state.sort !== 'random') query.set('sort', state.sort);
                 return query;
             };
 
             const updateUrl = () => {
                 const query = buildQuery().toString();
-                const next = query ? `/shop?${query}` : '/shop';
+                const next = query ? `${localePrefix}/shop?${query}` : `${localePrefix}/shop`;
                 window.history.pushState({}, '', next);
             };
 
@@ -364,28 +379,54 @@
                 `;
             };
 
-            const renderPager = (pagination) => {
-                if (!pagination || pagination.last_page <= 1) {
-                    pager.innerHTML = '';
-                    return;
-                }
-
-                const prevDisabled = !pagination.prev_page;
-                const nextDisabled = !pagination.next_page;
-
-                pager.innerHTML = `
-                    <button class="page-link" data-page="${pagination.prev_page || ''}" ${prevDisabled ? 'disabled' : ''}>السابق</button>
-                    <span class="page-link">صفحة ${pagination.current_page} من ${pagination.last_page}</span>
-                    <button class="page-link" data-page="${pagination.next_page || ''}" ${nextDisabled ? 'disabled' : ''}>التالي</button>
-                `;
-            };
-
-            const renderMeta = (pagination) => {
-                if (!pagination || !pagination.total) {
+            const renderMeta = (total, rendered) => {
+                if (!total) {
                     resultsMeta.textContent = 'لا توجد نتائج حاليًا.';
                     return;
                 }
-                resultsMeta.textContent = `عرض ${pagination.from} - ${pagination.to} من ${pagination.total} منتج`;
+                resultsMeta.textContent = `عرض ${rendered} من ${total} منتج`;
+            };
+
+            const renderNextChunk = () => {
+                const { allProducts, renderedCount, chunkSize } = renderState;
+
+                if (renderedCount >= allProducts.length) {
+                    loadStatus.textContent = allProducts.length ? 'تم عرض كل المنتجات' : '';
+                    return;
+                }
+
+                const nextItems = allProducts.slice(renderedCount, renderedCount + chunkSize);
+                const html = nextItems.map(productCard).join('');
+                grid.insertAdjacentHTML('beforeend', html);
+
+                renderState.renderedCount += nextItems.length;
+                renderMeta(allProducts.length, renderState.renderedCount);
+
+                if (renderState.renderedCount < allProducts.length) {
+                    loadStatus.textContent = 'جاري تحميل المزيد...';
+                } else {
+                    loadStatus.textContent = 'تم عرض كل المنتجات';
+                }
+            };
+
+            const setupLazyObserver = () => {
+                if (renderState.observer) {
+                    renderState.observer.disconnect();
+                }
+
+                renderState.observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            renderNextChunk();
+                        }
+                    });
+                }, {
+                    root: null,
+                    rootMargin: '200px 0px 200px 0px',
+                    threshold: 0,
+                });
+
+                renderState.observer.observe(lazySentinel);
             };
 
             const fetchProducts = async (pushHistory = true) => {
@@ -393,7 +434,8 @@
                 emptyState.style.display = 'none';
 
                 const query = buildQuery();
-                const response = await fetch(`/shop?${query.toString()}`, {
+                const endpoint = query.toString() ? `${localePrefix}/shop?${query.toString()}` : `${localePrefix}/shop`;
+                const response = await fetch(endpoint, {
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
@@ -402,6 +444,7 @@
 
                 if (!response.ok) {
                     grid.innerHTML = '';
+                    loadStatus.textContent = '';
                     resultsMeta.textContent = 'حدث خطأ أثناء تحميل المنتجات.';
                     return;
                 }
@@ -412,15 +455,17 @@
                 if (list.length === 0) {
                     grid.innerHTML = '';
                     emptyState.style.display = 'block';
-                    renderMeta(data.pagination);
-                    renderPager(data.pagination);
+                    loadStatus.textContent = '';
+                    renderMeta(0, 0);
                     if (pushHistory) updateUrl();
                     return;
                 }
 
-                grid.innerHTML = list.map(productCard).join('');
-                renderMeta(data.pagination);
-                renderPager(data.pagination);
+                renderState.allProducts = list;
+                renderState.renderedCount = 0;
+                grid.innerHTML = '';
+                renderNextChunk();
+                setupLazyObserver();
 
                 if (pushHistory) updateUrl();
             };
@@ -428,31 +473,18 @@
             searchForm.addEventListener('submit', (event) => {
                 event.preventDefault();
                 state.q = qInput.value.trim();
-                state.page = 1;
                 fetchProducts(true);
             });
 
             sortSelect.addEventListener('change', () => {
                 state.sort = sortSelect.value;
-                state.page = 1;
                 fetchProducts(true);
-            });
-
-            pager.addEventListener('click', (event) => {
-                const button = event.target.closest('[data-page]');
-                if (!button || button.disabled) return;
-                const nextPage = Number(button.dataset.page || 1);
-                if (!nextPage) return;
-                state.page = nextPage;
-                fetchProducts(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
             window.addEventListener('popstate', () => {
                 const qs = new URLSearchParams(window.location.search);
                 state.q = qs.get('q') ?? '';
-                state.sort = qs.get('sort') ?? 'newest';
-                state.page = Number(qs.get('page') || 1);
+                state.sort = qs.get('sort') ?? 'random';
                 qInput.value = state.q;
                 sortSelect.value = state.sort;
                 fetchProducts(false);

@@ -441,10 +441,10 @@ Route::get('/en', fn () => $homeHandler('en'));
 
 $shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $search = trim((string) $request->query('q', ''));
-    $sort = (string) $request->query('sort', 'newest');
+    $sort = (string) $request->query('sort', 'random');
 
-    if (!in_array($sort, ['newest', 'price_asc', 'price_desc'], true)) {
-        $sort = 'newest';
+    if (!in_array($sort, ['random', 'price_asc', 'price_desc'], true)) {
+        $sort = 'random';
     }
 
     $query = DB::table('wp_posts as p')
@@ -468,14 +468,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         $query->where('p.post_title', 'like', "%{$search}%");
     }
 
-    if ($sort === 'price_asc') {
+    if ($sort === 'random') {
+        $query->inRandomOrder();
+    } elseif ($sort === 'price_asc') {
         $query->orderByRaw('CAST(NULLIF(price.meta_value, "") AS DECIMAL(10,2)) ASC')
             ->orderBy('p.post_date', 'desc');
     } elseif ($sort === 'price_desc') {
         $query->orderByRaw('CAST(NULLIF(price.meta_value, "") AS DECIMAL(10,2)) DESC')
             ->orderBy('p.post_date', 'desc');
-    } else {
-        $query->orderBy('p.post_date', 'desc');
     }
 
     $products = $query->select(
@@ -485,9 +485,9 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         'price.meta_value as price',
         'regular.meta_value as regular_price',
         'img.guid as image'
-    )->paginate(16)->withQueryString();
+    )->get();
 
-    $products->setCollection($localizeProductsCollectionByWpml($products->getCollection(), $locale));
+    $products = $localizeProductsCollectionByWpml($products, $locale);
 
     return [$products, $search, $sort];
 };
@@ -499,7 +499,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
     [$products, $search, $sort] = $shopDataHandler($request, $currentLocale);
 
     if ($request->expectsJson() || $request->wantsJson() || strtolower((string) $request->header('X-Requested-With')) === 'xmlhttprequest') {
-        $items = $products->getCollection()->map(function ($product) {
+        $items = $products->map(function ($product) {
             $price = (float) ($product->price ?? 0);
             $regular = (float) ($product->regular_price ?? 0);
             $isSale = $regular > 0 && $price > 0 && $regular > $price;
@@ -526,14 +526,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
             ],
             'products' => $items,
             'pagination' => [
-                'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-                'total' => $products->total(),
-                'from' => $products->firstItem(),
-                'to' => $products->lastItem(),
-                'per_page' => $products->perPage(),
-                'next_page' => $products->hasMorePages() ? $products->currentPage() + 1 : null,
-                'prev_page' => $products->onFirstPage() ? null : $products->currentPage() - 1,
+                'total' => $items->count(),
             ],
         ]);
     }
