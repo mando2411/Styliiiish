@@ -793,7 +793,11 @@ if (!function_exists('shopire_styliiiish_fix_woocommerce_ajax_endpoint')) {
 			return $endpoint;
 		}
 
-		$action = $request === '%%endpoint%%' ? '%%endpoint%%' : sanitize_key($request);
+		$action = sanitize_key($request);
+		if (strpos($action, 'styliiiish_') !== 0) {
+			return $endpoint;
+		}
+
 		return add_query_arg('action', $action, admin_url('admin-ajax.php'));
 	}
 }
