@@ -4,6 +4,7 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $wpCheckoutUrl = $wpBaseUrl . ($isEnglish ? '/en/checkout/' : '/ar/checkout/');
     $canonicalPath = $localePrefix . '/cart';
 
     $translations = [
@@ -247,7 +248,7 @@
                     <a class="shipment-change" id="changeAddressLink" href="{{ $wpBaseUrl }}/cart/">{{ $t('change_address') }}</a>
                 </div>
                 <div class="totals-row total"><span>{{ $t('total') }}</span><strong id="cartTotal">—</strong></div>
-                <a class="btn checkout-btn" id="proceedCheckoutBtn" href="{{ $wpBaseUrl }}/checkout/">{{ $t('proceed_checkout') }}</a>
+                <a class="btn checkout-btn" id="proceedCheckoutBtn" href="{{ $wpCheckoutUrl }}">{{ $t('proceed_checkout') }}</a>
                 <a class="btn" href="{{ $localePrefix }}/shop">{{ $t('continue_shopping') }}</a>
             </div>
         </aside>
@@ -283,6 +284,7 @@
 (() => {
     const localePrefix = @json($localePrefix);
     const currentLocale = @json($currentLocale);
+    const wpCheckoutUrl = @json($wpCheckoutUrl);
     const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
     const texts = {
         loading: @json($t('loading')), emptyTitle: @json($t('empty_title')), emptyDesc: @json($t('empty_desc')), goShop: @json($t('go_shop')),
@@ -317,7 +319,7 @@
     const renderTotals = (payload) => {
         cartSubtotal.innerHTML = payload.subtotal_html || '—';
         cartTotal.innerHTML = payload.total_html || payload.subtotal_html || '—';
-        if (proceedCheckoutBtn && payload.checkout_url) proceedCheckoutBtn.href = payload.checkout_url;
+        if (proceedCheckoutBtn) proceedCheckoutBtn.href = wpCheckoutUrl;
 
         const lines = Array.isArray(payload.shipping_lines) ? payload.shipping_lines : [];
         const firstLine = lines.length ? lines[0] : null;

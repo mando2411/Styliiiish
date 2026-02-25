@@ -4,6 +4,7 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+        $wpCheckoutUrl = $wpBaseUrl . ($isEnglish ? '/en/checkout/' : '/ar/checkout/');
     $canonicalPath = $localePrefix . '/item/' . rawurlencode((string) ($product->post_name ?? ''));
 
     $translations = [
@@ -1554,7 +1555,7 @@
                 <div class="mini-cart-subtotal"><span>{{ $t('subtotal') }}</span><strong id="miniCartSubtotal">—</strong></div>
                 <div class="mini-cart-actions">
                     <a class="mini-cart-view" id="miniCartView" href="{{ $localePrefix }}/cart">{{ $t('view_cart') }}</a>
-                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpBaseUrl }}/checkout/">{{ $t('checkout') }}</a>
+                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpCheckoutUrl }}">{{ $t('checkout') }}</a>
                 </div>
             </div>
         </aside>
@@ -1629,6 +1630,7 @@
             const tabLoadFailedText = @json($t('tab_load_failed'));
             const leaveReviewText = @json($t('leave_review'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
+                const wpCheckoutUrl = @json($wpCheckoutUrl);
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json((string) ($product->post_name ?? ''));
             const productId = Number(@json((int) ($product->ID ?? 0))) || 0;
@@ -2504,7 +2506,7 @@
 
                 if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
                 if (miniCartView) miniCartView.href = `${@json($localePrefix)}/cart`;
-                if (miniCartCheckout && payload.checkout_url) miniCartCheckout.href = payload.checkout_url;
+                if (miniCartCheckout) miniCartCheckout.href = wpCheckoutUrl;
 
                 if (!miniCartList) return;
                 const items = Array.isArray(payload.items) ? payload.items : [];
