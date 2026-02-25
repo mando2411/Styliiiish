@@ -821,6 +821,12 @@ if (!function_exists('shopire_styliiiish_rewrite_broken_checkout_domains')) {
 			"'banner-img-3.webp'" => "'" . $siteBase . "/wp-content/uploads/2025/12/banner-img-3.webp'",
 		];
 
+		$html = preg_replace(
+			'#<script[^>]+src=["\"][^"\"]*pay\.google\.com/gp/p/js/pay\.js[^"\"]*["\"][^>]*>\s*</script>#i',
+			'',
+			$html
+		);
+
 		return str_replace(array_keys($checkoutBannerMap), array_values($checkoutBannerMap), $html);
 	}
 }
