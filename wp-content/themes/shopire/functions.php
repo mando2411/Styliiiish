@@ -826,8 +826,28 @@ if (!function_exists('shopire_styliiiish_rewrite_broken_checkout_domains')) {
 }
 
 if (!function_exists('shopire_styliiiish_checkout_output_buffer')) {
+	function shopire_styliiiish_is_checkout_like_request() {
+		if (function_exists('is_checkout') && is_checkout()) {
+			return true;
+		}
+
+		$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+		$decoded_uri = rawurldecode($request_uri);
+
+		$needles = ['/checkout', '/payment', '/الدفع'];
+		foreach ($needles as $needle) {
+			if (strpos($request_uri, $needle) !== false || strpos($decoded_uri, $needle) !== false) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
+if (!function_exists('shopire_styliiiish_checkout_output_buffer')) {
 	function shopire_styliiiish_checkout_output_buffer() {
-		if (is_admin() || wp_doing_ajax() || !function_exists('is_checkout') || !is_checkout()) {
+		if (is_admin() || wp_doing_ajax() || !shopire_styliiiish_is_checkout_like_request()) {
 			return;
 		}
 
@@ -842,13 +862,12 @@ if (!function_exists('shopire_styliiiish_checkout_permissions_policy')) {
 			return;
 		}
 
-		$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
-		$is_checkout_path = strpos($request_uri, '/checkout') !== false || strpos($request_uri, '/الدفع') !== false;
-		if ((!function_exists('is_checkout') || !is_checkout()) && !$is_checkout_path) {
+		if (!shopire_styliiiish_is_checkout_like_request()) {
 			return;
 		}
 
 		header('Permissions-Policy: payment=(self "https://pay.google.com" "https://accept.paymob.com")', true);
+		header('Feature-Policy: payment "self" https://pay.google.com https://accept.paymob.com', true);
 	}
 }
 add_action('send_headers', 'shopire_styliiiish_checkout_permissions_policy', 20);
