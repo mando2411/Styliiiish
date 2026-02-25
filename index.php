@@ -117,6 +117,10 @@ $wordpress_prefix_routes = [
 
 $send_to_laravel = null;
 
+if (isset($_GET['wc-ajax']) && (string) $_GET['wc-ajax'] !== '') {
+    $send_to_laravel = false;
+}
+
 if (in_array($request_uri, $wordpress_exact_routes, true) || in_array($path, $wordpress_exact_routes, true)) {
     $send_to_laravel = false;
 }
