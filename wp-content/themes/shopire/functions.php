@@ -426,10 +426,10 @@ add_action('template_redirect', function () {
 	}
 
 	$aliases = [
-		'ar/الدفع' => '/ar/checkout/',
-		'الدفع' => '/ar/checkout/',
-		'en/payment' => '/en/checkout/',
-		'payment' => '/en/checkout/',
+		'ar/الدفع' => '/checkout/',
+		'الدفع' => '/checkout/',
+		'en/payment' => '/checkout/',
+		'payment' => '/checkout/',
 	];
 
 	$target_path = $aliases[$decoded_path] ?? null;

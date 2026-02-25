@@ -4,7 +4,7 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
-    $wpCheckoutUrl = $wpBaseUrl . ($isEnglish ? '/en/checkout/' : '/ar/checkout/');
+    $wpCheckoutUrl = $wpBaseUrl . '/checkout/';
     $canonicalPath = $localePrefix . '/cart';
 
     $translations = [
