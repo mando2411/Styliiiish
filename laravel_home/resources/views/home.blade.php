@@ -2873,6 +2873,7 @@
             const localePrefix = @json($localePrefix);
             const wpCheckoutUrl = @json($wpCheckoutUrl);
             const wpMyAccountUrl = @json($wpMyAccountUrl);
+            const currentPageUrl = window.location.href;
             const wishlistLoadingText = @json($t('wishlist_loading'));
             const wishlistEmptyText = @json($t('wishlist_empty'));
             const goToProductText = @json($t('go_to_product'));
@@ -2903,6 +2904,7 @@
             const authWooLoginNonce = document.getElementById('authWooLoginNonce');
             const authGoogleButton = document.getElementById('authGoogleButton');
             const authGoogleFallback = document.getElementById('authGoogleFallback');
+            const authRedirectField = authLoginForm ? authLoginForm.querySelector('input[name="redirect"]') : null;
 
             let siteKitGoogleConfig = null;
             let siteKitGoogleInitialized = false;
@@ -2912,6 +2914,24 @@
                     .split(';')
                     .map((entry) => entry.trim())
                     .some((entry) => entry.startsWith('wordpress_logged_in_'));
+            };
+
+            const getSafeCurrentUrl = () => {
+                try {
+                    const parsed = new URL(window.location.href);
+                    if (parsed.origin === window.location.origin) {
+                        return parsed.toString();
+                    }
+                } catch (error) {
+                }
+
+                return wpMyAccountUrl;
+            };
+
+            const setSiteKitRedirectCookie = (redirectUrl) => {
+                const expires = new Date(Date.now() + (5 * 60 * 1000)).toUTCString();
+                const cookieValue = `googlesitekit_auth_redirect_to=${redirectUrl};expires=${expires};path=/`;
+                document.cookie = cookieValue;
             };
 
             const extractSiteKitGoogleConfig = (doc) => {
@@ -2977,6 +2997,8 @@
 
                 const handleGoogleCredentialResponse = async (response) => {
                     response.integration = 'woocommerce';
+                    const redirectTarget = getSafeCurrentUrl();
+                    setSiteKitRedirectCookie(redirectTarget);
 
                     try {
                         const result = await fetch(absoluteEndpoint, {
@@ -2993,7 +3015,7 @@
                     } catch (error) {
                     }
 
-                    location.assign(wpMyAccountUrl);
+                    location.assign(redirectTarget);
                 };
 
                 if (!siteKitGoogleInitialized) {
@@ -3305,6 +3327,10 @@
                         return;
                     }
 
+                    if (authRedirectField) {
+                        authRedirectField.value = getSafeCurrentUrl();
+                    }
+
                     openAuthModal();
                     fetchWooLoginNonce().catch(() => {});
                     const firstField = authModal ? authModal.querySelector('input[name="username"]') : null;
@@ -3320,6 +3346,9 @@
 
             if (authLoginForm) {
                 authLoginForm.addEventListener('submit', async () => {
+                    if (authRedirectField) {
+                        authRedirectField.value = getSafeCurrentUrl();
+                    }
                     await fetchWooLoginNonce().catch(() => {});
                 });
             }
