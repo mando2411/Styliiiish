@@ -3046,7 +3046,7 @@
             const parseAccountSummary = (doc) => {
                 const summary = {
                     name: accountLoggedInText,
-                    meta: accountLoggedInText,
+                    meta: '',
                     logoutUrl: wpMyAccountUrl,
                 };
 
@@ -3055,12 +3055,18 @@
                 const firstName = doc.querySelector('input[name="account_first_name"]')?.value?.trim() || '';
                 const lastName = doc.querySelector('input[name="account_last_name"]')?.value?.trim() || '';
                 const displayName = doc.querySelector('input[name="account_display_name"]')?.value?.trim() || '';
+                const username = doc.querySelector('input[name="account_username"]')?.value?.trim() || '';
                 const email = doc.querySelector('input[name="account_email"]')?.value?.trim() || '';
                 const logoutUrl = doc.querySelector('a[href*="customer-logout"]')?.getAttribute('href') || '';
+                const accountText = doc.querySelector('.woocommerce-MyAccount-content')?.textContent || '';
+
+                const englishHelloMatch = accountText.match(/Hello\s+([^\(\!\n\r]+)\s*(?:\(|\!|,|\.|$)/i);
+                const arabicHelloMatch = accountText.match(/مرحب(?:ا|اً|ًا)?\s+([^\(\!\n\r،,\.]+)\s*(?:\(|\!|،|,|\.|$)/i);
+                const helloName = (englishHelloMatch?.[1] || arabicHelloMatch?.[1] || '').trim();
 
                 const mergedName = [firstName, lastName].filter(Boolean).join(' ').trim();
-                summary.name = mergedName || displayName || summary.name;
-                summary.meta = email || summary.meta;
+                summary.name = mergedName || displayName || helloName || username || summary.name;
+                summary.meta = email || username || accountLoggedInText;
                 summary.logoutUrl = logoutUrl || summary.logoutUrl;
                 return summary;
             };
@@ -3089,14 +3095,14 @@
                 if (accountMenuName) accountMenuName.textContent = accountLoadingText;
                 if (accountMenuMeta) accountMenuMeta.textContent = accountLoggedInText;
 
-                const response = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, {
+                const editAccountResponse = await fetch(`${wpMyAccountUrl}edit-account/?_=${Date.now()}`, {
                     method: 'GET',
                     credentials: 'same-origin',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 });
 
-                if (!response.ok) return false;
-                const html = await response.text();
+                if (!editAccountResponse.ok) return false;
+                const html = await editAccountResponse.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
 
@@ -3107,6 +3113,33 @@
                 }
 
                 const summary = parseAccountSummary(doc);
+
+                if (summary.name === accountLoggedInText || summary.meta === accountLoggedInText) {
+                    const dashboardResponse = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    });
+
+                    if (dashboardResponse.ok) {
+                        const dashboardHtml = await dashboardResponse.text();
+                        const dashboardDoc = parser.parseFromString(dashboardHtml, 'text/html');
+                        const dashboardSummary = parseAccountSummary(dashboardDoc);
+
+                        if (summary.name === accountLoggedInText && dashboardSummary.name !== accountLoggedInText) {
+                            summary.name = dashboardSummary.name;
+                        }
+
+                        if ((summary.meta === accountLoggedInText || !summary.meta) && dashboardSummary.meta) {
+                            summary.meta = dashboardSummary.meta;
+                        }
+
+                        if (!summary.logoutUrl || summary.logoutUrl === wpMyAccountUrl) {
+                            summary.logoutUrl = dashboardSummary.logoutUrl || summary.logoutUrl;
+                        }
+                    }
+                }
+
                 applyAccountSummary(summary);
                 accountSummaryLoaded = true;
                 accountAuthState = 'logged-in';
