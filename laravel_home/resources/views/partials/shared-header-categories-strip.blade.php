@@ -18,7 +18,9 @@
 
             $localizedTerms = collect();
 
-            if (\Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations')) {
+            $hasWpml = \Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations');
+
+            if ($hasWpml) {
                 $localizedTerms = $baseTermsQuery
                     ->join('wp_icl_translations as tr', function ($join) {
                         $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
@@ -29,7 +31,7 @@
                     ->get();
             }
 
-            if ($localizedTerms->isEmpty()) {
+            if (!$hasWpml && $localizedTerms->isEmpty()) {
                 $localizedTerms = $baseTermsQuery
                     ->orderBy('t.name')
                     ->get();
