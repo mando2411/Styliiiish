@@ -40,9 +40,9 @@
                     ->orderBy('t.name')
                     ->get();
 
-                $localizedTerms = $localizedByTermId->count() > $localizedByTaxonomyId->count()
-                    ? $localizedByTermId
-                    : $localizedByTaxonomyId;
+                $localizedTerms = $localizedByTaxonomyId->isNotEmpty()
+                    ? $localizedByTaxonomyId
+                    : $localizedByTermId;
             }
 
             if (!$hasWpml && $localizedTerms->isEmpty()) {
