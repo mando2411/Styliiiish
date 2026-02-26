@@ -111,9 +111,9 @@
     </div>
 </header>
 
-@include('partials.shared-header-categories-strip')
-
 <div class="promo">{{ $ht('promo_line', 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل', 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days') }}</div>
+
+@include('partials.shared-header-categories-strip')
 
 @unless($isHomeRoute)
     @include('partials.shared-home-header-interactions', ['ht' => $ht])
