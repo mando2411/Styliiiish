@@ -277,9 +277,6 @@
     $wpLoginUrl = $wpMyAccountUrl;
     $wpRegisterUrl = $wpMyAccountUrl . '?register=1';
     $wpForgotPasswordUrl = $wpMyAccountUrl . 'lost-password/';
-    $wpGoogleLoginUrl = (string) (env('WP_GOOGLE_LOGIN_URL')
-        ? env('WP_GOOGLE_LOGIN_URL')
-        : ($wpMyAccountUrl . '?loginSocial=google&redirect=' . rawurlencode($wpMyAccountUrl)));
     $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/en/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $reviewsPrevArrow = $isEnglish ? '‹' : '›';
     $reviewsNextArrow = $isEnglish ? '›' : '‹';
@@ -1075,6 +1072,37 @@
             border-color: var(--primary);
             color: var(--primary);
             background: #fff8f9;
+        }
+
+        .auth-google-wrap {
+            display: grid;
+            gap: 8px;
+        }
+
+        .auth-google-wrap .googlesitekit-sign-in-with-google__frontend-output-button {
+            width: 100%;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .auth-google-fallback {
+            min-height: 44px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 1px solid var(--line);
+            color: var(--secondary);
+            background: #fff;
         }
 
         .auth-register {
@@ -2829,10 +2857,10 @@
 
                 <div class="auth-divider">or</div>
 
-                <a class="auth-google" href="{{ $wpGoogleLoginUrl }}" target="_blank" rel="noopener">
-                    <span aria-hidden="true">G</span>
-                    <span>{{ $t('sign_in_google') }}</span>
-                </a>
+                <div class="auth-google-wrap">
+                    <div class="googlesitekit-sign-in-with-google__frontend-output-button" id="authGoogleButton" data-googlesitekit-siwg-shape="pill" data-googlesitekit-siwg-text="continue_with" data-googlesitekit-siwg-theme="filled_blue" aria-label="{{ $t('sign_in_google') }}"></div>
+                    <a class="auth-google-fallback" id="authGoogleFallback" href="{{ $wpMyAccountUrl }}" target="_blank" rel="noopener">{{ $t('sign_in_google') }}</a>
+                </div>
 
                 <a class="auth-register" href="{{ $wpRegisterUrl }}" target="_blank" rel="noopener">{{ $t('register') }}</a>
             </form>
@@ -2873,6 +2901,11 @@
             const authModalClosers = authModal ? authModal.querySelectorAll('[data-close-auth-modal]') : [];
             const authLoginForm = document.getElementById('authLoginForm');
             const authWooLoginNonce = document.getElementById('authWooLoginNonce');
+            const authGoogleButton = document.getElementById('authGoogleButton');
+            const authGoogleFallback = document.getElementById('authGoogleFallback');
+
+            let siteKitGoogleConfig = null;
+            let siteKitGoogleInitialized = false;
 
             const hasWpLoginCookie = () => {
                 return document.cookie
@@ -2881,9 +2914,110 @@
                     .some((entry) => entry.startsWith('wordpress_logged_in_'));
             };
 
+            const extractSiteKitGoogleConfig = (doc) => {
+                if (!doc) return null;
+                const scripts = Array.from(doc.querySelectorAll('script'));
+
+                for (const scriptTag of scripts) {
+                    const text = String(scriptTag.textContent || '');
+                    if (!text.includes('googlesitekit_auth') || !text.includes('google.accounts.id.initialize')) {
+                        continue;
+                    }
+
+                    const endpointMatch = text.match(/fetch\('([^']*action=googlesitekit_auth[^']*)'/);
+                    const clientMatch = text.match(/client_id:'([^']+)'/);
+                    if (!endpointMatch || !clientMatch) continue;
+
+                    return {
+                        endpoint: endpointMatch[1],
+                        clientId: clientMatch[1],
+                    };
+                }
+
+                return null;
+            };
+
+            const loadGoogleIdentityScript = async () => {
+                if (window.google && window.google.accounts && window.google.accounts.id) return;
+
+                const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+                if (existingScript) {
+                    await new Promise((resolve) => {
+                        if (window.google && window.google.accounts && window.google.accounts.id) {
+                            resolve();
+                            return;
+                        }
+                        existingScript.addEventListener('load', resolve, { once: true });
+                        existingScript.addEventListener('error', resolve, { once: true });
+                    });
+                    return;
+                }
+
+                await new Promise((resolve) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://accounts.google.com/gsi/client';
+                    script.async = true;
+                    script.defer = true;
+                    script.onload = resolve;
+                    script.onerror = resolve;
+                    document.head.appendChild(script);
+                });
+            };
+
+            const initGoogleButton = async () => {
+                if (!authGoogleButton || !siteKitGoogleConfig) return;
+
+                await loadGoogleIdentityScript();
+                if (!(window.google && window.google.accounts && window.google.accounts.id)) return;
+
+                const endpointUrl = String(siteKitGoogleConfig.endpoint || '');
+                const absoluteEndpoint = endpointUrl.startsWith('http')
+                    ? endpointUrl
+                    : new URL(endpointUrl, wpMyAccountUrl).toString();
+
+                const handleGoogleCredentialResponse = async (response) => {
+                    response.integration = 'woocommerce';
+
+                    try {
+                        const result = await fetch(absoluteEndpoint, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: new URLSearchParams(response),
+                            credentials: 'same-origin',
+                        });
+
+                        if (result.ok && result.redirected) {
+                            location.assign(result.url);
+                            return;
+                        }
+                    } catch (error) {
+                    }
+
+                    location.assign(wpMyAccountUrl);
+                };
+
+                if (!siteKitGoogleInitialized) {
+                    window.google.accounts.id.initialize({
+                        client_id: siteKitGoogleConfig.clientId,
+                        callback: handleGoogleCredentialResponse,
+                        library_name: 'Site-Kit',
+                    });
+                    siteKitGoogleInitialized = true;
+                }
+
+                authGoogleButton.innerHTML = '';
+                window.google.accounts.id.renderButton(authGoogleButton, {
+                    shape: authGoogleButton.getAttribute('data-googlesitekit-siwg-shape') || 'pill',
+                    text: authGoogleButton.getAttribute('data-googlesitekit-siwg-text') || 'continue_with',
+                    theme: authGoogleButton.getAttribute('data-googlesitekit-siwg-theme') || 'filled_blue',
+                });
+
+                if (authGoogleFallback) authGoogleFallback.style.display = 'none';
+            };
+
             const fetchWooLoginNonce = async () => {
                 if (!authWooLoginNonce) return;
-                if (authWooLoginNonce.value) return;
+                if (authWooLoginNonce.value && siteKitGoogleConfig) return;
 
                 const response = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, {
                     method: 'GET',
@@ -2898,6 +3032,12 @@
                 const nonceField = doc.querySelector('input[name="woocommerce-login-nonce"]');
                 if (nonceField && nonceField.value) {
                     authWooLoginNonce.value = nonceField.value;
+                }
+
+                const extractedConfig = extractSiteKitGoogleConfig(doc);
+                if (extractedConfig) {
+                    siteKitGoogleConfig = extractedConfig;
+                    await initGoogleButton();
                 }
             };
 
