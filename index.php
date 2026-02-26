@@ -7,6 +7,33 @@ $request_uri = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? 
 $path = rtrim($request_uri, '/');
 $path = $path === '' ? '/' : $path;
 
+// Fix localized my-account URLs like /ar/حسابي/... or /en/my-account/... -> /my-account/...
+$localized_account_prefixes = [
+    '/ar/حسابي',
+    '/ara/حسابي',
+    '/ar/my-account',
+    '/ara/my-account',
+    '/en/my-account',
+];
+
+foreach ($localized_account_prefixes as $localized_prefix) {
+    if ($request_uri === $localized_prefix || strpos($request_uri, $localized_prefix . '/') === 0) {
+        $suffix = substr($request_uri, strlen($localized_prefix));
+        $target_path = '/my-account' . ($suffix === false ? '' : $suffix);
+
+        if ($target_path === '/my-account') {
+            $target_path .= '/';
+        }
+
+        $query_string = isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'] !== ''
+            ? ('?' . $_SERVER['QUERY_STRING'])
+            : '';
+
+        header('Location: ' . $target_path . $query_string, true, 302);
+        exit;
+    }
+}
+
 // Fix localized static asset URLs like /ar/wp-content/... -> /wp-content/...
 if (preg_match('#^/(ar|en|ara)/wp-content/(.+)$#u', $request_uri, $matches)) {
     $normalized_asset_path = '/wp-content/' . $matches[2];
