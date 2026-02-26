@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -568,8 +568,83 @@
         .action-account,
         .action-wishlist,
         .action-cart,
-        .action-sell {
+        .action-sell,
+        .action-categories {
             white-space: nowrap;
+        }
+
+        .header-categories {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .category-trigger {
+            min-height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fff;
+            color: var(--secondary);
+            padding: 0 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            transition: .2s ease;
+        }
+
+        .category-trigger:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .category-menu-panel {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(240px, 72vw);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(23, 39, 59, .14);
+            padding: 8px;
+            display: grid;
+            gap: 4px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+            z-index: 90;
+        }
+
+        [dir="rtl"] .category-menu-panel { right: auto; left: 0; }
+        [dir="ltr"] .category-menu-panel { left: auto; right: 0; }
+
+        .header-categories:hover .category-menu-panel,
+        .header-categories:focus-within .category-menu-panel {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .category-menu-panel a {
+            min-height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0 10px;
+            color: var(--secondary);
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: .2s ease;
+        }
+
+        .category-menu-panel a:hover {
+            background: #fff4f5;
+            color: var(--primary);
         }
 
         .search-form {
@@ -2156,8 +2231,20 @@
                 display: none;
             }
 
+            .category-trigger {
+                min-height: 34px;
+                padding: 0 10px;
+                font-size: 12px;
+                border-radius: 8px;
+            }
+
+            .category-menu-panel {
+                width: min(210px, 78vw);
+            }
+
             .action-account,
-            .action-cart {
+            .action-cart,
+            .action-categories {
                 min-width: 46px;
                 justify-content: center;
             }
@@ -2519,6 +2606,10 @@
                 font-size: 11px;
             }
 
+            .category-trigger span:last-child {
+                display: none;
+            }
+
             .brand-logo {
                 height: 36px;
                 max-width: 200px;
@@ -2609,6 +2700,18 @@
                     <span class="cart-plus-one" id="cartPlusOne">+1</span>
                 </span>
                 <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
+                <span class="header-categories action-categories">
+                    <button class="category-trigger" type="button" aria-haspopup="menu" aria-label="{{ $t('categories') }}">
+                        <span aria-hidden="true">☰</span>
+                        <span>{{ $t('categories') }}</span>
+                    </button>
+                    <div class="category-menu-panel" role="menu" aria-label="{{ $t('categories') }}">
+                        <a href="{{ $localePrefix }}/categories" role="menuitem">{{ $t('categories') }}</a>
+                        <a href="{{ $localePrefix }}/shop" role="menuitem">{{ $t('nav_shop') }}</a>
+                        <a href="{{ $localePrefix }}/marketplace" role="menuitem">{{ $t('nav_marketplace') }}</a>
+                        <a href="{{ $localePrefix }}/wishlist" role="menuitem">{{ $t('wishlist') }}</a>
+                    </div>
+                </span>
             </div>
         </div>
     </header>
