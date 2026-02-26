@@ -1879,8 +1879,8 @@
             object-fit: contain;
             display: block;
             margin-bottom: 12px;
-            filter: brightness(0) invert(1);
-            opacity: 0.96;
+            filter: none;
+            opacity: 1;
         }
 
         .footer-brand h4,

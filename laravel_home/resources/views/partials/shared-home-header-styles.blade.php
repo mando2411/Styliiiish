@@ -60,6 +60,11 @@
         font-size: 12px;
     }
 
+    .site-footer .footer-brand-logo {
+        filter: none !important;
+        opacity: 1 !important;
+    }
+
     .lang-switch {
         position: relative;
         display: inline-grid;
