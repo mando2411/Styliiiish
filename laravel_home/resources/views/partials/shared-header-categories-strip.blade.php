@@ -1,5 +1,8 @@
 @php
-    $currentLocale = $currentLocale ?? 'ar';
+    $pathLocale = request()->segment(1);
+    $currentLocale = in_array($pathLocale, ['ar', 'en'], true)
+        ? $pathLocale
+        : ($currentLocale ?? 'ar');
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
     $wpmlLocale = $currentLocale === 'en' ? 'en' : 'ar';
     $wpmlLocalePattern = $wpmlLocale . '%';
@@ -15,76 +18,77 @@
                 ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
                 ->where('tt.taxonomy', 'product_cat')
                 ->whereNotIn('t.slug', ['uncategorized'])
+                ->where('tt.count', '>', 0)
                 ->select('tt.term_taxonomy_id', 'tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
 
-            $localizedTerms = $baseTermsQuery
-                ->orderBy('t.name')
-                ->get();
+            $localizedTerms = collect();
 
             $hasWpml = \Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations');
 
-            if ($hasWpml && $localizedTerms->isNotEmpty()) {
-                $sourceTaxonomyIds = $localizedTerms
-                    ->pluck('term_taxonomy_id')
-                    ->filter(fn ($id) => !is_null($id))
-                    ->map(fn ($id) => (int) $id)
-                    ->unique()
-                    ->values();
+            if ($hasWpml) {
+                $localizedByTaxonomyId = (clone $baseTermsQuery)
+                    ->join('wp_icl_translations as tr', function ($join) {
+                        $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
+                            ->where('tr.element_type', '=', 'tax_product_cat');
+                    })
+                    ->where('tr.language_code', $wpmlLocale)
+                    ->orderByDesc('tt.count')
+                    ->orderBy('t.name')
+                    ->get();
 
-                if ($sourceTaxonomyIds->isNotEmpty()) {
-                    $translationPairs = \Illuminate\Support\Facades\DB::table('wp_icl_translations as source')
-                        ->join('wp_icl_translations as localized', function ($join) use ($wpmlLocalePattern) {
-                            $join->on('source.trid', '=', 'localized.trid')
-                                ->where('localized.element_type', '=', 'tax_product_cat')
-                                ->where('localized.language_code', 'like', $wpmlLocalePattern);
+                if ($localizedByTaxonomyId->isEmpty()) {
+                    $localizedByTaxonomyId = (clone $baseTermsQuery)
+                        ->join('wp_icl_translations as tr', function ($join) {
+                            $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
+                                ->where('tr.element_type', '=', 'tax_product_cat');
                         })
-                        ->where('source.element_type', 'tax_product_cat')
-                        ->whereIn('source.element_id', $sourceTaxonomyIds->all())
-                        ->select('source.element_id as source_taxonomy_id', 'localized.element_id as localized_taxonomy_id')
+                        ->where('tr.language_code', 'like', $wpmlLocalePattern)
+                        ->orderByDesc('tt.count')
+                        ->orderBy('t.name')
+                        ->get();
+                }
+
+                $localizedByTermId = collect();
+                if ($localizedByTaxonomyId->isEmpty()) {
+                    $localizedByTermId = (clone $baseTermsQuery)
+                        ->join('wp_icl_translations as tr', function ($join) {
+                            $join->on('tr.element_id', '=', 'tt.term_id')
+                                ->where('tr.element_type', '=', 'tax_product_cat');
+                        })
+                        ->where('tr.language_code', $wpmlLocale)
+                        ->orderByDesc('tt.count')
+                        ->orderBy('t.name')
                         ->get();
 
-                    if ($translationPairs->isNotEmpty()) {
-                        $localizedTaxonomyIds = $translationPairs
-                            ->pluck('localized_taxonomy_id')
-                            ->filter(fn ($id) => !is_null($id))
-                            ->map(fn ($id) => (int) $id)
-                            ->unique()
-                            ->values();
-
-                        if ($localizedTaxonomyIds->isNotEmpty()) {
-                            $localizedNamesByTaxonomyId = \Illuminate\Support\Facades\DB::table('wp_term_taxonomy as tt')
-                                ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
-                                ->whereIn('tt.term_taxonomy_id', $localizedTaxonomyIds->all())
-                                ->select('tt.term_taxonomy_id', 't.name', 't.slug')
-                                ->get()
-                                ->keyBy(fn ($row) => (int) $row->term_taxonomy_id);
-
-                            $sourceToLocalizedTaxonomyId = $translationPairs
-                                ->mapWithKeys(function ($row) {
-                                    return [(int) $row->source_taxonomy_id => (int) $row->localized_taxonomy_id];
-                                });
-
-                            $localizedTerms = $localizedTerms->map(function ($term) use ($sourceToLocalizedTaxonomyId, $localizedNamesByTaxonomyId) {
-                                $sourceId = (int) ($term->term_taxonomy_id ?? 0);
-                                $localizedId = (int) ($sourceToLocalizedTaxonomyId->get($sourceId, 0));
-                                if ($localizedId > 0 && $localizedNamesByTaxonomyId->has($localizedId)) {
-                                    $localizedTerm = $localizedNamesByTaxonomyId->get($localizedId);
-                                    $term->name = (string) ($localizedTerm->name ?? $term->name);
-                                    $term->slug = (string) ($localizedTerm->slug ?? $term->slug);
-                                }
-
-                                return $term;
-                            });
-                        }
+                    if ($localizedByTermId->isEmpty()) {
+                        $localizedByTermId = (clone $baseTermsQuery)
+                            ->join('wp_icl_translations as tr', function ($join) {
+                                $join->on('tr.element_id', '=', 'tt.term_id')
+                                    ->where('tr.element_type', '=', 'tax_product_cat');
+                            })
+                            ->where('tr.language_code', 'like', $wpmlLocalePattern)
+                            ->orderByDesc('tt.count')
+                            ->orderBy('t.name')
+                            ->get();
                     }
                 }
+
+                $localizedTerms = $localizedByTaxonomyId->isNotEmpty()
+                    ? $localizedByTaxonomyId
+                    : $localizedByTermId;
+            }
+
+            if ($localizedTerms->isEmpty()) {
+                $localizedTerms = (clone $baseTermsQuery)
+                    ->orderByDesc('tt.count')
+                    ->orderBy('t.name')
+                    ->get();
             }
 
             if ($localizedTerms->isNotEmpty()) {
                 $parents = $localizedTerms->where('parent', 0)->keyBy('term_id');
                 $childrenByParent = $localizedTerms
                     ->where('parent', '!=', 0)
-                    ->where('count', '>', 0)
                     ->groupBy('parent');
 
                 $categoryGroups = $parents
