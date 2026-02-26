@@ -2849,7 +2849,7 @@
         </div>
     </header>
 
-    <div class="promo">{{ $t('promo_line') }}</div> 
+   <!-- <div class="promo">{{ $t('promo_line') }}</div>   -->
 
     @include('partials.shared-header-categories-strip')
 
