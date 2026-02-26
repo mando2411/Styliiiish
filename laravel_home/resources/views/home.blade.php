@@ -2589,7 +2589,7 @@
         </div>
     </header>
 
-   <!-- <div class="promo">{{ $t('promo_line') }}</div> -->
+    <div class="promo">{{ $t('promo_line') }}</div> 
 
     <section class="hero">
         <div class="container hero-wrap">
