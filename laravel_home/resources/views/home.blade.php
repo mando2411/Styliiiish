@@ -280,14 +280,6 @@
     $wpGoogleLoginUrl = (string) (env('WP_GOOGLE_LOGIN_URL')
         ? env('WP_GOOGLE_LOGIN_URL')
         : ($wpBaseUrl . '/wp-login.php?loginSocial=google&redirect=' . rawurlencode($wpMyAccountUrl)));
-    $cookieNames = array_keys(request()->cookies->all());
-    $isWpLoggedIn = false;
-    foreach ($cookieNames as $cookieName) {
-        if (str_starts_with((string) $cookieName, 'wordpress_logged_in_')) {
-            $isWpLoggedIn = true;
-            break;
-        }
-    }
     $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/en/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $reviewsPrevArrow = $isEnglish ? '‹' : '›';
     $reviewsNextArrow = $isEnglish ? '›' : '‹';
@@ -2455,11 +2447,7 @@
                     <input class="search-input" type="search" name="s" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
-                @if ($isWpLoggedIn)
-                    <a class="icon-btn action-account" href="{{ $wpMyAccountUrl }}" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
-                @else
-                    <button class="icon-btn action-account account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-controls="authModal" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
-                @endif
+                <button class="icon-btn action-account account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-controls="authModal" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
                 <span class="wishlist-trigger-wrap action-wishlist">
                     <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>
                         <span class="wishlist-count" id="wishlistCountBadge">0</span>
@@ -2803,60 +2791,59 @@
         </aside>
     </div>
 
-    @if (!$isWpLoggedIn)
-        <div class="auth-modal" id="authModal" aria-hidden="true">
-            <div class="auth-modal-backdrop" data-close-auth-modal></div>
-            <section class="auth-modal-panel" role="dialog" aria-modal="true" aria-label="{{ $t('login_title') }}">
-                <div class="auth-head">
-                    <div class="auth-title-wrap">
-                        <h3>{{ $t('login_title') }}</h3>
-                        <p>{{ $t('login_subtitle') }}</p>
-                    </div>
-                    <button class="auth-close" type="button" data-close-auth-modal aria-label="{{ $t('close') }}">×</button>
+    <div class="auth-modal" id="authModal" aria-hidden="true">
+        <div class="auth-modal-backdrop" data-close-auth-modal></div>
+        <section class="auth-modal-panel" role="dialog" aria-modal="true" aria-label="{{ $t('login_title') }}">
+            <div class="auth-head">
+                <div class="auth-title-wrap">
+                    <h3>{{ $t('login_title') }}</h3>
+                    <p>{{ $t('login_subtitle') }}</p>
+                </div>
+                <button class="auth-close" type="button" data-close-auth-modal aria-label="{{ $t('close') }}">×</button>
+            </div>
+
+            <form class="auth-form" action="{{ $wpLoginUrl }}" method="post" autocomplete="on">
+                <input type="hidden" name="redirect_to" value="{{ $wpMyAccountUrl }}">
+                <input type="hidden" name="testcookie" value="1">
+
+                <div class="auth-field">
+                    <label for="authLoginField">{{ $t('login_username') }}</label>
+                    <input id="authLoginField" type="text" name="log" required>
                 </div>
 
-                <form class="auth-form" action="{{ $wpLoginUrl }}" method="post" autocomplete="on">
-                    <input type="hidden" name="redirect_to" value="{{ $wpMyAccountUrl }}">
-                    <input type="hidden" name="testcookie" value="1">
+                <div class="auth-field">
+                    <label for="authPasswordField">{{ $t('login_password') }}</label>
+                    <input id="authPasswordField" type="password" name="pwd" required>
+                </div>
 
-                    <div class="auth-field">
-                        <label for="authLoginField">{{ $t('login_username') }}</label>
-                        <input id="authLoginField" type="text" name="log" required>
-                    </div>
+                <div class="auth-row">
+                    <label class="auth-remember" for="authRememberField">
+                        <input id="authRememberField" type="checkbox" name="rememberme" value="forever">
+                        <span>{{ $t('remember_me') }}</span>
+                    </label>
+                    <a class="auth-forgot" href="{{ $wpForgotPasswordUrl }}" target="_blank" rel="noopener">{{ $t('forgot_password') }}</a>
+                </div>
 
-                    <div class="auth-field">
-                        <label for="authPasswordField">{{ $t('login_password') }}</label>
-                        <input id="authPasswordField" type="password" name="pwd" required>
-                    </div>
+                <button class="auth-submit" type="submit">{{ $t('sign_in') }}</button>
 
-                    <div class="auth-row">
-                        <label class="auth-remember" for="authRememberField">
-                            <input id="authRememberField" type="checkbox" name="rememberme" value="forever">
-                            <span>{{ $t('remember_me') }}</span>
-                        </label>
-                        <a class="auth-forgot" href="{{ $wpForgotPasswordUrl }}" target="_blank" rel="noopener">{{ $t('forgot_password') }}</a>
-                    </div>
+                <div class="auth-divider">or</div>
 
-                    <button class="auth-submit" type="submit">{{ $t('sign_in') }}</button>
+                <a class="auth-google" href="{{ $wpGoogleLoginUrl }}" target="_blank" rel="noopener">
+                    <span aria-hidden="true">G</span>
+                    <span>{{ $t('sign_in_google') }}</span>
+                </a>
 
-                    <div class="auth-divider">or</div>
-
-                    <a class="auth-google" href="{{ $wpGoogleLoginUrl }}" target="_blank" rel="noopener">
-                        <span aria-hidden="true">G</span>
-                        <span>{{ $t('sign_in_google') }}</span>
-                    </a>
-
-                    <a class="auth-register" href="{{ $wpRegisterUrl }}" target="_blank" rel="noopener">{{ $t('register') }}</a>
-                </form>
-            </section>
-        </div>
-    @endif
+                <a class="auth-register" href="{{ $wpRegisterUrl }}" target="_blank" rel="noopener">{{ $t('register') }}</a>
+            </form>
+        </section>
+    </div>
 
     <script>
         (() => {
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const localePrefix = @json($localePrefix);
             const wpCheckoutUrl = @json($wpCheckoutUrl);
+            const wpMyAccountUrl = @json($wpMyAccountUrl);
             const wishlistLoadingText = @json($t('wishlist_loading'));
             const wishlistEmptyText = @json($t('wishlist_empty'));
             const goToProductText = @json($t('go_to_product'));
@@ -2883,6 +2870,13 @@
             const accountLoginTrigger = document.getElementById('accountLoginTrigger');
             const authModal = document.getElementById('authModal');
             const authModalClosers = authModal ? authModal.querySelectorAll('[data-close-auth-modal]') : [];
+
+            const hasWpLoginCookie = () => {
+                return document.cookie
+                    .split(';')
+                    .map((entry) => entry.trim())
+                    .some((entry) => entry.startsWith('wordpress_logged_in_'));
+            };
 
             let currentWishlistCount = 0;
             let currentCartCount = 0;
@@ -3143,6 +3137,11 @@
 
             if (accountLoginTrigger) {
                 accountLoginTrigger.addEventListener('click', () => {
+                    if (hasWpLoginCookie()) {
+                        window.open(wpMyAccountUrl, '_blank', 'noopener');
+                        return;
+                    }
+
                     openAuthModal();
                     const firstField = authModal ? authModal.querySelector('input[name="log"]') : null;
                     if (firstField) {
