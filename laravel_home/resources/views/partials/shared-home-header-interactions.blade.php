@@ -1,30 +1,56 @@
 @php
-    $translateCallable = (isset($ht) && is_callable($ht))
-        ? $ht
-        : ((isset($t) && is_callable($t)) ? $t : null);
+    $currentLocale = $currentLocale ?? 'ar';
+    $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
+    $baseTranslator = (isset($t) && is_callable($t)) ? $t : null;
+    $headerTranslator = (isset($ht) && is_callable($ht)) ? $ht : null;
 
-    $translate = static function (string $key, array $replace = [], ?string $locale = null) use ($translateCallable) {
-        if (!$translateCallable) {
-            return $key;
-        }
+    $modalFallbacks = [
+        'cart_title' => ['ar' => 'سلة التسوق', 'en' => 'Shopping Cart'],
+        'close' => ['ar' => 'إغلاق', 'en' => 'Close'],
+        'subtotal' => ['ar' => 'الإجمالي الفرعي', 'en' => 'Subtotal'],
+        'view_cart' => ['ar' => 'عرض السلة', 'en' => 'View Cart'],
+        'checkout' => ['ar' => 'الدفع', 'en' => 'Checkout'],
+        'login_title' => ['ar' => 'تسجيل الدخول', 'en' => 'Sign In'],
+        'login_subtitle' => ['ar' => 'سجلي الدخول للوصول إلى حسابك', 'en' => 'Sign in to access your account'],
+        'login_username' => ['ar' => 'اسم المستخدم أو البريد الإلكتروني', 'en' => 'Username or email'],
+        'login_password' => ['ar' => 'كلمة المرور', 'en' => 'Password'],
+        'remember_me' => ['ar' => 'تذكرني', 'en' => 'Remember me'],
+        'forgot_password' => ['ar' => 'نسيت كلمة المرور؟', 'en' => 'Forgot password?'],
+        'sign_in' => ['ar' => 'تسجيل الدخول', 'en' => 'Sign In'],
+        'sign_in_google' => ['ar' => 'المتابعة عبر Google', 'en' => 'Continue with Google'],
+        'register' => ['ar' => 'إنشاء حساب', 'en' => 'Create account'],
+        'wishlist_loading' => ['ar' => 'جاري تحميل المفضلة…', 'en' => 'Loading wishlist…'],
+        'wishlist_empty' => ['ar' => 'لا توجد عناصر في المفضلة حالياً', 'en' => 'Your wishlist is empty'],
+        'go_to_product' => ['ar' => 'الذهاب إلى المنتج', 'en' => 'Go to product'],
+        'cart_empty' => ['ar' => 'السلة فارغة حالياً', 'en' => 'Your cart is empty'],
+        'loading_cart' => ['ar' => 'جاري تحميل السلة…', 'en' => 'Loading cart…'],
+        'remove' => ['ar' => 'حذف', 'en' => 'Remove'],
+        'qty_short' => ['ar' => 'الكمية', 'en' => 'Qty'],
+        'account_loading' => ['ar' => 'جاري تحميل بيانات الحساب…', 'en' => 'Loading account details…'],
+        'account_logged_in' => ['ar' => 'مستخدم مسجل دخول', 'en' => 'Logged-in user'],
+    ];
 
-        try {
-            return $translateCallable($key, $replace, $locale);
-        } catch (\ArgumentCountError $e) {
+    $translate = static function (string $key) use ($baseTranslator, $headerTranslator, $modalFallbacks, $isEnglish): string {
+        $fallback = $modalFallbacks[$key] ?? ['ar' => $key, 'en' => $key];
+
+        if ($baseTranslator) {
             try {
-                return $translateCallable($key, $replace);
-            } catch (\ArgumentCountError $e) {
-                try {
-                    return $translateCallable($key);
-                } catch (\Throwable $e) {
-                    return $key;
+                $value = (string) $baseTranslator($key);
+                if ($value !== '' && $value !== $key) {
+                    return $value;
                 }
             } catch (\Throwable $e) {
-                return $key;
             }
-        } catch (\Throwable $e) {
-            return $key;
         }
+
+        if ($headerTranslator) {
+            try {
+                return (string) $headerTranslator($key, $fallback['ar'], $fallback['en']);
+            } catch (\Throwable $e) {
+            }
+        }
+
+        return $isEnglish ? $fallback['en'] : $fallback['ar'];
     };
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $wpMyAccountUrl = $wpMyAccountUrl ?? ($wpBaseUrl . '/my-account/');
