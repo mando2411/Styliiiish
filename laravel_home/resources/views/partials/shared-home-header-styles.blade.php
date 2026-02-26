@@ -341,6 +341,14 @@
         display: inline-flex;
     }
 
+    .header-categories > summary {
+        list-style: none;
+    }
+
+    .header-categories > summary::-webkit-details-marker {
+        display: none;
+    }
+
     .category-trigger {
         min-height: 40px;
         border: 1px solid var(--line);
@@ -386,7 +394,8 @@
     [dir="ltr"] .category-menu-panel { left: auto; right: 0; }
 
     .header-categories:hover .category-menu-panel,
-    .header-categories:focus-within .category-menu-panel {
+    .header-categories:focus-within .category-menu-panel,
+    .header-categories[open] .category-menu-panel {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);

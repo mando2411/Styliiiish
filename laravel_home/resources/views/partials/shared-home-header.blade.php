@@ -107,18 +107,18 @@
                 <span class="cart-plus-one" id="cartPlusOne">+1</span>
             </span>
             <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $ht('start_selling', 'ابدئي البيع', 'Start Selling') }}</a>
-            <span class="header-categories action-categories">
-                <button class="category-trigger" type="button" aria-haspopup="menu" aria-label="{{ $ht('categories', 'الأقسام', 'Categories') }}">
+            <details class="header-categories action-categories">
+                <summary class="category-trigger" aria-haspopup="menu" aria-label="{{ $ht('categories', 'الأقسام', 'Categories') }}">
                     <span aria-hidden="true">☰</span>
                     <span>{{ $ht('categories', 'الأقسام', 'Categories') }}</span>
-                </button>
+                </summary>
                 <div class="category-menu-panel" role="menu" aria-label="{{ $ht('categories', 'الأقسام', 'Categories') }}">
                     <a href="{{ $localePrefix }}/categories" role="menuitem">{{ $ht('categories', 'كل الأقسام', 'All Categories') }}</a>
                     <a href="{{ $localePrefix }}/shop" role="menuitem">{{ $ht('nav_shop', 'المتجر', 'Shop') }}</a>
                     <a href="{{ $localePrefix }}/marketplace" role="menuitem">{{ $ht('nav_marketplace', 'الماركت بليس', 'Marketplace') }}</a>
                     <a href="{{ $localePrefix }}/wishlist" role="menuitem">{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}</a>
                 </div>
-            </span>
+            </details>
         </div>
     </div>
 </header>

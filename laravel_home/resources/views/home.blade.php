@@ -578,6 +578,14 @@
             display: inline-flex;
         }
 
+        .header-categories > summary {
+            list-style: none;
+        }
+
+        .header-categories > summary::-webkit-details-marker {
+            display: none;
+        }
+
         .category-trigger {
             min-height: 40px;
             border: 1px solid var(--line);
@@ -623,7 +631,8 @@
         [dir="ltr"] .category-menu-panel { left: auto; right: 0; }
 
         .header-categories:hover .category-menu-panel,
-        .header-categories:focus-within .category-menu-panel {
+        .header-categories:focus-within .category-menu-panel,
+        .header-categories[open] .category-menu-panel {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
@@ -2700,18 +2709,18 @@
                     <span class="cart-plus-one" id="cartPlusOne">+1</span>
                 </span>
                 <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
-                <span class="header-categories action-categories">
-                    <button class="category-trigger" type="button" aria-haspopup="menu" aria-label="{{ $t('categories') }}">
+                <details class="header-categories action-categories">
+                    <summary class="category-trigger" aria-haspopup="menu" aria-label="{{ $t('categories') }}">
                         <span aria-hidden="true">☰</span>
                         <span>{{ $t('categories') }}</span>
-                    </button>
+                    </summary>
                     <div class="category-menu-panel" role="menu" aria-label="{{ $t('categories') }}">
                         <a href="{{ $localePrefix }}/categories" role="menuitem">{{ $t('categories') }}</a>
                         <a href="{{ $localePrefix }}/shop" role="menuitem">{{ $t('nav_shop') }}</a>
                         <a href="{{ $localePrefix }}/marketplace" role="menuitem">{{ $t('nav_marketplace') }}</a>
                         <a href="{{ $localePrefix }}/wishlist" role="menuitem">{{ $t('wishlist') }}</a>
                     </div>
-                </span>
+                </details>
             </div>
         </div>
     </header>
