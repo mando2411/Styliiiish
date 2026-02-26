@@ -274,12 +274,12 @@
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
     $wpMyAccountUrl = $wpBaseUrl . '/my-account/';
-    $wpLoginUrl = $wpBaseUrl . '/wp-login.php';
-    $wpRegisterUrl = $wpBaseUrl . '/wp-login.php?action=register&redirect_to=' . rawurlencode($wpMyAccountUrl);
-    $wpForgotPasswordUrl = $wpBaseUrl . '/wp-login.php?action=lostpassword';
+    $wpLoginUrl = $wpMyAccountUrl;
+    $wpRegisterUrl = $wpMyAccountUrl . '?register=1';
+    $wpForgotPasswordUrl = $wpMyAccountUrl . 'lost-password/';
     $wpGoogleLoginUrl = (string) (env('WP_GOOGLE_LOGIN_URL')
         ? env('WP_GOOGLE_LOGIN_URL')
-        : ($wpBaseUrl . '/wp-login.php?loginSocial=google&redirect=' . rawurlencode($wpMyAccountUrl)));
+        : ($wpMyAccountUrl . '?loginSocial=google&redirect=' . rawurlencode($wpMyAccountUrl)));
     $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/en/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $reviewsPrevArrow = $isEnglish ? '‹' : '›';
     $reviewsNextArrow = $isEnglish ? '›' : '‹';
@@ -2802,18 +2802,19 @@
                 <button class="auth-close" type="button" data-close-auth-modal aria-label="{{ $t('close') }}">×</button>
             </div>
 
-            <form class="auth-form" action="{{ $wpLoginUrl }}" method="post" autocomplete="on">
-                <input type="hidden" name="redirect_to" value="{{ $wpMyAccountUrl }}">
-                <input type="hidden" name="testcookie" value="1">
+            <form class="auth-form" id="authLoginForm" action="{{ $wpLoginUrl }}" method="post" autocomplete="on">
+                <input type="hidden" name="redirect" value="{{ $wpMyAccountUrl }}">
+                <input type="hidden" name="login" value="Log in">
+                <input type="hidden" id="authWooLoginNonce" name="woocommerce-login-nonce" value="">
 
                 <div class="auth-field">
                     <label for="authLoginField">{{ $t('login_username') }}</label>
-                    <input id="authLoginField" type="text" name="log" required>
+                    <input id="authLoginField" type="text" name="username" required>
                 </div>
 
                 <div class="auth-field">
                     <label for="authPasswordField">{{ $t('login_password') }}</label>
-                    <input id="authPasswordField" type="password" name="pwd" required>
+                    <input id="authPasswordField" type="password" name="password" required>
                 </div>
 
                 <div class="auth-row">
@@ -2870,12 +2871,34 @@
             const accountLoginTrigger = document.getElementById('accountLoginTrigger');
             const authModal = document.getElementById('authModal');
             const authModalClosers = authModal ? authModal.querySelectorAll('[data-close-auth-modal]') : [];
+            const authLoginForm = document.getElementById('authLoginForm');
+            const authWooLoginNonce = document.getElementById('authWooLoginNonce');
 
             const hasWpLoginCookie = () => {
                 return document.cookie
                     .split(';')
                     .map((entry) => entry.trim())
                     .some((entry) => entry.startsWith('wordpress_logged_in_'));
+            };
+
+            const fetchWooLoginNonce = async () => {
+                if (!authWooLoginNonce) return;
+                if (authWooLoginNonce.value) return;
+
+                const response = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!response.ok) return;
+
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const nonceField = doc.querySelector('input[name="woocommerce-login-nonce"]');
+                if (nonceField && nonceField.value) {
+                    authWooLoginNonce.value = nonceField.value;
+                }
             };
 
             let currentWishlistCount = 0;
@@ -3143,7 +3166,8 @@
                     }
 
                     openAuthModal();
-                    const firstField = authModal ? authModal.querySelector('input[name="log"]') : null;
+                    fetchWooLoginNonce().catch(() => {});
+                    const firstField = authModal ? authModal.querySelector('input[name="username"]') : null;
                     if (firstField) {
                         setTimeout(() => firstField.focus(), 40);
                     }
@@ -3152,6 +3176,12 @@
 
             if (authModalClosers.length > 0) {
                 authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
+            }
+
+            if (authLoginForm) {
+                authLoginForm.addEventListener('submit', async () => {
+                    await fetchWooLoginNonce().catch(() => {});
+                });
             }
 
             if (miniCartList) {
