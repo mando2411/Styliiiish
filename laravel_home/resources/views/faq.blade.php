@@ -249,15 +249,7 @@
     </style>
 </head>
 <body>
-<header class="main-header">
-    <div class="container main-header-inner">
-        <a class="brand" href="{{ $localePrefix }}"><img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';"><span class="brand-tag">{{ $t('brand_tag') }}</span></a>
-        @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
-        <div class="header-tools">
-            <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}"><span class="lang-indicator" aria-hidden="true"></span><a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar/faq">AR</a><a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en/faq">EN</a></div>
-        </div>
-    </div>
-</header>
+@include('partials.shared-home-header')
 
 <section class="hero">
     <div class="container hero-box">

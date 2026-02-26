@@ -191,24 +191,7 @@
     </style>
 </head>
 <body>
-    <div class="topbar"><div class="container">المتجر الرسمي • شحن داخل مصر 2–10 أيام</div></div>
-
-    <header class="header">
-        <div class="container header-inner">
-            <a class="brand" href="/">
-                <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <span class="brand-sub">لأن كل امرأة تستحق أن تتألق</span>
-            </a>
-
-            @include('partials.shared-header-nav', ['navClass' => 'nav'])
-
-            <div style="display:flex; gap:8px; justify-content:center;">
-                <a class="head-btn" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" title="حسابي" aria-label="حسابي">👤</a>
-                <a class="head-btn" href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener" title="قائمة الأمنيات" aria-label="قائمة الأمنيات">❤</a>
-                <a class="head-btn" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" title="السلة" aria-label="السلة">🛒</a>
-            </div>
-        </div>
-    </header>
+    @include('partials.shared-home-header')
 
     <main class="container">
         <section class="shop-head">
