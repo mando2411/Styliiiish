@@ -41,6 +41,14 @@
         opacity: 1;
     }
 
+    .topbar-phone {
+        direction: ltr;
+        unicode-bidi: isolate;
+        display: inline-block;
+        letter-spacing: .2px;
+        font-variant-numeric: tabular-nums;
+    }
+
     .topbar-note {
         display: inline-flex;
         align-items: center;

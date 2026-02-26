@@ -419,6 +419,14 @@
             opacity: 1;
         }
 
+        .topbar-phone {
+            direction: ltr;
+            unicode-bidi: isolate;
+            display: inline-block;
+            letter-spacing: .2px;
+            font-variant-numeric: tabular-nums;
+        }
+
         .topbar-note {
             display: inline-flex;
             align-items: center;
@@ -2536,7 +2544,7 @@
         <div class="container topbar-inner">
             <div class="topbar-right">
                 <strong>{{ $t('contact_anytime') }}</strong>
-                <a href="tel:+201050874255">+20 010 5087 4255</a>
+                <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
             </div>
             <div class="topbar-left">
                 <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
