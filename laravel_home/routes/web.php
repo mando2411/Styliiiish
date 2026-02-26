@@ -443,6 +443,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'random');
 
+    $normalizeSearchText = static function (?string $value): string {
+        $text = mb_strtolower(trim((string) $value), 'UTF-8');
+        $text = str_replace(['أ', 'إ', 'آ', 'ى', 'ؤ', 'ئ', 'ة'], ['ا', 'ا', 'ا', 'ي', 'و', 'ي', 'ه'], $text);
+        $text = preg_replace('/[\x{064B}-\x{065F}\x{0670}\x{06D6}-\x{06ED}]/u', '', $text) ?? $text;
+        $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
+        return trim($text);
+    };
+
     if (!in_array($sort, ['random', 'price_asc', 'price_desc'], true)) {
         $sort = 'random';
     }
@@ -464,10 +472,6 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish');
 
-    if ($search !== '') {
-        $query->where('p.post_title', 'like', "%{$search}%");
-    }
-
     if ($sort === 'random') {
         $query->inRandomOrder();
     } elseif ($sort === 'price_asc') {
@@ -488,6 +492,86 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
     )->get();
 
     $products = $localizeProductsCollectionByWpml($products, $locale);
+
+    if ($search !== '') {
+        $needle = $normalizeSearchText($search);
+
+        if ($needle !== '' && $products->isNotEmpty()) {
+            $productIds = $products->pluck('ID')
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->values();
+
+            $categoryNamesByProduct = collect();
+
+            if ($productIds->isNotEmpty()) {
+                $baseCategoryRows = DB::table('wp_term_relationships as rel')
+                    ->join('wp_term_taxonomy as tt', function ($join) {
+                        $join->on('rel.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                            ->where('tt.taxonomy', '=', 'product_cat');
+                    })
+                    ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+                    ->whereIn('rel.object_id', $productIds->all())
+                    ->select('rel.object_id as product_id', 't.name as category_name')
+                    ->get();
+
+                $categoryNamesByProduct = $baseCategoryRows
+                    ->groupBy('product_id')
+                    ->map(fn ($rows) => $rows->pluck('category_name')->filter()->values());
+
+                if (Schema::hasTable('wp_icl_translations')) {
+                    $translatedCategoryRows = DB::table('wp_term_relationships as rel')
+                        ->join('wp_term_taxonomy as tt', function ($join) {
+                            $join->on('rel.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                                ->where('tt.taxonomy', '=', 'product_cat');
+                        })
+                        ->join('wp_icl_translations as src_i18n', function ($join) {
+                            $join->on('src_i18n.element_id', '=', 'tt.term_taxonomy_id')
+                                ->where('src_i18n.element_type', '=', 'tax_product_cat');
+                        })
+                        ->join('wp_icl_translations as tr_i18n', function ($join) {
+                            $join->on('tr_i18n.trid', '=', 'src_i18n.trid')
+                                ->where('tr_i18n.element_type', '=', 'tax_product_cat');
+                        })
+                        ->join('wp_term_taxonomy as tt_tr', 'tt_tr.term_taxonomy_id', '=', 'tr_i18n.element_id')
+                        ->join('wp_terms as t_tr', 'tt_tr.term_id', '=', 't_tr.term_id')
+                        ->whereIn('rel.object_id', $productIds->all())
+                        ->select('rel.object_id as product_id', 't_tr.name as category_name')
+                        ->get();
+
+                    if ($translatedCategoryRows->isNotEmpty()) {
+                        $translatedMap = $translatedCategoryRows
+                            ->groupBy('product_id')
+                            ->map(fn ($rows) => $rows->pluck('category_name')->filter()->values());
+
+                        $categoryNamesByProduct = $categoryNamesByProduct
+                            ->union($translatedMap)
+                            ->map(function ($names, $productId) use ($translatedMap) {
+                                $extra = $translatedMap->get($productId, collect());
+                                return collect($names)->merge($extra)->filter()->unique()->values();
+                            });
+                    }
+                }
+            }
+
+            $products = $products->filter(function ($product) use ($needle, $normalizeSearchText, $categoryNamesByProduct) {
+                $title = $normalizeSearchText((string) ($product->post_title ?? ''));
+                if ($title !== '' && str_contains($title, $needle)) {
+                    return true;
+                }
+
+                $categoryNames = $categoryNamesByProduct->get((int) ($product->ID ?? 0), collect());
+                foreach ($categoryNames as $categoryName) {
+                    $normalizedCategory = $normalizeSearchText((string) $categoryName);
+                    if ($normalizedCategory !== '' && str_contains($normalizedCategory, $needle)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })->values();
+        }
+    }
 
     return [$products, $search, $sort];
 };
