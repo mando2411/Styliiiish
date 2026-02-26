@@ -3677,14 +3677,14 @@
             <div class="footer-col">
                 <h5>{{ $t('quick_links') }}</h5>
                 <ul class="footer-links">
-                    <li><a href="https://styliiiish.com/" target="_blank" rel="noopener">{{ $t('nav_home') }}</a></li>
+                    <li><a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a></li>
                     <li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li>
-                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('shop_now') }}</a></li>
-                    <li><a href="https://styliiiish.com/dress-rental-in-cairo/" target="_blank" rel="noopener">{{ $t('nav_shop') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/shop">{{ $t('shop_now') }}</a></li>
+                    <li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li>
                     <li><a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a></li>
                     <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
                     <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a></li>
-                    <li><a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account') }}</a></li>
+                    <li><a href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener">{{ $t('account') }}</a></li>
                 </ul>
             </div>
 
@@ -3714,15 +3714,15 @@
 
         <div class="container footer-bottom">
             <span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
-            <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
+            <span><a href="{{ $localePrefix }}">styliiiish.com</a></span>
         </div>
 
         <div class="container footer-mini-nav">
-            <a href="https://styliiiish.com/" target="_blank" rel="noopener">{{ $t('home_mini') }}</a>
+            <a href="{{ $localePrefix }}">{{ $t('home_mini') }}</a>
             <a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a>
-            <a href="https://styliiiish.com/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a>
-            <a href="https://styliiiish.com/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
-            <a href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a>
+            <a href="{{ $localePrefix }}/cart">{{ $t('cart_mini') }}</a>
+            <a href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener">{{ $t('account_mini') }}</a>
+            <a href="{{ $localePrefix }}/wishlist">{{ $t('fav_mini') }}</a>
         </div>
     </footer>
 
