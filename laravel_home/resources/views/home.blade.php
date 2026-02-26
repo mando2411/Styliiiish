@@ -3009,13 +3009,7 @@
             let siteKitGoogleConfig = null;
             let siteKitGoogleInitialized = false;
             let accountSummaryLoaded = false;
-
-            const hasWpLoginCookie = () => {
-                return document.cookie
-                    .split(';')
-                    .map((entry) => entry.trim())
-                    .some((entry) => entry.startsWith('wordpress_logged_in_'));
-            };
+            let accountAuthState = 'unknown';
 
             const getSafeCurrentUrl = () => {
                 try {
@@ -3071,6 +3065,16 @@
                 return summary;
             };
 
+            const isLoggedInFromAccountDoc = (doc) => {
+                if (!doc) return false;
+
+                const hasLogoutLink = !!doc.querySelector('a[href*="customer-logout"]');
+                const hasEditAccountForm = !!doc.querySelector('form.woocommerce-EditAccountForm');
+                const hasAccountEmailField = !!doc.querySelector('input[name="account_email"]');
+
+                return hasLogoutLink || hasEditAccountForm || hasAccountEmailField;
+            };
+
             const applyAccountSummary = (summary) => {
                 if (!summary) return;
                 if (accountMenuName) accountMenuName.textContent = summary.name || accountLoggedInText;
@@ -3080,12 +3084,7 @@
             };
 
             const loadAccountSummary = async (forceReload = false) => {
-                if (!hasWpLoginCookie()) {
-                    closeAccountMenu();
-                    return false;
-                }
-
-                if (!forceReload && accountSummaryLoaded) return true;
+                if (!forceReload && accountSummaryLoaded && accountAuthState === 'logged-in') return true;
 
                 if (accountMenuName) accountMenuName.textContent = accountLoadingText;
                 if (accountMenuMeta) accountMenuMeta.textContent = accountLoggedInText;
@@ -3100,9 +3099,17 @@
                 const html = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
+
+                if (!isLoggedInFromAccountDoc(doc)) {
+                    accountAuthState = 'guest';
+                    accountSummaryLoaded = false;
+                    return false;
+                }
+
                 const summary = parseAccountSummary(doc);
                 applyAccountSummary(summary);
                 accountSummaryLoaded = true;
+                accountAuthState = 'logged-in';
                 return true;
             };
 
@@ -3496,13 +3503,18 @@
 
             if (accountLoginTrigger) {
                 accountLoginTrigger.addEventListener('click', async () => {
-                    if (hasWpLoginCookie()) {
-                        if (accountMenu && accountMenu.classList.contains('is-open')) {
-                            closeAccountMenu();
-                            return;
-                        }
+                    if (accountMenu && accountMenu.classList.contains('is-open')) {
+                        closeAccountMenu();
+                        return;
+                    }
+
+                    let isLoggedIn = accountAuthState === 'logged-in';
+                    if (!isLoggedIn) {
+                        isLoggedIn = await loadAccountSummary(true).catch(() => false);
+                    }
+
+                    if (isLoggedIn) {
                         openAccountMenu();
-                        await loadAccountSummary(true).catch(() => {});
                         return;
                     }
 
