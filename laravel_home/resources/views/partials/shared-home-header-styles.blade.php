@@ -61,6 +61,9 @@
     }
 
     .site-footer .footer-brand-logo {
+        height: 46px !important;
+        width: auto !important;
+        max-width: min(280px, 100%) !important;
         filter: none !important;
         opacity: 1 !important;
     }
@@ -139,9 +142,9 @@
     }
 
     .brand-logo {
-        height: 40px;
+        height: 52px;
         width: auto;
-        max-width: min(220px, 38vw);
+        max-width: min(280px, 48vw);
         object-fit: contain;
     }
 
@@ -695,8 +698,8 @@
         }
 
         .brand-logo {
-            height: 34px;
-            max-width: 190px;
+            height: 40px;
+            max-width: 220px;
         }
 
         .brand-tag {
@@ -766,8 +769,8 @@
         }
 
         .brand-logo {
-            height: 30px;
-            max-width: 165px;
+            height: 34px;
+            max-width: 185px;
         }
 
         .main-nav a {
