@@ -1,11 +1,7 @@
 @php
-    $pathLocale = request()->segment(1);
-    $currentLocale = in_array($pathLocale, ['ar', 'en'], true)
-        ? $pathLocale
-        : ($currentLocale ?? 'ar');
+    $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
     $wpmlLocale = $currentLocale === 'en' ? 'en' : 'ar';
-    $wpmlLocalePattern = $wpmlLocale . '%';
 
     $categoryGroups = collect();
 
@@ -18,69 +14,22 @@
                 ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
                 ->where('tt.taxonomy', 'product_cat')
                 ->whereNotIn('t.slug', ['uncategorized'])
-                ->where('tt.count', '>', 0)
-                ->select('tt.term_taxonomy_id', 'tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
-
+                ->select('tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
             $localizedTerms = collect();
 
-            $hasWpml = \Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations');
-
-            if ($hasWpml) {
-                $localizedByTaxonomyId = (clone $baseTermsQuery)
+            if (\Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations')) {
+                $localizedTerms = $baseTermsQuery
                     ->join('wp_icl_translations as tr', function ($join) {
                         $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
                             ->where('tr.element_type', '=', 'tax_product_cat');
                     })
                     ->where('tr.language_code', $wpmlLocale)
-                    ->orderByDesc('tt.count')
                     ->orderBy('t.name')
                     ->get();
-
-                if ($localizedByTaxonomyId->isEmpty()) {
-                    $localizedByTaxonomyId = (clone $baseTermsQuery)
-                        ->join('wp_icl_translations as tr', function ($join) {
-                            $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
-                                ->where('tr.element_type', '=', 'tax_product_cat');
-                        })
-                        ->where('tr.language_code', 'like', $wpmlLocalePattern)
-                        ->orderByDesc('tt.count')
-                        ->orderBy('t.name')
-                        ->get();
-                }
-
-                $localizedByTermId = collect();
-                if ($localizedByTaxonomyId->isEmpty()) {
-                    $localizedByTermId = (clone $baseTermsQuery)
-                        ->join('wp_icl_translations as tr', function ($join) {
-                            $join->on('tr.element_id', '=', 'tt.term_id')
-                                ->where('tr.element_type', '=', 'tax_product_cat');
-                        })
-                        ->where('tr.language_code', $wpmlLocale)
-                        ->orderByDesc('tt.count')
-                        ->orderBy('t.name')
-                        ->get();
-
-                    if ($localizedByTermId->isEmpty()) {
-                        $localizedByTermId = (clone $baseTermsQuery)
-                            ->join('wp_icl_translations as tr', function ($join) {
-                                $join->on('tr.element_id', '=', 'tt.term_id')
-                                    ->where('tr.element_type', '=', 'tax_product_cat');
-                            })
-                            ->where('tr.language_code', 'like', $wpmlLocalePattern)
-                            ->orderByDesc('tt.count')
-                            ->orderBy('t.name')
-                            ->get();
-                    }
-                }
-
-                $localizedTerms = $localizedByTaxonomyId->isNotEmpty()
-                    ? $localizedByTaxonomyId
-                    : $localizedByTermId;
             }
 
             if ($localizedTerms->isEmpty()) {
-                $localizedTerms = (clone $baseTermsQuery)
-                    ->orderByDesc('tt.count')
+                $localizedTerms = $baseTermsQuery
                     ->orderBy('t.name')
                     ->get();
             }
@@ -89,6 +38,7 @@
                 $parents = $localizedTerms->where('parent', 0)->keyBy('term_id');
                 $childrenByParent = $localizedTerms
                     ->where('parent', '!=', 0)
+                    ->where('count', '>', 0)
                     ->groupBy('parent');
 
                 $categoryGroups = $parents
