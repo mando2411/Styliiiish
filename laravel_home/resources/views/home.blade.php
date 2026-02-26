@@ -3,8 +3,7 @@
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
-    $wpSearchUrl = $isEnglish ? ($wpBaseUrl . '/en/') : ($wpBaseUrl . '/ar/');
+    $headerSearchUrl = $localePrefix . '/shop';
 
     $normalizeSwitcherPath = function (string $path): string {
         $trimmed = trim($path);
@@ -2572,9 +2571,8 @@
             @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
 
             <div class="header-actions">
-                <form class="search-form" action="{{ $wpSearchUrl }}" method="get">
-                    <input class="search-input" type="search" name="s" required placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
-                    <input type="hidden" name="post_type" value="product">
+                <form class="search-form" action="{{ $headerSearchUrl }}" method="get">
+                    <input class="search-input" type="search" name="q" required placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
                 <span class="account-trigger-wrap action-account">

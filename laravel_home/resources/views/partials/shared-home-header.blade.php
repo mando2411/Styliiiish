@@ -6,7 +6,7 @@
     $wpLogo = $wpLogo ?? 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 
     $wpMyAccountUrl = $wpMyAccountUrl ?? ($wpBaseUrl . '/my-account/');
-    $wpSearchUrl = $wpSearchUrl ?? ($isEnglish ? ($wpBaseUrl . '/en/') : ($wpBaseUrl . '/ar/'));
+    $headerSearchUrl = $localePrefix . '/shop';
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
@@ -69,9 +69,8 @@
         @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
 
         <div class="header-actions">
-            <form class="search-form" action="{{ $wpSearchUrl }}" method="get">
-                <input class="search-input" type="search" name="s" required placeholder="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}" aria-label="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}">
-                <input type="hidden" name="post_type" value="product">
+            <form class="search-form" action="{{ $headerSearchUrl }}" method="get">
+                <input class="search-input" type="search" name="q" required placeholder="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}" aria-label="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}">
                 <button class="search-btn" type="submit">{{ $ht('search_btn', 'بحث', 'Search') }}</button>
             </form>
             <span class="account-trigger-wrap action-account">
