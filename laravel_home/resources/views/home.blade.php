@@ -22,8 +22,8 @@
 
     $translations = [
         'ar' => [
-            'title' => 'ستايلش | فساتين سهرة وزفاف في مصر',
-            'meta_desc' => 'ستايلش: متجر فساتين سهرة وزفاف وخطوبة في مصر مع خصومات يومية حتى 50%، شحن سريع داخل مصر، وتجربة شراء احترافية وآمنة.',
+            'title' => 'ستايلش | فساتين سهرة وزفاف وخطوبة في مصر',
+            'meta_desc' => 'ستايلش وجهتكِ الأولى لفساتين السهرة والزفاف والخطوبة في مصر: موديلات أصلية، أسعار تنافسية، خصومات يومية حتى 50%، وشحن سريع لجميع المحافظات.',
             'contact_anytime' => 'اتصلي بنا في أي وقت:',
             'daily_deals' => '⚡ خصومات يومية',
             'facebook' => 'فيسبوك',
@@ -70,8 +70,8 @@
             'start_selling' => 'ابدئي البيع',
             'promo_line' => 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل',
             'hero_badge' => '✨ مجموعة حصرية بتحديثات يومية',
-            'hero_title' => 'اختاري فستان أحلامك لمناسبتك القادمة بأفضل قيمة في مصر',
-            'hero_lead' => 'موديلات سهرة وزفاف وخطوبة مختارة بعناية، مع عروض قوية وتجربة شراء سريعة من منصة موثوقة.',
+            'hero_title' => 'اختاري فستان مناسبتك بثقة من أكبر تشكيلة فساتين في مصر',
+            'hero_lead' => 'فساتين سهرة وزفاف وخطوبة بخامات مميزة وموديلات متجددة يوميًا، مع تجربة شراء آمنة وخدمة موثوقة قبل وبعد الطلب.',
             'hero_p1' => '✔️ خصومات تصل إلى 50% على موديلات مختارة',
             'hero_p2' => '✔️ توصيل داخل مصر خلال 2–10 أيام',
             'hero_p3' => '✔️ خيارات متنوعة للمقاسات والستايلات',
@@ -86,8 +86,8 @@
             'high_trust' => 'ثقة عالية',
             'support_before_after' => 'خدمة ودعم قبل وبعد الطلب',
             'why_sty' => 'لماذا Styliiiish؟',
-            'why_note' => 'مزيج بين جودة التصميم وسهولة الشراء، مع روابط وسياسات واضحة لبناء ثقة حقيقية.',
-            'why_1' => '✓ منتجات منشورة مباشرة من متجر ووردبريس لحظيًا',
+            'why_note' => 'نجمع بين جودة التصميم وسهولة التسوق وسياسات واضحة تمنحكِ تجربة شراء احترافية من البداية للنهاية.',
+            'why_1' => '✓ منتجات محدثة باستمرار مع عرض دقيق للتفاصيل والأسعار',
             'why_2' => '✓ فساتين سهرة وزفاف وموديلات محتشمة بألوان ومقاسات متنوعة',
             'why_3' => '✓ عروض يومية وأسعار مميزة على موديلات مختارة',
             'why_4' => '✓ خدمة داخل مصر مع سياسات شحن واسترجاع واضحة',
@@ -96,7 +96,7 @@
             'min_price' => 'أقل سعر حالي',
             'max_price' => 'أعلى سعر حالي',
             'featured_title' => 'منتجات مختارة لك الآن',
-            'featured_sub' => 'أحدث الفساتين من المتجر مع إبراز العروض والخصومات',
+            'featured_sub' => 'تشكيلة منتقاة من أحدث الفساتين مع أفضل العروض والخصومات المتاحة الآن',
             'view_all' => 'عرض كل المنتجات',
             'featured_badge' => 'مختارات مميزة',
             'discount_badge' => 'خصم',
@@ -113,7 +113,7 @@
             'trust_3_t' => '💸 بيعي فستانك بسهولة',
             'trust_3_d' => 'حوّلي فستانك المستعمل إلى دخل إضافي عبر المنصة.',
             'reviews_title' => 'تجارب حقيقية من Google Reviews',
-            'reviews_sub' => 'آراء عملائنا بالصورة كما هي لبناء ثقة كاملة قبل الطلب.',
+            'reviews_sub' => 'تجارب موثقة من عميلاتنا تساعدكِ على اتخاذ قرار شراء بثقة ووضوح.',
             'prev' => 'السابق',
             'next' => 'التالي',
             'open_google_reviews' => 'فتح تقييمات Google',
@@ -121,7 +121,7 @@
             'rating' => 'تقييم',
             'no_reviews_now' => 'لا توجد صور مراجعات متاحة الآن.',
             'final_title' => 'جاهزة تتألقي في مناسبتك القادمة؟',
-            'final_sub' => 'اكتشفي أجدد الموديلات والعروض الحصرية الآن، أو ارفعي فستانك للبيع في دقائق ووصول أسرع لآلاف المشترين في مصر.',
+            'final_sub' => 'ابدئي الآن بتصفح أحدث الموديلات والعروض الحصرية، أو اعرضي فستانك للبيع ووصول أسرع لآلاف المشتريات في مصر.',
             'start_shop' => 'ابدئي التسوق',
             'footer_title' => 'ستيليش فاشون هاوس',
             'footer_desc' => 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.',
@@ -147,7 +147,7 @@
             'categories' => 'الأقسام',
             'official_address' => '1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر',
             'rights' => 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير',
-            'footer_note' => 'الصفحة الرئيسية مطورة بـ Laravel ومتصلة ببيانات WordPress مباشرة',
+            'footer_note' => 'منصة موثوقة لبيع وشراء فساتين المناسبات في مصر مع تجربة استخدام احترافية.',
             'home_mini' => 'الرئيسية',
             'shop_mini' => 'المتجر',
             'cart_mini' => 'السلة',
@@ -156,7 +156,7 @@
         ],
         'en' => [
             'title' => 'Styliiiish | Evening, Bridal & Engagement Dresses in Egypt',
-            'meta_desc' => 'Styliiiish: Shop evening, bridal, and engagement dresses in Egypt with daily offers up to 50%, fast nationwide shipping, and a secure modern shopping experience.',
+            'meta_desc' => 'Styliiiish is your trusted destination for evening, bridal, and engagement dresses in Egypt with premium styles, daily offers up to 50%, and fast nationwide delivery.',
             'contact_anytime' => 'Call us anytime:',
             'daily_deals' => '⚡ Daily Deals',
             'facebook' => 'Facebook',
@@ -203,8 +203,8 @@
             'start_selling' => 'Start Selling',
             'promo_line' => 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days',
             'hero_badge' => '✨ Exclusive collection with daily updates',
-            'hero_title' => 'Find your dream dress for your next occasion at the best value in Egypt',
-            'hero_lead' => 'Carefully selected evening, bridal, and engagement dresses with strong offers and a fast shopping experience.',
+            'hero_title' => 'Find the perfect occasion dress with confidence and premium value',
+            'hero_lead' => 'Discover curated evening, bridal, and engagement styles with reliable service, secure shopping, and daily updated collections.',
             'hero_p1' => '✔️ Up to 50% off selected styles',
             'hero_p2' => '✔️ Delivery across Egypt in 2–10 days',
             'hero_p3' => '✔️ Wide range of sizes and styles',
@@ -219,8 +219,8 @@
             'high_trust' => 'High Trust',
             'support_before_after' => 'Support before and after your order',
             'why_sty' => 'Why Styliiiish?',
-            'why_note' => 'A blend of design quality and shopping simplicity with clear policies and trusted links.',
-            'why_1' => '✓ Products synced live from WordPress store',
+            'why_note' => 'We combine quality design, transparent policies, and a smooth shopping journey built for trust and convenience.',
+            'why_1' => '✓ Continuously updated products with accurate details and pricing',
             'why_2' => '✓ Evening, bridal, and modest styles in many colors and sizes',
             'why_3' => '✓ Daily offers and standout pricing on selected styles',
             'why_4' => '✓ Egypt-wide service with clear shipping and return policies',
@@ -229,7 +229,7 @@
             'min_price' => 'Current Min Price',
             'max_price' => 'Current Max Price',
             'featured_title' => 'Featured Products for You',
-            'featured_sub' => 'Latest dresses from the store with highlighted offers and discounts',
+            'featured_sub' => 'A handpicked selection of the latest dresses with the best live offers and discounts',
             'view_all' => 'View All Products',
             'featured_badge' => 'Featured Pick',
             'discount_badge' => 'OFF',
@@ -246,7 +246,7 @@
             'trust_3_t' => '💸 Sell Your Dress Easily',
             'trust_3_d' => 'Turn your pre-loved dress into extra income through the platform.',
             'reviews_title' => 'Real Reviews from Google',
-            'reviews_sub' => 'Authentic customer review screenshots to build confidence before ordering.',
+            'reviews_sub' => 'Verified customer experiences that help you choose with confidence before placing your order.',
             'prev' => 'Previous',
             'next' => 'Next',
             'open_google_reviews' => 'Open Google Reviews',
@@ -254,7 +254,7 @@
             'rating' => 'Review',
             'no_reviews_now' => 'No review images available right now.',
             'final_title' => 'Ready to shine at your next event?',
-            'final_sub' => 'Discover the latest styles and exclusive offers now, or list your dress for sale and reach thousands of buyers in Egypt.',
+            'final_sub' => 'Explore the newest styles and exclusive offers now, or list your dress and reach thousands of potential buyers across Egypt.',
             'start_shop' => 'Start Shopping',
             'footer_title' => 'Styliiiish Fashion House',
             'footer_desc' => 'We are passionate about offering the latest dress designs for every special occasion.',
@@ -280,7 +280,7 @@
             'categories' => 'Categories',
             'official_address' => '1 Nabil Khalil St, Nasr City, Cairo, Egypt',
             'rights' => 'All rights reserved © :year Styliiiish | Powered by',
-            'footer_note' => 'Homepage is built with Laravel and connected directly to WordPress data',
+            'footer_note' => 'A trusted marketplace experience for buying and selling occasion dresses across Egypt.',
             'home_mini' => 'Home',
             'shop_mini' => 'Shop',
             'cart_mini' => 'Cart',
@@ -329,6 +329,8 @@
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
+    <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_EG' }}">
+    <meta property="og:locale:alternate" content="{{ $isEnglish ? 'ar_EG' : 'en_US' }}">
     <meta property="og:title" content="{{ $t('title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
     <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
@@ -341,6 +343,41 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('title') }}</title>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebSite',
+            'name' => 'Styliiiish',
+            'url' => $wpBaseUrl . $canonicalPath,
+            'inLanguage' => $isEnglish ? 'en' : 'ar',
+            'potentialAction' => [
+                '@type' => 'SearchAction',
+                'target' => $wpBaseUrl . $localePrefix . '/shop?q={search_term_string}',
+                'query-input' => 'required name=search_term_string',
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            'name' => 'Styliiiish Fashion House',
+            'url' => $wpBaseUrl,
+            'logo' => $wpLogo,
+            'sameAs' => [
+                'https://www.facebook.com/Styliiish.Egypt/',
+                'https://www.instagram.com/styliiiish.egypt/',
+                'https://g.page/styliish',
+            ],
+            'contactPoint' => [[
+                '@type' => 'ContactPoint',
+                'telephone' => '+20 105 087 4255',
+                'contactType' => 'customer support',
+                'areaServed' => 'EG',
+                'availableLanguage' => ['ar', 'en'],
+            ]],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;
