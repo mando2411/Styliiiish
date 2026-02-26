@@ -128,7 +128,7 @@
     }
 
     .main-header-inner {
-        min-height: 84px;
+        min-height: 96px;
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
@@ -142,9 +142,9 @@
     }
 
     .brand-logo {
-        height: 52px;
+        height: 60px;
         width: auto;
-        max-width: min(280px, 48vw);
+        max-width: min(320px, 52vw);
         object-fit: contain;
     }
 
@@ -698,8 +698,8 @@
         }
 
         .brand-logo {
-            height: 40px;
-            max-width: 220px;
+            height: 44px;
+            max-width: 240px;
         }
 
         .brand-tag {
@@ -769,8 +769,8 @@
         }
 
         .brand-logo {
-            height: 34px;
-            max-width: 185px;
+            height: 36px;
+            max-width: 200px;
         }
 
         .main-nav a {
