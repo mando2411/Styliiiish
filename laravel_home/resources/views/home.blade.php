@@ -27,6 +27,10 @@
             'cart' => 'السلة',
             'login_title' => 'تسجيل الدخول',
             'login_subtitle' => 'أكملي إلى حسابك لإدارة الطلبات والمفضلة بسهولة.',
+            'account_loading' => 'جاري تحميل بيانات الحساب…',
+            'account_logged_in' => 'مستخدم مسجل دخول',
+            'manage_account' => 'إدارة حسابك',
+            'logout' => 'تسجيل خروج',
             'login_username' => 'اسم المستخدم أو البريد الإلكتروني',
             'login_password' => 'كلمة المرور',
             'remember_me' => 'تذكرني',
@@ -156,6 +160,10 @@
             'cart' => 'Cart',
             'login_title' => 'Sign In',
             'login_subtitle' => 'Access your account to manage orders and wishlist easily.',
+            'account_loading' => 'Loading account details…',
+            'account_logged_in' => 'Logged-in user',
+            'manage_account' => 'Manage your account',
+            'logout' => 'Log out',
             'login_username' => 'Username or Email',
             'login_password' => 'Password',
             'remember_me' => 'Remember me',
@@ -877,6 +885,79 @@
         .account-trigger {
             cursor: pointer;
             font-family: inherit;
+        }
+
+        .account-trigger-wrap {
+            position: relative;
+        }
+
+        .account-mini-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(320px, 86vw);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(23, 39, 59, .14);
+            padding: 10px;
+            display: none;
+            z-index: 90;
+        }
+
+        [dir="rtl"] .account-mini-menu { right: auto; left: 0; }
+        [dir="ltr"] .account-mini-menu { left: auto; right: 0; }
+        .account-mini-menu.is-open { display: block; }
+
+        .account-mini-head {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fbfcff;
+            padding: 10px;
+            display: grid;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .account-mini-name {
+            font-size: 14px;
+            font-weight: 900;
+            color: var(--secondary);
+            line-height: 1.3;
+        }
+
+        .account-mini-meta {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.3;
+            overflow-wrap: anywhere;
+        }
+
+        .account-mini-actions {
+            display: grid;
+            gap: 8px;
+        }
+
+        .account-mini-actions a {
+            min-height: 38px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .account-manage-link {
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--secondary);
+        }
+
+        .account-logout-link {
+            border: 1px solid rgba(var(--wf-main-rgb), .25);
+            background: #fff7f8;
+            color: var(--primary);
         }
 
         .auth-modal {
@@ -2475,7 +2556,19 @@
                     <input class="search-input" type="search" name="s" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
-                <button class="icon-btn action-account account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-controls="authModal" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
+                <span class="account-trigger-wrap action-account">
+                    <button class="icon-btn account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
+                    <div class="account-mini-menu" id="accountMenu" aria-hidden="true">
+                        <div class="account-mini-head">
+                            <strong class="account-mini-name" id="accountMenuName">{{ $t('account_loading') }}</strong>
+                            <span class="account-mini-meta" id="accountMenuMeta">{{ $t('account_logged_in') }}</span>
+                        </div>
+                        <div class="account-mini-actions">
+                            <a class="account-manage-link" id="accountMenuManage" href="{{ $wpMyAccountUrl }}">{{ $t('manage_account') }}</a>
+                            <a class="account-logout-link" id="accountMenuLogout" href="{{ $wpMyAccountUrl }}">{{ $t('logout') }}</a>
+                        </div>
+                    </div>
+                </span>
                 <span class="wishlist-trigger-wrap action-wishlist">
                     <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>
                         <span class="wishlist-count" id="wishlistCountBadge">0</span>
@@ -2905,9 +2998,17 @@
             const authGoogleButton = document.getElementById('authGoogleButton');
             const authGoogleFallback = document.getElementById('authGoogleFallback');
             const authRedirectField = authLoginForm ? authLoginForm.querySelector('input[name="redirect"]') : null;
+            const accountMenu = document.getElementById('accountMenu');
+            const accountMenuName = document.getElementById('accountMenuName');
+            const accountMenuMeta = document.getElementById('accountMenuMeta');
+            const accountMenuManage = document.getElementById('accountMenuManage');
+            const accountMenuLogout = document.getElementById('accountMenuLogout');
+            const accountLoadingText = @json($t('account_loading'));
+            const accountLoggedInText = @json($t('account_logged_in'));
 
             let siteKitGoogleConfig = null;
             let siteKitGoogleInitialized = false;
+            let accountSummaryLoaded = false;
 
             const hasWpLoginCookie = () => {
                 return document.cookie
@@ -2932,6 +3033,77 @@
                 const expires = new Date(Date.now() + (5 * 60 * 1000)).toUTCString();
                 const cookieValue = `googlesitekit_auth_redirect_to=${redirectUrl};expires=${expires};path=/`;
                 document.cookie = cookieValue;
+            };
+
+            const closeAccountMenu = () => {
+                if (!accountMenu || !accountLoginTrigger) return;
+                accountMenu.classList.remove('is-open');
+                accountMenu.setAttribute('aria-hidden', 'true');
+                accountLoginTrigger.setAttribute('aria-expanded', 'false');
+            };
+
+            const openAccountMenu = () => {
+                if (!accountMenu || !accountLoginTrigger) return;
+                accountMenu.classList.add('is-open');
+                accountMenu.setAttribute('aria-hidden', 'false');
+                accountLoginTrigger.setAttribute('aria-expanded', 'true');
+            };
+
+            const parseAccountSummary = (doc) => {
+                const summary = {
+                    name: accountLoggedInText,
+                    meta: accountLoggedInText,
+                    logoutUrl: wpMyAccountUrl,
+                };
+
+                if (!doc) return summary;
+
+                const firstName = doc.querySelector('input[name="account_first_name"]')?.value?.trim() || '';
+                const lastName = doc.querySelector('input[name="account_last_name"]')?.value?.trim() || '';
+                const displayName = doc.querySelector('input[name="account_display_name"]')?.value?.trim() || '';
+                const email = doc.querySelector('input[name="account_email"]')?.value?.trim() || '';
+                const logoutUrl = doc.querySelector('a[href*="customer-logout"]')?.getAttribute('href') || '';
+
+                const mergedName = [firstName, lastName].filter(Boolean).join(' ').trim();
+                summary.name = mergedName || displayName || summary.name;
+                summary.meta = email || summary.meta;
+                summary.logoutUrl = logoutUrl || summary.logoutUrl;
+                return summary;
+            };
+
+            const applyAccountSummary = (summary) => {
+                if (!summary) return;
+                if (accountMenuName) accountMenuName.textContent = summary.name || accountLoggedInText;
+                if (accountMenuMeta) accountMenuMeta.textContent = summary.meta || accountLoggedInText;
+                if (accountMenuManage) accountMenuManage.href = wpMyAccountUrl;
+                if (accountMenuLogout) accountMenuLogout.href = summary.logoutUrl || wpMyAccountUrl;
+            };
+
+            const loadAccountSummary = async (forceReload = false) => {
+                if (!hasWpLoginCookie()) {
+                    closeAccountMenu();
+                    return false;
+                }
+
+                if (!forceReload && accountSummaryLoaded) return true;
+
+                if (accountMenuName) accountMenuName.textContent = accountLoadingText;
+                if (accountMenuMeta) accountMenuMeta.textContent = accountLoggedInText;
+
+                const response = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+
+                if (!response.ok) return false;
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const summary = parseAccountSummary(doc);
+                applyAccountSummary(summary);
+                accountSummaryLoaded = true;
+                return true;
             };
 
             const extractSiteKitGoogleConfig = (doc) => {
@@ -3190,6 +3362,7 @@
 
             const openWishlistDropdown = async () => {
                 if (!wishlistDropdown || !wishlistTrigger) return;
+                closeAccountMenu();
                 wishlistDropdown.classList.add('is-open');
                 wishlistDropdown.setAttribute('aria-hidden', 'false');
                 wishlistTrigger.setAttribute('aria-expanded', 'true');
@@ -3306,6 +3479,7 @@
 
             if (cartTrigger) {
                 cartTrigger.addEventListener('click', () => {
+                    closeAccountMenu();
                     openMiniCart();
                     if (cartPayloadCache) {
                         renderMiniCart(cartPayloadCache);
@@ -3321,9 +3495,14 @@
             }
 
             if (accountLoginTrigger) {
-                accountLoginTrigger.addEventListener('click', () => {
+                accountLoginTrigger.addEventListener('click', async () => {
                     if (hasWpLoginCookie()) {
-                        window.open(wpMyAccountUrl, '_blank', 'noopener');
+                        if (accountMenu && accountMenu.classList.contains('is-open')) {
+                            closeAccountMenu();
+                            return;
+                        }
+                        openAccountMenu();
+                        await loadAccountSummary(true).catch(() => {});
                         return;
                     }
 
@@ -3339,6 +3518,13 @@
                     }
                 });
             }
+
+            document.addEventListener('click', (event) => {
+                if (!accountMenu || !accountLoginTrigger) return;
+                const insideTrigger = accountLoginTrigger.contains(event.target);
+                const insideMenu = accountMenu.contains(event.target);
+                if (!insideTrigger && !insideMenu) closeAccountMenu();
+            });
 
             if (authModalClosers.length > 0) {
                 authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
@@ -3387,6 +3573,7 @@
                 if (miniCart && miniCart.classList.contains('is-open')) closeMiniCart();
                 if (wishlistDropdown && wishlistDropdown.classList.contains('is-open')) closeWishlistDropdown();
                 if (authModal && authModal.classList.contains('is-open')) closeAuthModal();
+                if (accountMenu && accountMenu.classList.contains('is-open')) closeAccountMenu();
             });
 
             setCartCount(0);
