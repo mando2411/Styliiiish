@@ -1,5 +1,31 @@
 @php
-    $translate = $ht ?? ((isset($t) && is_callable($t)) ? $t : fn (string $key) => $key);
+    $translateCallable = (isset($ht) && is_callable($ht))
+        ? $ht
+        : ((isset($t) && is_callable($t)) ? $t : null);
+
+    $translate = static function (string $key, array $replace = [], ?string $locale = null) use ($translateCallable) {
+        if (!$translateCallable) {
+            return $key;
+        }
+
+        try {
+            return $translateCallable($key, $replace, $locale);
+        } catch (\ArgumentCountError $e) {
+            try {
+                return $translateCallable($key, $replace);
+            } catch (\ArgumentCountError $e) {
+                try {
+                    return $translateCallable($key);
+                } catch (\Throwable $e) {
+                    return $key;
+                }
+            } catch (\Throwable $e) {
+                return $key;
+            }
+        } catch (\Throwable $e) {
+            return $key;
+        }
+    };
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $wpMyAccountUrl = $wpMyAccountUrl ?? ($wpBaseUrl . '/my-account/');
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish ? ($wpBaseUrl . '/my-account/') : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
