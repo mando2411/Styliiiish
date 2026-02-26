@@ -2709,21 +2709,11 @@
                     <span class="cart-plus-one" id="cartPlusOne">+1</span>
                 </span>
                 <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
-                <details class="header-categories action-categories">
-                    <summary class="category-trigger" aria-haspopup="menu" aria-label="{{ $t('categories') }}">
-                        <span aria-hidden="true">☰</span>
-                        <span>{{ $t('categories') }}</span>
-                    </summary>
-                    <div class="category-menu-panel" role="menu" aria-label="{{ $t('categories') }}">
-                        <a href="{{ $localePrefix }}/categories" role="menuitem">{{ $t('categories') }}</a>
-                        <a href="{{ $localePrefix }}/shop" role="menuitem">{{ $t('nav_shop') }}</a>
-                        <a href="{{ $localePrefix }}/marketplace" role="menuitem">{{ $t('nav_marketplace') }}</a>
-                        <a href="{{ $localePrefix }}/wishlist" role="menuitem">{{ $t('wishlist') }}</a>
-                    </div>
-                </details>
             </div>
         </div>
     </header>
+
+    @include('partials.shared-header-categories-strip')
 
     <div class="promo">{{ $t('promo_line') }}</div> 
 
