@@ -1,7 +1,9 @@
 @php
-    $currentLocale = $currentLocale ?? 'ar';
+    $pathLocale = strtolower((string) request()->segment(1));
+    $currentLocale = in_array($pathLocale, ['ar', 'en'], true) ? $pathLocale : ($currentLocale ?? 'ar');
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
     $wpmlLocale = $currentLocale === 'en' ? 'en' : 'ar';
+    $wpmlLocalePattern = $wpmlLocale . '%';
 
     $categoryGroups = collect();
 
@@ -17,18 +19,31 @@
                 ->select('tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
             $localizedTerms = collect();
 
-            if (\Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations')) {
+            $hasWpml = \Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations');
+
+            if ($hasWpml) {
                 $localizedTerms = $baseTermsQuery
                     ->join('wp_icl_translations as tr', function ($join) {
                         $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
                             ->where('tr.element_type', '=', 'tax_product_cat');
                     })
-                    ->where('tr.language_code', $wpmlLocale)
+                    ->whereRaw('LOWER(tr.language_code) LIKE ?', [$wpmlLocalePattern])
                     ->orderBy('t.name')
                     ->get();
+
+                if ($localizedTerms->isEmpty()) {
+                    $localizedTerms = $baseTermsQuery
+                        ->join('wp_icl_translations as tr', function ($join) {
+                            $join->on('tr.element_id', '=', 'tt.term_id')
+                                ->where('tr.element_type', '=', 'tax_product_cat');
+                        })
+                        ->whereRaw('LOWER(tr.language_code) LIKE ?', [$wpmlLocalePattern])
+                        ->orderBy('t.name')
+                        ->get();
+                }
             }
 
-            if ($localizedTerms->isEmpty()) {
+            if (!$hasWpml && $localizedTerms->isEmpty()) {
                 $localizedTerms = $baseTermsQuery
                     ->orderBy('t.name')
                     ->get();
