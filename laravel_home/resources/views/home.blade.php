@@ -1874,8 +1874,8 @@
 
         .footer-brand-logo {
             width: auto;
-            height: 34px;
-            max-width: min(220px, 100%);
+            height: 62px;
+            max-width: min(360px, 100%);
             object-fit: contain;
             display: block;
             margin-bottom: 12px;

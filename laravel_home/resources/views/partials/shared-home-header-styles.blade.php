@@ -61,9 +61,9 @@
     }
 
     .site-footer .footer-brand-logo {
-        height: 46px !important;
+        height: 62px !important;
         width: auto !important;
-        max-width: min(280px, 100%) !important;
+        max-width: min(360px, 100%) !important;
         filter: none !important;
         opacity: 1 !important;
     }
