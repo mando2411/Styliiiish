@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -200,13 +200,7 @@
                 <span class="brand-sub">لأن كل امرأة تستحق أن تتألق</span>
             </a>
 
-            <nav class="nav" aria-label="Main Navigation">
-                <a href="/">الرئيسية</a>
-                <a class="active" href="/shop">المتجر</a>
-                <a href="/ar/marketplace">الماركت بليس</a>
-                <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">بيعي فستانك</a>
-                <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">المدونة</a>
-            </nav>
+            @include('partials.shared-header-nav', ['navClass' => 'nav'])
 
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" title="حسابي" aria-label="حسابي">👤</a>
@@ -495,3 +489,4 @@
     </script>
 </body>
 </html>
+

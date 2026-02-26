@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -1199,13 +1199,7 @@
                 <span class="brand-sub">{{ $t('brand_sub') }}</span>
             </a>
 
-            <nav class="nav" aria-label="Main Navigation">
-                <a href="{{ $localePrefix }}">{{ $t('home') }}</a>
-                <a class="active" href="{{ $localePrefix }}/shop">{{ $t('shop') }}</a>
-                <a href="{{ $localePrefix }}/marketplace">{{ $t('marketplace') }}</a>
-                <a href="{{ $wpBaseUrl }}/my-dresses/" target="_blank" rel="noopener">{{ $t('sell_dress') }}</a>
-                <a href="{{ $wpBaseUrl }}/blog/" target="_blank" rel="noopener">{{ $t('blog') }}</a>
-            </nav>
+            @include('partials.shared-header-nav', ['navClass' => 'nav'])
 
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener" title="{{ $t('account') }}" aria-label="{{ $t('account') }}">👤</a>
@@ -2863,3 +2857,4 @@
     </script>
 </body>
 </html>
+

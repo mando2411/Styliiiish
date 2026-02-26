@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -753,14 +753,7 @@
             <span class="brand-tag">{{ $t('brand_tag') }}</span>
         </a>
 
-        <nav class="nav" aria-label="Main Navigation">
-            <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
-            <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-            <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-            <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
-            <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-            <a class="active" href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
-        </nav>
+        @include('partials.shared-header-nav', ['navClass' => 'nav'])
 
         <div class="header-tools">
             <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="{{ $t('lang_switch') }}">
@@ -916,3 +909,4 @@
 </footer>
 </body>
 </html>
+

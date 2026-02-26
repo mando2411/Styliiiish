@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -258,13 +258,7 @@
                 <span class="brand-sub">{{ $t('slogan') }}</span>
             </a>
 
-            <nav class="nav" aria-label="Main Navigation">
-                <a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
-                <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-                <a href="{{ $localePrefix }}/marketplace">{{ $t('nav_marketplace') }}</a>
-                <a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('nav_sell') }}</a>
-                <a href="https://styliiiish.com/blog/" target="_blank" rel="noopener">{{ $t('nav_blog') }}</a>
-            </nav>
+            @include('partials.shared-header-nav', ['navClass' => 'nav'])
 
             <div style="display:flex; gap:8px; justify-content:center;">
                 <a class="head-btn" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" title="Account" aria-label="Account">👤</a>
@@ -492,3 +486,4 @@
     </script>
 </body>
 </html>
+

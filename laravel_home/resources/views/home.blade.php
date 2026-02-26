@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -2544,13 +2544,7 @@
                 <span class="brand-tag">{{ $t('brand_tag') }}</span>
             </a>
 
-            <nav class="main-nav" aria-label="Main Navigation">
-                <a class="active" href="{{ $localePrefix }}">{{ $t('nav_home') }}</a>
-                <a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a>
-                <a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a>
-                <a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a>
-                <a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a>
-            </nav>
+            @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
 
             <div class="header-actions">
                 <form class="search-form" action="https://styliiiish.com/" method="get" target="_blank">
