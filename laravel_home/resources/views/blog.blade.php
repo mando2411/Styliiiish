@@ -586,6 +586,7 @@
             .footer-mini-nav::-webkit-scrollbar { display: none; }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
 @include('partials.shared-home-header')

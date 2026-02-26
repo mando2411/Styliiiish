@@ -336,6 +336,7 @@
             .footer-mini-nav { justify-content: flex-start; overflow-x: auto; white-space: nowrap; scrollbar-width: none; padding-bottom: 12px; }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
 @include('partials.shared-home-header')

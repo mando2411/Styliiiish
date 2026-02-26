@@ -247,6 +247,7 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
     @include('partials.shared-home-header')

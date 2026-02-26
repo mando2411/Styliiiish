@@ -220,6 +220,7 @@
         @media (max-width:720px){.cart-item{grid-template-columns:78px 1fr}.thumb{width:78px;height:78px}.item-side{grid-column:1/-1;grid-template-columns:1fr 1fr;justify-items:stretch}.item-side-box{min-width:0}.item-actions{grid-column:1/-1;justify-content:stretch}.item-actions .btn{flex:1 1 100%}.nav{overflow-x:auto;justify-content:flex-start}}
         @media (max-width:390px){.footer-grid{grid-template-columns:1fr}}
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
 @include('partials.shared-home-header')

@@ -744,6 +744,7 @@
             }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
 @include('partials.shared-home-header')

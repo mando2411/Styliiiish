@@ -1187,6 +1187,7 @@
             }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
     <!-- {{ $buildMarker }} -->
