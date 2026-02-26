@@ -656,6 +656,56 @@
             color: var(--primary);
         }
 
+        .header-categories-strip {
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+            border-bottom: 1px solid rgba(23, 39, 59, 0.08);
+        }
+
+        .categories-strip-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .categories-strip-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-strip-chip {
+            flex: 0 0 auto;
+            min-height: 36px;
+            border: 1px solid rgba(23, 39, 59, 0.12);
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--secondary);
+            padding: 0 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(23, 39, 59, 0.05);
+            transition: transform .2s ease, border-color .2s ease, color .2s ease, background-color .2s ease, box-shadow .2s ease;
+            animation: categoryChipIn .35s ease both;
+        }
+
+        .category-strip-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff4f5;
+            box-shadow: 0 6px 14px rgba(23, 39, 59, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @keyframes categoryChipIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .search-form {
             display: flex;
             align-items: center;
@@ -2161,6 +2211,17 @@
                 width: 100%;
                 justify-content: center;
                 gap: 8px;
+            }
+
+            .categories-strip-inner {
+                padding: 8px 0;
+                gap: 6px;
+            }
+
+            .category-strip-chip {
+                min-height: 32px;
+                padding: 0 10px;
+                font-size: 12px;
             }
 
             .topbar-right strong {
