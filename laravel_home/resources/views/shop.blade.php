@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -222,59 +222,7 @@
         <div id="lazySentinel" aria-hidden="true"></div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div class="footer-brand">
-                <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <h4>ستيليش فاشون هاوس</h4>
-                <p>نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.</p>
-                <p>مواعيد العمل: السبت إلى الجمعة من 11:00 صباحًا حتى 7:00 مساءً.</p>
-                <div class="footer-contact-row">
-                    <a href="/contact-us">تواصلي معنا</a>
-                    <a href="tel:+201050874255">اتصال مباشر</a>
-                </div>
-            </div>
-
-            <div class="footer-col">
-                <h5>روابط سريعة</h5>
-                <ul class="footer-links">
-                    <li><a href="/">الرئيسية</a></li>
-                    <li><a href="/shop">المتجر</a></li>
-                    <li><a href="/blog">المدونة</a></li>
-                    <li><a href="/about-us">من نحن</a></li>
-                    <li><a href="/contact-us">تواصل معنا</a></li>
-                    <li><a href="/categories">الأقسام</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h5>معلومات رسمية</h5>
-                <ul class="footer-links">
-                    <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر</a></li>
-                    <li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-                    <li><a href="mailto:email@styliiiish.com">email@styliiiish.com</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h5>سياسات وقوانين</h5>
-                <ul class="footer-links">
-                    <li><a href="/about-us">من نحن</a></li>
-                    <li><a href="/privacy-policy">سياسة الخصوصية</a></li>
-                    <li><a href="/terms-conditions">الشروط والأحكام</a></li>
-                    <li><a href="/refund-return-policy">سياسة الاسترجاع والاستبدال</a></li>
-                    <li><a href="/faq">الأسئلة الشائعة</a></li>
-                    <li><a href="/shipping-delivery-policy">سياسة الشحن والتوصيل</a></li>
-                    <li><a href="/cookie-policy">سياسة ملفات الارتباط</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="container footer-bottom">
-            <span>جميع الحقوق محفوظة © {{ date('Y') }} Styliiiish | تشغيل وتطوير <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
-            <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
-        </div>
-    </footer>
+    @include('partials.shared-home-footer')
 
     <script>
         (() => {

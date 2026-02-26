@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -268,11 +268,7 @@
     </section>
 </main>
 
-<footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';"><h4>{{ $t('footer_brand_title') }}</h4><p>{{ $t('footer_brand_desc') }}</p><p>{{ $t('footer_brand_time') }}</p><div class="footer-contact-row"><a href="{{ $localePrefix }}/contact-us">{{ $t('footer_contact') }}</a><a href="tel:+201050874255">+2 010-5087-4255</a></div></div>
-<div class="footer-col"><h5>{{ $t('footer_quick') }}</h5><ul class="footer-links"><li><a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a></li><li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li><li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li><li><a href="{{ $localePrefix }}/about-us">{{ $t('footer_about') }}</a></li><li><a href="{{ $localePrefix }}/contact-us">{{ $t('footer_contact') }}</a></li><li><a href="{{ $localePrefix }}/categories">{{ $isEnglish ? 'Categories' : 'الأقسام' }}</a></li></ul></div>
-<div class="footer-col"><h5>{{ $t('footer_official') }}</h5><ul class="footer-links"><li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 Nabil Khalil St, Nasr City, Cairo, Egypt</a></li><li><a href="tel:+201050874255">+2 010-5087-4255</a></li><li><a href="mailto:email@styliiiish.com">email@styliiiish.com</a></li></ul></div>
-<div class="footer-col"><h5>{{ $t('footer_policies') }}</h5><ul class="footer-links"><li><a href="{{ $localePrefix }}/about-us">{{ $t('footer_about') }}</a></li><li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('footer_privacy') }}</a></li><li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('footer_terms') }}</a></li><li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('footer_refund') }}</a></li><li><a href="{{ $localePrefix }}/faq">{{ $t('footer_faq') }}</a></li><li><a href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('footer_shipping') }}</a></li><li><a href="{{ $localePrefix }}/cookie-policy">{{ $t('footer_cookie') }}</a></li></ul></div></div>
-<div class="container footer-bottom"><span>{{ $t('footer_rights') }} © {{ date('Y') }} Styliiiish | <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span><span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span></div></footer>
+@include('partials.shared-home-footer')
 
 <script>
 (() => {

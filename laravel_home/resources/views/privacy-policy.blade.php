@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -387,16 +387,7 @@
     </div>
 </section>
 
-<footer class="site-footer">
-    <div class="container footer-grid">
-        <div class="footer-brand"><img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';"><h4>{{ $t('footer_title') }}</h4><p>{{ $t('footer_desc') }}</p><p>{{ $t('footer_hours') }}</p><div class="footer-contact-row"><a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a><a href="tel:+201050874255">{{ $t('direct_call') }}</a></div></div>
-        <div class="footer-col"><h5>{{ $t('quick_links') }}</h5><ul class="footer-links"><li><a href="{{ $localePrefix }}">{{ $t('nav_home') }}</a></li><li><a href="{{ $localePrefix }}/shop">{{ $t('nav_shop') }}</a></li><li><a href="{{ $localePrefix }}/blog">{{ $t('nav_blog') }}</a></li><li><a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a></li><li><a href="{{ $localePrefix }}/contact-us">{{ $t('nav_contact') }}</a></li><li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li></ul></div>
-        <div class="footer-col"><h5>{{ $t('official_info') }}</h5><ul class="footer-links"><li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">{{ $t('official_address') }}</a></li><li><a href="tel:+201050874255">+2 010-5087-4255</a></li><li><a href="mailto:privacy@styliiiish.com">privacy@styliiiish.com</a></li></ul></div>
-        <div class="footer-col"><h5>{{ $t('policies') }}</h5><ul class="footer-links"><li><a href="{{ $localePrefix }}/about-us">{{ $t('about_us') }}</a></li><li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('privacy') }}</a></li><li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('terms') }}</a></li><li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund_policy') }}</a></li><li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li><li><a href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('shipping_policy') }}</a></li><li><a href="{{ $localePrefix }}/cookie-policy">{{ $t('cookies') }}</a></li></ul></div>
-    </div>
-    <div class="container footer-bottom"><span>{{ str_replace(':year', (string) date('Y'), $t('rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span><span><a href="{{ $wpBaseUrl }}/" target="_blank" rel="noopener">{{ $wpDisplayHost }}</a></span></div>
-    <div class="container footer-mini-nav"><a href="{{ $localePrefix }}">{{ $t('home_mini') }}</a><a href="{{ $localePrefix }}/shop">{{ $t('shop_mini') }}</a><a href="{{ $wpBaseUrl }}/cart/" target="_blank" rel="noopener">{{ $t('cart_mini') }}</a><a href="{{ $wpBaseUrl }}/my-account/" target="_blank" rel="noopener">{{ $t('account_mini') }}</a><a href="{{ $wpBaseUrl }}/wishlist/" target="_blank" rel="noopener">{{ $t('fav_mini') }}</a></div>
-</footer>
+@include('partials.shared-home-footer')
 </body>
 </html>
 

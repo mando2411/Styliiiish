@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @php
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
@@ -1449,59 +1449,7 @@
         @endif
     </main>
 
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div class="footer-brand">
-                <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <h4>ستيليش فاشون هاوس</h4>
-                <p>{{ $t('shop_desc') }}</p>
-                <p>11:00 AM - 7:00 PM</p>
-                <div class="footer-contact-row">
-                    <a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a>
-                    <a href="tel:+201050874255">{{ $t('direct_call') }}</a>
-                </div>
-            </div>
-
-            <div class="footer-col">
-                <h5>{{ $t('quick_links') }}</h5>
-                <ul class="footer-links">
-                    <li><a href="{{ $localePrefix }}">{{ $t('home') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/shop">{{ $t('shop') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/blog">{{ $t('blog') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/about-us">{{ $t('about') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/contact-us">{{ $t('contact_us') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/categories">{{ $t('categories') }}</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h5>{{ $t('official_info') }}</h5>
-                <ul class="footer-links">
-                    <li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 Nabil Khalil St, Nasr City, Cairo, Egypt</a></li>
-                    <li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-                    <li><a href="mailto:email@styliiiish.com">email@styliiiish.com</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h5>{{ $t('policies') }}</h5>
-                <ul class="footer-links">
-                    <li><a href="{{ $localePrefix }}/about-us">{{ $t('about') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/privacy-policy">{{ $t('privacy') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/terms-conditions">{{ $t('terms') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/refund-return-policy">{{ $t('refund') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/faq">{{ $t('faq') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/shipping-delivery-policy">{{ $t('shipping_policy') }}</a></li>
-                    <li><a href="{{ $localePrefix }}/cookie-policy">{{ $t('cookies') }}</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <div class="container footer-bottom">
-            <span>{{ str_replace(':year', (string) date('Y'), $t('all_rights')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
-            <span><a href="https://styliiiish.com/" target="_blank" rel="noopener">styliiiish.com</a></span>
-        </div>
-    </footer>
+    @include('partials.shared-home-footer')
 
     <div class="mini-cart" id="miniCart" aria-hidden="true">
         <div class="mini-cart-backdrop" data-close-mini-cart></div>
