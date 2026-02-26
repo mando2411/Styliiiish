@@ -282,6 +282,9 @@
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
     $wpMyAccountUrl = $wpBaseUrl . '/my-account/';
+    $wpLocalizedAccountUrl = $isEnglish
+        ? ($wpBaseUrl . '/my-account/')
+        : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/');
     $wpLoginUrl = $wpMyAccountUrl;
     $wpRegisterUrl = $wpMyAccountUrl . '?register=1';
     $wpForgotPasswordUrl = $wpMyAccountUrl . 'lost-password/';
@@ -2564,7 +2567,7 @@
                             <span class="account-mini-meta" id="accountMenuMeta">{{ $t('account_logged_in') }}</span>
                         </div>
                         <div class="account-mini-actions">
-                            <a class="account-manage-link" id="accountMenuManage" href="{{ $wpMyAccountUrl }}">{{ $t('manage_account') }}</a>
+                            <a class="account-manage-link" id="accountMenuManage" href="{{ $wpLocalizedAccountUrl }}">{{ $t('manage_account') }}</a>
                             <a class="account-logout-link" id="accountMenuLogout" href="{{ $wpMyAccountUrl }}">{{ $t('logout') }}</a>
                         </div>
                     </div>
@@ -2966,6 +2969,7 @@
             const localePrefix = @json($localePrefix);
             const wpCheckoutUrl = @json($wpCheckoutUrl);
             const wpMyAccountUrl = @json($wpMyAccountUrl);
+            const wpLocalizedAccountUrl = @json($wpLocalizedAccountUrl);
             const currentPageUrl = window.location.href;
             const wishlistLoadingText = @json($t('wishlist_loading'));
             const wishlistEmptyText = @json($t('wishlist_empty'));
@@ -3085,7 +3089,7 @@
                 if (!summary) return;
                 if (accountMenuName) accountMenuName.textContent = summary.name || accountLoggedInText;
                 if (accountMenuMeta) accountMenuMeta.textContent = summary.meta || accountLoggedInText;
-                if (accountMenuManage) accountMenuManage.href = wpMyAccountUrl;
+                if (accountMenuManage) accountMenuManage.href = wpLocalizedAccountUrl;
                 if (accountMenuLogout) accountMenuLogout.href = summary.logoutUrl || wpMyAccountUrl;
             };
 
