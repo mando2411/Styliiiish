@@ -3,54 +3,91 @@
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
     $wpmlLocale = $currentLocale === 'en' ? 'en' : 'ar';
 
-    $categories = collect();
+    $categoryGroups = collect();
 
     try {
         $hasTerms = \Illuminate\Support\Facades\Schema::hasTable('wp_terms')
             && \Illuminate\Support\Facades\Schema::hasTable('wp_term_taxonomy');
 
         if ($hasTerms) {
-            $baseQuery = \Illuminate\Support\Facades\DB::table('wp_term_taxonomy as tt')
+            $baseTermsQuery = \Illuminate\Support\Facades\DB::table('wp_term_taxonomy as tt')
                 ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
                 ->where('tt.taxonomy', 'product_cat')
-                ->where('tt.parent', 0)
-                ->where('tt.count', '>', 0)
                 ->whereNotIn('t.slug', ['uncategorized'])
-                ->select('t.name', 't.slug', 'tt.count');
+                ->select('tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
+
+            $localizedTerms = collect();
 
             if (\Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations')) {
-                $categories = $baseQuery
+                $localizedTerms = $baseTermsQuery
                     ->join('wp_icl_translations as tr', function ($join) {
                         $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
                             ->where('tr.element_type', '=', 'tax_product_cat');
                     })
                     ->where('tr.language_code', $wpmlLocale)
-                    ->orderByDesc('tt.count')
                     ->orderBy('t.name')
-                    ->limit(14)
                     ->get();
             }
 
-            if ($categories->isEmpty()) {
-                $categories = $baseQuery
-                    ->orderByDesc('tt.count')
+            if ($localizedTerms->isEmpty()) {
+                $localizedTerms = $baseTermsQuery
                     ->orderBy('t.name')
-                    ->limit(14)
                     ->get();
+            }
+
+            if ($localizedTerms->isNotEmpty()) {
+                $parents = $localizedTerms->where('parent', 0)->keyBy('term_id');
+                $childrenByParent = $localizedTerms
+                    ->where('parent', '!=', 0)
+                    ->where('count', '>', 0)
+                    ->groupBy('parent');
+
+                $categoryGroups = $parents
+                    ->map(function ($parent) use ($childrenByParent) {
+                        $children = $childrenByParent->get($parent->term_id, collect())->values();
+                        $childrenTotal = (int) $children->sum('count');
+                        $parentCount = (int) ($parent->count ?? 0);
+                        $score = max($parentCount, $childrenTotal);
+
+                        if ($score <= 0) {
+                            return null;
+                        }
+
+                        return [
+                            'parent' => $parent,
+                            'children' => $children,
+                            'score' => $score,
+                        ];
+                    })
+                    ->filter()
+                    ->sortByDesc('score')
+                    ->take(10)
+                    ->values();
             }
         }
     } catch (\Throwable $e) {
-        $categories = collect();
+        $categoryGroups = collect();
     }
 @endphp
 
-@if($categories->isNotEmpty())
+@if($categoryGroups->isNotEmpty())
     <div class="header-categories-strip" aria-label="{{ $currentLocale === 'en' ? 'Product Categories' : 'أقسام المنتجات' }}">
         <div class="container categories-strip-inner">
-            @foreach($categories as $category)
-                <a class="category-strip-chip" href="{{ $localePrefix }}/shop?q={{ rawurlencode((string) $category->name) }}">
-                    {{ $category->name }}
-                </a>
+            @foreach($categoryGroups as $group)
+                @php
+                    $parent = $group['parent'];
+                    $children = $group['children'];
+                @endphp
+                <span class="category-strip-group">
+                    <a class="category-strip-chip category-strip-parent" href="{{ $localePrefix }}/shop?q={{ rawurlencode((string) $parent->name) }}">
+                        {{ $parent->name }}
+                    </a>
+                    @foreach($children->take(6) as $child)
+                        <a class="category-strip-chip category-strip-sub" href="{{ $localePrefix }}/shop?q={{ rawurlencode((string) $child->name) }}">
+                            {{ $child->name }}
+                        </a>
+                    @endforeach
+                </span>
             @endforeach
         </div>
     </div>
