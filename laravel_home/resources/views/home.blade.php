@@ -25,6 +25,15 @@
             'account' => 'حسابي',
             'wishlist' => 'قائمة الأمنيات',
             'cart' => 'السلة',
+            'login_title' => 'تسجيل الدخول',
+            'login_subtitle' => 'أكملي إلى حسابك لإدارة الطلبات والمفضلة بسهولة.',
+            'login_username' => 'اسم المستخدم أو البريد الإلكتروني',
+            'login_password' => 'كلمة المرور',
+            'remember_me' => 'تذكرني',
+            'sign_in' => 'تسجيل الدخول',
+            'sign_in_google' => 'تسجيل الدخول عبر Google',
+            'register' => 'إنشاء حساب جديد',
+            'forgot_password' => 'نسيت كلمة المرور؟',
             'wishlist_loading' => 'جاري تحميل المفضلة…',
             'wishlist_empty' => 'لا توجد منتجات في المفضلة حالياً.',
             'view_all_wishlist' => 'عرض كل المفضلة',
@@ -145,6 +154,15 @@
             'account' => 'My Account',
             'wishlist' => 'Wishlist',
             'cart' => 'Cart',
+            'login_title' => 'Sign In',
+            'login_subtitle' => 'Access your account to manage orders and wishlist easily.',
+            'login_username' => 'Username or Email',
+            'login_password' => 'Password',
+            'remember_me' => 'Remember me',
+            'sign_in' => 'Sign In',
+            'sign_in_google' => 'Sign in with Google',
+            'register' => 'Create an account',
+            'forgot_password' => 'Forgot password?',
             'wishlist_loading' => 'Loading wishlist…',
             'wishlist_empty' => 'No products in wishlist yet.',
             'view_all_wishlist' => 'View full wishlist',
@@ -255,6 +273,21 @@
     $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
+    $wpMyAccountUrl = $wpBaseUrl . '/my-account/';
+    $wpLoginUrl = $wpBaseUrl . '/wp-login.php';
+    $wpRegisterUrl = $wpBaseUrl . '/wp-login.php?action=register&redirect_to=' . rawurlencode($wpMyAccountUrl);
+    $wpForgotPasswordUrl = $wpBaseUrl . '/wp-login.php?action=lostpassword';
+    $wpGoogleLoginUrl = (string) (env('WP_GOOGLE_LOGIN_URL')
+        ? env('WP_GOOGLE_LOGIN_URL')
+        : ($wpBaseUrl . '/wp-login.php?loginSocial=google&redirect=' . rawurlencode($wpMyAccountUrl)));
+    $cookieNames = array_keys(request()->cookies->all());
+    $isWpLoggedIn = false;
+    foreach ($cookieNames as $cookieName) {
+        if (str_starts_with((string) $cookieName, 'wordpress_logged_in_')) {
+            $isWpLoggedIn = true;
+            break;
+        }
+    }
     $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/en/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $reviewsPrevArrow = $isEnglish ? '‹' : '›';
     $reviewsNextArrow = $isEnglish ? '›' : '‹';
@@ -851,6 +884,216 @@
         .mini-cart-actions a { min-height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
         .mini-cart-view { border: 1px solid var(--line); background: #fff; color: var(--secondary); }
         .mini-cart-checkout { background: var(--primary); color: #fff; }
+
+        .account-trigger {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .auth-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 120;
+            pointer-events: none;
+        }
+
+        .auth-modal.is-open { pointer-events: auto; }
+
+        .auth-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 26, 42, .54);
+            opacity: 0;
+            transition: .22s ease;
+        }
+
+        .auth-modal.is-open .auth-modal-backdrop { opacity: 1; }
+
+        .auth-modal-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: min(450px, 94vw);
+            max-height: min(88vh, 760px);
+            overflow: auto;
+            transform: translate(-50%, calc(-50% + 16px));
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 22px 50px rgba(23, 39, 59, .24);
+            padding: 18px;
+            transition: .22s ease;
+            opacity: 0;
+        }
+
+        .auth-modal.is-open .auth-modal-panel {
+            transform: translate(-50%, -50%);
+            opacity: 1;
+        }
+
+        .auth-head {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .auth-title-wrap h3 {
+            margin: 0;
+            font-size: 22px;
+            line-height: 1.2;
+            color: var(--secondary);
+        }
+
+        .auth-title-wrap p {
+            margin: 7px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .auth-close {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            min-width: 36px;
+            min-height: 36px;
+            background: #fff;
+            color: var(--secondary);
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .auth-form {
+            display: grid;
+            gap: 10px;
+        }
+
+        .auth-field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .auth-field label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+
+        .auth-field input[type="text"],
+        .auth-field input[type="password"] {
+            min-height: 44px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: var(--secondary);
+            outline: none;
+            font-family: inherit;
+            background: #fff;
+        }
+
+        .auth-field input[type="text"]:focus,
+        .auth-field input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(var(--wf-main-rgb), .14);
+        }
+
+        .auth-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .auth-remember {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--secondary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .auth-remember input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        .auth-forgot {
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .auth-submit {
+            min-height: 44px;
+            border: 0;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .auth-submit:hover {
+            background: var(--primary-2);
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 12px;
+            margin: 2px 0;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--line);
+        }
+
+        .auth-google,
+        .auth-register {
+            min-height: 44px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .auth-google {
+            border: 1px solid var(--line);
+            color: var(--secondary);
+            background: #fff;
+        }
+
+        .auth-google:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff8f9;
+        }
+
+        .auth-register {
+            border: 1px dashed rgba(var(--wf-main-rgb), .38);
+            color: var(--primary);
+            background: #fff8f9;
+        }
+
+        .auth-register:hover {
+            background: #ffeef1;
+        }
 
         .header-cta {
             height: 40px;
@@ -2212,7 +2455,11 @@
                     <input class="search-input" type="search" name="s" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
-                <a class="icon-btn action-account" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
+                @if ($isWpLoggedIn)
+                    <a class="icon-btn action-account" href="{{ $wpMyAccountUrl }}" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
+                @else
+                    <button class="icon-btn action-account account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-controls="authModal" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
+                @endif
                 <span class="wishlist-trigger-wrap action-wishlist">
                     <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>
                         <span class="wishlist-count" id="wishlistCountBadge">0</span>
@@ -2556,6 +2803,55 @@
         </aside>
     </div>
 
+    @if (!$isWpLoggedIn)
+        <div class="auth-modal" id="authModal" aria-hidden="true">
+            <div class="auth-modal-backdrop" data-close-auth-modal></div>
+            <section class="auth-modal-panel" role="dialog" aria-modal="true" aria-label="{{ $t('login_title') }}">
+                <div class="auth-head">
+                    <div class="auth-title-wrap">
+                        <h3>{{ $t('login_title') }}</h3>
+                        <p>{{ $t('login_subtitle') }}</p>
+                    </div>
+                    <button class="auth-close" type="button" data-close-auth-modal aria-label="{{ $t('close') }}">×</button>
+                </div>
+
+                <form class="auth-form" action="{{ $wpLoginUrl }}" method="post" autocomplete="on">
+                    <input type="hidden" name="redirect_to" value="{{ $wpMyAccountUrl }}">
+                    <input type="hidden" name="testcookie" value="1">
+
+                    <div class="auth-field">
+                        <label for="authLoginField">{{ $t('login_username') }}</label>
+                        <input id="authLoginField" type="text" name="log" required>
+                    </div>
+
+                    <div class="auth-field">
+                        <label for="authPasswordField">{{ $t('login_password') }}</label>
+                        <input id="authPasswordField" type="password" name="pwd" required>
+                    </div>
+
+                    <div class="auth-row">
+                        <label class="auth-remember" for="authRememberField">
+                            <input id="authRememberField" type="checkbox" name="rememberme" value="forever">
+                            <span>{{ $t('remember_me') }}</span>
+                        </label>
+                        <a class="auth-forgot" href="{{ $wpForgotPasswordUrl }}" target="_blank" rel="noopener">{{ $t('forgot_password') }}</a>
+                    </div>
+
+                    <button class="auth-submit" type="submit">{{ $t('sign_in') }}</button>
+
+                    <div class="auth-divider">or</div>
+
+                    <a class="auth-google" href="{{ $wpGoogleLoginUrl }}" target="_blank" rel="noopener">
+                        <span aria-hidden="true">G</span>
+                        <span>{{ $t('sign_in_google') }}</span>
+                    </a>
+
+                    <a class="auth-register" href="{{ $wpRegisterUrl }}" target="_blank" rel="noopener">{{ $t('register') }}</a>
+                </form>
+            </section>
+        </div>
+    @endif
+
     <script>
         (() => {
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
@@ -2584,11 +2880,20 @@
             const miniCartView = document.getElementById('miniCartView');
             const miniCartCheckout = document.getElementById('miniCartCheckout');
             const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
+            const accountLoginTrigger = document.getElementById('accountLoginTrigger');
+            const authModal = document.getElementById('authModal');
+            const authModalClosers = authModal ? authModal.querySelectorAll('[data-close-auth-modal]') : [];
 
             let currentWishlistCount = 0;
             let currentCartCount = 0;
             let wishlistItemsCache = [];
             let cartPayloadCache = null;
+
+            const updateBodyScrollLock = () => {
+                const isMiniCartOpen = !!(miniCart && miniCart.classList.contains('is-open'));
+                const isAuthOpen = !!(authModal && authModal.classList.contains('is-open'));
+                document.body.style.overflow = (isMiniCartOpen || isAuthOpen) ? 'hidden' : '';
+            };
 
             const getWishlistCountUrl = () => `${localePrefix}/item/wishlist/count`;
             const getWishlistItemsUrl = () => `${localePrefix}/item/wishlist/items`;
@@ -2727,14 +3032,30 @@
                 if (!miniCart) return;
                 miniCart.classList.add('is-open');
                 miniCart.setAttribute('aria-hidden', 'false');
-                document.body.style.overflow = 'hidden';
+                updateBodyScrollLock();
             };
 
             const closeMiniCart = () => {
                 if (!miniCart) return;
                 miniCart.classList.remove('is-open');
                 miniCart.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
+                updateBodyScrollLock();
+            };
+
+            const openAuthModal = () => {
+                if (!authModal) return;
+                authModal.classList.add('is-open');
+                authModal.setAttribute('aria-hidden', 'false');
+                if (accountLoginTrigger) accountLoginTrigger.setAttribute('aria-expanded', 'true');
+                updateBodyScrollLock();
+            };
+
+            const closeAuthModal = () => {
+                if (!authModal) return;
+                authModal.classList.remove('is-open');
+                authModal.setAttribute('aria-hidden', 'true');
+                if (accountLoginTrigger) accountLoginTrigger.setAttribute('aria-expanded', 'false');
+                updateBodyScrollLock();
             };
 
             const renderMiniCart = (payload) => {
@@ -2820,6 +3141,20 @@
                 miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
             }
 
+            if (accountLoginTrigger) {
+                accountLoginTrigger.addEventListener('click', () => {
+                    openAuthModal();
+                    const firstField = authModal ? authModal.querySelector('input[name="log"]') : null;
+                    if (firstField) {
+                        setTimeout(() => firstField.focus(), 40);
+                    }
+                });
+            }
+
+            if (authModalClosers.length > 0) {
+                authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
+            }
+
             if (miniCartList) {
                 miniCartList.addEventListener('click', async (event) => {
                     const removeBtn = event.target.closest('[data-remove-cart-key]');
@@ -2853,6 +3188,7 @@
                 if (event.key !== 'Escape') return;
                 if (miniCart && miniCart.classList.contains('is-open')) closeMiniCart();
                 if (wishlistDropdown && wishlistDropdown.classList.contains('is-open')) closeWishlistDropdown();
+                if (authModal && authModal.classList.contains('is-open')) closeAuthModal();
             });
 
             setCartCount(0);
