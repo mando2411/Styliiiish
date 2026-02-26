@@ -88,12 +88,73 @@
         font-weight: 600;
     }
 
+    .main-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        background: #f9fbff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 6px;
+    }
+
+    .main-nav a {
+        color: var(--secondary);
+        font-size: 14px;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: .2s ease;
+        text-decoration: none;
+    }
+
+    .main-nav a:hover {
+        color: var(--primary);
+        background: #fff4f5;
+    }
+
+    .main-nav a.active {
+        background: #fff4f5;
+        color: var(--primary);
+    }
+
     .header-actions {
         display: flex;
         align-items: center;
         gap: 8px;
         flex-wrap: wrap;
         justify-content: flex-end;
+    }
+
+    .action-account,
+    .action-wishlist,
+    .action-cart,
+    .action-sell {
+        white-space: nowrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .btn-primary {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-2);
+        border-color: var(--primary-2);
     }
 
     .search-form {

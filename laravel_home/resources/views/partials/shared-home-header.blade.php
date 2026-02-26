@@ -9,6 +9,17 @@
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
+    $normalizePath = function (string $path): string {
+        $trimmed = trim($path);
+        if ($trimmed === '' || $trimmed === '/') {
+            return '/';
+        }
+
+        return '/' . trim($trimmed, '/');
+    };
+    $currentPath = $normalizePath(request()->getPathInfo());
+    $homePath = $normalizePath($localePrefix);
+    $isHomeRoute = $currentPath === $homePath;
 
     $translate = (isset($t) && is_callable($t)) ? $t : fn (string $key) => $key;
     $ht = function (string $key, string $arFallback, string $enFallback) use ($translate, $isEnglish): string {
@@ -55,6 +66,7 @@
                 <input class="search-input" type="search" name="s" placeholder="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}" aria-label="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}">
                 <button class="search-btn" type="submit">{{ $ht('search_btn', 'بحث', 'Search') }}</button>
             </form>
+            @if($isHomeRoute)
             <span class="account-trigger-wrap action-account">
                 <button class="icon-btn account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
                 <div class="account-mini-menu" id="accountMenu" aria-hidden="true">
@@ -88,6 +100,17 @@
                 </button>
                 <span class="cart-plus-one" id="cartPlusOne">+1</span>
             </span>
+            @else
+            <span class="account-trigger-wrap action-account">
+                <a class="icon-btn" href="{{ $wpLocalizedAccountUrl }}" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}"><span class="icon" aria-hidden="true">👤</span></a>
+            </span>
+            <span class="wishlist-trigger-wrap action-wishlist">
+                <a class="icon-btn" href="{{ $localePrefix }}/wishlist" aria-label="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}" title="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}"><span class="icon" aria-hidden="true">❤</span></a>
+            </span>
+            <span class="cart-trigger-wrap action-cart">
+                <a class="icon-btn" href="{{ $localePrefix }}/cart" aria-label="{{ $ht('cart', 'السلة', 'Cart') }}" title="{{ $ht('cart', 'السلة', 'Cart') }}"><span class="icon" aria-hidden="true">🛒</span></a>
+            </span>
+            @endif
             <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $ht('start_selling', 'ابدئي البيع', 'Start Selling') }}</a>
         </div>
     </div>
