@@ -4,6 +4,21 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
 
+    $normalizeSwitcherPath = function (string $path): string {
+        $trimmed = trim($path);
+        if ($trimmed === '' || $trimmed === '/') {
+            return '/';
+        }
+
+        return '/' . trim($trimmed, '/');
+    };
+    $currentSwitcherPath = $normalizeSwitcherPath(request()->getPathInfo());
+    $switcherPathWithoutLocale = preg_replace('#^/(ar|en)(?=/|$)#i', '', $currentSwitcherPath) ?? $currentSwitcherPath;
+    $switcherPathWithoutLocale = $normalizeSwitcherPath($switcherPathWithoutLocale);
+    $switcherPathTail = $switcherPathWithoutLocale === '/' ? '' : $switcherPathWithoutLocale;
+    $arSwitchUrl = '/ar' . $switcherPathTail;
+    $enSwitchUrl = '/en' . $switcherPathTail;
+
     $translations = [
         'ar' => [
             'title' => 'ستايلش | فساتين سهرة وزفاف في مصر',
@@ -2526,8 +2541,8 @@
             <div class="topbar-left">
                 <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
                     <span class="lang-indicator" aria-hidden="true"></span>
-                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar">AR</a>
-                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en">EN</a>
+                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="{{ $arSwitchUrl }}">AR</a>
+                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="{{ $enSwitchUrl }}">EN</a>
                 </div>
                 <span class="topbar-note">{{ $t('daily_deals') }}</span>
                 <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">{{ $t('facebook') }}</a>

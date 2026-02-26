@@ -21,6 +21,12 @@
     $homePath = $normalizePath($localePrefix);
     $isHomeRoute = $currentPath === $homePath;
 
+    $pathWithoutLocale = preg_replace('#^/(ar|en)(?=/|$)#i', '', $currentPath) ?? $currentPath;
+    $pathWithoutLocale = $normalizePath($pathWithoutLocale);
+    $localePathTail = $pathWithoutLocale === '/' ? '' : $pathWithoutLocale;
+    $arSwitchUrl = '/ar' . $localePathTail;
+    $enSwitchUrl = '/en' . $localePathTail;
+
     $translate = (isset($t) && is_callable($t)) ? $t : fn (string $key) => $key;
     $ht = function (string $key, string $arFallback, string $enFallback) use ($translate, $isEnglish): string {
         $value = (string) $translate($key);
@@ -41,8 +47,8 @@
         <div class="topbar-left">
             <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
                 <span class="lang-indicator" aria-hidden="true"></span>
-                <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="/ar">AR</a>
-                <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="/en">EN</a>
+                <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="{{ $arSwitchUrl }}">AR</a>
+                <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="{{ $enSwitchUrl }}">EN</a>
             </div>
             <span class="topbar-note">{{ $ht('daily_deals', '⚡ خصومات يومية', '⚡ Daily Deals') }}</span>
             <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">{{ $ht('facebook', 'فيسبوك', 'Facebook') }}</a>
