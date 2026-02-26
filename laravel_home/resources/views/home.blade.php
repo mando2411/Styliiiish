@@ -25,6 +25,19 @@
             'account' => 'حسابي',
             'wishlist' => 'قائمة الأمنيات',
             'cart' => 'السلة',
+            'wishlist_loading' => 'جاري تحميل المفضلة…',
+            'wishlist_empty' => 'لا توجد منتجات في المفضلة حالياً.',
+            'view_all_wishlist' => 'عرض كل المفضلة',
+            'go_to_product' => 'عرض المنتج',
+            'cart_title' => 'سلة التسوق',
+            'close' => 'إغلاق',
+            'subtotal' => 'الإجمالي الفرعي',
+            'view_cart' => 'عرض السلة',
+            'checkout' => 'إتمام الطلب',
+            'cart_empty' => 'العربة فارغة حاليًا.',
+            'loading_cart' => 'جاري تحميل العربة…',
+            'remove' => 'حذف',
+            'qty_short' => 'الكمية',
             'start_selling' => 'ابدئي البيع',
             'promo_line' => 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل',
             'hero_badge' => '✨ مجموعة حصرية بتحديثات يومية',
@@ -132,6 +145,19 @@
             'account' => 'My Account',
             'wishlist' => 'Wishlist',
             'cart' => 'Cart',
+            'wishlist_loading' => 'Loading wishlist…',
+            'wishlist_empty' => 'No products in wishlist yet.',
+            'view_all_wishlist' => 'View full wishlist',
+            'go_to_product' => 'View product',
+            'cart_title' => 'Shopping Cart',
+            'close' => 'Close',
+            'subtotal' => 'Subtotal',
+            'view_cart' => 'View Cart',
+            'checkout' => 'Checkout',
+            'cart_empty' => 'Your cart is currently empty.',
+            'loading_cart' => 'Loading cart…',
+            'remove' => 'Remove',
+            'qty_short' => 'Qty',
             'start_selling' => 'Start Selling',
             'promo_line' => 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days',
             'hero_badge' => '✨ Exclusive collection with daily updates',
@@ -229,6 +255,7 @@
     $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
+    $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/en/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $reviewsPrevArrow = $isEnglish ? '‹' : '›';
     $reviewsNextArrow = $isEnglish ? '›' : '‹';
 
@@ -551,6 +578,279 @@
             border-color: var(--primary);
             color: var(--primary);
         }
+
+        .wishlist-trigger-wrap,
+        .cart-trigger-wrap {
+            position: relative;
+        }
+
+        .wishlist-trigger,
+        .cart-trigger {
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .wishlist-count,
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 800;
+            padding: 0 4px;
+            display: none;
+        }
+
+        .wishlist-plus-one,
+        .cart-plus-one {
+            position: absolute;
+            top: -24px;
+            right: -4px;
+            font-size: 12px;
+            font-weight: 900;
+            color: var(--primary);
+            opacity: 0;
+            transform: translateY(0);
+            pointer-events: none;
+        }
+
+        .wishlist-plus-one.show,
+        .cart-plus-one.show {
+            animation: cartPlusOne .8s ease;
+        }
+
+        @keyframes cartPlusOne {
+            0% { opacity: 0; transform: translateY(8px); }
+            20% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-12px); }
+        }
+
+        .wishlist-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: min(360px, 82vw);
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: 0 12px 30px rgba(23, 39, 59, .14);
+            padding: 10px;
+            display: none;
+            z-index: 80;
+        }
+
+        [dir="rtl"] .wishlist-dropdown { right: auto; left: 0; }
+        [dir="ltr"] .wishlist-dropdown { left: auto; right: 0; }
+        .wishlist-dropdown.is-open { display: block; }
+
+        .wishlist-dropdown-list {
+            display: grid;
+            gap: 8px;
+            max-height: 360px;
+            overflow: auto;
+        }
+
+        .wishlist-dropdown-item {
+            display: grid;
+            grid-template-columns: 56px 1fr;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 8px;
+            background: #fff;
+        }
+
+        .wishlist-dropdown-item img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f2f2f5;
+        }
+
+        .wishlist-dropdown-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--secondary);
+            margin: 0 0 6px;
+            line-height: 1.35;
+        }
+
+        .wishlist-dropdown-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30px;
+            padding: 0 10px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .wishlist-dropdown-empty {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            text-align: center;
+            padding: 12px 8px;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            background: #fbfcff;
+        }
+
+        .wishlist-dropdown-footer {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--line);
+        }
+
+        .wishlist-dropdown-all {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .mini-cart {
+            position: fixed;
+            inset: 0;
+            z-index: 110;
+            pointer-events: none;
+        }
+
+        .mini-cart.is-open { pointer-events: auto; }
+
+        .mini-cart-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 26, 42, 0.52);
+            opacity: 0;
+            transition: .2s ease;
+        }
+
+        .mini-cart.is-open .mini-cart-backdrop { opacity: 1; }
+
+        .mini-cart-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: min(430px, 92vw);
+            height: 100%;
+            background: #fff;
+            border-inline-start: 1px solid var(--line);
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            transform: translateX(100%);
+            transition: .24s ease;
+            box-shadow: -10px 0 30px rgba(23, 39, 59, .14);
+        }
+
+        .mini-cart.is-open .mini-cart-panel { transform: translateX(0); }
+        [dir="rtl"] .mini-cart-panel { right: auto; left: 0; border-inline-start: 0; border-inline-end: 1px solid var(--line); transform: translateX(-100%); }
+        [dir="rtl"] .mini-cart.is-open .mini-cart-panel { transform: translateX(0); }
+
+        .mini-cart-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .mini-cart-head h3 { margin: 0; font-size: 17px; color: var(--secondary); }
+
+        .mini-cart-close {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            color: var(--secondary);
+            padding: 6px 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 700;
+        }
+
+        .mini-cart-list {
+            overflow: auto;
+            padding: 12px;
+            display: grid;
+            gap: 10px;
+            align-content: start;
+            grid-auto-rows: max-content;
+        }
+
+        .mini-cart-item {
+            display: grid;
+            grid-template-columns: 70px 1fr auto;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 9px;
+            align-items: center;
+        }
+
+        .mini-cart-item img {
+            width: 70px;
+            height: 92px;
+            object-fit: cover;
+            border-radius: 9px;
+            background: #f2f2f5;
+        }
+
+        .mini-cart-info { min-width: 0; }
+
+        .mini-cart-item h4 {
+            margin: 0 0 4px;
+            font-size: 13px;
+            line-height: 1.35;
+            color: var(--secondary);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .mini-cart-meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+        .mini-cart-price { font-size: 12px; color: var(--primary); font-weight: 800; margin-top: 4px; }
+
+        .mini-cart-remove {
+            border: 1px solid rgba(var(--wf-main-rgb), .2);
+            background: #fff;
+            color: var(--primary);
+            border-radius: 8px;
+            min-width: 34px;
+            min-height: 34px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .mini-cart-remove:hover { background: #ffeff1; }
+        .mini-cart-empty { color: var(--muted); font-size: 14px; padding: 8px 0; text-align: center; }
+        .mini-cart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 10px 0; }
+
+        .mini-cart-foot {
+            border-top: 1px solid var(--line);
+            padding: 12px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .mini-cart-subtotal { font-size: 13px; color: var(--secondary); display: flex; justify-content: space-between; }
+        .mini-cart-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .mini-cart-actions a { min-height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+        .mini-cart-view { border: 1px solid var(--line); background: #fff; color: var(--secondary); }
+        .mini-cart-checkout { background: var(--primary); color: #fff; }
 
         .header-cta {
             height: 40px;
@@ -1913,8 +2213,26 @@
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
                 </form>
                 <a class="icon-btn action-account" href="https://styliiiish.com/my-account/" target="_blank" rel="noopener" aria-label="{{ $t('account') }}" title="{{ $t('account') }}"><span class="icon" aria-hidden="true">👤</span></a>
-                <a class="icon-btn action-wishlist" href="https://styliiiish.com/wishlist/" target="_blank" rel="noopener" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}"><span class="icon" aria-hidden="true">❤</span></a>
-                <a class="icon-btn action-cart" href="https://styliiiish.com/cart/" target="_blank" rel="noopener" aria-label="{{ $t('cart') }}" title="{{ $t('cart') }}"><span class="icon" aria-hidden="true">🛒</span></a>
+                <span class="wishlist-trigger-wrap action-wishlist">
+                    <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>
+                        <span class="wishlist-count" id="wishlistCountBadge">0</span>
+                    </button>
+                    <span class="wishlist-plus-one" id="wishlistPlusOne">+1</span>
+                    <div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="{{ $t('wishlist') }}" aria-hidden="true">
+                        <div class="wishlist-dropdown-list" id="wishlistDropdownList">
+                            <p class="wishlist-dropdown-empty" id="wishlistDropdownLoading">{{ $t('wishlist_loading') }}</p>
+                        </div>
+                        <div class="wishlist-dropdown-footer">
+                            <a class="wishlist-dropdown-all" href="{{ $localePrefix }}/wishlist">{{ $t('view_all_wishlist') }}</a>
+                        </div>
+                    </div>
+                </span>
+                <span class="cart-trigger-wrap action-cart">
+                    <button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="{{ $t('cart') }}" title="{{ $t('cart') }}"><span class="icon" aria-hidden="true">🛒</span>
+                        <span class="cart-count" id="cartCountBadge">0</span>
+                    </button>
+                    <span class="cart-plus-one" id="cartPlusOne">+1</span>
+                </span>
                 <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
             </div>
         </div>
@@ -2217,6 +2535,330 @@
 
             updateButtons();
             startAutoSlide();
+        })();
+    </script>
+
+    <div class="mini-cart" id="miniCart" aria-hidden="true">
+        <div class="mini-cart-backdrop" data-close-mini-cart></div>
+        <aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $t('cart_title') }}">
+            <div class="mini-cart-head">
+                <h3>{{ $t('cart_title') }}</h3>
+                <button class="mini-cart-close" type="button" data-close-mini-cart>{{ $t('close') }}</button>
+            </div>
+            <div class="mini-cart-list" id="miniCartList"></div>
+            <div class="mini-cart-foot">
+                <div class="mini-cart-subtotal"><span>{{ $t('subtotal') }}</span><strong id="miniCartSubtotal">—</strong></div>
+                <div class="mini-cart-actions">
+                    <a class="mini-cart-view" id="miniCartView" href="{{ $localePrefix }}/cart">{{ $t('view_cart') }}</a>
+                    <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpCheckoutUrl }}">{{ $t('checkout') }}</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        (() => {
+            const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
+            const localePrefix = @json($localePrefix);
+            const wpCheckoutUrl = @json($wpCheckoutUrl);
+            const wishlistLoadingText = @json($t('wishlist_loading'));
+            const wishlistEmptyText = @json($t('wishlist_empty'));
+            const goToProductText = @json($t('go_to_product'));
+            const cartEmptyText = @json($t('cart_empty'));
+            const loadingCartText = @json($t('loading_cart'));
+            const removeText = @json($t('remove'));
+            const qtyShortText = @json($t('qty_short'));
+
+            const wishlistTrigger = document.getElementById('wishlistTrigger');
+            const wishlistBadge = document.getElementById('wishlistCountBadge');
+            const wishlistPlusOne = document.getElementById('wishlistPlusOne');
+            const wishlistDropdown = document.getElementById('wishlistDropdown');
+            const wishlistDropdownList = document.getElementById('wishlistDropdownList');
+
+            const cartTrigger = document.getElementById('miniCartTrigger');
+            const cartBadge = document.getElementById('cartCountBadge');
+            const plusOne = document.getElementById('cartPlusOne');
+            const miniCart = document.getElementById('miniCart');
+            const miniCartList = document.getElementById('miniCartList');
+            const miniCartSubtotal = document.getElementById('miniCartSubtotal');
+            const miniCartView = document.getElementById('miniCartView');
+            const miniCartCheckout = document.getElementById('miniCartCheckout');
+            const miniCartClosers = miniCart ? miniCart.querySelectorAll('[data-close-mini-cart]') : [];
+
+            let currentWishlistCount = 0;
+            let currentCartCount = 0;
+            let wishlistItemsCache = [];
+            let cartPayloadCache = null;
+
+            const getWishlistCountUrl = () => `${localePrefix}/item/wishlist/count`;
+            const getWishlistItemsUrl = () => `${localePrefix}/item/wishlist/items`;
+
+            const escapeHtml = (value) => String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+
+            const setWishlistCount = (count) => {
+                currentWishlistCount = Math.max(0, Number(count) || 0);
+                if (!wishlistBadge) return;
+                wishlistBadge.textContent = String(currentWishlistCount);
+                wishlistBadge.style.display = currentWishlistCount > 0 ? 'inline-block' : 'none';
+            };
+
+            const setCartCount = (count) => {
+                currentCartCount = Math.max(0, Number(count) || 0);
+                if (!cartBadge) return;
+                cartBadge.textContent = String(currentCartCount);
+                cartBadge.style.display = currentCartCount > 0 ? 'inline-block' : 'none';
+            };
+
+            const resolveCountFromPayload = (payload) => {
+                if (!payload) return 0;
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (items.length > 0) {
+                    return items.reduce((total, item) => total + Math.max(0, Number(item.qty || 0)), 0);
+                }
+                return Math.max(0, Number(payload.count || 0));
+            };
+
+            const animatePlusOne = (node) => {
+                if (!node) return;
+                node.classList.remove('show');
+                void node.offsetWidth;
+                node.classList.add('show');
+            };
+
+            const renderWishlistDropdown = (items = []) => {
+                if (!wishlistDropdownList) return;
+                const safeItems = Array.isArray(items) ? items : [];
+                if (safeItems.length === 0) {
+                    wishlistDropdownList.innerHTML = `<p class="wishlist-dropdown-empty">${escapeHtml(wishlistEmptyText)}</p>`;
+                    return;
+                }
+
+                wishlistDropdownList.innerHTML = safeItems.map((item) => {
+                    const image = escapeHtml(item.image || '');
+                    const name = escapeHtml(item.name || '');
+                    const url = escapeHtml(item.url || '#');
+
+                    return `
+                        <article class="wishlist-dropdown-item">
+                            <a href="${url}"><img src="${image}" alt="${name}"></a>
+                            <div>
+                                <h4 class="wishlist-dropdown-name">${name}</h4>
+                                <a class="wishlist-dropdown-link" href="${url}">${escapeHtml(goToProductText)}</a>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+            };
+
+            const loadWishlistItems = async (forceReload = false) => {
+                if (!wishlistDropdownList) return wishlistItemsCache;
+
+                if (!forceReload && wishlistItemsCache.length > 0) {
+                    renderWishlistDropdown(wishlistItemsCache);
+                    return wishlistItemsCache;
+                }
+
+                wishlistDropdownList.innerHTML = `<p class="wishlist-dropdown-empty">${escapeHtml(wishlistLoadingText)}</p>`;
+
+                const response = await fetch(`${getWishlistItemsUrl()}?_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) throw new Error('wishlist_items_failed');
+                const result = await response.json();
+                if (!result || !result.success) throw new Error('wishlist_items_failed');
+
+                setWishlistCount(Math.max(0, Number(result.count || 0)));
+                wishlistItemsCache = Array.isArray(result.items) ? result.items : [];
+                renderWishlistDropdown(wishlistItemsCache);
+                return wishlistItemsCache;
+            };
+
+            const refreshWishlistCount = async (withAnimation = false) => {
+                const response = await fetch(`${getWishlistCountUrl()}?_=${Date.now()}`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) throw new Error('wishlist_count_failed');
+                const result = await response.json();
+                if (!result || !result.success) throw new Error('wishlist_count_failed');
+
+                const nextCount = Math.max(0, Number(result.count || 0));
+                const shouldAnimate = withAnimation && nextCount > currentWishlistCount;
+                setWishlistCount(nextCount);
+                if (shouldAnimate) animatePlusOne(wishlistPlusOne);
+            };
+
+            const openWishlistDropdown = async () => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                wishlistDropdown.classList.add('is-open');
+                wishlistDropdown.setAttribute('aria-hidden', 'false');
+                wishlistTrigger.setAttribute('aria-expanded', 'true');
+                try {
+                    await loadWishlistItems(true);
+                } catch (error) {
+                    renderWishlistDropdown([]);
+                }
+            };
+
+            const closeWishlistDropdown = () => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                wishlistDropdown.classList.remove('is-open');
+                wishlistDropdown.setAttribute('aria-hidden', 'true');
+                wishlistTrigger.setAttribute('aria-expanded', 'false');
+            };
+
+            const openMiniCart = () => {
+                if (!miniCart) return;
+                miniCart.classList.add('is-open');
+                miniCart.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            };
+
+            const closeMiniCart = () => {
+                if (!miniCart) return;
+                miniCart.classList.remove('is-open');
+                miniCart.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            };
+
+            const renderMiniCart = (payload) => {
+                if (!payload) return;
+                cartPayloadCache = payload;
+
+                const count = resolveCountFromPayload(payload);
+                const shouldAnimate = count > currentCartCount;
+                setCartCount(count);
+                if (shouldAnimate) animatePlusOne(plusOne);
+
+                if (miniCartSubtotal) miniCartSubtotal.innerHTML = payload.subtotal_html || '—';
+                if (miniCartView) miniCartView.href = `${localePrefix}/cart`;
+                if (miniCartCheckout) miniCartCheckout.href = wpCheckoutUrl;
+
+                if (!miniCartList) return;
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (items.length === 0) {
+                    miniCartList.innerHTML = `<p class="mini-cart-empty">${escapeHtml(cartEmptyText)}</p>`;
+                    return;
+                }
+
+                miniCartList.innerHTML = items.map((item) => {
+                    return `
+                        <article class="mini-cart-item">
+                            <a href="${escapeHtml(item.url || '#')}"><img src="${escapeHtml(item.image || '')}" alt="${escapeHtml(item.name || '')}"></a>
+                            <div class="mini-cart-info">
+                                <h4>${escapeHtml(item.name || '')}</h4>
+                                <div class="mini-cart-meta"><span>${escapeHtml(qtyShortText)}:</span><strong>${Number(item.qty || 1)}</strong></div>
+                                <div class="mini-cart-price">${item.line_total_html || item.price_html || ''}</div>
+                            </div>
+                            <button type="button" class="mini-cart-remove" data-remove-cart-key="${escapeHtml(item.key || '')}">${escapeHtml(removeText)}</button>
+                        </article>
+                    `;
+                }).join('');
+            };
+
+            const getCartSummary = async () => {
+                const response = await fetch(`${adminAjaxUrl}?action=styliiiish_cart_summary`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!response.ok) throw new Error('summary_failed');
+
+                const result = await response.json();
+                if (!result || !result.success) throw new Error('summary_failed');
+                renderMiniCart(result.data);
+            };
+
+            if (wishlistTrigger) {
+                wishlistTrigger.addEventListener('click', async (event) => {
+                    event.preventDefault();
+                    if (!wishlistDropdown) return;
+                    if (wishlistDropdown.classList.contains('is-open')) {
+                        closeWishlistDropdown();
+                        return;
+                    }
+                    await openWishlistDropdown();
+                });
+            }
+
+            document.addEventListener('click', (event) => {
+                if (!wishlistDropdown || !wishlistTrigger) return;
+                const insideTrigger = wishlistTrigger.contains(event.target);
+                const insideDropdown = wishlistDropdown.contains(event.target);
+                if (!insideTrigger && !insideDropdown) closeWishlistDropdown();
+            });
+
+            if (cartTrigger) {
+                cartTrigger.addEventListener('click', () => {
+                    openMiniCart();
+                    if (cartPayloadCache) {
+                        renderMiniCart(cartPayloadCache);
+                    } else if (miniCartList && miniCartList.innerHTML.trim() === '') {
+                        miniCartList.innerHTML = `<div class="mini-cart-loading">${escapeHtml(loadingCartText)}</div>`;
+                    }
+                    getCartSummary().catch(() => {});
+                });
+            }
+
+            if (miniCartClosers.length > 0) {
+                miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
+            }
+
+            if (miniCartList) {
+                miniCartList.addEventListener('click', async (event) => {
+                    const removeBtn = event.target.closest('[data-remove-cart-key]');
+                    if (!removeBtn) return;
+
+                    const cartKey = removeBtn.getAttribute('data-remove-cart-key') || '';
+                    if (!cartKey) return;
+
+                    const params = new URLSearchParams();
+                    params.set('action', 'styliiiish_remove_from_cart');
+                    params.set('cart_key', cartKey);
+
+                    const response = await fetch(adminAjaxUrl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: params.toString(),
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result && result.success) {
+                        renderMiniCart(result.data);
+                    }
+                });
+            }
+
+            document.addEventListener('keydown', (event) => {
+                if (event.key !== 'Escape') return;
+                if (miniCart && miniCart.classList.contains('is-open')) closeMiniCart();
+                if (wishlistDropdown && wishlistDropdown.classList.contains('is-open')) closeWishlistDropdown();
+            });
+
+            setCartCount(0);
+            getCartSummary().catch(() => setCartCount(0));
+            setWishlistCount(0);
+            refreshWishlistCount(false).catch(() => {});
         })();
     </script>
 
