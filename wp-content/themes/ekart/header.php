@@ -169,8 +169,8 @@
 					<div class="topbar-mobile-lang">
 						<button class="topbar-lang-toggle" id="topbarLangToggle" type="button" aria-controls="topbarLangPanel" aria-expanded="false"><?php echo esc_html($is_english ? 'EN' : 'AR'); ?></button>
 						<div class="topbar-lang-panel" id="topbarLangPanel" aria-hidden="true">
-							<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>">AR</a>
-							<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>">EN</a>
+							<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
+							<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($en_switch_url); ?>';return false;">EN</a>
 						</div>
 					</div>
 					<div class="topbar-mobile-social">
