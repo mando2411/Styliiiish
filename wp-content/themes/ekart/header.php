@@ -101,6 +101,14 @@
 	.account-menu a{min-height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;text-decoration:none}
 	#accountMenuManage{background:var(--secondary);color:#fff}
 	#accountMenuLogout{background:#fff;border:1px solid var(--line);color:var(--secondary)}
+	.wishlist-trigger-wrap{position:relative}
+	.wishlist-dropdown{position:absolute;top:calc(100% + 10px);inset-inline-end:0;width:min(360px,82vw);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(23,39,59,.14);padding:10px;display:none;z-index:90}
+	.wishlist-dropdown.is-open{display:block}
+	.wishlist-dropdown-list{display:grid;gap:8px;max-height:360px;overflow:auto}
+	.wishlist-dropdown-empty{margin:0;font-size:13px;color:var(--muted);text-align:center;padding:12px 8px;border:1px dashed var(--line);border-radius:10px;background:#fbfcff}
+	.wishlist-dropdown-footer{display:flex;justify-content:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+	.wishlist-dropdown-all{font-size:13px;color:var(--primary);font-weight:800;text-decoration:none}
+	.wishlist-count{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;border-radius:999px;background:var(--primary);color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:800;padding:0 4px;display:inline-block}
 	.cart-count{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;border-radius:999px;background:var(--primary);color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:800;padding:0 4px;display:inline-block}
 	.mini-cart{position:fixed;inset:0;z-index:110;pointer-events:none}
 	.mini-cart.is-open{pointer-events:auto}
@@ -130,9 +138,9 @@
 	.category-strip-group:last-child{border-inline-end:0;padding-inline-end:0}
 	.category-strip-chip{flex:0 0 auto;min-height:36px;border:1px solid rgba(23,39,59,.12);border-radius:999px;background:#fff;color:var(--secondary);padding:0 14px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(23,39,59,.05);transition:transform .2s ease,border-color .2s ease,color .2s ease,background-color .2s ease,box-shadow .2s ease}
 	.category-strip-chip:hover{border-color:var(--primary);color:var(--primary);background:#fff4f5;box-shadow:0 6px 14px rgba(23,39,59,.1);transform:translateY(-2px)}
-	@media (max-width:980px){.main-header-inner{grid-template-columns:1fr auto;gap:8px;min-height:auto;padding:10px 0}.brand{align-items:center;text-align:center}.brand-logo{height:44px!important;max-height:44px!important;max-width:240px!important}.brand-tag{font-size:11px}.main-nav{grid-column:1 / -1;margin-top:4px;border-radius:10px;padding:5px;gap:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;display:none;justify-content:flex-start}.main-nav.is-open{display:flex}.main-nav::-webkit-scrollbar{display:none}.main-nav a{font-size:12px;padding:7px 10px;scroll-snap-align:start}.header-actions{justify-content:flex-end;gap:6px;flex-wrap:nowrap}.action-nav-toggle{display:inline-flex}.search-form{display:none}.icon-btn{min-width:34px;min-height:34px;padding:0 8px;font-size:12px;border-radius:8px}.action-wishlist,.action-sell{display:none}.action-account,.action-cart{min-width:46px;justify-content:center}}
+	@media (max-width:980px){.main-header-inner{grid-template-columns:1fr auto;gap:8px;min-height:auto;padding:10px 0}.brand{align-items:center;text-align:center}.brand-logo{height:44px!important;max-height:44px!important;max-width:240px!important}.brand-tag{font-size:11px}.main-nav{grid-column:1 / -1;margin-top:4px;border-radius:10px;padding:5px;gap:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;display:none;justify-content:flex-start}.main-nav.is-open{display:flex}.main-nav::-webkit-scrollbar{display:none}.main-nav a{font-size:12px;padding:7px 10px;scroll-snap-align:start}.header-actions{justify-content:flex-end;gap:6px;flex-wrap:nowrap}.action-nav-toggle{display:inline-flex}.search-form{display:none}.icon-btn{min-width:34px;min-height:34px;padding:0 8px;font-size:12px;border-radius:8px}.action-sell{display:none}.action-account,.action-cart,.action-wishlist{min-width:46px;justify-content:center}}
 	@media (max-width:640px){.topbar{background:transparent;border-bottom:0;height:0;overflow:visible}.topbar-inner{min-height:0;padding:0}.topbar-left,.topbar-desktop-contact{display:none}.topbar-right{width:100%;justify-content:flex-end}.topbar-mobile-social,.topbar-mobile-lang{display:inline-flex}.topbar-mobile-social{inset-inline-end:10px;bottom:12px}.topbar-mobile-lang{inset-inline-end:10px;bottom:80px}.categories-strip-inner{padding:8px 0;gap:6px}.category-strip-group{gap:5px;padding-inline-end:5px}.category-strip-chip{min-height:32px;padding:0 10px;font-size:12px}}
-	@media (max-width:390px){.action-account,.action-cart{min-width:42px;font-size:11px}.brand-logo{height:36px!important;max-width:200px!important}.main-nav a{font-size:11px;padding:6px 9px}}
+	@media (max-width:390px){.action-account,.action-cart,.action-wishlist{min-width:42px;font-size:11px}.brand-logo{height:36px!important;max-width:200px!important}.main-nav a{font-size:11px;padding:6px 9px}}
 </style>
 
 	<div id="page" class="site">
@@ -232,9 +240,17 @@
 							<a id="accountMenuLogout" href="<?php echo esc_url($build_localized_url('/my-account')); ?>"><?php echo esc_html($is_english ? 'Open account page' : 'فتح صفحة الحساب'); ?></a>
 						</div>
 					</span>
-					<span class="icon-wrap action-wishlist">
-						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
+					<span class="icon-wrap wishlist-trigger-wrap action-wishlist">
+						<button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>" aria-expanded="false" aria-controls="wishlistDropdown">❤<span class="wishlist-count" id="wishlistCountBadge">0</span></button>
 						<span class="icon-plus-one">+1</span>
+						<div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="<?php echo esc_attr('Wishlist'); ?>" aria-hidden="true">
+							<div class="wishlist-dropdown-list" id="wishlistDropdownList">
+								<p class="wishlist-dropdown-empty"><?php echo esc_html($is_english ? 'Your wishlist preview opens here.' : 'معاينة المفضلة تظهر هنا.'); ?></p>
+							</div>
+							<div class="wishlist-dropdown-footer">
+								<a class="wishlist-dropdown-all" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>"><?php echo esc_html($is_english ? 'View full wishlist' : 'عرض كل المفضلة'); ?></a>
+							</div>
+						</div>
 					</span>
 					<span class="icon-wrap cart-trigger-wrap action-cart">
 						<button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>" aria-expanded="false" aria-controls="miniCart">🛒<span class="cart-count" id="cartCountBadge">0</span></button>
@@ -270,6 +286,8 @@
 			var langPanel=document.getElementById('topbarLangPanel');
 			var socialToggle=document.getElementById('topbarSocialToggle');
 			var socialPanel=document.getElementById('topbarSocialPanel');
+			var wishlistTrigger=document.getElementById('wishlistTrigger');
+			var wishlistDropdown=document.getElementById('wishlistDropdown');
 			var accountTrigger=document.getElementById('accountLoginTrigger');
 			var accountMenu=document.getElementById('accountMenu');
 			var cartTrigger=document.getElementById('miniCartTrigger');
@@ -278,6 +296,8 @@
 			var closeNav=function(){if(!navToggle||!nav)return;nav.classList.remove('is-open');navToggle.setAttribute('aria-expanded','false');};
 			var closeLang=function(){if(!langToggle||!langPanel)return;langPanel.classList.remove('is-open');langPanel.setAttribute('aria-hidden','true');langToggle.setAttribute('aria-expanded','false');};
 			var closeSocial=function(){if(!socialToggle||!socialPanel)return;socialPanel.classList.remove('is-open');socialPanel.setAttribute('aria-hidden','true');socialToggle.setAttribute('aria-expanded','false');};
+			var closeWishlist=function(){if(!wishlistTrigger||!wishlistDropdown)return;wishlistDropdown.classList.remove('is-open');wishlistDropdown.setAttribute('aria-hidden','true');wishlistTrigger.setAttribute('aria-expanded','false');};
+			var openWishlist=function(){if(!wishlistTrigger||!wishlistDropdown)return;wishlistDropdown.classList.add('is-open');wishlistDropdown.setAttribute('aria-hidden','false');wishlistTrigger.setAttribute('aria-expanded','true');};
 			var closeAccountMenu=function(){if(!accountTrigger||!accountMenu)return;accountMenu.classList.remove('is-open');accountMenu.setAttribute('aria-hidden','true');accountTrigger.setAttribute('aria-expanded','false');};
 			var openAccountMenu=function(){if(!accountTrigger||!accountMenu)return;accountMenu.classList.add('is-open');accountMenu.setAttribute('aria-hidden','false');accountTrigger.setAttribute('aria-expanded','true');};
 			var closeMiniCart=function(){if(!miniCart)return;miniCart.classList.remove('is-open');miniCart.setAttribute('aria-hidden','true');if(cartTrigger)cartTrigger.setAttribute('aria-expanded','false');document.body.style.overflow='';};
@@ -285,12 +305,13 @@
 			if(navToggle&&nav){navToggle.addEventListener('click',function(){var open=!nav.classList.contains('is-open');nav.classList.toggle('is-open',open);navToggle.setAttribute('aria-expanded',open?'true':'false');});}
 			if(langToggle&&langPanel){langToggle.addEventListener('click',function(){var open=!langPanel.classList.contains('is-open');langPanel.classList.toggle('is-open',open);langPanel.setAttribute('aria-hidden',open?'false':'true');langToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeSocial();});document.addEventListener('click',function(e){var wrap=langToggle.closest('.topbar-mobile-lang');if(wrap&&!wrap.contains(e.target))closeLang();});}
 			if(socialToggle&&socialPanel){socialToggle.addEventListener('click',function(){var open=!socialPanel.classList.contains('is-open');socialPanel.classList.toggle('is-open',open);socialPanel.setAttribute('aria-hidden',open?'false':'true');socialToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeLang();});document.addEventListener('click',function(e){var wrap=socialToggle.closest('.topbar-mobile-social');if(wrap&&!wrap.contains(e.target))closeSocial();});}
-			if(accountTrigger&&accountMenu){accountTrigger.addEventListener('click',function(e){e.preventDefault();if(accountMenu.classList.contains('is-open')){closeAccountMenu();return;}closeMiniCart();openAccountMenu();});}
-			if(cartTrigger&&miniCart){cartTrigger.addEventListener('click',function(){closeAccountMenu();openMiniCart();});}
+			if(wishlistTrigger&&wishlistDropdown){wishlistTrigger.addEventListener('click',function(e){e.preventDefault();if(wishlistDropdown.classList.contains('is-open')){closeWishlist();return;}closeAccountMenu();closeMiniCart();openWishlist();});}
+			if(accountTrigger&&accountMenu){accountTrigger.addEventListener('click',function(e){e.preventDefault();if(accountMenu.classList.contains('is-open')){closeAccountMenu();return;}closeWishlist();closeMiniCart();openAccountMenu();});}
+			if(cartTrigger&&miniCart){cartTrigger.addEventListener('click',function(){closeWishlist();closeAccountMenu();openMiniCart();});}
 			if(miniCartClosers.length){miniCartClosers.forEach(function(node){node.addEventListener('click',closeMiniCart);});}
-			document.addEventListener('click',function(e){if(accountTrigger&&accountMenu&&!accountTrigger.contains(e.target)&&!accountMenu.contains(e.target))closeAccountMenu();});
-			document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;closeMiniCart();closeAccountMenu();closeLang();closeSocial();});
-			window.addEventListener('resize',function(){if(window.innerWidth>640){closeNav();closeLang();closeSocial();}if(window.innerWidth>980){closeAccountMenu();closeMiniCart();}});
+			document.addEventListener('click',function(e){if(wishlistTrigger&&wishlistDropdown&&!wishlistTrigger.contains(e.target)&&!wishlistDropdown.contains(e.target))closeWishlist();if(accountTrigger&&accountMenu&&!accountTrigger.contains(e.target)&&!accountMenu.contains(e.target))closeAccountMenu();});
+			document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;closeMiniCart();closeWishlist();closeAccountMenu();closeLang();closeSocial();});
+			window.addEventListener('resize',function(){if(window.innerWidth>640){closeNav();closeLang();closeSocial();}if(window.innerWidth>980){closeWishlist();closeAccountMenu();closeMiniCart();}});
 		})();
 		</script>
 		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
