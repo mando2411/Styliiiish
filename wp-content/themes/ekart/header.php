@@ -23,11 +23,37 @@
 	if ($normalized_path === '') {
 		$normalized_path = '/';
 	}
-	$is_english = (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || ($normalized_path === '/my-account');
+	global $TRP_LANGUAGE;
+	$trp_lang = isset($TRP_LANGUAGE) ? strtolower((string) $TRP_LANGUAGE) : '';
+	$is_english = str_starts_with($trp_lang, 'en') || (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || ($normalized_path === '/my-account');
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$is_account_layout = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي', '/ara/حسابي', '/حسابي'], true);
+	$ar_switch_url = home_url('/ar/حسابي/');
+	$en_switch_url = home_url('/my-account/');
+	if (function_exists('trp_custom_language_switcher')) {
+		$trp_switcher = trp_custom_language_switcher();
+		if (is_array($trp_switcher)) {
+			foreach ($trp_switcher as $language_data) {
+				if (!is_array($language_data)) {
+					continue;
+				}
+				$language_code = strtolower((string) ($language_data['language_code'] ?? ''));
+				$short_name = strtolower((string) ($language_data['short_language_name'] ?? ''));
+				$current_url = (string) ($language_data['current_page_url'] ?? '');
+				if ($current_url === '') {
+					continue;
+				}
+				if ($short_name === 'ar' || str_starts_with($language_code, 'ar')) {
+					$ar_switch_url = $current_url;
+				}
+				if ($short_name === 'en' || str_starts_with($language_code, 'en')) {
+					$en_switch_url = $current_url;
+				}
+			}
+		}
+	}
 ?>
 
 <?php if ($is_account_layout) : ?>
@@ -83,8 +109,8 @@
 				<div class="topbar-left">
 					<div class="lang-switch <?php echo $is_english ? 'is-en' : 'is-ar'; ?>" aria-label="Language Switcher">
 						<span class="lang-indicator" aria-hidden="true"></span>
-						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/ar/حسابي/')); ?>">AR</a>
-						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/my-account/')); ?>">EN</a>
+						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>">AR</a>
+						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>">EN</a>
 					</div>
 					<span class="topbar-note">⚡ Daily Deals</span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
