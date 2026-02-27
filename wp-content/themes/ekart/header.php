@@ -57,9 +57,15 @@
 	.search-form{display:flex;align-items:center;gap:6px}
 	.search-input{height:38px;min-width:190px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:13px;outline:none}
 	.search-btn{height:38px;border:none;border-radius:10px;background:#17273B;color:#fff;padding:0 12px;font-size:13px;font-weight:700;cursor:pointer}
+	.icon-wrap{position:relative;display:inline-flex;align-items:center}
 	.icon-btn{height:38px;min-width:38px;border:1px solid var(--line);border-radius:10px;background:#fff;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--secondary);font-size:16px}
+	.icon-plus-one{position:absolute;top:-7px;right:-8px;background:var(--primary);color:#fff;border-radius:999px;padding:1px 6px;font-size:11px;font-weight:800;line-height:1}
 	.header-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none}
 	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:600}
+	.header-categories-strip{background:#fff;border-bottom:1px solid var(--line)}
+	.categories-strip-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0}
+	.category-strip-chip{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border-radius:999px;background:#f6f8fb;color:var(--secondary);font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line)}
+	.category-strip-chip:hover{background:#fff4f5;color:var(--primary)}
 	@media (max-width:900px){.main-header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.main-nav{justify-content:flex-start}.brand-logo{height:46px!important;max-height:46px!important;max-width:min(220px,70vw)!important}.search-input{min-width:140px}}
 </style>
 <?php endif; ?>
@@ -106,13 +112,30 @@
 						<button class="search-btn" type="submit"><?php echo $is_english ? 'Search' : 'بحث'; ?></button>
 					</form>
 					<a class="icon-btn" href="<?php echo esc_url($is_english ? home_url('/my-account/') : home_url('/ar/حسابي/')); ?>" aria-label="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>" title="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>">👤</a>
-					<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>" title="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>">❤</a>
-					<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>" title="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>">🛒</a>
+					<span class="icon-wrap">
+						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>" title="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>">❤</a>
+						<span class="icon-plus-one">+1</span>
+					</span>
+					<span class="icon-wrap">
+						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>" title="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>">🛒</a>
+						<span class="icon-plus-one">+1</span>
+					</span>
 					<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Start Selling' : 'ابدئي البيع'; ?></a>
 				</div>
 			</div>
 		</header>
 		<div class="promo"><?php echo $is_english ? 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days' : 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل'; ?></div>
+		<div class="header-categories-strip">
+			<div class="container categories-strip-inner">
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=dress')); ?>"><?php echo $is_english ? 'Dress' : 'فستان'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=bridesmaid-dresses')); ?>"><?php echo $is_english ? 'Bridesmaid Dresses' : 'فساتين وصيفات العروس'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=evening-dresses')); ?>"><?php echo $is_english ? 'Evening Dresses' : 'فساتين سواريه'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=final-clearance-dresses')); ?>"><?php echo $is_english ? 'Final Clearance Dresses' : 'فساتين التصفية النهائية'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=plus-size-dresses')); ?>"><?php echo $is_english ? 'Plus Size Dresses' : 'فساتين بمقاسات كبيرة'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=mothers-dresses')); ?>"><?php echo $is_english ? 'Mother of the Bride Dresses' : 'فساتين الأمهات'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=pre-loved-dresses')); ?>"><?php echo $is_english ? 'Pre-Loved Dresses' : 'فساتين مستعملة'; ?></a>
+			</div>
+		</div>
 	<?php else : ?>
 		<?php 
 			// Theme Header
