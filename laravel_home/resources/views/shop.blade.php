@@ -10,10 +10,60 @@
         'ar' => [
             'page_title' => 'المتجر | ستايلش',
             'meta_desc' => 'تسوقي الآن من متجر ستايلش أحدث فساتين السهرة والزفاف والخطوبة في مصر مع عروض حصرية، شحن سريع، وتجربة شراء آمنة وحديثة.',
+            'shop_title' => 'المتجر',
+            'shop_subtitle' => 'اكتشفي أحدث فساتين السهرة والزفاف والخطوبة بأسعار تنافسية.',
+            'search_placeholder' => 'ابحثي عن منتج...',
+            'search_aria' => 'ابحثي عن منتج',
+            'search_btn' => 'بحث',
+            'sort_aria' => 'ترتيب المنتجات',
+            'sort_newest' => 'الأحدث',
+            'sort_best_selling' => 'الأكثر مبيعًا',
+            'sort_top_rated' => 'الأعلى تقييمًا',
+            'sort_discount_desc' => 'أعلى خصم',
+            'sort_price_asc' => 'السعر: من الأقل للأعلى',
+            'sort_price_desc' => 'السعر: من الأعلى للأقل',
+            'sort_random' => 'ترتيب عشوائي',
+            'empty_now' => 'لا توجد منتجات مطابقة الآن. جرّبي البحث بكلمات مختلفة.',
+            'currency' => 'ج.م',
+            'contact_price' => 'تواصل لمعرفة السعر',
+            'discount_badge' => 'خصم',
+            'save_prefix' => 'وفّري',
+            'buy_now' => 'اطلبي الآن',
+            'preview' => 'معاينة',
+            'results_none' => 'لا توجد نتائج حاليًا.',
+            'results_showing' => 'عرض :rendered من :total منتج',
+            'load_more' => 'جاري تحميل المزيد...',
+            'load_done' => 'تم عرض كل المنتجات',
+            'load_error' => 'حدث خطأ أثناء تحميل المنتجات.',
         ],
         'en' => [
             'page_title' => 'Shop | Styliiiish',
             'meta_desc' => 'Shop the latest evening, bridal, and engagement dresses at Styliiiish with exclusive offers, fast Egypt-wide shipping, and a secure modern checkout experience.',
+            'shop_title' => 'Shop',
+            'shop_subtitle' => 'Discover the latest evening, bridal, and engagement dresses at competitive prices.',
+            'search_placeholder' => 'Search products...',
+            'search_aria' => 'Search products',
+            'search_btn' => 'Search',
+            'sort_aria' => 'Sort products',
+            'sort_newest' => 'Newest',
+            'sort_best_selling' => 'Best Selling',
+            'sort_top_rated' => 'Top Rated',
+            'sort_discount_desc' => 'Highest Discount',
+            'sort_price_asc' => 'Price: Low to High',
+            'sort_price_desc' => 'Price: High to Low',
+            'sort_random' => 'Random',
+            'empty_now' => 'No matching products right now. Try different keywords.',
+            'currency' => 'EGP',
+            'contact_price' => 'Contact for price',
+            'discount_badge' => 'OFF',
+            'save_prefix' => 'Save',
+            'buy_now' => 'Order Now',
+            'preview' => 'Preview',
+            'results_none' => 'No results right now.',
+            'results_showing' => 'Showing :rendered of :total products',
+            'load_more' => 'Loading more products...',
+            'load_done' => 'All products loaded',
+            'load_error' => 'An error occurred while loading products.',
         ],
     ];
 
@@ -196,24 +246,24 @@
 
     <main class="container">
         <section class="shop-head">
-            <h1>المتجر</h1>
-            <p>اكتشفي أحدث فساتين السهرة والزفاف والخطوبة بأسعار تنافسية.</p>
+            <h1>{{ $t('shop_title') }}</h1>
+            <p>{{ $t('shop_subtitle') }}</p>
         </section>
 
         <section class="toolbar">
-            <form class="search-form" id="searchForm" method="GET" action="/shop">
-                <input class="search-input" type="search" id="qInput" name="q" value="{{ $search }}" placeholder="ابحثي عن منتج..." aria-label="ابحثي عن منتج">
-                <button class="search-btn" type="submit">بحث</button>
+            <form class="search-form" id="searchForm" method="GET" action="{{ $localePrefix }}/shop">
+                <input class="search-input" type="search" id="qInput" name="q" value="{{ $search }}" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_aria') }}">
+                <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
             </form>
 
-            <select class="sort" id="sortSelect" name="sort" aria-label="ترتيب المنتجات">
-                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>الأحدث</option>
-                <option value="best_selling" {{ $sort === 'best_selling' ? 'selected' : '' }}>الأكثر مبيعًا</option>
-                <option value="top_rated" {{ $sort === 'top_rated' ? 'selected' : '' }}>الأعلى تقييمًا</option>
-                <option value="discount_desc" {{ $sort === 'discount_desc' ? 'selected' : '' }}>أعلى خصم</option>
-                <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>السعر: من الأقل للأعلى</option>
-                <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>السعر: من الأعلى للأقل</option>
-                <option value="random" {{ $sort === 'random' ? 'selected' : '' }}>ترتيب عشوائي</option>
+            <select class="sort" id="sortSelect" name="sort" aria-label="{{ $t('sort_aria') }}">
+                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>{{ $t('sort_newest') }}</option>
+                <option value="best_selling" {{ $sort === 'best_selling' ? 'selected' : '' }}>{{ $t('sort_best_selling') }}</option>
+                <option value="top_rated" {{ $sort === 'top_rated' ? 'selected' : '' }}>{{ $t('sort_top_rated') }}</option>
+                <option value="discount_desc" {{ $sort === 'discount_desc' ? 'selected' : '' }}>{{ $t('sort_discount_desc') }}</option>
+                <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>{{ $t('sort_price_asc') }}</option>
+                <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>{{ $t('sort_price_desc') }}</option>
+                <option value="random" {{ $sort === 'random' ? 'selected' : '' }}>{{ $t('sort_random') }}</option>
             </select>
         </section>
 
@@ -221,7 +271,7 @@
 
         <section class="grid" id="productsGrid"></section>
 
-        <div class="empty" id="emptyState" style="display:none;">لا توجد منتجات مطابقة الآن. جرّبي البحث بكلمات مختلفة.</div>
+        <div class="empty" id="emptyState" style="display:none;">{{ $t('empty_now') }}</div>
         <div class="load-status" id="loadStatus"></div>
         <div id="lazySentinel" aria-hidden="true"></div>
     </main>
@@ -257,6 +307,19 @@
 
             const fmt = new Intl.NumberFormat('en-US');
             const localePrefix = @json($localePrefix);
+            const i18n = {
+                currency: @json($t('currency')),
+                contactPrice: @json($t('contact_price')),
+                discountBadge: @json($t('discount_badge')),
+                savePrefix: @json($t('save_prefix')),
+                buyNow: @json($t('buy_now')),
+                preview: @json($t('preview')),
+                resultsNone: @json($t('results_none')),
+                resultsShowing: @json($t('results_showing')),
+                loadMore: @json($t('load_more')),
+                loadDone: @json($t('load_done')),
+                loadError: @json($t('load_error')),
+            };
 
             const buildQuery = () => {
                 const query = new URLSearchParams();
@@ -282,10 +345,10 @@
             };
 
             const productCard = (product) => {
-                const priceText = product.price > 0 ? `${fmt.format(product.price)} ج.م` : 'تواصل لمعرفة السعر';
-                const oldText = product.is_sale ? `<span class="old">${fmt.format(product.regular_price)} ج.م</span>` : '';
-                const badge = product.is_sale ? `<span class="badge">خصم ${product.discount}%</span>` : '';
-                const save = product.is_sale ? `<span class="save">وفّري ${fmt.format(product.saving)} ج.م</span>` : '';
+                const priceText = product.price > 0 ? `${fmt.format(product.price)} ${i18n.currency}` : i18n.contactPrice;
+                const oldText = product.is_sale ? `<span class="old">${fmt.format(product.regular_price)} ${i18n.currency}</span>` : '';
+                const badge = product.is_sale ? `<span class="badge">${i18n.discountBadge} ${product.discount}%</span>` : '';
+                const save = product.is_sale ? `<span class="save">${i18n.savePrefix} ${fmt.format(product.saving)} ${i18n.currency}</span>` : '';
 
                 return `
                     <article class="card">
@@ -301,8 +364,8 @@
                             </div>
                             ${save}
                             <div class="actions">
-                                <a class="btn-buy" href="${localePrefix}/item/${product.slug}">اطلبي الآن</a>
-                                <a class="btn-view" href="${localePrefix}/item/${product.slug}">معاينة</a>
+                                <a class="btn-buy" href="${localePrefix}/item/${product.slug}">${i18n.buyNow}</a>
+                                <a class="btn-view" href="${localePrefix}/item/${product.slug}">${i18n.preview}</a>
                             </div>
                         </div>
                     </article>
@@ -311,17 +374,19 @@
 
             const renderMeta = (total, rendered) => {
                 if (!total) {
-                    resultsMeta.textContent = 'لا توجد نتائج حاليًا.';
+                    resultsMeta.textContent = i18n.resultsNone;
                     return;
                 }
-                resultsMeta.textContent = `عرض ${rendered} من ${total} منتج`;
+                resultsMeta.textContent = i18n.resultsShowing
+                    .replace(':rendered', String(rendered))
+                    .replace(':total', String(total));
             };
 
             const renderNextChunk = () => {
                 const { allProducts, renderedCount, chunkSize } = renderState;
 
                 if (renderedCount >= allProducts.length) {
-                    loadStatus.textContent = allProducts.length ? 'تم عرض كل المنتجات' : '';
+                    loadStatus.textContent = allProducts.length ? i18n.loadDone : '';
                     return;
                 }
 
@@ -333,9 +398,9 @@
                 renderMeta(allProducts.length, renderState.renderedCount);
 
                 if (renderState.renderedCount < allProducts.length) {
-                    loadStatus.textContent = 'جاري تحميل المزيد...';
+                    loadStatus.textContent = i18n.loadMore;
                 } else {
-                    loadStatus.textContent = 'تم عرض كل المنتجات';
+                    loadStatus.textContent = i18n.loadDone;
                 }
             };
 
@@ -375,7 +440,7 @@
                 if (!response.ok) {
                     grid.innerHTML = '';
                     loadStatus.textContent = '';
-                    resultsMeta.textContent = 'حدث خطأ أثناء تحميل المنتجات.';
+                    resultsMeta.textContent = i18n.loadError;
                     return;
                 }
 
