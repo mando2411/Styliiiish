@@ -83,11 +83,34 @@
 					<a href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
 				</div>
 				<div class="topbar-left">
-					<div class="lang-switch" aria-label="Language Switcher" data-no-translation>
+					<div class="lang-switch <?php echo $is_english ? 'is-en' : 'is-ar'; ?>" aria-label="Language Switcher" data-no-translation data-en-url="<?php echo esc_attr($en_switch_url); ?>" data-ar-url="<?php echo esc_attr($ar_switch_url); ?>">
 						<span class="lang-indicator" aria-hidden="true"></span>
 						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="var sw=this.parentElement;sw.classList.remove('is-en');sw.classList.add('is-ar');this.classList.add('active');this.nextElementSibling&&this.nextElementSibling.classList.remove('active');window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
 						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>" onclick="var sw=this.parentElement;sw.classList.remove('is-ar');sw.classList.add('is-en');this.classList.add('active');this.previousElementSibling&&this.previousElementSibling.classList.remove('active');window.location.href='<?php echo esc_js($en_switch_url); ?>';return false;">EN</a>
 					</div>
+					<script>
+					(function(){
+						var sw = document.currentScript && document.currentScript.previousElementSibling;
+						if(!sw || !sw.classList || !sw.classList.contains('lang-switch')) return;
+						var current = (window.location.pathname || '').replace(/\/+$/,'').toLowerCase();
+						var isEnglishPath = (current === '/my-account' || current === '/en/my-account');
+						var links = sw.querySelectorAll('a');
+						if(links.length !== 2) return;
+						var arLink = links[0];
+						var enLink = links[1];
+						if(isEnglishPath){
+							sw.classList.remove('is-ar');
+							sw.classList.add('is-en');
+							enLink.classList.add('active');
+							arLink.classList.remove('active');
+						}else{
+							sw.classList.remove('is-en');
+							sw.classList.add('is-ar');
+							arLink.classList.add('active');
+							enLink.classList.remove('active');
+						}
+					})();
+					</script>
 					<span class="topbar-note">⚡ Daily Deals</span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
 					<a href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener">Instagram</a>

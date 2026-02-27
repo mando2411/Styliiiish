@@ -123,3 +123,54 @@ function ekart_fix_arabic_myaccount_endpoints_404() {
 	exit;
 }
 add_action( 'template_redirect', 'ekart_fix_arabic_myaccount_endpoints_404', 1 );
+
+/**
+ * Replace broken legacy asset host on my-account pages.
+ */
+function ekart_rewrite_legacy_assets_host_for_account_pages() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	$account_prefixes = [
+		'/my-account',
+		'/en/my-account',
+		'/ar/حسابي',
+		'/ara/حسابي',
+		'/حسابي',
+	];
+
+	$is_account_request = false;
+	foreach ( $account_prefixes as $prefix ) {
+		if ( $normalized === $prefix || str_starts_with( $normalized, $prefix . '/' ) ) {
+			$is_account_request = true;
+			break;
+		}
+	}
+
+	if ( ! $is_account_request ) {
+		return;
+	}
+
+	ob_start(
+		static function ( $html ) {
+			if ( ! is_string( $html ) || $html === '' ) {
+				return $html;
+			}
+
+			$replacements = [
+				'https://l.styliiiish.com/' => 'https://styliiiish.com/',
+				'http://l.styliiiish.com/'  => 'https://styliiiish.com/',
+				'//l.styliiiish.com/'       => '//styliiiish.com/',
+			];
+
+			return strtr( $html, $replacements );
+		}
+	);
+}
+add_action( 'template_redirect', 'ekart_rewrite_legacy_assets_host_for_account_pages', 2 );
