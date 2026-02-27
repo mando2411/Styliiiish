@@ -11,7 +11,7 @@
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
-	$account_url = $is_english ? home_url('/my-account/') : home_url('/ar/حسابي/');
+	$account_url = $is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 	$is_account_layout = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي', '/ara/حسابي', '/حسابي'], true);
 	$hour_now = (int) current_time('G');
 	$is_open_now = ($hour_now >= 11 && $hour_now < 19);
