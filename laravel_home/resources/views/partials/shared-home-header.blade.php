@@ -1,7 +1,17 @@
 @php
-    $currentLocale = $currentLocale ?? 'ar';
+    $currentLocale = strtolower((string) ($currentLocale ?? 'ar'));
+    if (!in_array($currentLocale, ['ar', 'en'], true)) {
+        $currentLocale = 'ar';
+    }
+
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
-    $localePrefix = $localePrefix ?? ($isEnglish ? '/en' : '/ar');
+    $rawLocalePrefix = (string) ($localePrefix ?? ($isEnglish ? '/en' : '/ar'));
+    $rawLocalePrefix = '/' . trim($rawLocalePrefix, '/');
+    $localePrefix = preg_match('#^/(ar|en)(?:/.*)?$#i', $rawLocalePrefix, $localeMatch)
+        ? ('/' . strtolower((string) $localeMatch[1]))
+        : ($isEnglish ? '/en' : '/ar');
+    $currentLocale = $localePrefix === '/en' ? 'en' : 'ar';
+    $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
     $wpLogo = $wpLogo ?? 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 

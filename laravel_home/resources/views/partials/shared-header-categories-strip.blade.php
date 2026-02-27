@@ -1,7 +1,17 @@
 @php
     $pathLocale = strtolower((string) request()->segment(1));
-    $currentLocale = in_array($pathLocale, ['ar', 'en'], true) ? $pathLocale : ($currentLocale ?? 'ar');
-    $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
+    $fallbackLocale = strtolower((string) ($currentLocale ?? 'ar'));
+    if (!in_array($fallbackLocale, ['ar', 'en'], true)) {
+        $fallbackLocale = 'ar';
+    }
+    $currentLocale = in_array($pathLocale, ['ar', 'en'], true) ? $pathLocale : $fallbackLocale;
+
+    $rawLocalePrefix = (string) ($localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar'));
+    $rawLocalePrefix = '/' . trim($rawLocalePrefix, '/');
+    $localePrefix = preg_match('#^/(ar|en)(?:/.*)?$#i', $rawLocalePrefix, $localeMatch)
+        ? ('/' . strtolower((string) $localeMatch[1]))
+        : ($currentLocale === 'en' ? '/en' : '/ar');
+    $currentLocale = $localePrefix === '/en' ? 'en' : 'ar';
     $activeCategorySlug = strtolower(trim((string) request()->query('category', '')));
 
     $categoryGroups = collect();

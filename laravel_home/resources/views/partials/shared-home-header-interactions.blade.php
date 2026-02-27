@@ -1,6 +1,17 @@
 @php
-    $currentLocale = $currentLocale ?? 'ar';
+    $currentLocale = strtolower((string) ($currentLocale ?? 'ar'));
+    if (!in_array($currentLocale, ['ar', 'en'], true)) {
+        $currentLocale = 'ar';
+    }
+
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
+    $rawLocalePrefix = (string) ($localePrefix ?? ($isEnglish ? '/en' : '/ar'));
+    $rawLocalePrefix = '/' . trim($rawLocalePrefix, '/');
+    $localePrefix = preg_match('#^/(ar|en)(?:/.*)?$#i', $rawLocalePrefix, $localeMatch)
+        ? ('/' . strtolower((string) $localeMatch[1]))
+        : ($isEnglish ? '/en' : '/ar');
+    $currentLocale = $localePrefix === '/en' ? 'en' : 'ar';
+    $isEnglish = $currentLocale === 'en';
     $baseTranslator = (isset($t) && is_callable($t)) ? $t : null;
     $headerTranslator = (isset($ht) && is_callable($ht)) ? $ht : null;
 
