@@ -40,16 +40,18 @@
 	};
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
-	$query_params = $_GET;
-	if (isset($query_params['trp-form-language'])) {
-		unset($query_params['trp-form-language']);
+	$path_without_locale = preg_replace('#^/(ar|en)(?=/|$)#i', '', $request_path);
+	$path_without_locale = is_string($path_without_locale) ? $path_without_locale : $request_path;
+	$path_without_locale = '/' . ltrim($path_without_locale, '/');
+	if ($path_without_locale === '//') {
+		$path_without_locale = '/';
 	}
-	$current_clean_url = rtrim($wp_base_url, '/') . ($request_path ?: '/');
-	if (!empty($query_params)) {
-		$current_clean_url .= '?' . http_build_query($query_params);
-	}
-	$ar_switch_url = add_query_arg('trp-form-language', 'ar', $current_clean_url);
-	$en_switch_url = add_query_arg('trp-form-language', 'en', $current_clean_url);
+	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي'], true);
+	$ar_switch_path = $is_account_path ? '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/' : ('/ar' . ($path_without_locale === '/' ? '' : $path_without_locale));
+	$en_switch_path = $is_account_path ? '/my-account/' : ($path_without_locale === '/' ? '/' : $path_without_locale);
+	$query_string = isset($_SERVER['QUERY_STRING']) && (string) $_SERVER['QUERY_STRING'] !== '' ? ('?' . (string) $_SERVER['QUERY_STRING']) : '';
+	$ar_switch_url = rtrim($wp_base_url, '/') . $ar_switch_path . $query_string;
+	$en_switch_url = rtrim($wp_base_url, '/') . $en_switch_path . $query_string;
 ?>
 
 <style>
