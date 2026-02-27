@@ -222,14 +222,14 @@
                     $desc = trim(strip_tags((string) ($category->description ?? '')));
                     $shortDesc = $desc !== '' ? (mb_strlen($desc) > 90 ? mb_substr($desc, 0, 90) . '…' : $desc) : '';
                     $image = $category->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
-                    $link = $wpBaseUrl . '/product-category/' . rawurlencode($category->slug) . '/';
+                    $link = $localePrefix . '/shop?q=' . rawurlencode((string) $category->name);
                 @endphp
                 <article class="card" data-name="{{ mb_strtolower((string) $category->name) }}" data-desc="{{ mb_strtolower($desc) }}">
                     <div class="thumb-wrap"><img class="thumb" src="{{ $image }}" alt="{{ $category->name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/uploads/woocommerce-placeholder.png';"></div>
                     <div class="card-body">
                         <h2 class="name">{{ $category->name }}</h2>
                         <p class="desc">{{ $shortDesc !== '' ? $shortDesc : '—' }}</p>
-                        <div class="meta"><span class="count">{{ (int) $category->products_count }} {{ $t('products_count') }}</span><a class="cta" href="{{ $link }}" target="_blank" rel="noopener">{{ $t('view_category') }}</a></div>
+                        <div class="meta"><span class="count">{{ (int) $category->products_count }} {{ $t('products_count') }}</span><a class="cta" href="{{ $link }}">{{ $t('view_category') }}</a></div>
                     </div>
                 </article>
             @endforeach
