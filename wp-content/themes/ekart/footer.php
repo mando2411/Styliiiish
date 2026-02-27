@@ -64,7 +64,7 @@
 				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>"><?php echo $is_english ? 'Marketplace' : 'الماركت بليس'; ?></a></li>
 				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>"><?php echo $is_english ? 'Categories' : 'الأقسام'; ?></a></li>
 				<li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Sell Your Dress' : 'بيعي فستانك'; ?></a></li>
-				<li><a href="<?php echo esc_url($account_url); ?>"><?php echo $is_english ? 'My Account' : 'حسابي'; ?></a></li>
+				<li><a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener"><?php echo $is_english ? 'My Account' : 'حسابي'; ?></a></li>
 			</ul>
 		</div>
 		<div class="footer-col">
@@ -97,7 +97,7 @@
 		<a href="<?php echo esc_url(home_url($locale_prefix)); ?>"><?php echo $is_english ? 'Home' : 'الرئيسية'; ?></a>
 		<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a>
 		<a href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>"><?php echo $is_english ? 'Cart' : 'السلة'; ?></a>
-		<a href="<?php echo esc_url($account_url); ?>"><?php echo $is_english ? 'Account' : 'حسابي'; ?></a>
+		<a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener"><?php echo $is_english ? 'Account' : 'حسابي'; ?></a>
 		<a href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>"><?php echo $is_english ? 'Wishlist' : 'المفضلة'; ?></a>
 	</div>
 </footer>
