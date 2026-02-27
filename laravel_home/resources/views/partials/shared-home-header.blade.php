@@ -10,6 +10,9 @@
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
+    $wpLocalizedMyDressesUrl = $wpLocalizedMyDressesUrl ?? ($isEnglish
+        ? ($wpBaseUrl . '/my-dresses/')
+        : ($wpBaseUrl . '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/'));
     $normalizePath = function (string $path): string {
         $trimmed = trim($path);
         if ($trimmed === '' || $trimmed === '/') {
@@ -109,7 +112,7 @@
                 </button>
                 <span class="cart-plus-one" id="cartPlusOne">+1</span>
             </span>
-            <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $ht('start_selling', 'ابدئي البيع', 'Start Selling') }}</a>
+            <a class="btn btn-primary header-cta action-sell" href="{{ $wpLocalizedMyDressesUrl }}" target="_blank" rel="noopener">{{ $ht('start_selling', 'ابدئي البيع', 'Start Selling') }}</a>
         </div>
     </div>
 </header>
