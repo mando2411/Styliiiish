@@ -74,10 +74,10 @@
 		<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'ekart' ); ?></a>
 
 	<?php if ($is_account_layout) : ?>
-		<div class="topbar notranslate" translate="no">
+		<div class="topbar">
 			<div class="container topbar-inner">
 				<div class="topbar-right">
-					<strong><?php echo $is_english ? 'Call us anytime:' : 'اتصلي بنا في أي وقت:'; ?></strong>
+					<strong>Call us anytime:</strong>
 					<a href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
 				</div>
 				<div class="topbar-left">
@@ -86,54 +86,54 @@
 						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/ar/حسابي/')); ?>">AR</a>
 						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/my-account/')); ?>">EN</a>
 					</div>
-					<span class="topbar-note"><?php echo $is_english ? '⚡ Daily Deals' : '⚡ خصومات يومية'; ?></span>
+					<span class="topbar-note">⚡ Daily Deals</span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
 					<a href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener">Instagram</a>
 					<a href="https://g.page/styliish" target="_blank" rel="noopener">Google</a>
 				</div>
 			</div>
 		</div>
-		<header class="main-header notranslate" translate="no">
+		<header class="main-header">
 			<div class="container main-header-inner">
 				<a class="brand" href="<?php echo esc_url(home_url($locale_prefix)); ?>">
 					<img class="brand-logo" src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish">
-					<span class="brand-tag"><?php echo $is_english ? 'Because every woman deserves to shine' : 'لأن كل امرأة تستحق أن تتألق'; ?></span>
+					<span class="brand-tag">Because every woman deserves to shine</span>
 				</a>
 				<nav class="main-nav" aria-label="Main Navigation">
-					<a href="<?php echo esc_url(home_url($locale_prefix)); ?>"><?php echo $is_english ? 'Home' : 'الرئيسية'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>"><?php echo $is_english ? 'Blog' : 'المدونة'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>"><?php echo $is_english ? 'About' : 'من نحن'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>"><?php echo $is_english ? 'Contact' : 'تواصل معنا'; ?></a>
+					<a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>">Blog</a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>">About</a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact</a>
 				</nav>
 				<div class="header-actions">
 					<form class="search-form" action="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>" method="get">
-						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr($is_english ? 'Search for your dress...' : 'ابحثي عن فستانك...'); ?>" aria-label="<?php echo esc_attr($is_english ? 'Search for your dress...' : 'ابحثي عن فستانك...'); ?>">
-						<button class="search-btn" type="submit"><?php echo $is_english ? 'Search' : 'بحث'; ?></button>
+						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr('Search for your dress...'); ?>" aria-label="<?php echo esc_attr('Search for your dress...'); ?>">
+						<button class="search-btn" type="submit">Search</button>
 					</form>
-					<a class="icon-btn" href="<?php echo esc_url($is_english ? home_url('/my-account/') : home_url('/ar/حسابي/')); ?>" aria-label="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>" title="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>">👤</a>
+					<a class="icon-btn" href="<?php echo esc_url($is_english ? home_url('/my-account/') : home_url('/ar/حسابي/')); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
 					<span class="icon-wrap">
-						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>" title="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>">❤</a>
+						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
 					<span class="icon-wrap">
-						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>" title="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>">🛒</a>
+						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
-					<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Start Selling' : 'ابدئي البيع'; ?></a>
+					<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">Start Selling</a>
 				</div>
 			</div>
 		</header>
-		<div class="promo notranslate" translate="no"><?php echo $is_english ? 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days' : 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل'; ?></div>
-		<div class="header-categories-strip notranslate" translate="no">
+		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
+		<div class="header-categories-strip">
 			<div class="container categories-strip-inner">
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=dress')); ?>"><?php echo $is_english ? 'Dress' : 'فستان'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=bridesmaid-dresses')); ?>"><?php echo $is_english ? 'Bridesmaid Dresses' : 'فساتين وصيفات العروس'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=evening-dresses')); ?>"><?php echo $is_english ? 'Evening Dresses' : 'فساتين سواريه'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=final-clearance-dresses')); ?>"><?php echo $is_english ? 'Final Clearance Dresses' : 'فساتين التصفية النهائية'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=plus-size-dresses')); ?>"><?php echo $is_english ? 'Plus Size Dresses' : 'فساتين بمقاسات كبيرة'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=mothers-dresses')); ?>"><?php echo $is_english ? 'Mother of the Bride Dresses' : 'فساتين الأمهات'; ?></a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=pre-loved-dresses')); ?>"><?php echo $is_english ? 'Pre-Loved Dresses' : 'فساتين مستعملة'; ?></a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=dress')); ?>">Dress</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=bridesmaid-dresses')); ?>">Bridesmaid Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=evening-dresses')); ?>">Evening Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=final-clearance-dresses')); ?>">Final Clearance Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=plus-size-dresses')); ?>">Plus Size Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=mothers-dresses')); ?>">Mother of the Bride Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a>
 			</div>
 		</div>
 	<?php else : ?>

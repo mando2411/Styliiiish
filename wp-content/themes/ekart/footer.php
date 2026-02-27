@@ -41,64 +41,64 @@
 	.footer-mini-nav a:hover{color:#fff}
 	@media (max-width:900px){.footer-grid{grid-template-columns:1fr}}
 </style>
-<footer class="site-footer notranslate" translate="no">
+<footer class="site-footer">
 	<div class="footer-wrap footer-grid">
 		<div class="footer-brand">
 			<img src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish" style="height:62px;width:auto;max-width:min(360px,100%);margin-bottom:10px;">
-			<h4><?php echo $is_english ? 'Styliiiish Fashion House' : 'ستيليش فاشون هاوس'; ?></h4>
-			<p><?php echo $is_english ? 'We are passionate about offering the latest dress designs for every special occasion.' : 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.'; ?></p>
-			<p class="footer-status"><?php echo $is_english ? 'Status' : 'الحالة'; ?> : <span class="status-pill <?php echo $is_open_now ? 'is-open' : 'is-closed'; ?>"><?php echo $is_open_now ? ($is_english ? 'Open' : 'مفتوح') : ($is_english ? 'Closed' : 'مغلق'); ?></span></p>
-			<p class="footer-open-hours"><strong><?php echo $is_english ? 'Working Hours' : 'ساعات العمل'; ?>:</strong> <?php echo $is_english ? 'Saturday – Friday: 11:00 AM – 7:00 PM' : 'السبت – الجمعة: 11:00 ص – 7:00 م'; ?></p>
+			<h4>Styliiiish Fashion House</h4>
+			<p>We are passionate about offering the latest dress designs for every special occasion.</p>
+			<p class="footer-status">Status : <span class="status-pill <?php echo $is_open_now ? 'is-open' : 'is-closed'; ?>"><?php echo $is_open_now ? 'Open' : 'Closed'; ?></span></p>
+			<p class="footer-open-hours"><strong>Working Hours:</strong> Saturday – Friday: 11:00 AM – 7:00 PM</p>
 			<div class="footer-contact-row">
-				<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>"><?php echo $is_english ? 'Contact Us' : 'تواصلي معنا'; ?></a>
-				<a href="tel:+201050874255"><?php echo $is_english ? 'Direct Call' : 'اتصال مباشر'; ?></a>
+				<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact Us</a>
+				<a href="tel:+201050874255">Direct Call</a>
 			</div>
 		</div>
 		<div class="footer-col">
-			<h5><?php echo $is_english ? 'Quick Links' : 'روابط سريعة'; ?></h5>
+			<h5>Quick Links</h5>
 			<ul class="footer-links">
-				<li><a href="<?php echo esc_url(home_url($locale_prefix)); ?>"><?php echo $is_english ? 'Home' : 'الرئيسية'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>"><?php echo $is_english ? 'Blog' : 'المدونة'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop Dresses Now' : 'تسوقي الفساتين الآن'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>"><?php echo $is_english ? 'Marketplace' : 'الماركت بليس'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>"><?php echo $is_english ? 'Categories' : 'الأقسام'; ?></a></li>
-				<li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Sell Your Dress' : 'بيعي فستانك'; ?></a></li>
-				<li><a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener"><?php echo $is_english ? 'My Account' : 'حسابي'; ?></a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>">Blog</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop Dresses Now</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>">Marketplace</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>">Categories</a></li>
+				<li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">Sell Your Dress</a></li>
+				<li><a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener">My Account</a></li>
 			</ul>
 		</div>
 		<div class="footer-col">
-			<h5><?php echo $is_english ? 'Official Info' : 'معلومات رسمية'; ?></h5>
+			<h5>Official Info</h5>
 			<ul class="footer-links">
-				<li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener"><?php echo $is_english ? '1 Nabil Khalil St, Nasr City, Cairo, Egypt' : '1 شارع نبيل خليل، مدينة نصر، القاهرة، مصر'; ?></a></li>
+				<li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 Nabil Khalil St, Nasr City, Cairo, Egypt</a></li>
 				<li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>"><?php echo $is_english ? 'Contact Us' : 'تواصل معنا'; ?></a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact Us</a></li>
 			</ul>
 		</div>
 		<div class="footer-col">
-			<h5><?php echo $is_english ? 'Policies & Legal' : 'سياسات وقوانين'; ?></h5>
+			<h5>Policies & Legal</h5>
 			<ul class="footer-links">
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>"><?php echo $is_english ? 'About Us' : 'من نحن'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/privacy-policy')); ?>"><?php echo $is_english ? 'Privacy Policy' : 'سياسة الخصوصية'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/terms-conditions')); ?>"><?php echo $is_english ? 'Terms & Conditions' : 'الشروط والأحكام'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace-policy')); ?>"><?php echo $is_english ? 'Marketplace Policy' : 'سياسة الماركت بليس'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/refund-return-policy')); ?>"><?php echo $is_english ? 'Refund & Return Policy' : 'سياسة الاسترجاع والاستبدال'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/faq')); ?>"><?php echo $is_english ? 'FAQ' : 'الأسئلة الشائعة'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shipping-delivery-policy')); ?>"><?php echo $is_english ? 'Shipping & Delivery Policy' : 'سياسة الشحن والتوصيل'; ?></a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/cookie-policy')); ?>"><?php echo $is_english ? 'Cookie Policy' : 'سياسة ملفات الارتباط'; ?></a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>">About Us</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/privacy-policy')); ?>">Privacy Policy</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/terms-conditions')); ?>">Terms & Conditions</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace-policy')); ?>">Marketplace Policy</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/refund-return-policy')); ?>">Refund & Return Policy</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/faq')); ?>">FAQ</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shipping-delivery-policy')); ?>">Shipping & Delivery Policy</a></li>
+				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/cookie-policy')); ?>">Cookie Policy</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="footer-wrap footer-bottom">
-		<span><?php echo $is_english ? ('All rights reserved © ' . esc_html(date('Y')) . ' Styliiiish | Powered by ') : ('جميع الحقوق محفوظة © ' . esc_html(date('Y')) . ' Styliiiish | تشغيل وتطوير '); ?><a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
+		<span><?php echo 'All rights reserved © ' . esc_html(date('Y')) . ' Styliiiish | Powered by '; ?><a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
 		<span><a href="<?php echo esc_url(home_url($locale_prefix)); ?>">styliiiish.com</a></span>
 	</div>
 	<div class="footer-wrap footer-mini-nav">
-		<a href="<?php echo esc_url(home_url($locale_prefix)); ?>"><?php echo $is_english ? 'Home' : 'الرئيسية'; ?></a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>"><?php echo $is_english ? 'Cart' : 'السلة'; ?></a>
-		<a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener"><?php echo $is_english ? 'Account' : 'حسابي'; ?></a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>"><?php echo $is_english ? 'Wishlist' : 'المفضلة'; ?></a>
+		<a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a>
+		<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a>
+		<a href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>">Cart</a>
+		<a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener">Account</a>
+		<a href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>">Wishlist</a>
 	</div>
 </footer>
 <?php else : ?>
