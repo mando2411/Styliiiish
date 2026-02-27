@@ -85,8 +85,8 @@
 				<div class="topbar-left">
 					<div class="lang-switch" aria-label="Language Switcher" data-no-translation>
 						<span class="lang-indicator" aria-hidden="true"></span>
-						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
-						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($en_switch_url); ?>';return false;">EN</a>
+						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="var sw=this.parentElement;sw.classList.remove('is-en');sw.classList.add('is-ar');this.classList.add('active');this.nextElementSibling&&this.nextElementSibling.classList.remove('active');window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
+						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>" onclick="var sw=this.parentElement;sw.classList.remove('is-ar');sw.classList.add('is-en');this.classList.add('active');this.previousElementSibling&&this.previousElementSibling.classList.remove('active');window.location.href='<?php echo esc_js($en_switch_url); ?>';return false;">EN</a>
 					</div>
 					<span class="topbar-note">⚡ Daily Deals</span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
