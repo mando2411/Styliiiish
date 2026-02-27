@@ -12,6 +12,7 @@
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$account_url = $is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
+	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
 	$hour_now = (int) current_time('G');
 	$is_open_now = ($hour_now >= 11 && $hour_now < 19);
 ?>
@@ -61,7 +62,7 @@
 				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a></li>
 				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>">Marketplace</a></li>
 				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>">Categories</a></li>
-				<li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">Sell Your Dress</a></li>
+				<li><a href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Sell Your Dress</a></li>
 				<li><a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener">My Account</a></li>
 			</ul>
 		</div>

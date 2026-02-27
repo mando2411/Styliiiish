@@ -169,6 +169,12 @@ $wordpress_exact_routes = [
     '/my-account/',
     '/en/my-account',
     '/en/my-account/',
+    '/فساتيني',
+    '/فساتيني/',
+    '/ar/فساتيني',
+    '/ar/فساتيني/',
+    '/ara/فساتيني',
+    '/ara/فساتيني/',
 ];
 
 $wordpress_prefix_routes = [
@@ -180,6 +186,9 @@ $wordpress_prefix_routes = [
     '/حسابي/',
     '/my-account/',
     '/en/my-account/',
+    '/ar/فساتيني/',
+    '/ara/فساتيني/',
+    '/فساتيني/',
 ];
 
 $send_to_laravel = null;

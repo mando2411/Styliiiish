@@ -27,6 +27,7 @@
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
 	$ar_switch_url = 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 	$en_switch_url = 'https://styliiiish.com/my-account/';
 ?>
@@ -141,7 +142,7 @@
 						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
-					<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">Start Selling</a>
+					<a class="header-cta" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
 				</div>
 			</div>
 		</header>
