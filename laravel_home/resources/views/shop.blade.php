@@ -253,6 +253,7 @@
         <section class="toolbar">
             <form class="search-form" id="searchForm" method="GET" action="{{ $localePrefix }}/shop">
                 <input class="search-input" type="search" id="qInput" name="q" value="{{ $search }}" placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_aria') }}">
+                <input type="hidden" id="categoryInput" name="category" value="{{ $category ?? '' }}">
                 <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
             </form>
 
@@ -286,12 +287,14 @@
             const loadStatus = document.getElementById('loadStatus');
             const lazySentinel = document.getElementById('lazySentinel');
             const qInput = document.getElementById('qInput');
+            const categoryInput = document.getElementById('categoryInput');
             const sortSelect = document.getElementById('sortSelect');
             const searchForm = document.getElementById('searchForm');
 
             const params = new URLSearchParams(window.location.search);
             const state = {
                 q: params.get('q') ?? qInput.value ?? '',
+                category: params.get('category') ?? (categoryInput?.value ?? ''),
                 sort: params.get('sort') ?? sortSelect.value ?? 'random',
             };
 
@@ -303,6 +306,7 @@
             };
 
             qInput.value = state.q;
+            if (categoryInput) categoryInput.value = state.category;
             sortSelect.value = state.sort;
 
             const fmt = new Intl.NumberFormat('en-US');
@@ -324,6 +328,7 @@
             const buildQuery = () => {
                 const query = new URLSearchParams();
                 if (state.q.trim() !== '') query.set('q', state.q.trim());
+                if ((state.category || '').trim() !== '') query.set('category', state.category.trim());
                 if (state.sort !== 'random') query.set('sort', state.sort);
                 return query;
             };
@@ -479,8 +484,10 @@
             window.addEventListener('popstate', () => {
                 const qs = new URLSearchParams(window.location.search);
                 state.q = qs.get('q') ?? '';
+                state.category = qs.get('category') ?? '';
                 state.sort = qs.get('sort') ?? 'random';
                 qInput.value = state.q;
+                if (categoryInput) categoryInput.value = state.category;
                 sortSelect.value = state.sort;
                 fetchProducts(false);
             });

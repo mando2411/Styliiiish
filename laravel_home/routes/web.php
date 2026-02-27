@@ -442,6 +442,10 @@ Route::get('/en', fn () => $homeHandler('en'));
 $shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes) {
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'random');
+    $category = trim((string) $request->query('category', ''));
+    $category = trim(rawurldecode($category));
+    $category = strtolower($category);
+    $category = preg_replace('/[^a-z0-9\-_]/', '', $category) ?? '';
 
     $normalizeSearchText = static function (?string $value): string {
         $text = mb_strtolower(trim((string) $value), 'UTF-8');
@@ -479,6 +483,70 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish');
+
+    if ($category !== '') {
+        $baseCategoryTerm = DB::table('wp_terms as t')
+            ->join('wp_term_taxonomy as tt', function ($join) {
+                $join->on('t.term_id', '=', 'tt.term_id')
+                    ->where('tt.taxonomy', '=', 'product_cat');
+            })
+            ->where('t.slug', $category)
+            ->select('t.term_id', 'tt.term_taxonomy_id')
+            ->first();
+
+        if ($baseCategoryTerm) {
+            $allTermIds = collect([(int) $baseCategoryTerm->term_id]);
+            $cursor = collect([(int) $baseCategoryTerm->term_id]);
+
+            while ($cursor->isNotEmpty()) {
+                $childTermIds = DB::table('wp_term_taxonomy')
+                    ->where('taxonomy', 'product_cat')
+                    ->whereIn('parent', $cursor->all())
+                    ->pluck('term_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => $id > 0)
+                    ->unique()
+                    ->values();
+
+                $next = $childTermIds->diff($allTermIds)->values();
+                if ($next->isEmpty()) {
+                    break;
+                }
+
+                $allTermIds = $allTermIds->merge($next)->unique()->values();
+                $cursor = $next;
+            }
+
+            $taxonomyIds = DB::table('wp_term_taxonomy')
+                ->where('taxonomy', 'product_cat')
+                ->whereIn('term_id', $allTermIds->all())
+                ->pluck('term_taxonomy_id')
+                ->map(fn ($id) => (int) $id)
+                ->filter(fn ($id) => $id > 0)
+                ->unique()
+                ->values();
+
+            if ($taxonomyIds->isNotEmpty()) {
+                $productIdsByCategory = DB::table('wp_term_relationships')
+                    ->whereIn('term_taxonomy_id', $taxonomyIds->all())
+                    ->pluck('object_id')
+                    ->map(fn ($id) => (int) $id)
+                    ->filter(fn ($id) => $id > 0)
+                    ->unique()
+                    ->values();
+
+                if ($productIdsByCategory->isNotEmpty()) {
+                    $query->whereIn('p.ID', $productIdsByCategory->all());
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+    }
 
     if ($sort === 'newest') {
         $query->orderBy('p.post_date', 'desc');
@@ -687,14 +755,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         }
     }
 
-    return [$products, $search, $sort];
+    return [$products, $search, $sort, $category];
 };
 
 $shopHandler = function (Request $request, string $locale = 'ar') use ($shopDataHandler) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
-    [$products, $search, $sort] = $shopDataHandler($request, $currentLocale);
+    [$products, $search, $sort, $category] = $shopDataHandler($request, $currentLocale);
 
     if ($request->expectsJson() || $request->wantsJson() || strtolower((string) $request->header('X-Requested-With')) === 'xmlhttprequest') {
         $items = $products->map(function ($product) {
@@ -721,6 +789,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
             'filters' => [
                 'q' => $search,
                 'sort' => $sort,
+                'category' => $category,
             ],
             'products' => $items,
             'pagination' => [
@@ -729,7 +798,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
         ]);
     }
 
-    return view('shop', compact('search', 'sort', 'currentLocale', 'localePrefix'));
+    return view('shop', compact('search', 'sort', 'category', 'currentLocale', 'localePrefix'));
 };
 
 Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));

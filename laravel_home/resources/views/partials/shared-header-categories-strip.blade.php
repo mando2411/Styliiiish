@@ -127,11 +127,11 @@
                     $children = $group['children'];
                 @endphp
                 <span class="category-strip-group">
-                    <a class="category-strip-chip category-strip-parent" href="{{ $localePrefix }}/shop?q={{ rawurlencode((string) $parent->name) }}">
+                    <a class="category-strip-chip category-strip-parent" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $parent->slug) }}">
                         {{ $parent->name }}
                     </a>
                     @foreach($children->take(6) as $child)
-                        <a class="category-strip-chip category-strip-sub" href="{{ $localePrefix }}/shop?q={{ rawurlencode((string) $child->name) }}">
+                        <a class="category-strip-chip category-strip-sub" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $child->slug) }}">
                             {{ $child->name }}
                         </a>
                     @endforeach
