@@ -2397,15 +2397,14 @@
             }
 
             .categories-strip-inner {
-                box-shadow: 0 10px 24px rgba(10, 17, 30, 0.38);
-                transition: transform .28s cubic-bezier(.22, .61, .36, 1), box-shadow .28s ease, background .28s ease;
+                padding: 8px 0;
                 gap: 6px;
             }
 
             .category-strip-group {
                 gap: 5px;
                 padding-inline-end: 5px;
-                transition: transform .32s cubic-bezier(.22, .61, .36, 1);
+            }
 
             .category-strip-chip {
                 min-height: 32px;
@@ -2638,9 +2637,6 @@
             }
 
             .hero-mobile-trust span {
-                opacity: 0;
-                transform: translateX(10px) scale(.88);
-                transition: transform .28s cubic-bezier(.22, .61, .36, 1), opacity .22s ease, background .2s ease;
                 flex: 0 0 auto;
                 scroll-snap-align: start;
                 padding: 7px 10px;
