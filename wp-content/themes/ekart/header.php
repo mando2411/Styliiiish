@@ -33,11 +33,18 @@
 <?php if ($is_account_layout) : ?>
 <style>
 	:root{--wf-main-rgb:213,21,34;--wf-main-color:rgb(var(--wf-main-rgb));--wf-secondary-color:#17273B;--line:rgba(189,189,189,.4);--primary:var(--wf-main-color);--secondary:var(--wf-secondary-color);--muted:#5a6678}
-	.laravel-wrap{width:min(1180px,92%);margin:0 auto}
+	.container{width:min(1180px,92%);margin:0 auto}
 	.topbar{background:var(--secondary);color:#fff;font-size:13px;border-bottom:1px solid rgba(255,255,255,.12)}
 	.topbar-inner{min-height:42px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
 	.topbar-left,.topbar-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 	.topbar a{color:#fff;opacity:.92;text-decoration:none}.topbar a:hover{opacity:1}
+	.topbar-note{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border-radius:999px;padding:4px 10px;font-weight:700;font-size:12px}
+	.lang-switch{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;align-items:center;direction:ltr;width:110px;height:34px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:3px;overflow:hidden}
+	.lang-switch .lang-indicator{position:absolute;top:3px;width:calc(50% - 3px);height:calc(100% - 6px);background:#fff;border-radius:999px;transition:.25s ease;z-index:1}
+	.lang-switch.is-ar .lang-indicator{left:3px}
+	.lang-switch.is-en .lang-indicator{right:3px}
+	.lang-switch a{position:relative;z-index:2;text-align:center;font-size:12px;font-weight:800;opacity:.95;color:#fff;padding:5px 0;text-decoration:none}
+	.lang-switch a.active{color:var(--secondary);opacity:1}
 	.main-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;box-shadow:0 8px 24px rgba(23,39,59,.06)}
 	.main-header-inner{min-height:96px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
 	.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none}
@@ -57,21 +64,26 @@
 
 	<?php if ($is_account_layout) : ?>
 		<div class="topbar">
-			<div class="laravel-wrap topbar-inner">
+			<div class="container topbar-inner">
 				<div class="topbar-right">
 					<strong><?php echo $is_english ? 'Call us anytime:' : 'اتصلي بنا في أي وقت:'; ?></strong>
 					<a href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
 				</div>
 				<div class="topbar-left">
-					<a href="<?php echo esc_url(home_url('/ar/حسابي/')); ?>">AR</a>
-					<a href="<?php echo esc_url(home_url('/my-account/')); ?>">EN</a>
+					<div class="lang-switch <?php echo $is_english ? 'is-en' : 'is-ar'; ?>" aria-label="Language Switcher">
+						<span class="lang-indicator" aria-hidden="true"></span>
+						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/ar/حسابي/')); ?>">AR</a>
+						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url(home_url('/my-account/')); ?>">EN</a>
+					</div>
+					<span class="topbar-note"><?php echo $is_english ? '⚡ Daily Deals' : '⚡ خصومات يومية'; ?></span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
 					<a href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener">Instagram</a>
+					<a href="https://g.page/styliish" target="_blank" rel="noopener">Google</a>
 				</div>
 			</div>
 		</div>
 		<header class="main-header">
-			<div class="laravel-wrap main-header-inner">
+			<div class="container main-header-inner">
 				<a class="brand" href="<?php echo esc_url(home_url($locale_prefix)); ?>">
 					<img class="brand-logo" src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish">
 					<span class="brand-tag"><?php echo $is_english ? 'Because every woman deserves to shine' : 'لأن كل امرأة تستحق أن تتألق'; ?></span>
@@ -81,6 +93,7 @@
 					<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a>
 					<a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>"><?php echo $is_english ? 'Blog' : 'المدونة'; ?></a>
 					<a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>"><?php echo $is_english ? 'Marketplace' : 'الماركت بليس'; ?></a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>"><?php echo $is_english ? 'Categories' : 'الأقسام'; ?></a>
 				</nav>
 				<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Start Selling' : 'ابدئي البيع'; ?></a>
 			</div>
