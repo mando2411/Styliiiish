@@ -1,0 +1,197 @@
+﻿<?php
+/**
+ * Plugin Name: Styliiiish Account API
+ * Description: Custom REST API endpoints for Laravel My Account page.
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('styliiiish/v1', '/account', [
+        'methods' => 'GET',
+        'callback' => 'styliiiish_get_account_data',
+        'permission_callback' => function () { return is_user_logged_in(); }
+    ]);
+
+    register_rest_route('styliiiish/v1', '/account/details', [
+        'methods' => 'POST',
+        'callback' => 'styliiiish_update_account_details',
+        'permission_callback' => function () { return is_user_logged_in(); }
+    ]);
+
+    register_rest_route('styliiiish/v1', '/account/addresses', [
+        'methods' => 'POST',
+        'callback' => 'styliiiish_update_account_addresses',
+        'permission_callback' => function () { return is_user_logged_in(); }
+    ]);
+
+    register_rest_route('styliiiish/v1', '/account/paymob-card/(?P<id>\d+)', [
+        'methods' => 'DELETE',
+        'callback' => 'styliiiish_delete_paymob_card',
+        'permission_callback' => function () { return is_user_logged_in(); }
+    ]);
+});
+
+function styliiiish_get_account_data() {
+    $user_id = get_current_user_id();
+    $user = get_userdata($user_id);
+    $customer = new WC_Customer($user_id);
+
+    $details = [
+        'first_name' => $customer->get_first_name(),
+        'last_name' => $customer->get_last_name(),
+        'display_name' => $customer->get_display_name(),
+        'email' => $customer->get_email(),
+    ];
+
+    $addresses = [
+        'billing' => $customer->get_billing(),
+        'shipping' => $customer->get_shipping(),
+    ];
+
+    $orders_data = [];
+    $orders = wc_get_orders([
+        'customer' => $user_id,
+        'limit' => -1,
+        'orderby' => 'date',
+        'order' => 'DESC',
+    ]);
+
+    foreach ($orders as $order) {
+        $orders_data[] = [
+            'id' => $order->get_id(),
+            'order_number' => $order->get_order_number(),
+            'date' => $order->get_date_created()->date('Y-m-d'),
+            'status' => wc_get_order_status_name($order->get_status()),
+            'status_raw' => $order->get_status(),
+            'total' => $order->get_formatted_order_total(),
+            'item_count' => $order->get_item_count(),
+            'view_url' => $order->get_view_order_url(),
+        ];
+    }
+
+    global $wpdb;
+    $cards = [];
+    $table_name = $wpdb->prefix . 'paymob_cards_token';
+    if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
+        $results = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE user_id = %d", $user_id));
+        foreach ($results as $row) {
+            $cards[] = [
+                'id' => $row->id,
+                'masked_pan' => $row->masked_pan,
+                'card_subtype' => $row->card_subtype,
+            ];
+        }
+    }
+
+    return rest_ensure_response([
+        'success' => true,
+        'data' => [
+            'details' => $details,
+            'addresses' => $addresses,
+            'orders' => $orders_data,
+            'paymob_cards' => $cards,
+        ]
+    ]);
+}
+
+function styliiiish_update_account_details($request) {
+    $user_id = get_current_user_id();
+    $customer = new WC_Customer($user_id);
+
+    $first_name = sanitize_text_field($request->get_param('first_name'));
+    $last_name = sanitize_text_field($request->get_param('last_name'));
+    $display_name = sanitize_text_field($request->get_param('display_name'));
+    $email = sanitize_email($request->get_param('email'));
+
+    $customer->set_first_name($first_name);
+    $customer->set_last_name($last_name);
+    $customer->set_display_name($display_name);
+    
+    if (is_email($email) && (email_exists($email) == false || email_exists($email) == $user_id)) {
+        $customer->set_email($email);
+    }
+
+    $password_current = $request->get_param('password_current');
+    $password_1 = $request->get_param('password_1');
+    $password_2 = $request->get_param('password_2');
+
+    if (!empty($password_1)) {
+        if (empty($password_current)) {
+            return new WP_Error('missing_current_password', 'Please enter your current password.', ['status' => 400]);
+        }
+        $user = get_userdata($user_id);
+        if (!wp_check_password($password_current, $user->user_pass, $user_id)) {
+            return new WP_Error('invalid_current_password', 'Current password is incorrect.', ['status' => 400]);
+        }
+        if ($password_1 !== $password_2) {
+            return new WP_Error('password_mismatch', 'New passwords do not match.', ['status' => 400]);
+        }
+        wp_set_password($password_1, $user_id);
+        wp_set_auth_cookie($user_id);
+    }
+
+    $customer->save();
+    return rest_ensure_response(['success' => true, 'message' => 'Account details updated successfully.']);
+}
+
+function styliiiish_update_account_addresses($request) {
+    $user_id = get_current_user_id();
+    $customer = new WC_Customer($user_id);
+    $type = sanitize_text_field($request->get_param('type'));
+
+    if (!in_array($type, ['billing', 'shipping'])) {
+        return new WP_Error('invalid_type', 'Invalid address type.', ['status' => 400]);
+    }
+
+    $address = $request->get_param('address');
+    if (!is_array($address)) {
+        return new WP_Error('invalid_data', 'Invalid address data.', ['status' => 400]);
+    }
+
+    if ($type === 'billing') {
+        $customer->set_billing_first_name(sanitize_text_field($address['first_name'] ?? ''));
+        $customer->set_billing_last_name(sanitize_text_field($address['last_name'] ?? ''));
+        $customer->set_billing_company(sanitize_text_field($address['company'] ?? ''));
+        $customer->set_billing_country(sanitize_text_field($address['country'] ?? ''));
+        $customer->set_billing_address_1(sanitize_text_field($address['address_1'] ?? ''));
+        $customer->set_billing_address_2(sanitize_text_field($address['address_2'] ?? ''));
+        $customer->set_billing_city(sanitize_text_field($address['city'] ?? ''));
+        $customer->set_billing_state(sanitize_text_field($address['state'] ?? ''));
+        $customer->set_billing_postcode(sanitize_text_field($address['postcode'] ?? ''));
+        $customer->set_billing_phone(sanitize_text_field($address['phone'] ?? ''));
+        $customer->set_billing_email(sanitize_email($address['email'] ?? ''));
+    } else {
+        $customer->set_shipping_first_name(sanitize_text_field($address['first_name'] ?? ''));
+        $customer->set_shipping_last_name(sanitize_text_field($address['last_name'] ?? ''));
+        $customer->set_shipping_company(sanitize_text_field($address['company'] ?? ''));
+        $customer->set_shipping_country(sanitize_text_field($address['country'] ?? ''));
+        $customer->set_shipping_address_1(sanitize_text_field($address['address_1'] ?? ''));
+        $customer->set_shipping_address_2(sanitize_text_field($address['address_2'] ?? ''));
+        $customer->set_shipping_city(sanitize_text_field($address['city'] ?? ''));
+        $customer->set_shipping_state(sanitize_text_field($address['state'] ?? ''));
+        $customer->set_shipping_postcode(sanitize_text_field($address['postcode'] ?? ''));
+    }
+
+    $customer->save();
+    return rest_ensure_response(['success' => true, 'message' => ucfirst($type) . ' address updated successfully.']);
+}
+
+function styliiiish_delete_paymob_card($request) {
+    $user_id = get_current_user_id();
+    $card_id = (int) $request->get_param('id');
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'paymob_cards_token';
+    
+    $deleted = $wpdb->delete($table_name, ['id' => $card_id, 'user_id' => $user_id], ['%d', '%d']);
+
+    if ($deleted) {
+        return rest_ensure_response(['success' => true, 'message' => 'Card deleted successfully.']);
+    }
+
+    return new WP_Error('delete_failed', 'Could not delete card or card not found.', ['status' => 400]);
+}
+

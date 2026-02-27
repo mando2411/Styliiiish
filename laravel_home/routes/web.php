@@ -4183,6 +4183,17 @@ Route::get('/ar/marketplace', fn (Request $request) => $marketplaceHandler($requ
 Route::get('/en/marketplace', fn (Request $request) => $marketplaceHandler($request, 'en'));
 Route::get('/marketplace/', fn (Request $request) => $marketplaceHandler($request, 'en'));
 
+$accountHandler = function (Request $request, string $currentLocale) {
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    return view('account', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/حسابي', fn (Request $request) => $accountHandler($request, 'ar'));
+Route::get('/ar/حسابي', fn (Request $request) => $accountHandler($request, 'ar'));
+Route::get('/en/my-account', fn (Request $request) => $accountHandler($request, 'en'));
+Route::get('/my-account', fn (Request $request) => $accountHandler($request, 'en'));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
