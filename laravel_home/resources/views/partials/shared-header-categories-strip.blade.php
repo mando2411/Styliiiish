@@ -2,8 +2,6 @@
     $pathLocale = strtolower((string) request()->segment(1));
     $currentLocale = in_array($pathLocale, ['ar', 'en'], true) ? $pathLocale : ($currentLocale ?? 'ar');
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
-    $wpmlLocale = $currentLocale === 'en' ? 'en' : 'ar';
-    $wpmlLocalePattern = $wpmlLocale . '%';
 
     $categoryGroups = collect();
 
@@ -17,46 +15,72 @@
                 ->where('tt.taxonomy', 'product_cat')
                 ->whereNotIn('t.slug', ['uncategorized'])
                 ->select('tt.term_id', 'tt.parent', 'tt.count', 't.name', 't.slug');
-            $localizedTerms = collect();
+            $localizedTerms = $baseTermsQuery
+                ->orderBy('t.name')
+                ->get();
 
-            $hasWpml = \Illuminate\Support\Facades\Schema::hasTable('wp_icl_translations');
+            if ($localizedTerms->isNotEmpty()) {
+                $targetPrefix = $currentLocale === 'en' ? 'en' : 'ar';
+                $trpSettingsRaw = \Illuminate\Support\Facades\Schema::hasTable('wp_options')
+                    ? \Illuminate\Support\Facades\DB::table('wp_options')->where('option_name', 'trp_settings')->value('option_value')
+                    : null;
 
-            if ($hasWpml) {
-                $localizedTerms = $baseTermsQuery
-                    ->join('wp_icl_translations as tr', function ($join) {
-                        $join->on('tr.element_id', '=', 'tt.term_taxonomy_id')
-                            ->where('tr.element_type', '=', 'tax_product_cat');
-                    })
-                    ->whereRaw('LOWER(tr.language_code) LIKE ?', [$wpmlLocalePattern])
-                    ->orderBy('t.name')
-                    ->get();
+                $trpSettings = @unserialize((string) $trpSettingsRaw);
+                $trpSettings = is_array($trpSettings) ? $trpSettings : [];
 
-                if ($localizedTerms->isEmpty()) {
-                    $localizedTerms = $baseTermsQuery
-                        ->join('wp_icl_translations as tr', function ($join) {
-                            $join->on('tr.element_id', '=', 'tt.term_id')
-                                ->where('tr.element_type', '=', 'tax_product_cat');
-                        })
-                        ->whereRaw('LOWER(tr.language_code) LIKE ?', [$wpmlLocalePattern])
-                        ->orderBy('t.name')
-                        ->get();
-                }
+                $defaultLanguage = strtolower(trim((string) ($trpSettings['default-language'] ?? '')));
+                $translationLanguages = collect($trpSettings['translation-languages'] ?? [])
+                    ->filter(fn ($value) => is_string($value) && trim($value) !== '')
+                    ->map(fn ($value) => strtolower(trim((string) $value)))
+                    ->values();
 
-                if ($currentLocale === 'ar' && $localizedTerms->isNotEmpty()) {
-                    $arabicOnlyTerms = $localizedTerms->filter(function ($term) {
-                        return preg_match('/[\x{0600}-\x{06FF}]/u', (string) ($term->name ?? '')) === 1;
-                    })->values();
+                $targetLanguage = (string) ($translationLanguages->first(function ($languageCode) use ($targetPrefix) {
+                    return str_starts_with((string) $languageCode, $targetPrefix);
+                }) ?? '');
 
-                    if ($arabicOnlyTerms->isNotEmpty()) {
-                        $localizedTerms = $arabicOnlyTerms;
+                if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+                    $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+                    if (\Illuminate\Support\Facades\Schema::hasTable($dictionaryTable)) {
+                        $lookupNames = $localizedTerms
+                            ->pluck('name')
+                            ->map(fn ($value) => trim((string) $value))
+                            ->filter(fn ($value) => $value !== '')
+                            ->unique()
+                            ->values();
+
+                        if ($lookupNames->isNotEmpty()) {
+                            $dictionaryRows = \Illuminate\Support\Facades\DB::table($dictionaryTable)
+                                ->whereIn('original', $lookupNames->all())
+                                ->where('status', '!=', 0)
+                                ->whereNotNull('translated')
+                                ->where('translated', '!=', '')
+                                ->select('original', 'translated')
+                                ->get();
+
+                            if ($dictionaryRows->isNotEmpty()) {
+                                $translationMap = [];
+                                foreach ($dictionaryRows as $row) {
+                                    $original = trim((string) ($row->original ?? ''));
+                                    $translated = trim((string) ($row->translated ?? ''));
+                                    if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
+                                        $translationMap[$original] = $translated;
+                                    }
+                                }
+
+                                if (!empty($translationMap)) {
+                                    $localizedTerms = $localizedTerms->map(function ($term) use ($translationMap) {
+                                        $originalName = trim((string) ($term->name ?? ''));
+                                        if ($originalName !== '' && isset($translationMap[$originalName])) {
+                                            $term->name = (string) $translationMap[$originalName];
+                                        }
+
+                                        return $term;
+                                    });
+                                }
+                            }
+                        }
                     }
                 }
-            }
-
-            if (!$hasWpml && $localizedTerms->isEmpty()) {
-                $localizedTerms = $baseTermsQuery
-                    ->orderBy('t.name')
-                    ->get();
             }
 
             if ($localizedTerms->isNotEmpty()) {
