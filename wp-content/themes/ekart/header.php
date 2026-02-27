@@ -47,11 +47,27 @@
 		$path_without_locale = '/';
 	}
 	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي'], true);
+	$is_account_orders_path = in_array($normalized_path, ['/my-account/orders', '/en/my-account/orders', '/ar/حسابي/طلبات'], true);
+	$is_account_edit_address_path = in_array($normalized_path, ['/my-account/edit-address', '/en/my-account/edit-address', '/ar/حسابي/تعديل-العنوان'], true);
+	$is_account_edit_account_path = in_array($normalized_path, ['/my-account/edit-account', '/en/my-account/edit-account', '/ar/حسابي/تعديل-الحساب'], true);
+	$is_account_saved_cards_path = in_array($normalized_path, ['/my-account/saved-cards', '/en/my-account/saved-cards', '/ar/حسابي/البطاقة-المحفوظة'], true);
 	$is_my_dresses_path = in_array($normalized_path, ['/my-dresses', '/ar/فساتيني'], true);
 	$is_owner_dashboard_path = in_array($normalized_path, ['/owner-dashboard', '/ar/لوحة-معلومات-المالك'], true);
 	if ($is_account_path) {
 		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 		$en_switch_path = '/my-account/';
+	} elseif ($is_account_orders_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d8%b7%d9%84%d8%a8%d8%a7%d8%aa/';
+		$en_switch_path = '/my-account/orders/';
+	} elseif ($is_account_edit_address_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d8%aa%d8%b9%d8%af%d9%8a%d9%84-%d8%a7%d9%84%d8%b9%d9%86%d9%88%d8%a7%d9%86/';
+		$en_switch_path = '/my-account/edit-address/';
+	} elseif ($is_account_edit_account_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d8%aa%d8%b9%d8%af%d9%8a%d9%84-%d8%a7%d9%84%d8%ad%d8%b3%d8%a7%d8%a8/';
+		$en_switch_path = '/my-account/edit-account/';
+	} elseif ($is_account_saved_cards_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d8%a7%d9%84%d8%a8%d8%b7%d8%a7%d9%82%d8%a9-%d8%a7%d9%84%d9%85%d8%ad%d9%81%d9%88%d8%b8%d8%a9/';
+		$en_switch_path = '/my-account/saved-cards/';
 	} elseif ($is_my_dresses_path) {
 		$ar_switch_path = '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
 		$en_switch_path = '/my-dresses/';
