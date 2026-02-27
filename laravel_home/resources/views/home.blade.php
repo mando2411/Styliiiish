@@ -468,6 +468,34 @@
             font-variant-numeric: tabular-nums;
         }
 
+        .topbar-desktop-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-mobile-icons {
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .topbar-mobile-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.12);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            line-height: 1;
+        }
+
         .topbar-note {
             display: inline-flex;
             align-items: center;
@@ -2282,6 +2310,14 @@
                 width: 100%;
                 justify-content: center;
                 gap: 8px;
+            }
+
+            .topbar-desktop-contact {
+                display: none;
+            }
+
+            .topbar-mobile-icons {
+                display: inline-flex;
             }
 
             .categories-strip-inner {

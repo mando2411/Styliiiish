@@ -68,8 +68,17 @@
 <div class="topbar">
     <div class="container topbar-inner">
         <div class="topbar-right">
-            <strong>{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}</strong>
-            <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
+            <div class="topbar-desktop-contact">
+                <strong>{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}</strong>
+                <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
+            </div>
+            <div class="topbar-mobile-icons" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}">
+                <a class="topbar-mobile-icon" href="tel:+201050874255" aria-label="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}" title="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}">📞</a>
+                <a class="topbar-mobile-icon" href="https://wa.me/201050874255" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">🟢</a>
+                <a class="topbar-mobile-icon" href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">f</a>
+                <a class="topbar-mobile-icon" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">◎</a>
+                <a class="topbar-mobile-icon" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google" title="Google">G</a>
+            </div>
         </div>
         <div class="topbar-left">
             <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
