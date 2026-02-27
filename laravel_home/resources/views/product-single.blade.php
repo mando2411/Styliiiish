@@ -231,8 +231,44 @@
     $regular = (float) ($product->regular_price ?? 0);
     $isSale = $regular > 0 && $price > 0 && $regular > $price;
 
-    $placeholderImage = $wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png';
-    $normalizePublicAssetUrl = function (?string $url) use ($wpBaseUrl): string {
+    $placeholderImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+    $resolveAttachmentSlugUrl = function (string $value) use ($wpBaseUrl): string {
+        $slug = trim($value, " \t\n\r\0\x0B/");
+        if ($slug === '' || !preg_match('/^att-[a-z0-9_-]+$/i', $slug)) {
+            return '';
+        }
+
+        static $resolvedBySlug = [];
+        if (array_key_exists($slug, $resolvedBySlug)) {
+            return (string) $resolvedBySlug[$slug];
+        }
+
+        $row = \Illuminate\Support\Facades\DB::table('wp_posts as p')
+            ->leftJoin('wp_postmeta as pm', function ($join) {
+                $join->on('p.ID', '=', 'pm.post_id')
+                    ->where('pm.meta_key', '_wp_attached_file');
+            })
+            ->where('p.post_type', 'attachment')
+            ->where('p.post_name', $slug)
+            ->select('pm.meta_value as attached_file', 'p.guid')
+            ->first();
+
+        $resolved = '';
+        $attachedFile = ltrim(trim((string) ($row->attached_file ?? '')), '/');
+        if ($attachedFile !== '') {
+            $resolved = rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $attachedFile;
+        } else {
+            $guid = trim((string) ($row->guid ?? ''));
+            if ($guid !== '' && preg_match('#^https?://#i', $guid) === 1) {
+                $resolved = $guid;
+            }
+        }
+
+        $resolvedBySlug[$slug] = $resolved;
+        return $resolved;
+    };
+
+    $normalizePublicAssetUrl = function (?string $url) use ($wpBaseUrl, $resolveAttachmentSlugUrl): string {
         $value = trim((string) $url);
         if ($value === '') {
             return '';
@@ -250,6 +286,12 @@
 
         $path = ltrim($normalized, '/');
         $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
+
+        $resolvedAttachmentUrl = $resolveAttachmentSlugUrl($path);
+        if ($resolvedAttachmentUrl !== '') {
+            return $resolvedAttachmentUrl;
+        }
+
         return rtrim($wpBaseUrl, '/') . '/' . $path;
     };
 
@@ -297,10 +339,14 @@
 
         $contentHtml = preg_replace_callback(
             '/\b(src|href)\s*=\s*(["\'])(?!https?:\/\/|\/\/|data:|mailto:|tel:|#)([^"\']+)\2/i',
-            function (array $matches) use ($wpBaseUrl): string {
+            function (array $matches) use ($wpBaseUrl, $normalizePublicAssetUrl): string {
                 $path = ltrim((string) ($matches[3] ?? ''), '/');
                 $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
-                return $matches[1] . '=' . $matches[2] . rtrim($wpBaseUrl, '/') . '/' . $path . $matches[2];
+                $resolved = $normalizePublicAssetUrl($path);
+                if ($resolved === '') {
+                    $resolved = rtrim($wpBaseUrl, '/') . '/' . $path;
+                }
+                return $matches[1] . '=' . $matches[2] . $resolved . $matches[2];
             },
             $contentHtml
         );
