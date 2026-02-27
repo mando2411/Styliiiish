@@ -92,6 +92,34 @@
 	.icon-wrap{position:relative;display:inline-flex;align-items:center}
 	.icon-btn{height:38px;min-width:38px;border:1px solid var(--line);border-radius:10px;background:#fff;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--secondary);font-size:16px}
 	.icon-plus-one{position:absolute;top:-7px;right:-8px;background:var(--primary);color:#fff;border-radius:999px;padding:1px 6px;font-size:11px;font-weight:800;line-height:1}
+	.cart-trigger-wrap,.account-trigger-wrap{position:relative}
+	.account-menu{position:absolute;top:calc(100% + 8px);inset-inline-end:0;width:min(260px,78vw);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 26px rgba(23,39,59,.18);padding:10px;display:none;z-index:70}
+	.account-menu.is-open{display:grid;gap:6px}
+	.account-menu-head{border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:2px;display:grid;gap:2px}
+	.account-menu-head strong{color:var(--secondary);font-size:13px;line-height:1.35}
+	.account-menu-head span{color:var(--muted);font-size:12px}
+	.account-menu a{min-height:34px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;text-decoration:none}
+	#accountMenuManage{background:var(--secondary);color:#fff}
+	#accountMenuLogout{background:#fff;border:1px solid var(--line);color:var(--secondary)}
+	.cart-count{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;border-radius:999px;background:var(--primary);color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:800;padding:0 4px;display:inline-block}
+	.mini-cart{position:fixed;inset:0;z-index:110;pointer-events:none}
+	.mini-cart.is-open{pointer-events:auto}
+	.mini-cart-backdrop{position:absolute;inset:0;background:rgba(15,26,42,.52);opacity:0;transition:.2s ease}
+	.mini-cart.is-open .mini-cart-backdrop{opacity:1}
+	.mini-cart-panel{position:absolute;top:0;right:0;width:min(430px,92vw);height:100%;background:#fff;border-inline-start:1px solid var(--line);display:grid;grid-template-rows:auto 1fr auto;transform:translateX(100%);transition:.24s ease;box-shadow:-10px 0 30px rgba(23,39,59,.14)}
+	.mini-cart.is-open .mini-cart-panel{transform:translateX(0)}
+	[dir="rtl"] .mini-cart-panel{right:auto;left:0;border-inline-start:0;border-inline-end:1px solid var(--line);transform:translateX(-100%)}
+	[dir="rtl"] .mini-cart.is-open .mini-cart-panel{transform:translateX(0)}
+	.mini-cart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border-bottom:1px solid var(--line)}
+	.mini-cart-head h3{margin:0;font-size:17px;color:var(--secondary)}
+	.mini-cart-close{border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--secondary);padding:6px 10px;cursor:pointer;font-family:inherit;font-weight:700}
+	.mini-cart-list{overflow:auto;padding:12px;display:grid;gap:10px;align-content:start}
+	.mini-cart-empty{color:var(--muted);font-size:14px;padding:8px 0;text-align:center;border:1px dashed var(--line);border-radius:10px;background:#fbfcff}
+	.mini-cart-foot{border-top:1px solid var(--line);padding:12px;display:grid;gap:8px}
+	.mini-cart-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+	.mini-cart-actions a{min-height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;text-decoration:none}
+	.mini-cart-view{border:1px solid var(--line);background:#fff;color:var(--secondary)}
+	.mini-cart-checkout{background:var(--primary);color:#fff}
 	.header-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none}
 	.action-nav-toggle{display:none}
 	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:600}
@@ -193,19 +221,47 @@
 						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr('Search for your dress...'); ?>" aria-label="<?php echo esc_attr('Search for your dress...'); ?>">
 						<button class="search-btn" type="submit">Search</button>
 					</form>
-					<a class="icon-btn action-account" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
+					<span class="account-trigger-wrap action-account">
+						<a class="icon-btn account-trigger" id="accountLoginTrigger" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>" aria-expanded="false" aria-controls="accountMenu">👤</a>
+						<div class="account-menu" id="accountMenu" role="dialog" aria-label="<?php echo esc_attr('My Account'); ?>" aria-hidden="true">
+							<div class="account-menu-head">
+								<strong><?php echo esc_html($is_english ? 'My Account' : 'حسابي'); ?></strong>
+								<span><?php echo esc_html($is_english ? 'Quick access to your account' : 'وصول سريع إلى حسابك'); ?></span>
+							</div>
+							<a id="accountMenuManage" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>"><?php echo esc_html($is_english ? 'Manage account' : 'إدارة الحساب'); ?></a>
+							<a id="accountMenuLogout" href="<?php echo esc_url($build_localized_url('/my-account')); ?>"><?php echo esc_html($is_english ? 'Open account page' : 'فتح صفحة الحساب'); ?></a>
+						</div>
+					</span>
 					<span class="icon-wrap action-wishlist">
 						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
-					<span class="icon-wrap action-cart">
-						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
+					<span class="icon-wrap cart-trigger-wrap action-cart">
+						<button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>" aria-expanded="false" aria-controls="miniCart">🛒<span class="cart-count" id="cartCountBadge">0</span></button>
 						<span class="icon-plus-one">+1</span>
 					</span>
 					<a class="header-cta action-sell" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
 				</div>
 			</div>
 		</header>
+		<div class="mini-cart" id="miniCart" aria-hidden="true">
+			<div class="mini-cart-backdrop" data-close-mini-cart></div>
+			<aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="<?php echo esc_attr($is_english ? 'Shopping Cart' : 'سلة التسوق'); ?>">
+				<div class="mini-cart-head">
+					<h3><?php echo esc_html($is_english ? 'Shopping Cart' : 'سلة التسوق'); ?></h3>
+					<button class="mini-cart-close" type="button" data-close-mini-cart><?php echo esc_html($is_english ? 'Close' : 'إغلاق'); ?></button>
+				</div>
+				<div class="mini-cart-list" id="miniCartList">
+					<p class="mini-cart-empty"><?php echo esc_html($is_english ? 'Your cart preview opens here. Continue to cart or checkout.' : 'معاينة السلة تظهر هنا. يمكنك المتابعة إلى السلة أو الدفع.'); ?></p>
+				</div>
+				<div class="mini-cart-foot">
+					<div class="mini-cart-actions">
+						<a class="mini-cart-view" href="<?php echo esc_url($build_localized_url('/cart')); ?>"><?php echo esc_html($is_english ? 'View Cart' : 'عرض السلة'); ?></a>
+						<a class="mini-cart-checkout" href="<?php echo esc_url($build_localized_url('/checkout')); ?>"><?php echo esc_html($is_english ? 'Checkout' : 'الدفع'); ?></a>
+					</div>
+				</div>
+			</aside>
+		</div>
 		<script>
 		(function(){
 			var navToggle=document.getElementById('headerNavToggle');
@@ -214,13 +270,27 @@
 			var langPanel=document.getElementById('topbarLangPanel');
 			var socialToggle=document.getElementById('topbarSocialToggle');
 			var socialPanel=document.getElementById('topbarSocialPanel');
+			var accountTrigger=document.getElementById('accountLoginTrigger');
+			var accountMenu=document.getElementById('accountMenu');
+			var cartTrigger=document.getElementById('miniCartTrigger');
+			var miniCart=document.getElementById('miniCart');
+			var miniCartClosers=miniCart?miniCart.querySelectorAll('[data-close-mini-cart]'):[];
 			var closeNav=function(){if(!navToggle||!nav)return;nav.classList.remove('is-open');navToggle.setAttribute('aria-expanded','false');};
 			var closeLang=function(){if(!langToggle||!langPanel)return;langPanel.classList.remove('is-open');langPanel.setAttribute('aria-hidden','true');langToggle.setAttribute('aria-expanded','false');};
 			var closeSocial=function(){if(!socialToggle||!socialPanel)return;socialPanel.classList.remove('is-open');socialPanel.setAttribute('aria-hidden','true');socialToggle.setAttribute('aria-expanded','false');};
+			var closeAccountMenu=function(){if(!accountTrigger||!accountMenu)return;accountMenu.classList.remove('is-open');accountMenu.setAttribute('aria-hidden','true');accountTrigger.setAttribute('aria-expanded','false');};
+			var openAccountMenu=function(){if(!accountTrigger||!accountMenu)return;accountMenu.classList.add('is-open');accountMenu.setAttribute('aria-hidden','false');accountTrigger.setAttribute('aria-expanded','true');};
+			var closeMiniCart=function(){if(!miniCart)return;miniCart.classList.remove('is-open');miniCart.setAttribute('aria-hidden','true');if(cartTrigger)cartTrigger.setAttribute('aria-expanded','false');document.body.style.overflow='';};
+			var openMiniCart=function(){if(!miniCart)return;miniCart.classList.add('is-open');miniCart.setAttribute('aria-hidden','false');if(cartTrigger)cartTrigger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';};
 			if(navToggle&&nav){navToggle.addEventListener('click',function(){var open=!nav.classList.contains('is-open');nav.classList.toggle('is-open',open);navToggle.setAttribute('aria-expanded',open?'true':'false');});}
 			if(langToggle&&langPanel){langToggle.addEventListener('click',function(){var open=!langPanel.classList.contains('is-open');langPanel.classList.toggle('is-open',open);langPanel.setAttribute('aria-hidden',open?'false':'true');langToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeSocial();});document.addEventListener('click',function(e){var wrap=langToggle.closest('.topbar-mobile-lang');if(wrap&&!wrap.contains(e.target))closeLang();});}
 			if(socialToggle&&socialPanel){socialToggle.addEventListener('click',function(){var open=!socialPanel.classList.contains('is-open');socialPanel.classList.toggle('is-open',open);socialPanel.setAttribute('aria-hidden',open?'false':'true');socialToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeLang();});document.addEventListener('click',function(e){var wrap=socialToggle.closest('.topbar-mobile-social');if(wrap&&!wrap.contains(e.target))closeSocial();});}
-			window.addEventListener('resize',function(){if(window.innerWidth>640){closeNav();closeLang();closeSocial();}});
+			if(accountTrigger&&accountMenu){accountTrigger.addEventListener('click',function(e){e.preventDefault();if(accountMenu.classList.contains('is-open')){closeAccountMenu();return;}closeMiniCart();openAccountMenu();});}
+			if(cartTrigger&&miniCart){cartTrigger.addEventListener('click',function(){closeAccountMenu();openMiniCart();});}
+			if(miniCartClosers.length){miniCartClosers.forEach(function(node){node.addEventListener('click',closeMiniCart);});}
+			document.addEventListener('click',function(e){if(accountTrigger&&accountMenu&&!accountTrigger.contains(e.target)&&!accountMenu.contains(e.target))closeAccountMenu();});
+			document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;closeMiniCart();closeAccountMenu();closeLang();closeSocial();});
+			window.addEventListener('resize',function(){if(window.innerWidth>640){closeNav();closeLang();closeSocial();}if(window.innerWidth>980){closeAccountMenu();closeMiniCart();}});
 		})();
 		</script>
 		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
