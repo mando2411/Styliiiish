@@ -3,6 +3,7 @@
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
     $localePrefix = $localePrefix ?? ($isEnglish ? '/en' : '/ar');
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $wpLogo = $wpLogo ?? ($wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
