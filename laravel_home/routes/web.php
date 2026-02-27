@@ -3233,6 +3233,72 @@ Route::get('/blog', fn (Request $request) => $blogHandler($request, 'ar'));
 Route::get('/ar/blog', fn (Request $request) => $blogHandler($request, 'ar'));
 Route::get('/en/blog', fn (Request $request) => $blogHandler($request, 'en'));
 
+$blogSingleHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $resolvePostBySlug = function (string $candidateSlug) {
+        return DB::table('wp_posts as p')
+            ->leftJoin('wp_postmeta as thumb', function ($join) {
+                $join->on('p.ID', '=', 'thumb.post_id')
+                    ->where('thumb.meta_key', '_thumbnail_id');
+            })
+            ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+            ->where('p.post_type', 'post')
+            ->where('p.post_status', 'publish')
+            ->where('p.post_name', $candidateSlug)
+            ->select(
+                'p.ID',
+                'p.post_title',
+                'p.post_name',
+                'p.post_excerpt',
+                'p.post_content',
+                'p.post_date',
+                'img.guid as image'
+            )
+            ->first();
+    };
+
+    $post = $resolvePostBySlug($slug);
+    if (!$post) {
+        $decodedSlug = trim(rawurldecode($slug));
+        if ($decodedSlug !== '' && $decodedSlug !== $slug) {
+            $post = $resolvePostBySlug($decodedSlug);
+        }
+    }
+
+    if (!$post) {
+        abort(404);
+    }
+
+    $post = $localizeProductsCollectionByTranslatePress([$post], $currentLocale, true)->first();
+
+    $relatedPosts = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as thumb', function ($join) {
+            $join->on('p.ID', '=', 'thumb.post_id')
+                ->where('thumb.meta_key', '_thumbnail_id');
+        })
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->where('p.post_type', 'post')
+        ->where('p.post_status', 'publish')
+        ->where('p.ID', '!=', (int) $post->ID)
+        ->orderBy('p.post_date', 'desc')
+        ->limit(3)
+        ->select('p.ID', 'p.post_title', 'p.post_name', 'p.post_date', 'img.guid as image')
+        ->get();
+
+    if ($relatedPosts->isNotEmpty()) {
+        $relatedPosts = $localizeProductsCollectionByTranslatePress($relatedPosts, $currentLocale, false)->values();
+    }
+
+    return view('blog-single', compact('post', 'relatedPosts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+};
+
+Route::get('/blog/{slug}', fn (Request $request, string $slug) => $blogSingleHandler($request, $slug, 'ar'));
+Route::get('/ar/blog/{slug}', fn (Request $request, string $slug) => $blogSingleHandler($request, $slug, 'ar'));
+Route::get('/en/blog/{slug}', fn (Request $request, string $slug) => $blogSingleHandler($request, $slug, 'en'));
+
 $contactHandler = function (string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';

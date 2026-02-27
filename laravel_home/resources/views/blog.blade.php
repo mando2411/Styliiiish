@@ -611,8 +611,7 @@
                 @foreach($posts as $post)
                     @php
                         $slug = rawurlencode(rawurldecode((string) $post->post_name));
-                        $fallbackPostUrl = $wpBaseUrl . $wpBlogArchiveBase . $slug . '/';
-                        $postUrl = !empty($post->permalink) ? (string) $post->permalink : $fallbackPostUrl;
+                        $postUrl = $localePrefix . '/blog/' . $slug;
                         $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
                         if (!$isEnglish) {
                             $hasArabicExcerpt = preg_match('/[\x{0600}-\x{06FF}]/u', $excerptSource) === 1;
@@ -631,14 +630,14 @@
                     @endphp
 
                     <article class="post-card">
-                        <a href="{{ $postUrl }}" target="_blank" rel="noopener">
+                        <a href="{{ $postUrl }}">
                             <img class="post-thumb" src="{{ $image }}" alt="{{ $post->post_title }}" loading="lazy">
                         </a>
                         <div class="post-content">
                             <h3 class="post-title">{{ $post->post_title }}</h3>
                             <span class="post-meta">{{ $t('published_on') }} {{ \Carbon\Carbon::parse($post->post_date)->format('Y-m-d') }}</span>
                             <p class="post-excerpt">{{ $excerpt }}</p>
-                            <a class="post-read" href="{{ $postUrl }}" target="_blank" rel="noopener">{{ $t('read_more') }}</a>
+                            <a class="post-read" href="{{ $postUrl }}">{{ $t('read_more') }}</a>
                         </div>
                     </article>
                 @endforeach
