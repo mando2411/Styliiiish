@@ -99,6 +99,8 @@
             'featured_sub' => 'تشكيلة منتقاة من أحدث الفساتين مع أفضل العروض والخصومات المتاحة الآن',
             'view_all' => 'عرض كل المنتجات',
             'featured_badge' => 'مختارات مميزة',
+            'badge_marketplace' => 'ماركت بليس',
+            'badge_brand' => 'ستايلش',
             'discount_badge' => 'خصم',
             'available_label' => 'متوفر الآن',
             'delivery_label' => 'توصيل سريع',
@@ -232,6 +234,8 @@
             'featured_sub' => 'A handpicked selection of the latest dresses with the best live offers and discounts',
             'view_all' => 'View All Products',
             'featured_badge' => 'Featured Pick',
+            'badge_marketplace' => 'Marketplace',
+            'badge_brand' => 'Styliiiish',
             'discount_badge' => 'OFF',
             'available_label' => 'In Stock',
             'delivery_label' => 'Fast Delivery',
@@ -3269,13 +3273,15 @@
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+                        $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
+                        $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                     @endphp
 
                     <article class="card">
                         <div class="product-media">
                             <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
                             <div class="card-badges">
-                                <span class="badge-chip badge-hot">{{ $t('featured_badge') }}</span>
+                                <span class="badge-chip badge-hot">{{ $primaryBadge }}</span>
                                 @if($isSale)
                                     <span class="badge-chip badge-discount">{{ $t('discount_badge') }} {{ $discount }}%</span>
                                 @endif

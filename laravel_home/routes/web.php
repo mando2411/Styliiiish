@@ -391,7 +391,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         })
         ->values();
 
-    $products = Cache::remember('home_products_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml) {
+    $products = Cache::remember('home_products_v2_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml) {
 
         $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
@@ -423,6 +423,15 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
                 'sale.meta_value as sale_price',
                 'img.guid as image'
             )
+            ->selectRaw("EXISTS (
+                SELECT 1
+                FROM wp_term_relationships tr
+                INNER JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                INNER JOIN wp_terms t ON t.term_id = tt.term_id
+                WHERE tr.object_id = p.ID
+                  AND tt.taxonomy = 'product_cat'
+                  AND t.slug IN ('marketplace', 'market-place', 'market_place')
+            ) as is_marketplace")
             ->limit(12)
             ->get();
 
