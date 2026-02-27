@@ -53,9 +53,14 @@
 	.main-nav{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;background:#f9fbff;border:1px solid var(--line);border-radius:12px;padding:6px}
 	.main-nav a{color:var(--secondary);font-size:14px;font-weight:700;padding:8px 12px;border-radius:8px;transition:.2s ease;text-decoration:none}
 	.main-nav a:hover{color:var(--primary);background:#fff4f5}
+	.header-actions{display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+	.search-form{display:flex;align-items:center;gap:6px}
+	.search-input{height:38px;min-width:190px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:13px;outline:none}
+	.search-btn{height:38px;border:none;border-radius:10px;background:#17273B;color:#fff;padding:0 12px;font-size:13px;font-weight:700;cursor:pointer}
+	.icon-btn{height:38px;min-width:38px;border:1px solid var(--line);border-radius:10px;background:#fff;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--secondary);font-size:16px}
 	.header-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none}
 	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:600}
-	@media (max-width:900px){.main-header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.main-nav{justify-content:flex-start}.brand-logo{height:46px!important;max-height:46px!important;max-width:min(220px,70vw)!important}}
+	@media (max-width:900px){.main-header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.main-nav{justify-content:flex-start}.brand-logo{height:46px!important;max-height:46px!important;max-width:min(220px,70vw)!important}.search-input{min-width:140px}}
 </style>
 <?php endif; ?>
 
@@ -92,10 +97,19 @@
 					<a href="<?php echo esc_url(home_url($locale_prefix)); ?>"><?php echo $is_english ? 'Home' : 'الرئيسية'; ?></a>
 					<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>"><?php echo $is_english ? 'Shop' : 'المتجر'; ?></a>
 					<a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>"><?php echo $is_english ? 'Blog' : 'المدونة'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>"><?php echo $is_english ? 'Marketplace' : 'الماركت بليس'; ?></a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>"><?php echo $is_english ? 'Categories' : 'الأقسام'; ?></a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>"><?php echo $is_english ? 'About' : 'من نحن'; ?></a>
+					<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>"><?php echo $is_english ? 'Contact' : 'تواصل معنا'; ?></a>
 				</nav>
-				<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Start Selling' : 'ابدئي البيع'; ?></a>
+				<div class="header-actions">
+					<form class="search-form" action="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>" method="get">
+						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr($is_english ? 'Search for your dress...' : 'ابحثي عن فستانك...'); ?>" aria-label="<?php echo esc_attr($is_english ? 'Search for your dress...' : 'ابحثي عن فستانك...'); ?>">
+						<button class="search-btn" type="submit"><?php echo $is_english ? 'Search' : 'بحث'; ?></button>
+					</form>
+					<a class="icon-btn" href="<?php echo esc_url($is_english ? home_url('/my-account/') : home_url('/ar/حسابي/')); ?>" aria-label="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>" title="<?php echo esc_attr($is_english ? 'My Account' : 'حسابي'); ?>">👤</a>
+					<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>" title="<?php echo esc_attr($is_english ? 'Wishlist' : 'المفضلة'); ?>">❤</a>
+					<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>" title="<?php echo esc_attr($is_english ? 'Cart' : 'السلة'); ?>">🛒</a>
+					<a class="header-cta" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener"><?php echo $is_english ? 'Start Selling' : 'ابدئي البيع'; ?></a>
+				</div>
 			</div>
 		</header>
 		<div class="promo"><?php echo $is_english ? 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days' : 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل'; ?></div>
