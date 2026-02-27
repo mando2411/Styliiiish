@@ -108,13 +108,6 @@ $laravel_exact_routes = [
     '/google-reviews',
     '/brand',
     '/favicon.ico',
-    '/حسابي',
-    '/ar/حسابي',
-    '/ara/حسابي',
-    '/my-account',
-    '/my-account/',
-    '/en/my-account',
-    '/en/my-account/',
 ];
 
 // Prefix routes (assets/subpaths) handled by Laravel
@@ -152,6 +145,16 @@ $wordpress_exact_routes = [
     '/ar/الدفع/',
     '/ara/الدفع',
     '/ara/الدفع/',
+    '/حسابي',
+    '/حسابي/',
+    '/ar/حسابي',
+    '/ar/حسابي/',
+    '/ara/حسابي',
+    '/ara/حسابي/',
+    '/my-account',
+    '/my-account/',
+    '/en/my-account',
+    '/en/my-account/',
 ];
 
 $wordpress_prefix_routes = [
