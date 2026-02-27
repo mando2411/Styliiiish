@@ -72,6 +72,13 @@
                 <strong>{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}</strong>
                 <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
             </div>
+            <div class="topbar-mobile-lang">
+                <button class="topbar-lang-toggle" id="topbarLangToggle" type="button" aria-label="{{ $ht('menu', 'اللغة', 'Language') }}" title="{{ $ht('menu', 'اللغة', 'Language') }}" aria-controls="topbarLangPanel" aria-expanded="false">{{ strtoupper($currentLocale) }}</button>
+                <div class="topbar-lang-panel" id="topbarLangPanel" aria-hidden="true">
+                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="{{ $arSwitchUrl }}">AR</a>
+                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="{{ $enSwitchUrl }}">EN</a>
+                </div>
+            </div>
             <div class="topbar-mobile-social">
                 <button class="topbar-social-toggle" id="topbarSocialToggle" type="button" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}" title="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}" aria-controls="topbarSocialPanel" aria-expanded="false">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 14a3 3 0 0 0-2.24 1l-4.27-2.14a3.1 3.1 0 0 0 0-1.72l4.27-2.14a3 3 0 1 0-.9-1.8L9.59 9.34a3 3 0 1 0 0 5.32l4.27 2.14A3 3 0 1 0 17 14z"/></svg>
@@ -161,6 +168,8 @@
     (() => {
         const navToggle = document.getElementById('headerNavToggle');
         const nav = document.getElementById('headerMainNav');
+        const langToggle = document.getElementById('topbarLangToggle');
+        const langPanel = document.getElementById('topbarLangPanel');
         const socialToggle = document.getElementById('topbarSocialToggle');
         const socialPanel = document.getElementById('topbarSocialPanel');
 
@@ -175,6 +184,13 @@
             socialPanel.classList.remove('is-open');
             socialPanel.setAttribute('aria-hidden', 'true');
             socialToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        const closeLang = () => {
+            if (!langToggle || !langPanel) return;
+            langPanel.classList.remove('is-open');
+            langPanel.setAttribute('aria-hidden', 'true');
+            langToggle.setAttribute('aria-expanded', 'false');
         };
 
         if (navToggle && nav) {
@@ -195,6 +211,7 @@
                 socialPanel.classList.toggle('is-open', willOpen);
                 socialPanel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
                 socialToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                if (willOpen) closeLang();
             });
 
             socialPanel.querySelectorAll('a').forEach((link) => {
@@ -208,10 +225,31 @@
             });
         }
 
+        if (langToggle && langPanel) {
+            langToggle.addEventListener('click', () => {
+                const willOpen = !langPanel.classList.contains('is-open');
+                langPanel.classList.toggle('is-open', willOpen);
+                langPanel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+                langToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                if (willOpen) closeSocial();
+            });
+
+            langPanel.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', closeLang);
+            });
+
+            document.addEventListener('click', (event) => {
+                const wrap = langToggle.closest('.topbar-mobile-lang');
+                if (!wrap) return;
+                if (!wrap.contains(event.target)) closeLang();
+            });
+        }
+
         window.addEventListener('resize', () => {
             if (window.innerWidth > 640) {
                 closeNav();
                 closeSocial();
+                closeLang();
             }
         });
     })();
