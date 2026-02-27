@@ -28,13 +28,15 @@
     $arSwitchUrl = '/ar' . $localePathTail;
     $enSwitchUrl = '/en' . $localePathTail;
 
+    $decodedCurrentPath = $normalizePath(rawurldecode($currentPath));
+
     $accountPaths = [
         '/my-account',
         '/en/my-account',
         '/ar/حسابي',
     ];
 
-    if (in_array($currentPath, $accountPaths, true)) {
+    if (in_array($currentPath, $accountPaths, true) || in_array($decodedCurrentPath, $accountPaths, true)) {
         $arSwitchUrl = '/ar/حسابي/';
         $enSwitchUrl = '/my-account/';
     }
