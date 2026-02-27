@@ -9,7 +9,19 @@
 	}
 	$is_english = (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || ($normalized_path === '/my-account');
 	$locale_prefix = $is_english ? '/en' : '/ar';
-	$wp_base_url = rtrim(home_url('/'), '/');
+	$wp_base_url = rtrim((string) get_option('home'), '/');
+	if ($wp_base_url === '') {
+		$wp_base_url = rtrim(home_url('/'), '/');
+	}
+
+	$build_localized_url = static function (string $path = '') use ($wp_base_url, $locale_prefix): string {
+		$clean_path = trim($path);
+		$clean_path = $clean_path === '' ? '' : ('/' . ltrim($clean_path, '/'));
+		$clean_path = preg_replace('#^/(ar|en)(?=/|$)#i', '', (string) $clean_path);
+		$clean_path = $clean_path === null ? '' : $clean_path;
+
+		return rtrim($wp_base_url, '/') . $locale_prefix . $clean_path;
+	};
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$account_url = $is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
@@ -49,19 +61,19 @@
 			<p class="footer-status">Status : <span class="status-pill <?php echo $is_open_now ? 'is-open' : 'is-closed'; ?>"><?php echo $is_open_now ? 'Open' : 'Closed'; ?></span></p>
 			<p class="footer-open-hours"><strong>Working Hours:</strong> Saturday – Friday: 11:00 AM – 7:00 PM</p>
 			<div class="footer-contact-row">
-				<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact Us</a>
+				<a href="<?php echo esc_url($build_localized_url('/contact-us')); ?>">Contact Us</a>
 				<a href="tel:+201050874255">Direct Call</a>
 			</div>
 		</div>
 		<div class="footer-col">
 			<h5>Quick Links</h5>
 			<ul class="footer-links">
-				<li><a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>">Blog</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop Dresses Now</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace')); ?>">Marketplace</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/categories')); ?>">Categories</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/')); ?>">Home</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/blog')); ?>">Blog</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/shop')); ?>">Shop Dresses Now</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/shop')); ?>">Shop</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/marketplace')); ?>">Marketplace</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/categories')); ?>">Categories</a></li>
 				<li><a href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Sell Your Dress</a></li>
 				<li><a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener">My Account</a></li>
 			</ul>
@@ -71,33 +83,33 @@
 			<ul class="footer-links">
 				<li><a href="https://maps.app.goo.gl/MCdcFEcFoR4tEjpT8" target="_blank" rel="noopener">1 Nabil Khalil St, Nasr City, Cairo, Egypt</a></li>
 				<li><a href="tel:+201050874255">+2 010-5087-4255</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact Us</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/contact-us')); ?>">Contact Us</a></li>
 			</ul>
 		</div>
 		<div class="footer-col">
 			<h5>Policies & Legal</h5>
 			<ul class="footer-links">
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>">About Us</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/privacy-policy')); ?>">Privacy Policy</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/terms-conditions')); ?>">Terms & Conditions</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/marketplace-policy')); ?>">Marketplace Policy</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/refund-return-policy')); ?>">Refund & Return Policy</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/faq')); ?>">FAQ</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/shipping-delivery-policy')); ?>">Shipping & Delivery Policy</a></li>
-				<li><a href="<?php echo esc_url(home_url($locale_prefix . '/cookie-policy')); ?>">Cookie Policy</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/about-us')); ?>">About Us</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/privacy-policy')); ?>">Privacy Policy</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/terms-conditions')); ?>">Terms & Conditions</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/marketplace-policy')); ?>">Marketplace Policy</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/refund-return-policy')); ?>">Refund & Return Policy</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/faq')); ?>">FAQ</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/shipping-delivery-policy')); ?>">Shipping & Delivery Policy</a></li>
+				<li><a href="<?php echo esc_url($build_localized_url('/cookie-policy')); ?>">Cookie Policy</a></li>
 			</ul>
 		</div>
 	</div>
 	<div class="footer-wrap footer-bottom">
 		<span><?php echo 'All rights reserved © ' . esc_html(date('Y')) . ' Styliiiish | Powered by '; ?><a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
-		<span><a href="<?php echo esc_url(home_url($locale_prefix)); ?>">styliiiish.com</a></span>
+		<span><a href="<?php echo esc_url($build_localized_url('/')); ?>">styliiiish.com</a></span>
 	</div>
 	<div class="footer-wrap footer-mini-nav">
-		<a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>">Cart</a>
+		<a href="<?php echo esc_url($build_localized_url('/')); ?>">Home</a>
+		<a href="<?php echo esc_url($build_localized_url('/shop')); ?>">Shop</a>
+		<a href="<?php echo esc_url($build_localized_url('/cart')); ?>">Cart</a>
 		<a href="<?php echo esc_url($account_url); ?>" target="_blank" rel="noopener">Account</a>
-		<a href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>">Wishlist</a>
+		<a href="<?php echo esc_url($build_localized_url('/wishlist')); ?>">Wishlist</a>
 	</div>
 </footer>
 <?php 

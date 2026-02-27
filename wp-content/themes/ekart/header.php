@@ -25,7 +25,19 @@
 	}
 	$is_english = in_array($normalized_path, ['/my-account', '/en/my-account'], true);
 	$locale_prefix = $is_english ? '/en' : '/ar';
-	$wp_base_url = rtrim(home_url('/'), '/');
+	$wp_base_url = rtrim((string) get_option('home'), '/');
+	if ($wp_base_url === '') {
+		$wp_base_url = rtrim(home_url('/'), '/');
+	}
+
+	$build_localized_url = static function (string $path = '') use ($wp_base_url, $locale_prefix): string {
+		$clean_path = trim($path);
+		$clean_path = $clean_path === '' ? '' : ('/' . ltrim($clean_path, '/'));
+		$clean_path = preg_replace('#^/(ar|en)(?=/|$)#i', '', (string) $clean_path);
+		$clean_path = $clean_path === null ? '' : $clean_path;
+
+		return rtrim($wp_base_url, '/') . $locale_prefix . $clean_path;
+	};
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
 	$ar_switch_url = 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
@@ -117,29 +129,29 @@
 		</div>
 		<header class="main-header">
 			<div class="container main-header-inner">
-				<a class="brand" href="<?php echo esc_url(home_url($locale_prefix)); ?>">
+				<a class="brand" href="<?php echo esc_url($build_localized_url('/')); ?>">
 					<img class="brand-logo" src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish">
 					<span class="brand-tag">Because every woman deserves to shine</span>
 				</a>
 				<nav class="main-nav" aria-label="Main Navigation">
-					<a href="<?php echo esc_url(home_url($locale_prefix)); ?>">Home</a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>">Shop</a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/blog')); ?>">Blog</a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/about-us')); ?>">About</a>
-					<a href="<?php echo esc_url(home_url($locale_prefix . '/contact-us')); ?>">Contact</a>
+					<a href="<?php echo esc_url($build_localized_url('/')); ?>">Home</a>
+					<a href="<?php echo esc_url($build_localized_url('/shop')); ?>">Shop</a>
+					<a href="<?php echo esc_url($build_localized_url('/blog')); ?>">Blog</a>
+					<a href="<?php echo esc_url($build_localized_url('/about-us')); ?>">About</a>
+					<a href="<?php echo esc_url($build_localized_url('/contact-us')); ?>">Contact</a>
 				</nav>
 				<div class="header-actions">
-					<form class="search-form" action="<?php echo esc_url(home_url($locale_prefix . '/shop')); ?>" method="get">
+					<form class="search-form" action="<?php echo esc_url($build_localized_url('/shop')); ?>" method="get">
 						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr('Search for your dress...'); ?>" aria-label="<?php echo esc_attr('Search for your dress...'); ?>">
 						<button class="search-btn" type="submit">Search</button>
 					</form>
-					<a class="icon-btn" href="<?php echo esc_url($is_english ? home_url('/my-account/') : home_url('/ar/حسابي/')); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
+					<a class="icon-btn" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
 					<span class="icon-wrap">
-						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
+						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
 					<span class="icon-wrap">
-						<a class="icon-btn" href="<?php echo esc_url(home_url($locale_prefix . '/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
+						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
 					<a class="header-cta" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
@@ -149,13 +161,13 @@
 		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
 		<div class="header-categories-strip">
 			<div class="container categories-strip-inner">
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=dress')); ?>">Dress</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=bridesmaid-dresses')); ?>">Bridesmaid Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=evening-dresses')); ?>">Evening Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=final-clearance-dresses')); ?>">Final Clearance Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=plus-size-dresses')); ?>">Plus Size Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=mothers-dresses')); ?>">Mother of the Bride Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=dress')); ?>">Dress</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=bridesmaid-dresses')); ?>">Bridesmaid Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=evening-dresses')); ?>">Evening Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=final-clearance-dresses')); ?>">Final Clearance Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=plus-size-dresses')); ?>">Plus Size Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=mothers-dresses')); ?>">Mother of the Bride Dresses</a>
+				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a>
 			</div>
 		</div>
 	
