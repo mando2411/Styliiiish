@@ -1942,6 +1942,45 @@ Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProduct
 Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
 Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
+$attachmentSlugHandler = function (Request $request, string $attachmentSlug) {
+    $slug = trim((string) $attachmentSlug);
+    if (!preg_match('/^att-[a-z0-9_-]+$/i', $slug)) {
+        abort(404);
+    }
+
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $attachment = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as pm', function ($join) {
+            $join->on('p.ID', '=', 'pm.post_id')
+                ->where('pm.meta_key', '_wp_attached_file');
+        })
+        ->where('p.post_type', 'attachment')
+        ->where('p.post_name', $slug)
+        ->select('p.guid', 'pm.meta_value as attached_file')
+        ->first();
+
+    if (!$attachment) {
+        abort(404);
+    }
+
+    $attachedFile = ltrim(trim((string) ($attachment->attached_file ?? '')), '/');
+    if ($attachedFile !== '') {
+        return redirect()->to($wpBaseUrl . '/wp-content/uploads/' . $attachedFile, 302);
+    }
+
+    $guid = trim((string) ($attachment->guid ?? ''));
+    if ($guid !== '' && preg_match('#^https?://#i', $guid) === 1) {
+        return redirect()->to($guid, 302);
+    }
+
+    abort(404);
+};
+
+Route::get('/att-{token}', fn (Request $request, string $token) => $attachmentSlugHandler($request, 'att-' . $token))->where('token', '[A-Za-z0-9_-]+');
+Route::get('/ar/att-{token}', fn (Request $request, string $token) => $attachmentSlugHandler($request, 'att-' . $token))->where('token', '[A-Za-z0-9_-]+');
+Route::get('/en/att-{token}', fn (Request $request, string $token) => $attachmentSlugHandler($request, 'att-' . $token))->where('token', '[A-Za-z0-9_-]+');
+
 $resolveProductForAjaxSections = function (Request $request, string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $allowOwnerPreview = $request->boolean('od_preview');
