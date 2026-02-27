@@ -3842,6 +3842,7 @@
                     trigger.addEventListener('click', async (event) => {
                         const targetUrl = trigger.getAttribute('href') || wpMyAccountUrl;
                         if (!targetUrl) return;
+                        event.preventDefault();
 
                         let isLoggedIn = accountAuthState === 'logged-in';
                         if (!isLoggedIn) {
@@ -3849,10 +3850,10 @@
                         }
 
                         if (isLoggedIn) {
+                            window.location.assign(targetUrl);
                             return;
                         }
 
-                        event.preventDefault();
                         authPendingRedirectUrl = targetUrl;
                         if (authRedirectField) authRedirectField.value = authPendingRedirectUrl;
 
