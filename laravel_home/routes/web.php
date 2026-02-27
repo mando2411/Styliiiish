@@ -4192,7 +4192,9 @@ $accountHandler = function (Request $request, string $currentLocale) {
 Route::get('/حسابي', fn (Request $request) => $accountHandler($request, 'ar'));
 Route::get('/ar/حسابي', fn (Request $request) => $accountHandler($request, 'ar'));
 Route::get('/en/my-account', fn (Request $request) => $accountHandler($request, 'en'));
+Route::get('/en/my-account/', fn (Request $request) => $accountHandler($request, 'en'));
 Route::get('/my-account', fn (Request $request) => $accountHandler($request, 'en'));
+Route::get('/my-account/', fn (Request $request) => $accountHandler($request, 'en'));
 
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');

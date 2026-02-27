@@ -112,7 +112,9 @@ $laravel_exact_routes = [
     '/ar/حسابي',
     '/ara/حسابي',
     '/my-account',
+    '/my-account/',
     '/en/my-account',
+    '/en/my-account/',
 ];
 
 // Prefix routes (assets/subpaths) handled by Laravel
