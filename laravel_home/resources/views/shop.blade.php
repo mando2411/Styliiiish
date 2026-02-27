@@ -207,9 +207,13 @@
             </form>
 
             <select class="sort" id="sortSelect" name="sort" aria-label="ترتيب المنتجات">
-                <option value="random" {{ $sort === 'random' ? 'selected' : '' }}>ترتيب عشوائي</option>
+                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>الأحدث</option>
+                <option value="best_selling" {{ $sort === 'best_selling' ? 'selected' : '' }}>الأكثر مبيعًا</option>
+                <option value="top_rated" {{ $sort === 'top_rated' ? 'selected' : '' }}>الأعلى تقييمًا</option>
+                <option value="discount_desc" {{ $sort === 'discount_desc' ? 'selected' : '' }}>أعلى خصم</option>
                 <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>السعر: من الأقل للأعلى</option>
                 <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>السعر: من الأعلى للأقل</option>
+                <option value="random" {{ $sort === 'random' ? 'selected' : '' }}>ترتيب عشوائي</option>
             </select>
         </section>
 
@@ -238,7 +242,7 @@
             const params = new URLSearchParams(window.location.search);
             const state = {
                 q: params.get('q') ?? qInput.value ?? '',
-                sort: params.get('sort') ?? sortSelect.value ?? 'random',
+                sort: params.get('sort') ?? sortSelect.value ?? 'newest',
             };
 
             const renderState = {
@@ -257,7 +261,7 @@
             const buildQuery = () => {
                 const query = new URLSearchParams();
                 if (state.q.trim() !== '') query.set('q', state.q.trim());
-                if (state.sort !== 'random') query.set('sort', state.sort);
+                if (state.sort !== 'newest') query.set('sort', state.sort);
                 return query;
             };
 
@@ -410,7 +414,7 @@
             window.addEventListener('popstate', () => {
                 const qs = new URLSearchParams(window.location.search);
                 state.q = qs.get('q') ?? '';
-                state.sort = qs.get('sort') ?? 'random';
+                state.sort = qs.get('sort') ?? 'newest';
                 qInput.value = state.q;
                 sortSelect.value = state.sort;
                 fetchProducts(false);

@@ -441,7 +441,7 @@ Route::get('/en', fn () => $homeHandler('en'));
 
 $shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes) {
     $search = trim((string) $request->query('q', ''));
-    $sort = (string) $request->query('sort', 'random');
+    $sort = (string) $request->query('sort', 'newest');
 
     $normalizeSearchText = static function (?string $value): string {
         $text = mb_strtolower(trim((string) $value), 'UTF-8');
@@ -451,8 +451,8 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         return trim($text);
     };
 
-    if (!in_array($sort, ['random', 'price_asc', 'price_desc'], true)) {
-        $sort = 'random';
+    if (!in_array($sort, ['newest', 'best_selling', 'top_rated', 'discount_desc', 'price_asc', 'price_desc', 'random'], true)) {
+        $sort = 'newest';
     }
 
     $query = DB::table('wp_posts as p')
@@ -464,6 +464,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
             $join->on('p.ID', '=', 'regular.post_id')
                 ->where('regular.meta_key', '_regular_price');
         })
+        ->leftJoin('wp_postmeta as sales', function ($join) {
+            $join->on('p.ID', '=', 'sales.post_id')
+                ->where('sales.meta_key', 'total_sales');
+        })
+        ->leftJoin('wp_postmeta as rating', function ($join) {
+            $join->on('p.ID', '=', 'rating.post_id')
+                ->where('rating.meta_key', '_wc_average_rating');
+        })
         ->leftJoin('wp_postmeta as thumb', function ($join) {
             $join->on('p.ID', '=', 'thumb.post_id')
                 ->where('thumb.meta_key', '_thumbnail_id');
@@ -472,14 +480,26 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish');
 
-    if ($sort === 'random') {
-        $query->inRandomOrder();
+    if ($sort === 'newest') {
+        $query->orderBy('p.post_date', 'desc');
+    } elseif ($sort === 'best_selling') {
+        $query->orderByRaw('CAST(COALESCE(NULLIF(sales.meta_value, ""), "0") AS UNSIGNED) DESC')
+            ->orderBy('p.post_date', 'desc');
+    } elseif ($sort === 'top_rated') {
+        $query->orderByRaw('CAST(COALESCE(NULLIF(rating.meta_value, ""), "0") AS DECIMAL(4,2)) DESC')
+            ->orderByRaw('CAST(COALESCE(NULLIF(sales.meta_value, ""), "0") AS UNSIGNED) DESC')
+            ->orderBy('p.post_date', 'desc');
+    } elseif ($sort === 'discount_desc') {
+        $query->orderByRaw('CASE WHEN CAST(COALESCE(NULLIF(regular.meta_value, ""), "0") AS DECIMAL(10,2)) > 0 AND CAST(COALESCE(NULLIF(price.meta_value, ""), "0") AS DECIMAL(10,2)) > 0 AND CAST(COALESCE(NULLIF(regular.meta_value, ""), "0") AS DECIMAL(10,2)) > CAST(COALESCE(NULLIF(price.meta_value, ""), "0") AS DECIMAL(10,2)) THEN ((CAST(COALESCE(NULLIF(regular.meta_value, ""), "0") AS DECIMAL(10,2)) - CAST(COALESCE(NULLIF(price.meta_value, ""), "0") AS DECIMAL(10,2))) / CAST(COALESCE(NULLIF(regular.meta_value, ""), "0") AS DECIMAL(10,2))) ELSE 0 END DESC')
+            ->orderBy('p.post_date', 'desc');
     } elseif ($sort === 'price_asc') {
         $query->orderByRaw('CAST(NULLIF(price.meta_value, "") AS DECIMAL(10,2)) ASC')
             ->orderBy('p.post_date', 'desc');
     } elseif ($sort === 'price_desc') {
         $query->orderByRaw('CAST(NULLIF(price.meta_value, "") AS DECIMAL(10,2)) DESC')
             ->orderBy('p.post_date', 'desc');
+    } elseif ($sort === 'random') {
+        $query->inRandomOrder();
     }
 
     $products = $query->select(
