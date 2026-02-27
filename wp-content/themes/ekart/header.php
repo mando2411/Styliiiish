@@ -83,10 +83,10 @@
 					<a href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
 				</div>
 				<div class="topbar-left">
-					<div class="lang-switch <?php echo $is_english ? 'is-en' : 'is-ar'; ?>" aria-label="Language Switcher">
+					<div class="lang-switch" aria-label="Language Switcher" data-no-translation>
 						<span class="lang-indicator" aria-hidden="true"></span>
-						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>">AR</a>
-						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>">EN</a>
+						<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
+						<a class="<?php echo $is_english ? 'active' : ''; ?>" href="<?php echo esc_url($en_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($en_switch_url); ?>';return false;">EN</a>
 					</div>
 					<span class="topbar-note">⚡ Daily Deals</span>
 					<a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">Facebook</a>
