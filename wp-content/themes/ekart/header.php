@@ -71,6 +71,12 @@
 	.topbar-mobile-icons.is-open{opacity:1;transform:translateX(0) scale(1);pointer-events:auto}
 	.topbar-mobile-icon{width:32px;height:32px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.14);display:inline-flex;align-items:center;justify-content:center;color:#fff;text-decoration:none}
 	.topbar-mobile-icon svg{width:16px;height:16px;fill:currentColor}
+	.topbar-mobile-icon.icon-call{color:#fff}
+	.topbar-mobile-icon.icon-whatsapp{color:#25D366}
+	.topbar-mobile-icon.icon-facebook{color:#1877F2}
+	.topbar-mobile-icon.icon-instagram{color:#E1306C}
+	.topbar-mobile-icon.icon-tiktok{color:#111111}
+	.topbar-mobile-icon.icon-google{color:#4285F4}
 	.main-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;box-shadow:0 8px 24px rgba(23,39,59,.06)}
 	.main-header-inner{min-height:96px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
 	.brand{display:flex;flex-direction:column;gap:2px;text-decoration:none}
@@ -93,8 +99,9 @@
 	.categories-strip-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0}
 	.category-strip-chip{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border-radius:999px;background:#f6f8fb;color:var(--secondary);font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line)}
 	.category-strip-chip:hover{background:#fff4f5;color:var(--primary)}
-	@media (max-width:980px){.main-header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.brand{align-items:center;text-align:center}.action-nav-toggle{display:inline-flex}.header-actions{width:100%;justify-content:center}.search-form{width:100%}.search-input{min-width:0;flex:1}.main-nav{display:none;width:100%;justify-content:flex-start;flex-wrap:nowrap;overflow:auto}.main-nav.is-open{display:flex}.brand-logo{height:46px!important;max-height:46px!important;max-width:min(220px,70vw)!important}}
+	@media (max-width:980px){.main-header-inner{grid-template-columns:1fr auto;gap:8px;min-height:auto;padding:10px 0}.brand{align-items:center;text-align:center}.brand-logo{height:44px!important;max-height:44px!important;max-width:240px!important}.brand-tag{font-size:11px}.main-nav{grid-column:1 / -1;margin-top:4px;border-radius:10px;padding:5px;gap:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;display:none;justify-content:flex-start}.main-nav.is-open{display:flex}.main-nav::-webkit-scrollbar{display:none}.main-nav a{font-size:12px;padding:7px 10px;scroll-snap-align:start}.header-actions{justify-content:flex-end;gap:6px;flex-wrap:nowrap}.action-nav-toggle{display:inline-flex}.search-form{display:none}.icon-btn{min-width:34px;min-height:34px;padding:0 8px;font-size:12px;border-radius:8px}.action-wishlist,.action-sell{display:none}.action-account,.action-cart{min-width:46px;justify-content:center}}
 	@media (max-width:640px){.topbar{background:transparent;border-bottom:0;height:0;overflow:visible}.topbar-inner{min-height:0;padding:0}.topbar-left,.topbar-desktop-contact{display:none}.topbar-right{width:100%;justify-content:flex-end}.topbar-mobile-social,.topbar-mobile-lang{display:inline-flex}.topbar-mobile-social{inset-inline-end:10px;bottom:12px}.topbar-mobile-lang{inset-inline-end:10px;bottom:80px}}
+	@media (max-width:390px){.action-account,.action-cart{min-width:42px;font-size:11px}.brand-logo{height:36px!important;max-width:200px!important}.main-nav a{font-size:11px;padding:6px 9px}}
 </style>
 
 	<div id="page" class="site">
@@ -119,12 +126,12 @@
 							<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 14a3 3 0 0 0-2.24 1l-4.27-2.14a3.1 3.1 0 0 0 0-1.72l4.27-2.14a3 3 0 1 0-.9-1.8L9.59 9.34a3 3 0 1 0 0 5.32l4.27 2.14A3 3 0 1 0 17 14z"/></svg>
 						</button>
 						<div class="topbar-mobile-icons" id="topbarSocialPanel" aria-hidden="true">
-							<a class="topbar-mobile-icon" href="tel:+201050874255" aria-label="Call"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1.5 1.5 0 0 1 1.5-.37c1.1.36 2.28.55 3.5.55A1.5 1.5 0 0 1 22 16.9V21a1.5 1.5 0 0 1-1.5 1.5C11.94 22.5 1.5 12.06 1.5 3.5A1.5 1.5 0 0 1 3 2h4.1a1.5 1.5 0 0 1 1.5 1.27c.1 1.22.3 2.4.66 3.5a1.5 1.5 0 0 1-.37 1.52l-2.3 2.5z"/></svg></a>
-							<a class="topbar-mobile-icon" href="https://wa.me/201050874255" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.9 11.9 0 0 0 12.07 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.16 1.6 5.98L0 24l6.33-1.66a11.87 11.87 0 0 0 5.73 1.46h.01c6.57 0 11.9-5.33 11.9-11.9 0-3.18-1.24-6.17-3.45-8.42z"/></svg></a>
-							<a class="topbar-mobile-icon" href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.87.25-1.46 1.5-1.46h1.6V5.02c-.28-.04-1.23-.12-2.33-.12-2.3 0-3.87 1.4-3.87 4v2.1H8v3h2.4v8h3.1z"/></svg></a>
-							<a class="topbar-mobile-icon" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2z"/></svg></a>
-							<a class="topbar-mobile-icon" href="https://www.tiktok.com/@styliiish_?_r=1&_t=ZS-94HEUy9a0RE" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.13V2h-3.1v12.4a2.74 2.74 0 1 1-1.88-2.6V8.67a5.84 5.84 0 1 0 5 5.79V8.17a7.91 7.91 0 0 0 4.62 1.48V6.69h-.87z"/></svg></a>
-							<a class="topbar-mobile-icon" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 12.27c0-.82-.07-1.4-.23-2H12v4.26h6.61c-.13 1.06-.86 2.66-2.47 3.74l3.81 2.8c2.28-2.1 3.55-5.2 3.55-8.94z"/></svg></a>
+							<a class="topbar-mobile-icon icon-call" href="tel:+201050874255" aria-label="Call"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1.5 1.5 0 0 1 1.5-.37c1.1.36 2.28.55 3.5.55A1.5 1.5 0 0 1 22 16.9V21a1.5 1.5 0 0 1-1.5 1.5C11.94 22.5 1.5 12.06 1.5 3.5A1.5 1.5 0 0 1 3 2h4.1a1.5 1.5 0 0 1 1.5 1.27c.1 1.22.3 2.4.66 3.5a1.5 1.5 0 0 1-.37 1.52l-2.3 2.5z"/></svg></a>
+							<a class="topbar-mobile-icon icon-whatsapp" href="https://wa.me/201050874255" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.9 11.9 0 0 0 12.07 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.16 1.6 5.98L0 24l6.33-1.66a11.87 11.87 0 0 0 5.73 1.46h.01c6.57 0 11.9-5.33 11.9-11.9 0-3.18-1.24-6.17-3.45-8.42z"/></svg></a>
+							<a class="topbar-mobile-icon icon-facebook" href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.87.25-1.46 1.5-1.46h1.6V5.02c-.28-.04-1.23-.12-2.33-.12-2.3 0-3.87 1.4-3.87 4v2.1H8v3h2.4v8h3.1z"/></svg></a>
+							<a class="topbar-mobile-icon icon-instagram" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2z"/></svg></a>
+							<a class="topbar-mobile-icon icon-tiktok" href="https://www.tiktok.com/@styliiish_?_r=1&_t=ZS-94HEUy9a0RE" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.13V2h-3.1v12.4a2.74 2.74 0 1 1-1.88-2.6V8.67a5.84 5.84 0 1 0 5 5.79V8.17a7.91 7.91 0 0 0 4.62 1.48V6.69h-.87z"/></svg></a>
+							<a class="topbar-mobile-icon icon-google" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 12.27c0-.82-.07-1.4-.23-2H12v4.26h6.61c-.13 1.06-.86 2.66-2.47 3.74l3.81 2.8c2.28-2.1 3.55-5.2 3.55-8.94z"/></svg></a>
 						</div>
 					</div>
 				</div>
@@ -183,16 +190,16 @@
 						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr('Search for your dress...'); ?>" aria-label="<?php echo esc_attr('Search for your dress...'); ?>">
 						<button class="search-btn" type="submit">Search</button>
 					</form>
-					<a class="icon-btn" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
-					<span class="icon-wrap">
+					<a class="icon-btn action-account" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>">👤</a>
+					<span class="icon-wrap action-wishlist">
 						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>">❤</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
-					<span class="icon-wrap">
+					<span class="icon-wrap action-cart">
 						<a class="icon-btn" href="<?php echo esc_url($build_localized_url('/cart')); ?>" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>">🛒</a>
 						<span class="icon-plus-one">+1</span>
 					</span>
-					<a class="header-cta" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
+					<a class="header-cta action-sell" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
 				</div>
 			</div>
 		</header>
