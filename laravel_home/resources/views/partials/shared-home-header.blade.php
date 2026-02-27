@@ -28,6 +28,17 @@
     $arSwitchUrl = '/ar' . $localePathTail;
     $enSwitchUrl = '/en' . $localePathTail;
 
+    $accountPaths = [
+        '/my-account',
+        '/en/my-account',
+        '/ar/حسابي',
+    ];
+
+    if (in_array($currentPath, $accountPaths, true)) {
+        $arSwitchUrl = '/ar/حسابي/';
+        $enSwitchUrl = '/my-account/';
+    }
+
     $translate = (isset($t) && is_callable($t)) ? $t : fn (string $key) => $key;
     $ht = function (string $key, string $arFallback, string $enFallback) use ($translate, $isEnglish): string {
         $value = (string) $translate($key);
