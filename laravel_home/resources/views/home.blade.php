@@ -1431,6 +1431,10 @@
             font-size: 13px;
         }
 
+        .action-nav-toggle {
+            display: none;
+        }
+
         .hero {
             padding: 56px 0 34px;
         }
@@ -2340,6 +2344,12 @@
                 -webkit-overflow-scrolling: touch;
                 scroll-snap-type: x proximity;
                 scrollbar-width: none;
+                display: none;
+                justify-content: flex-start;
+            }
+
+            .main-nav.is-open {
+                display: flex;
             }
 
             .main-nav::-webkit-scrollbar {
@@ -2356,6 +2366,10 @@
                 justify-content: flex-end;
                 gap: 6px;
                 flex-wrap: nowrap;
+            }
+
+            .action-nav-toggle {
+                display: inline-flex;
             }
 
             .search-form {
@@ -2807,9 +2821,10 @@
                 <span class="brand-tag">{{ $t('brand_tag') }}</span>
             </a>
 
-            @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
+            @include('partials.shared-header-nav', ['navClass' => 'main-nav', 'navId' => 'headerMainNav'])
 
             <div class="header-actions">
+                <button class="icon-btn nav-toggle action-nav-toggle" id="headerNavToggle" type="button" aria-label="{{ $isEnglish ? 'Menu' : 'القائمة' }}" title="{{ $isEnglish ? 'Menu' : 'القائمة' }}" aria-controls="headerMainNav" aria-expanded="false"><span class="icon" aria-hidden="true">☰</span></button>
                 <form class="search-form" action="{{ $headerSearchUrl }}" method="get">
                     <input class="search-input" type="search" name="q" required placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
                     <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
@@ -3260,6 +3275,8 @@
             const authGoogleFallback = document.getElementById('authGoogleFallback');
             const authRedirectField = authLoginForm ? authLoginForm.querySelector('input[name="redirect"]') : null;
             const authSellTriggers = document.querySelectorAll('[data-auth-sell-trigger]');
+            const headerNavToggle = document.getElementById('headerNavToggle');
+            const headerMainNav = document.getElementById('headerMainNav');
             const accountMenu = document.getElementById('accountMenu');
             const accountMenuName = document.getElementById('accountMenuName');
             const accountMenuMeta = document.getElementById('accountMenuMeta');
@@ -3304,6 +3321,12 @@
                 accountMenu.classList.add('is-open');
                 accountMenu.setAttribute('aria-hidden', 'false');
                 accountLoginTrigger.setAttribute('aria-expanded', 'true');
+            };
+
+            const closeHeaderNav = () => {
+                if (!headerMainNav || !headerNavToggle) return;
+                headerMainNav.classList.remove('is-open');
+                headerNavToggle.setAttribute('aria-expanded', 'false');
             };
 
             const parseAccountSummary = (doc) => {
@@ -3835,6 +3858,22 @@
 
             if (authModalClosers.length > 0) {
                 authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
+            }
+
+            if (headerNavToggle && headerMainNav) {
+                headerNavToggle.addEventListener('click', () => {
+                    const willOpen = !headerMainNav.classList.contains('is-open');
+                    headerMainNav.classList.toggle('is-open', willOpen);
+                    headerNavToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                });
+
+                headerMainNav.querySelectorAll('a').forEach((link) => {
+                    link.addEventListener('click', closeHeaderNav);
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth > 640) closeHeaderNav();
+                });
             }
 
             if (authSellTriggers.length > 0) {
