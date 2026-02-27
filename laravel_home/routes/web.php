@@ -3177,6 +3177,13 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') use ($no
 
     $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
     if ($languageCodes && $categories->isNotEmpty()) {
+        $normalizeLookupText = function (string $value): string {
+            $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $stripped = trim(strip_tags($decoded));
+            $collapsed = preg_replace('/\s+/u', ' ', $stripped) ?? $stripped;
+            return trim((string) $collapsed);
+        };
+
         $defaultLanguage = (string) ($languageCodes['default'] ?? '');
         $targetLanguage = (string) ($languageCodes['target'] ?? '');
 
@@ -3184,10 +3191,15 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') use ($no
             $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
             if (Schema::hasTable($dictionaryTable)) {
                 $lookupStrings = $categories
-                    ->flatMap(function ($category) {
+                    ->flatMap(function ($category) use ($normalizeLookupText) {
+                        $name = trim((string) ($category->name ?? ''));
+                        $description = trim((string) ($category->description ?? ''));
+
                         return [
-                            trim((string) ($category->name ?? '')),
-                            trim((string) ($category->description ?? '')),
+                            $name,
+                            $normalizeLookupText($name),
+                            $description,
+                            $normalizeLookupText($description),
                         ];
                     })
                     ->filter(fn ($value) => $value !== '')
@@ -3211,18 +3223,33 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') use ($no
                             if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
                                 $translationMap[$original] = $translated;
                             }
+
+                            $normalizedOriginal = $normalizeLookupText($original);
+                            if ($normalizedOriginal !== '' && $translated !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
+                                $translationMap[$normalizedOriginal] = $translated;
+                            }
                         }
 
                         if (!empty($translationMap)) {
-                            $categories = $categories->map(function ($category) use ($translationMap, $normalizeBrandByLocale, $currentLocale) {
+                            $categories = $categories->map(function ($category) use ($translationMap, $normalizeBrandByLocale, $currentLocale, $normalizeLookupText) {
                                 $originalName = trim((string) ($category->name ?? ''));
                                 if ($originalName !== '' && isset($translationMap[$originalName])) {
                                     $category->name = $normalizeBrandByLocale((string) $translationMap[$originalName], $currentLocale);
+                                } else {
+                                    $normalizedName = $normalizeLookupText($originalName);
+                                    if ($normalizedName !== '' && isset($translationMap[$normalizedName])) {
+                                        $category->name = $normalizeBrandByLocale((string) $translationMap[$normalizedName], $currentLocale);
+                                    }
                                 }
 
                                 $originalDescription = trim((string) ($category->description ?? ''));
                                 if ($originalDescription !== '' && isset($translationMap[$originalDescription])) {
                                     $category->description = $normalizeBrandByLocale((string) $translationMap[$originalDescription], $currentLocale);
+                                } else {
+                                    $normalizedDescription = $normalizeLookupText($originalDescription);
+                                    if ($normalizedDescription !== '' && isset($translationMap[$normalizedDescription])) {
+                                        $category->description = $normalizeBrandByLocale((string) $translationMap[$normalizedDescription], $currentLocale);
+                                    }
                                 }
 
                                 return $category;
@@ -3232,6 +3259,42 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') use ($no
                 }
             }
         }
+    }
+
+    if ($currentLocale === 'ar' && $categories->isNotEmpty()) {
+        $fallbackArabicDescriptions = [
+            'discover beautiful plus-size modest dresses designed for the perfect fit' => 'اكتشفي فساتين محتشمة بمقاسات كبيرة بتصميمات أنيقة وقصّات مريحة تمنحكِ إطلالة متناسقة وثقة أكبر.',
+            'final clearance modest dresses! shop our last chance collection for deep discounts on elegant' => 'تصفية نهائية على الفساتين المحتشمة — فرصة أخيرة للحصول على موديلات أنيقة بخصومات قوية لفترة محدودة.',
+            'discover luxury modest evening dresses and formal gowns. shop sparkling sequins, elegant' => 'اكتشفي فساتين سواريه فاخرة وموديلات رسمية أنيقة بتفاصيل راقية ولمسات مميزة تناسب مناسباتك الخاصة.',
+            'discover our stunning collection of used dresses in excellent condition' => 'اكتشفي مجموعة فساتين مستعملة بحالة ممتازة بعناية وجودة عالية وبأسعار مناسبة.',
+            'discover elegant modest dresses for the mother of the bride/groom' => 'اكتشفي فساتين أنيقة ومحتشمة للأمهات في حفلات الزفاف والخطوبة بإطلالات راقية ومريحة.',
+        ];
+
+        $categories = $categories->map(function ($category) use ($fallbackArabicDescriptions) {
+            $description = trim((string) ($category->description ?? ''));
+            if ($description === '') {
+                return $category;
+            }
+
+            $hasArabic = preg_match('/[\x{0600}-\x{06FF}]/u', $description) === 1;
+            if ($hasArabic) {
+                return $category;
+            }
+
+            $normalizedDescription = mb_strtolower($description);
+            $normalizedDescription = html_entity_decode($normalizedDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $normalizedDescription = preg_replace('/\s+/u', ' ', trim($normalizedDescription)) ?? trim($normalizedDescription);
+
+            foreach ($fallbackArabicDescriptions as $needle => $arabicText) {
+                if (str_contains($normalizedDescription, $needle)) {
+                    $category->description = $arabicText;
+                    return $category;
+                }
+            }
+
+            $category->description = 'اكتشفي موديلات هذا القسم بتفاصيل مميزة وجودة عالية مع خيارات متنوعة تناسب مناسبتك.';
+            return $category;
+        });
     }
 
     return view('categories', compact('categories', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
