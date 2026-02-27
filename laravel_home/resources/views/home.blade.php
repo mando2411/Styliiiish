@@ -2917,11 +2917,12 @@
 
             .review-shot img {
                 width: 100%;
-                height: auto;
-                aspect-ratio: 16 / 9;
-                max-height: 190px;
+                height: 150px;
+                aspect-ratio: auto;
+                max-height: none;
                 border-radius: 9px;
                 object-fit: cover;
+                object-position: center;
             }
 
             .review-shot::after {
