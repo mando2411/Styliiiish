@@ -301,6 +301,9 @@
     $wpLocalizedAccountUrl = $isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/');
+    $wpLocalizedMyDressesUrl = $isEnglish
+        ? ($wpBaseUrl . '/my-dresses/')
+        : ($wpBaseUrl . '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/');
     $wpLoginUrl = $wpMyAccountUrl;
     $wpRegisterUrl = $wpMyAccountUrl . '?register=1';
     $wpForgotPasswordUrl = $wpMyAccountUrl . 'lost-password/';
@@ -2844,7 +2847,7 @@
                     </button>
                     <span class="cart-plus-one" id="cartPlusOne">+1</span>
                 </span>
-                <a class="btn btn-primary header-cta action-sell" href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
+                <a class="btn btn-primary header-cta action-sell" href="{{ $wpLocalizedMyDressesUrl }}" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
             </div>
         </div>
     </header>
@@ -2869,7 +2872,7 @@
 
                 <div class="actions">
                     <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('shop_now') }}</a>
-                    <a class="btn btn-light" href="/my-dresses/">{{ $t('sell_now') }}</a>
+                    <a class="btn btn-light" href="{{ $wpLocalizedMyDressesUrl }}">{{ $t('sell_now') }}</a>
                 </div>
 
                 <div class="hero-mobile-trust" aria-hidden="true">
@@ -3891,7 +3894,7 @@
         <p>{{ $t('final_sub') }}</p>
         <div class="actions">
             <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('start_shop') }}</a>
-            <a class="btn btn-light" href="/my-dresses/">{{ $t('start_selling') }}</a>
+            <a class="btn btn-light" href="{{ $wpLocalizedMyDressesUrl }}">{{ $t('start_selling') }}</a>
         </div>
     </section>
 
