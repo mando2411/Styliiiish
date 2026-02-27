@@ -43,10 +43,10 @@ function ekart_parent_theme_options() {
 add_action( 'after_switch_theme', 'ekart_parent_theme_options' );
 
 /**
- * Fix Arabic my-account logout endpoint 404 by redirecting it
- * to WooCommerce valid logout endpoint while preserving nonce.
+ * Fix Arabic my-account endpoint 404s by redirecting endpoint tails
+ * to WooCommerce my-account endpoint paths while preserving query args.
  */
-function ekart_fix_arabic_logout_endpoint_404() {
+function ekart_fix_arabic_myaccount_endpoints_404() {
 	if ( is_admin() ) {
 		return;
 	}
@@ -55,22 +55,71 @@ function ekart_fix_arabic_logout_endpoint_404() {
 	$request_path = parse_url( $request_uri, PHP_URL_PATH );
 	$request_path = is_string( $request_path ) ? $request_path : '/';
 	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+	if ( $normalized === '' ) {
+		$normalized = '/';
+	}
 
-	if ( $normalized !== '/ar/حسابي/customer-logout' ) {
+	$arabic_account_bases = [
+		'/ar/حسابي',
+		'/ara/حسابي',
+		'/حسابي',
+	];
+
+	$endpoint_tail = '';
+	foreach ( $arabic_account_bases as $account_base ) {
+		if ( $normalized === $account_base ) {
+			return;
+		}
+
+		$prefix = $account_base . '/';
+		if ( str_starts_with( $normalized, $prefix ) ) {
+			$endpoint_tail = ltrim( substr( $normalized, strlen( $prefix ) ), '/' );
+			break;
+		}
+	}
+
+	if ( $endpoint_tail === '' ) {
 		return;
 	}
 
-	$target = home_url( '/my-account/customer-logout/' );
+	$my_account_permalink = function_exists( 'wc_get_page_permalink' )
+		? (string) wc_get_page_permalink( 'myaccount' )
+		: (string) home_url( '/my-account/' );
 
-	if ( isset( $_GET['_wpnonce'] ) ) {
-		$target = add_query_arg(
-			'_wpnonce',
-			sanitize_text_field( wp_unslash( (string) $_GET['_wpnonce'] ) ),
-			$target
-		);
+	$my_account_path = wp_parse_url( $my_account_permalink, PHP_URL_PATH );
+	$my_account_path = is_string( $my_account_path ) ? rtrim( $my_account_path, '/' ) : '/my-account';
+	if ( $my_account_path === '' ) {
+		$my_account_path = '/my-account';
+	}
+
+	$target = home_url( $my_account_path . '/' . $endpoint_tail . '/' );
+
+	if ( ! empty( $_GET ) ) {
+		$sanitized_query = [];
+		foreach ( $_GET as $key => $value ) {
+			$clean_key = sanitize_key( (string) $key );
+			if ( $clean_key === '' ) {
+				continue;
+			}
+
+			if ( is_array( $value ) ) {
+				$sanitized_query[ $clean_key ] = array_map(
+					static function ( $item ) {
+						return sanitize_text_field( wp_unslash( (string) $item ) );
+					},
+					$value
+				);
+			} else {
+				$sanitized_query[ $clean_key ] = sanitize_text_field( wp_unslash( (string) $value ) );
+			}
+		}
+
+		if ( ! empty( $sanitized_query ) ) {
+			$target = add_query_arg( $sanitized_query, $target );
+		}
 	}
 
 	wp_safe_redirect( $target, 302 );
 	exit;
 }
-add_action( 'template_redirect', 'ekart_fix_arabic_logout_endpoint_404', 1 );
+add_action( 'template_redirect', 'ekart_fix_arabic_myaccount_endpoints_404', 1 );

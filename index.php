@@ -7,6 +7,16 @@ $request_uri = rawurldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? 
 $path = rtrim($request_uri, '/');
 $path = $path === '' ? '/' : $path;
 
+// Ensure Arabic my-account logout endpoint never 404s before WP boot.
+if (in_array($path, ['/ar/حسابي/customer-logout', '/ara/حسابي/customer-logout', '/حسابي/customer-logout'], true)) {
+    $target = '/my-account/customer-logout/';
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $target .= '?' . $_SERVER['QUERY_STRING'];
+    }
+    header('Location: ' . $target, true, 302);
+    exit;
+}
+
 // Fix localized static asset URLs like /ar/wp-content/... -> /wp-content/...
 if (preg_match('#^/(ar|en|ara)/wp-content/(.+)$#u', $request_uri, $matches)) {
     $normalized_asset_path = '/wp-content/' . $matches[2];
@@ -161,6 +171,11 @@ $wordpress_prefix_routes = [
     '/ar/wp-json/',
     '/en/wp-json/',
     '/ara/wp-json/',
+    '/ar/حسابي/',
+    '/ara/حسابي/',
+    '/حسابي/',
+    '/my-account/',
+    '/en/my-account/',
 ];
 
 $send_to_laravel = null;
