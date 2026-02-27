@@ -3629,10 +3629,39 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
             "Next, think about where you're going. Is it a casual lunch date, a formal wedding, or a fun night out? The occasion will help guide your options and ensure you choose a dress that fits the vibe." => 'بعد ذلك، فكّري في المكان الذي ستذهبين إليه. هل هي مناسبة غداء كاجوال، أم حفل زفاف رسمي، أم سهرة ممتعة؟ طبيعة المناسبة ستساعدك على تضييق الخيارات واختيار فستان يناسب الأجواء.',
             "No matter how beautiful a dress is, if it doesn’t fit well, you won't feel comfortable in it. Try on different sizes and styles until you find a dress that fits your form perfectly. Consider tailoring if necessary!" => 'مهما كان الفستان جميلًا، إذا لم تكن المقاس مضبوطًا فلن تشعري بالراحة. جرّبي مقاسات وقصّات مختلفة حتى تصلي إلى الفستان الأنسب لقوامك، ولا تترددي في التعديل لدى الخياطة عند الحاجة.',
             "No matter how beautiful a dress is, if it doesn't fit well, you won't feel comfortable in it. Try on different sizes and styles until you find a dress that fits your form perfectly. Consider tailoring if necessary!" => 'مهما كان الفستان جميلًا، إذا لم تكن المقاس مضبوطًا فلن تشعري بالراحة. جرّبي مقاسات وقصّات مختلفة حتى تصلي إلى الفستان الأنسب لقوامك، ولا تترددي في التعديل لدى الخياطة عند الحاجة.',
+            'Selling your dress has never been easier' => 'بيع فستانك أصبح أسهل من أي وقت مضى',
+            'Whether it’s your wedding dress, engagement dress, or a special occasional outfit, you can list it in minutes and reach thousands of potential buyers.' => 'سواء كان فستان زفافك أو فستان خطوبة أو إطلالة مناسبة خاصة، يمكنكِ إدراجه خلال دقائق والوصول إلى آلاف المشترين المحتملين.',
+            'Styliiiish Marketplace operates as a marketplace platform that allows individual users to list and sell their own dresses.' => 'يعمل سوق Styliiiish كمنصة تتيح للمستخدمين الأفراد عرض فساتينهم وبيعها مباشرة.',
+            'By listing a dress, sellers confirm that they own the item and that all provided information is accurate.' => 'عند إدراج الفستان، يؤكد البائع أنه يملك القطعة وأن جميع المعلومات المقدمة دقيقة.',
+            'All marketplace listings are subject to Styliiiish' => 'جميع قوائم الماركت بليس تخضع لسياسات Styliiiish',
+            'Your product name is the first thing shoppers see — so choose it carefully.Try something clear and attractive, for example:' => 'اسم المنتج هو أول ما يراه المتسوقون، لذا اختاريه بعناية. اختاري اسمًا واضحًا وجذابًا مثل:',
+            'Describe your dress honestly and clearly.Include:' => 'صِفي فستانك بصدق ووضوح. احرصي على تضمين:',
+            'Fit & comfort' => 'المقاس والراحة',
+            'Good photos make a HUGE difference!We recommend:' => 'الصور الجيدة تصنع فرقًا كبيرًا جدًا! ننصحكِ بـ:',
+            'Inside your dashboard, tap Edit and choose:' => 'من داخل لوحة التحكم، اضغطي على تعديل ثم اختاري:',
+            'Size' => 'المقاس',
+            'Weight' => 'الوزن',
+            'Choose a price that feels fair and competitive.Remember:' => 'حددي سعرًا عادلًا وتنافسيًا. وتذكّري:',
+            'Styliiiish takes a 50% marketplace fee.So if you set your price at 2,000 EGP, Styliiiish will deduct 1,000 EGP, And you get paid 1,000 EGP.If you want to receive 2,000 EGP for the dress, you must set the price at 4,000 EGP.' => 'تأخذ Styliiiish عمولة 50% من سعر الماركت بليس. إذا حدّدتِ السعر 2000 جنيه، سيتم خصم 1000 جنيه وتحصلين على 1000 جنيه. وإذا أردتِ استلام 2000 جنيه صافي، يجب ضبط السعر على 4000 جنيه.',
+            'Step 6: Sell Your Dress & Get Your Cash!' => 'الخطوة 6: بيعي فستانك واحصلي على أرباحك!',
+            'And you’ll receive your payment smoothly.Your job is simply to list the dress — we’ll take care of the rest.' => 'وسيصل إليكِ المبلغ بسهولة وسلاسة. مهمتك فقط إدراج الفستان، ونحن نتولى الباقي.',
+            'Styliiiish offers a next-generation marketplace experience:' => 'تقدم Styliiiish تجربة ماركت بليس من الجيل الجديد:',
+            'Automatic saving — no need to click “Save”' => 'حفظ تلقائي بدون الحاجة للضغط على زر "حفظ"',
+            'English-to-Arabic translation built in' => 'ترجمة مدمجة من الإنجليزية إلى العربية',
+            'Designed for smooth, fast, soft selling' => 'مصممة لعملية بيع سلسة وسريعة ومريحة',
+            'Clear mobile-friendly dashboard' => 'لوحة تحكم واضحة ومتوافقة مع الجوال',
+            'Professional system for used dress selling' => 'نظام احترافي لبيع الفساتين المستعملة',
+            'Trusted by thousands of buyers every month' => 'موثوق بها من آلاف المشترين شهريًا',
+            'Our platform is built to make selling your dress as comfortable, modern, and effortless as possible.' => 'منصتنا مبنية لتجعل بيع فستانك مريحًا وعصريًا وبأقل مجهود ممكن.',
+            'Marketplace Rules & Policies' => 'قواعد وسياسات الماركت بليس',
+            'By using Styliiiish Marketplace, sellers agree to follow:' => 'باستخدام سوق Styliiiish، يوافق البائعون على الالتزام بـ:',
+            'Terms & Conditions' => 'الشروط والأحكام',
+            'Refund & Return Policy' => 'سياسة الاسترجاع والاستبدال',
+            'Join Styliiiish Marketplace and turn your dress into money' => 'انضمي إلى سوق Styliiiish وحوّلي فستانك إلى مال',
         ];
 
-        $post->post_content = str_replace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_content ?? ''));
-        $post->post_excerpt = str_replace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_excerpt ?? ''));
+        $post->post_content = str_ireplace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_content ?? ''));
+        $post->post_excerpt = str_ireplace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_excerpt ?? ''));
 
         $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
         if ($languageCodes) {
