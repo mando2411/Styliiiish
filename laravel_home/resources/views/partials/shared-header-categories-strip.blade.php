@@ -41,6 +41,16 @@
                         ->orderBy('t.name')
                         ->get();
                 }
+
+                if ($currentLocale === 'ar' && $localizedTerms->isNotEmpty()) {
+                    $arabicOnlyTerms = $localizedTerms->filter(function ($term) {
+                        return preg_match('/[\x{0600}-\x{06FF}]/u', (string) ($term->name ?? '')) === 1;
+                    })->values();
+
+                    if ($arabicOnlyTerms->isNotEmpty()) {
+                        $localizedTerms = $arabicOnlyTerms;
+                    }
+                }
             }
 
             if (!$hasWpml && $localizedTerms->isEmpty()) {
