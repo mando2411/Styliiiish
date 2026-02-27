@@ -214,6 +214,11 @@ if ($send_to_laravel === null) {
     }
 }
 
+// Default strategy: Laravel handles all non-explicit-WordPress routes.
+if ($send_to_laravel === null) {
+    $send_to_laravel = true;
+}
+
 if ($send_to_laravel) {
     $laravel_public = __DIR__ . '/laravel_home/public';
     $requested_file = realpath($laravel_public . $request_uri);
