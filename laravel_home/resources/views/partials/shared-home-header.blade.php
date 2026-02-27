@@ -72,7 +72,11 @@
                 <strong>{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}</strong>
                 <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
             </div>
-            <div class="topbar-mobile-icons" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}">
+            <div class="topbar-mobile-social">
+                <button class="topbar-social-toggle" id="topbarSocialToggle" type="button" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}" title="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}" aria-controls="topbarSocialPanel" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 14a3 3 0 0 0-2.24 1l-4.27-2.14a3.1 3.1 0 0 0 0-1.72l4.27-2.14a3 3 0 1 0-.9-1.8L9.59 9.34a3 3 0 1 0 0 5.32l4.27 2.14A3 3 0 1 0 17 14z"/></svg>
+                </button>
+                <div class="topbar-mobile-icons" id="topbarSocialPanel" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}" aria-hidden="true">
                 <a class="topbar-mobile-icon icon-call" href="tel:+201050874255" aria-label="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}" title="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1.5 1.5 0 0 1 1.5-.37c1.1.36 2.28.55 3.5.55A1.5 1.5 0 0 1 22 16.9V21a1.5 1.5 0 0 1-1.5 1.5C11.94 22.5 1.5 12.06 1.5 3.5A1.5 1.5 0 0 1 3 2h4.1a1.5 1.5 0 0 1 1.5 1.27c.1 1.22.3 2.4.66 3.5a1.5 1.5 0 0 1-.37 1.52l-2.3 2.5z"/></svg>
                 </a>
@@ -91,6 +95,7 @@
                 <a class="topbar-mobile-icon icon-google" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google" title="Google">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 12.27c0-.82-.07-1.4-.23-2H12v4.26h6.61c-.13 1.06-.86 2.66-2.47 3.74l-.02.14 3.58 2.77.25.03c2.28-2.1 3.55-5.2 3.55-8.94zM12 24c3.24 0 5.95-1.07 7.93-2.92l-3.78-2.92c-1.01.7-2.37 1.19-4.15 1.19-3.17 0-5.86-2.1-6.82-5l-.13.01-3.73 2.88-.04.12A12 12 0 0 0 12 24zM5.18 14.35A7.2 7.2 0 0 1 4.78 12c0-.82.14-1.62.38-2.35l-.01-.16L1.38 6.57l-.12.06A11.98 11.98 0 0 0 0 12c0 1.93.46 3.75 1.27 5.37l3.91-3.02zM12 4.65c2.24 0 3.75.97 4.61 1.78l3.36-3.28C17.94 1.25 15.24 0 12 0A12 12 0 0 0 1.27 6.63l3.9 3.02c.97-2.9 3.66-5 6.83-5z"/></svg>
                 </a>
+                </div>
             </div>
         </div>
         <div class="topbar-left">
@@ -156,26 +161,58 @@
     (() => {
         const navToggle = document.getElementById('headerNavToggle');
         const nav = document.getElementById('headerMainNav');
-
-        if (!navToggle || !nav) return;
+        const socialToggle = document.getElementById('topbarSocialToggle');
+        const socialPanel = document.getElementById('topbarSocialPanel');
 
         const closeNav = () => {
+            if (!navToggle || !nav) return;
             nav.classList.remove('is-open');
             navToggle.setAttribute('aria-expanded', 'false');
         };
 
-        navToggle.addEventListener('click', () => {
-            const willOpen = !nav.classList.contains('is-open');
-            nav.classList.toggle('is-open', willOpen);
-            navToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-        });
+        const closeSocial = () => {
+            if (!socialToggle || !socialPanel) return;
+            socialPanel.classList.remove('is-open');
+            socialPanel.setAttribute('aria-hidden', 'true');
+            socialToggle.setAttribute('aria-expanded', 'false');
+        };
 
-        nav.querySelectorAll('a').forEach((link) => {
-            link.addEventListener('click', closeNav);
-        });
+        if (navToggle && nav) {
+            navToggle.addEventListener('click', () => {
+                const willOpen = !nav.classList.contains('is-open');
+                nav.classList.toggle('is-open', willOpen);
+                navToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            });
+
+            nav.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', closeNav);
+            });
+        }
+
+        if (socialToggle && socialPanel) {
+            socialToggle.addEventListener('click', () => {
+                const willOpen = !socialPanel.classList.contains('is-open');
+                socialPanel.classList.toggle('is-open', willOpen);
+                socialPanel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+                socialToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            });
+
+            socialPanel.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', closeSocial);
+            });
+
+            document.addEventListener('click', (event) => {
+                const wrap = socialToggle.closest('.topbar-mobile-social');
+                if (!wrap) return;
+                if (!wrap.contains(event.target)) closeSocial();
+            });
+        }
 
         window.addEventListener('resize', () => {
-            if (window.innerWidth > 640) closeNav();
+            if (window.innerWidth > 640) {
+                closeNav();
+                closeSocial();
+            }
         });
     })();
 </script>

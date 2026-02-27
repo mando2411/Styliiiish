@@ -55,10 +55,56 @@
         gap: 8px;
     }
 
-    .topbar-mobile-icons {
+    .topbar-mobile-social {
         display: none;
+        position: relative;
+    }
+
+    .topbar-social-toggle {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(255, 255, 255, 0.14);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(10, 17, 30, 0.2);
+        cursor: pointer;
+    }
+
+    .topbar-social-toggle svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+
+    .topbar-mobile-icons {
+        position: absolute;
+        top: calc(100% + 8px);
+        inset-inline-end: 0;
+        z-index: 80;
+        min-width: 48px;
+        padding: 8px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(15, 26, 42, 0.94);
+        box-shadow: 0 14px 30px rgba(10, 17, 30, 0.32);
+        display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 9px;
+        opacity: 0;
+        transform: translateX(8px);
+        pointer-events: none;
+        transition: .2s ease;
+    }
+
+    .topbar-mobile-icons.is-open {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
     }
 
     .topbar-mobile-icon {
@@ -1047,7 +1093,7 @@
 
         .topbar-right {
             width: 100%;
-            justify-content: center;
+            justify-content: flex-end;
             gap: 8px;
         }
 
@@ -1055,7 +1101,7 @@
             display: none;
         }
 
-        .topbar-mobile-icons {
+        .topbar-mobile-social {
             display: inline-flex;
         }
 
