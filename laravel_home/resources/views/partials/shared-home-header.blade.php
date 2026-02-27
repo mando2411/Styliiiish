@@ -73,11 +73,21 @@
                 <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
             </div>
             <div class="topbar-mobile-icons" aria-label="{{ $ht('contact_anytime', 'اتصلي بنا في أي وقت:', 'Call us anytime:') }}">
-                <a class="topbar-mobile-icon" href="tel:+201050874255" aria-label="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}" title="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}">📞</a>
-                <a class="topbar-mobile-icon" href="https://wa.me/201050874255" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">🟢</a>
-                <a class="topbar-mobile-icon" href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">f</a>
-                <a class="topbar-mobile-icon" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">◎</a>
-                <a class="topbar-mobile-icon" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google" title="Google">G</a>
+                <a class="topbar-mobile-icon icon-call" href="tel:+201050874255" aria-label="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}" title="{{ $ht('direct_call', 'اتصال مباشر', 'Direct Call') }}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1.5 1.5 0 0 1 1.5-.37c1.1.36 2.28.55 3.5.55A1.5 1.5 0 0 1 22 16.9V21a1.5 1.5 0 0 1-1.5 1.5C11.94 22.5 1.5 12.06 1.5 3.5A1.5 1.5 0 0 1 3 2h4.1a1.5 1.5 0 0 1 1.5 1.27c.1 1.22.3 2.4.66 3.5a1.5 1.5 0 0 1-.37 1.52l-2.3 2.5z"/></svg>
+                </a>
+                <a class="topbar-mobile-icon icon-whatsapp" href="https://wa.me/201050874255" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.9 11.9 0 0 0 12.07 0C5.5 0 .17 5.33.17 11.9c0 2.1.55 4.16 1.6 5.98L0 24l6.33-1.66a11.87 11.87 0 0 0 5.73 1.46h.01c6.57 0 11.9-5.33 11.9-11.9 0-3.18-1.24-6.17-3.45-8.42zM12.08 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.22-3.76.98 1-3.66-.23-.37a9.88 9.88 0 0 1 8.38-15.1 9.9 9.9 0 0 1 7.02 2.9 9.83 9.83 0 0 1 2.9 7.01c0 5.45-4.44 9.88-9.9 9.88zm5.42-7.42c-.3-.15-1.79-.88-2.07-.98-.27-.1-.47-.15-.67.15-.2.3-.77.98-.95 1.18-.17.2-.35.22-.65.07-.3-.15-1.24-.46-2.36-1.47a8.86 8.86 0 0 1-1.64-2.03c-.17-.3-.02-.47.13-.62.14-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.57-.49-.5-.67-.5h-.57c-.2 0-.52.07-.8.37-.27.3-1.05 1.02-1.05 2.48s1.08 2.87 1.23 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.27.5 1.7.64.72.23 1.38.2 1.9.12.58-.09 1.79-.73 2.04-1.44.25-.71.25-1.31.17-1.44-.07-.12-.27-.2-.57-.35z"/></svg>
+                </a>
+                <a class="topbar-mobile-icon icon-facebook" href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3h-3.1V9.1c0-.87.25-1.46 1.5-1.46h1.6V5.02c-.28-.04-1.23-.12-2.33-.12-2.3 0-3.87 1.4-3.87 4v2.1H8v3h2.4v8h3.1z"/></svg>
+                </a>
+                <a class="topbar-mobile-icon icon-instagram" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5zm8.95 1.35a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.8A3.2 3.2 0 1 0 12 15.2 3.2 3.2 0 0 0 12 8.8z"/></svg>
+                </a>
+                <a class="topbar-mobile-icon icon-google" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google" title="Google">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 12.27c0-.82-.07-1.4-.23-2H12v4.26h6.61c-.13 1.06-.86 2.66-2.47 3.74l-.02.14 3.58 2.77.25.03c2.28-2.1 3.55-5.2 3.55-8.94zM12 24c3.24 0 5.95-1.07 7.93-2.92l-3.78-2.92c-1.01.7-2.37 1.19-4.15 1.19-3.17 0-5.86-2.1-6.82-5l-.13.01-3.73 2.88-.04.12A12 12 0 0 0 12 24zM5.18 14.35A7.2 7.2 0 0 1 4.78 12c0-.82.14-1.62.38-2.35l-.01-.16L1.38 6.57l-.12.06A11.98 11.98 0 0 0 0 12c0 1.93.46 3.75 1.27 5.37l3.91-3.02zM12 4.65c2.24 0 3.75.97 4.61 1.78l3.36-3.28C17.94 1.25 15.24 0 12 0A12 12 0 0 0 1.27 6.63l3.9 3.02c.97-2.9 3.66-5 6.83-5z"/></svg>
+                </a>
             </div>
         </div>
         <div class="topbar-left">

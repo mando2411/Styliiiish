@@ -58,23 +58,44 @@
     .topbar-mobile-icons {
         display: none;
         align-items: center;
-        gap: 8px;
+        gap: 9px;
     }
 
     .topbar-mobile-icon {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         border-radius: 999px;
         border: 1px solid rgba(255, 255, 255, 0.35);
-        background: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.14);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-size: 13px;
-        font-weight: 800;
         text-decoration: none;
         line-height: 1;
+        box-shadow: 0 3px 10px rgba(10, 17, 30, 0.2);
+    }
+
+    .topbar-mobile-icon:hover {
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.22);
+    }
+
+    .topbar-mobile-icon svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+
+    .topbar-mobile-icon.icon-call { color: #ffffff; }
+    .topbar-mobile-icon.icon-whatsapp { color: #25D366; }
+    .topbar-mobile-icon.icon-facebook { color: #1877F2; }
+    .topbar-mobile-icon.icon-instagram { color: #E1306C; }
+    .topbar-mobile-icon.icon-google { color: #4285F4; }
+
+    .topbar-mobile-icon.icon-google svg {
+        width: 14px;
+        height: 14px;
     }
 
     .topbar-note {
