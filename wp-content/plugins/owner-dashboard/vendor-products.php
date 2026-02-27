@@ -569,7 +569,15 @@ function sty_render_vendor_single_card($product_id){
 			$post = get_post($product_id);
 			$date = $post ? date('d M Y --- h:i A', strtotime($post->post_date)) : '�';
 		}
-	$source = $date_obj ? 'Vendor' : 'Admin';
+    $source = $date_obj ? 'Vendor' : 'Admin';
+    $post_status = get_post_status($product_id);
+    $view_url = get_permalink($product_id);
+    if ($post_status && $post_status !== 'publish') {
+        $preview_url = get_preview_post_link($product_id);
+        if (!empty($preview_url)) {
+            $view_url = $preview_url;
+        }
+    }
     $thumb      = $p->get_image('thumbnail');
 
     // Condition Attribute
@@ -617,7 +625,7 @@ function sty_render_vendor_single_card($product_id){
             <div class="sty-vendor-actions">
                 <button class="sty-btn sty-approve" data-id="<?php echo $product_id; ?>"> Approve</button>
                 <button class="sty-btn sty-reject"  data-id="<?php echo $product_id; ?>"> Reject</button>
-                <a target="_blank" href="<?php echo get_permalink($product_id); ?>" class="sty-btn sty-view">View</a>
+                <a target="_blank" href="<?php echo esc_url($view_url); ?>" class="sty-btn sty-view">View</a>
             </div>
 
         </div>
