@@ -483,22 +483,22 @@
         }
 
         .topbar-social-toggle {
-            width: 32px;
-            height: 32px;
+            width: 44px;
+            height: 44px;
             border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: rgba(15, 26, 42, 0.96);
             color: #fff;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 10px rgba(10, 17, 30, 0.2);
+            box-shadow: 0 10px 24px rgba(10, 17, 30, 0.38);
             cursor: pointer;
         }
 
         .topbar-social-toggle svg {
-            width: 16px;
-            height: 16px;
+            width: 20px;
+            height: 20px;
             fill: currentColor;
         }
 
