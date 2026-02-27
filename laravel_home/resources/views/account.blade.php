@@ -319,6 +319,9 @@
             .account-content { padding: 20px; }
         }
     </style>
+    <script>
+        window.disableWishlistRequests = true;
+    </script>
     @include('partials.shared-home-header-styles')
 </head>
 <body>
@@ -512,10 +515,6 @@
     </section>
 </main>
 
-<script>
-window.disableWishlistRequests = true;
-</script>
-
 @include('partials.shared-home-footer')
 
 <script>
@@ -526,7 +525,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const passwordMismatchText = @json($t('password_mismatch'));
     const registerDisabledText = @json($t('register_disabled'));
     let accountData = null;
-    let authContext = { loginNonce: '', registerNonce: '', canRegister: true, googleConfig: null };
+    let authContext = { loginNonce: '', registerNonce: '', canRegister: true, googleConfig: null, isLoggedIn: false };
 
     const showMsg = (id, text) => {
         const el = document.getElementById(id);
@@ -608,6 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const html = await response.text();
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
+        authContext.isLoggedIn = isLoggedInFromDoc(doc);
 
         authContext.loginNonce = doc.querySelector('input[name="woocommerce-login-nonce"]')?.value || '';
         authContext.registerNonce = doc.querySelector('input[name="woocommerce-register-nonce"]')?.value || '';
@@ -747,6 +747,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fetchAccountData = async () => {
         try {
+            await fetchAuthContext();
+            if (!authContext.isLoggedIn) {
+                document.getElementById('mainLoader').style.display = 'none';
+                await setupGuestAuth();
+                return;
+            }
+
             const res = await fetch(apiUrl, { credentials: 'same-origin' });
             if (!res.ok) throw new Error('Not logged in');
             const json = await res.json();
