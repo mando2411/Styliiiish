@@ -4173,10 +4173,9 @@
                 miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
             }
 
-            const isDirectAccountLink = !!(accountLoginTrigger && accountLoginTrigger.tagName === 'A' && accountLoginTrigger.getAttribute('href'));
-
-            if (accountLoginTrigger && !isDirectAccountLink) {
-                accountLoginTrigger.addEventListener('click', async () => {
+            if (accountLoginTrigger) {
+                accountLoginTrigger.addEventListener('click', async (event) => {
+                    if (event) event.preventDefault();
                     if (accountMenu && accountMenu.classList.contains('is-open')) {
                         closeAccountMenu();
                         return;

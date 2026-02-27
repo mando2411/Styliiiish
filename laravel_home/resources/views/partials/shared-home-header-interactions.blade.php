@@ -555,10 +555,9 @@
 
         if (miniCartClosers.length > 0) miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
 
-        const isDirectAccountLink = !!(accountLoginTrigger && accountLoginTrigger.tagName === 'A' && accountLoginTrigger.getAttribute('href'));
-
-        if (accountLoginTrigger && !isDirectAccountLink && hasAccountMiniMenu) {
-            accountLoginTrigger.addEventListener('click', async () => {
+        if (accountLoginTrigger && hasAccountMiniMenu) {
+            accountLoginTrigger.addEventListener('click', async (event) => {
+                if (event) event.preventDefault();
                 if (accountMenu?.classList.contains('is-open')) return closeAccountMenu();
                 let isLoggedIn = accountAuthState === 'logged-in';
                 if (!isLoggedIn) isLoggedIn = await loadAccountSummary(true).catch(() => false);
