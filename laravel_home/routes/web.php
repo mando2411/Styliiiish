@@ -3143,7 +3143,7 @@ Route::get('/en/cookie-policy', fn (Request $request) => $cookiePolicyHandler($r
 Route::get('/🍪-cookie-policy', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 Route::get('/🍪-cookie-policy/', fn (Request $request) => $cookiePolicyHandler($request, 'en'));
 
-$categoriesHandler = function (Request $request, string $locale = 'ar') use ($normalizeBrandByLocale) {
+$categoriesHandler = function (Request $request, string $locale = 'ar') use ($normalizeBrandByLocale, $resolveTranslatePressLanguageCodes) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -3174,6 +3174,65 @@ $categoriesHandler = function (Request $request, string $locale = 'ar') use ($no
             $category->description = $normalizeBrandByLocale((string) ($category->description ?? ''), $currentLocale);
             return $category;
         });
+
+    $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+    if ($languageCodes && $categories->isNotEmpty()) {
+        $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+        $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+        if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+            $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+            if (Schema::hasTable($dictionaryTable)) {
+                $lookupStrings = $categories
+                    ->flatMap(function ($category) {
+                        return [
+                            trim((string) ($category->name ?? '')),
+                            trim((string) ($category->description ?? '')),
+                        ];
+                    })
+                    ->filter(fn ($value) => $value !== '')
+                    ->unique()
+                    ->values();
+
+                if ($lookupStrings->isNotEmpty()) {
+                    $dictionaryRows = DB::table($dictionaryTable)
+                        ->whereIn('original', $lookupStrings->all())
+                        ->where('status', '!=', 0)
+                        ->whereNotNull('translated')
+                        ->where('translated', '!=', '')
+                        ->select('original', 'translated')
+                        ->get();
+
+                    if ($dictionaryRows->isNotEmpty()) {
+                        $translationMap = [];
+                        foreach ($dictionaryRows as $row) {
+                            $original = trim((string) ($row->original ?? ''));
+                            $translated = trim((string) ($row->translated ?? ''));
+                            if ($original !== '' && $translated !== '' && !array_key_exists($original, $translationMap)) {
+                                $translationMap[$original] = $translated;
+                            }
+                        }
+
+                        if (!empty($translationMap)) {
+                            $categories = $categories->map(function ($category) use ($translationMap, $normalizeBrandByLocale, $currentLocale) {
+                                $originalName = trim((string) ($category->name ?? ''));
+                                if ($originalName !== '' && isset($translationMap[$originalName])) {
+                                    $category->name = $normalizeBrandByLocale((string) $translationMap[$originalName], $currentLocale);
+                                }
+
+                                $originalDescription = trim((string) ($category->description ?? ''));
+                                if ($originalDescription !== '' && isset($translationMap[$originalDescription])) {
+                                    $category->description = $normalizeBrandByLocale((string) $translationMap[$originalDescription], $currentLocale);
+                                }
+
+                                return $category;
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     return view('categories', compact('categories', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };

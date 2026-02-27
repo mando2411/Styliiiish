@@ -56,6 +56,11 @@ Core files for architecture understanding:
 - Vendor moderation flow: `wp-content/plugins/owner-dashboard/vendor-products.php`
 - Product management AJAX core: `wp-content/plugins/owner-dashboard/modules/shared/ajax/manage-products-ajax.php`
 
+### Localization Note (Source of Truth)
+
+- Official translation plugin used in this project is: **`translatepress-multilingual`**.
+- Any frontend/backend localization logic should be compatible with TranslatePress dictionary/settings (not WPML-specific assumptions).
+
 ---
 
 ## 4) Laravel Layer — What It Does
