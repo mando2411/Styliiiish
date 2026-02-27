@@ -87,17 +87,7 @@
                 <button class="search-btn" type="submit">{{ $ht('search_btn', 'بحث', 'Search') }}</button>
             </form>
             <span class="account-trigger-wrap action-account">
-                <a class="icon-btn account-trigger" id="accountLoginTrigger" href="{{ $wpLocalizedAccountUrl }}" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}"><span class="icon" aria-hidden="true">👤</span></a>
-                <div class="account-mini-menu" id="accountMenu" aria-hidden="true">
-                    <div class="account-mini-head">
-                        <strong class="account-mini-name" id="accountMenuName">{{ $ht('account_loading', 'جاري تحميل بيانات الحساب…', 'Loading account details…') }}</strong>
-                        <span class="account-mini-meta" id="accountMenuMeta">{{ $ht('account_logged_in', 'مستخدم مسجل دخول', 'Logged-in user') }}</span>
-                    </div>
-                    <div class="account-mini-actions">
-                        <a class="account-manage-link" id="accountMenuManage" href="{{ $wpLocalizedAccountUrl }}">{{ $ht('manage_account', 'إدارة حسابك', 'Manage your account') }}</a>
-                        <a class="account-logout-link" id="accountMenuLogout" href="{{ $wpMyAccountUrl }}">{{ $ht('logout', 'تسجيل خروج', 'Log out') }}</a>
-                    </div>
-                </div>
+                <a class="icon-btn account-trigger" id="accountLoginTrigger" href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}"><span class="icon" aria-hidden="true">👤</span></a>
             </span>
             <span class="wishlist-trigger-wrap action-wishlist">
                 <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}" title="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>

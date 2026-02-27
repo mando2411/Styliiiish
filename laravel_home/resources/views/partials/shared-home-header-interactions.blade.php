@@ -166,6 +166,7 @@
         const accountMenuMeta = document.getElementById('accountMenuMeta');
         const accountMenuManage = document.getElementById('accountMenuManage');
         const accountMenuLogout = document.getElementById('accountMenuLogout');
+        const hasAccountMiniMenu = !!accountMenu;
 
         const authModal = document.getElementById('authModal');
         const authModalClosers = authModal ? authModal.querySelectorAll('[data-close-auth-modal]') : [];
@@ -305,6 +306,7 @@
         };
 
         const loadAccountSummary = async (forceReload = false) => {
+            if (!hasAccountMiniMenu) return false;
             if (!forceReload && accountSummaryLoaded && accountAuthState === 'logged-in') return true;
             if (accountMenuName) accountMenuName.textContent = accountLoadingText;
             if (accountMenuMeta) accountMenuMeta.textContent = accountLoggedInText;
@@ -394,6 +396,7 @@
         };
 
         const fetchWooLoginNonce = async () => {
+            if (!hasAccountMiniMenu) return;
             if (!authWooLoginNonce) return;
             if (authWooLoginNonce.value && siteKitGoogleConfig) return;
             const response = await fetch(`${wpMyAccountUrl}?_=${Date.now()}`, { method: 'GET', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
@@ -521,7 +524,7 @@
                 wishlistDropdown.setAttribute('aria-hidden', 'true');
                 wishlistTrigger.setAttribute('aria-expanded', 'false');
             }
-            if (accountMenu && accountLoginTrigger && !accountLoginTrigger.contains(event.target) && !accountMenu.contains(event.target)) {
+            if (hasAccountMiniMenu && accountMenu && accountLoginTrigger && !accountLoginTrigger.contains(event.target) && !accountMenu.contains(event.target)) {
                 closeAccountMenu();
             }
         });
@@ -543,7 +546,7 @@
 
         const isDirectAccountLink = !!(accountLoginTrigger && accountLoginTrigger.tagName === 'A' && accountLoginTrigger.getAttribute('href'));
 
-        if (accountLoginTrigger && !isDirectAccountLink) {
+        if (accountLoginTrigger && !isDirectAccountLink && hasAccountMiniMenu) {
             accountLoginTrigger.addEventListener('click', async () => {
                 if (accountMenu?.classList.contains('is-open')) return closeAccountMenu();
                 let isLoggedIn = accountAuthState === 'logged-in';
