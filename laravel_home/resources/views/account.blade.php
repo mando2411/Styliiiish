@@ -341,19 +341,21 @@
             </div>
 
             <div class="guest-auth-pane active" id="guestAuthPane-login">
-                <form id="guestLoginForm" class="guest-auth-grid" autocomplete="on">
-                    <input type="hidden" id="guestLoginNonce" value="">
+                <form id="guestLoginForm" class="guest-auth-grid" autocomplete="on" action="{{ $wpAccountUrl }}" method="post">
+                    <input type="hidden" id="guestLoginNonce" name="woocommerce-login-nonce" value="">
+                    <input type="hidden" id="guestLoginRedirect" name="redirect" value="{{ request()->fullUrl() }}">
+                    <input type="hidden" name="login" value="Log in">
                     <div class="form-group">
                         <label for="guestLoginUsername">{{ $t('login_username') }}</label>
-                        <input id="guestLoginUsername" class="form-control" type="text" required>
+                        <input id="guestLoginUsername" class="form-control" type="text" name="username" required>
                     </div>
                     <div class="form-group">
                         <label for="guestLoginPassword">{{ $t('login_password') }}</label>
-                        <input id="guestLoginPassword" class="form-control" type="password" required>
+                        <input id="guestLoginPassword" class="form-control" type="password" name="password" required>
                     </div>
                     <div class="form-group" style="grid-column: 1 / -1; margin-top: -8px;">
                         <label style="display: inline-flex; align-items: center; gap: 8px; margin: 0; font-weight: 600; color: var(--muted);">
-                            <input id="guestRemember" type="checkbox" value="forever">
+                            <input id="guestRemember" type="checkbox" name="rememberme" value="forever">
                             <span>{{ $t('remember_me') }}</span>
                         </label>
                     </div>
@@ -364,19 +366,21 @@
             </div>
 
             <div class="guest-auth-pane" id="guestAuthPane-register">
-                <form id="guestRegisterForm" class="guest-auth-grid" autocomplete="on">
-                    <input type="hidden" id="guestRegisterNonce" value="">
+                <form id="guestRegisterForm" class="guest-auth-grid" autocomplete="on" action="{{ $wpAccountUrl }}" method="post">
+                    <input type="hidden" id="guestRegisterNonce" name="woocommerce-register-nonce" value="">
+                    <input type="hidden" id="guestRegisterRedirect" name="redirect" value="{{ request()->fullUrl() }}">
+                    <input type="hidden" name="register" value="Register">
                     <div class="form-group">
                         <label for="guestRegisterUsername">{{ $t('register_username') }}</label>
-                        <input id="guestRegisterUsername" class="form-control" type="text" required>
+                        <input id="guestRegisterUsername" class="form-control" type="text" name="username" required>
                     </div>
                     <div class="form-group">
                         <label for="guestRegisterEmail">{{ $t('register_email') }}</label>
-                        <input id="guestRegisterEmail" class="form-control" type="email" required>
+                        <input id="guestRegisterEmail" class="form-control" type="email" name="email" required>
                     </div>
                     <div class="form-group">
                         <label for="guestRegisterPassword">{{ $t('new_password') }}</label>
-                        <input id="guestRegisterPassword" class="form-control" type="password" required>
+                        <input id="guestRegisterPassword" class="form-control" type="password" name="password" required>
                     </div>
                     <div class="form-group">
                         <label for="guestRegisterPasswordConfirm">{{ $t('confirm_password') }}</label>
@@ -695,35 +699,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     showGuestAuthError(authFailedText);
                     return;
                 }
-
-                const params = new URLSearchParams();
-                params.set('username', document.getElementById('guestLoginUsername').value.trim());
-                params.set('password', document.getElementById('guestLoginPassword').value);
-                if (document.getElementById('guestRemember')?.checked) params.set('rememberme', 'forever');
-                params.set('woocommerce-login-nonce', authContext.loginNonce);
-                params.set('login', 'Log in');
-                params.set('redirect', window.location.href);
+                const loginNonceInput = document.getElementById('guestLoginNonce');
+                const loginRedirectInput = document.getElementById('guestLoginRedirect');
+                if (loginNonceInput) loginNonceInput.value = authContext.loginNonce;
+                if (loginRedirectInput) loginRedirectInput.value = window.location.href;
 
                 if (loginSubmit) loginSubmit.disabled = true;
-                try {
-                    const response = await fetch(wpAccountUrl, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
-                        body: params.toString()
-                    });
-                    const html = await response.text();
-                    const doc = new DOMParser().parseFromString(html, 'text/html');
-                    if (isLoggedInFromDoc(doc)) {
-                        location.reload();
-                        return;
-                    }
-                    showGuestAuthError(parseWooErrors(doc) || authFailedText);
-                } catch (error) {
-                    showGuestAuthError(authFailedText);
-                } finally {
-                    if (loginSubmit) loginSubmit.disabled = false;
-                }
+                loginForm.submit();
             });
         }
 
@@ -752,34 +734,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const params = new URLSearchParams();
-                params.set('username', document.getElementById('guestRegisterUsername').value.trim());
-                params.set('email', document.getElementById('guestRegisterEmail').value.trim());
-                params.set('password', password);
-                params.set('woocommerce-register-nonce', authContext.registerNonce);
-                params.set('register', 'Register');
-                params.set('redirect', window.location.href);
+                const registerNonceInput = document.getElementById('guestRegisterNonce');
+                const registerRedirectInput = document.getElementById('guestRegisterRedirect');
+                if (registerNonceInput) registerNonceInput.value = authContext.registerNonce;
+                if (registerRedirectInput) registerRedirectInput.value = window.location.href;
 
                 if (registerSubmit) registerSubmit.disabled = true;
-                try {
-                    const response = await fetch(wpAccountUrl, {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
-                        body: params.toString()
-                    });
-                    const html = await response.text();
-                    const doc = new DOMParser().parseFromString(html, 'text/html');
-                    if (isLoggedInFromDoc(doc)) {
-                        location.reload();
-                        return;
-                    }
-                    showGuestAuthError(parseWooErrors(doc) || authFailedText);
-                } catch (error) {
-                    showGuestAuthError(authFailedText);
-                } finally {
-                    if (registerSubmit) registerSubmit.disabled = false;
-                }
+                registerForm.submit();
             });
         }
     };
