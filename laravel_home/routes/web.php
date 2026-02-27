@@ -3355,6 +3355,87 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
         }
     }
 
+    if ($currentLocale === 'ar' && $post) {
+        $slugValue = trim((string) ($post->post_name ?? ''));
+        $candidateUrls = collect([
+            $wpBaseUrl . '/ar/' . rawurlencode($slugValue) . '/',
+            $wpBaseUrl . '/ar/blog/' . rawurlencode($slugValue) . '/',
+            $wpBaseUrl . '/' . rawurlencode($slugValue) . '/',
+        ])->unique()->values();
+
+        foreach ($candidateUrls as $candidateUrl) {
+            try {
+                $articleResponse = Http::timeout(10)->get((string) $candidateUrl);
+                if (!$articleResponse->successful()) {
+                    continue;
+                }
+
+                $html = trim((string) $articleResponse->body());
+                if ($html === '') {
+                    continue;
+                }
+
+                $dom = new \DOMDocument();
+                @$dom->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+                $xpath = new \DOMXPath($dom);
+
+                $extractNodeText = function (string $query) use ($xpath): string {
+                    $node = $xpath->query($query)->item(0);
+                    if (!$node) {
+                        return '';
+                    }
+
+                    return trim(html_entity_decode((string) $node->textContent, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+                };
+
+                $extractNodeHtml = function (string $query) use ($xpath, $dom): string {
+                    $node = $xpath->query($query)->item(0);
+                    if (!$node) {
+                        return '';
+                    }
+
+                    $htmlParts = [];
+                    foreach ($node->childNodes as $childNode) {
+                        $htmlParts[] = $dom->saveHTML($childNode);
+                    }
+
+                    return trim(implode('', $htmlParts));
+                };
+
+                $renderedTitle = $extractNodeText('//meta[@property="og:title"]/@content | //h1[contains(@class,"entry-title") or contains(@class,"post-title") or contains(@class,"article-title")]');
+                $renderedExcerpt = $extractNodeText('//meta[@name="description"]/@content | //meta[@property="og:description"]/@content | //div[contains(@class,"entry-summary") or contains(@class,"post-excerpt")]');
+                $renderedContentHtml = $extractNodeHtml('//article//*[contains(@class,"entry-content") or contains(@class,"post-content") or contains(@class,"article-content")][1] | //div[contains(@class,"entry-content") or contains(@class,"post-content") or contains(@class,"article-content")][1]');
+
+                $renderedPlainText = trim(strip_tags($renderedTitle . ' ' . $renderedExcerpt . ' ' . $renderedContentHtml));
+                $hasArabic = preg_match('/[\x{0600}-\x{06FF}]/u', $renderedPlainText) === 1;
+
+                if (!$hasArabic) {
+                    continue;
+                }
+
+                if ($renderedTitle !== '') {
+                    $post->post_title = $normalizeBrandByLocale($renderedTitle, 'ar');
+                }
+
+                if ($renderedExcerpt !== '') {
+                    $post->post_excerpt = $normalizeBrandByLocale($renderedExcerpt, 'ar');
+                }
+
+                if ($renderedContentHtml !== '') {
+                    $post->post_content = $normalizeBrandByLocale($renderedContentHtml, 'ar');
+                }
+
+                $renderedImage = $extractNodeText('//meta[@property="og:image"]/@content | //article//img[1]/@src | //img[contains(@class,"wp-post-image")][1]/@src');
+                if ($renderedImage !== '') {
+                    $post->image = $renderedImage;
+                }
+
+                break;
+            } catch (\Throwable $exception) {
+            }
+        }
+    }
+
     $relatedPosts = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
             $join->on('p.ID', '=', 'thumb.post_id')
