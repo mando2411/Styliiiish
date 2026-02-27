@@ -3260,11 +3260,89 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
             ->first();
     };
 
-    $post = $resolvePostBySlug($slug);
-    if (!$post) {
-        $decodedSlug = trim(rawurldecode($slug));
-        if ($decodedSlug !== '' && $decodedSlug !== $slug) {
-            $post = $resolvePostBySlug($decodedSlug);
+    $normalizeSlugCandidate = static function (?string $value): string {
+        $slug = trim(rawurldecode((string) ($value ?? '')));
+        if ($slug === '') {
+            return '';
+        }
+
+        $slug = str_replace(['%E2%AD%90', '%e2%ad%90'], '', $slug);
+        $slug = preg_replace('/^[^\p{L}\p{N}]+/u', '', $slug) ?? $slug;
+        $slug = preg_replace('/[^\p{L}\p{N}\-\_]+/u', '-', $slug) ?? $slug;
+        $slug = preg_replace('/-+/u', '-', $slug) ?? $slug;
+        $slug = trim((string) $slug, '-_');
+
+        return mb_strtolower($slug, 'UTF-8');
+    };
+
+    $slugCandidates = collect([
+        (string) $slug,
+        trim(rawurldecode((string) $slug)),
+        trim(rawurlencode(trim((string) $slug))),
+        trim(strtolower(rawurlencode(trim((string) $slug)))),
+        $normalizeSlugCandidate((string) $slug),
+        $normalizeSlugCandidate(trim(rawurldecode((string) $slug))),
+    ])->map(fn ($item) => trim((string) $item))
+        ->filter(fn ($item) => $item !== '')
+        ->unique()
+        ->values();
+
+    $post = null;
+    foreach ($slugCandidates as $candidate) {
+        $post = $resolvePostBySlug((string) $candidate);
+        if ($post) {
+            break;
+        }
+    }
+
+    if (!$post && $slugCandidates->isNotEmpty()) {
+        $finalCandidate = (string) $slugCandidates->last();
+        if ($finalCandidate !== '') {
+            $likeCandidates = collect([$finalCandidate]);
+
+            $tokens = collect(explode('-', $finalCandidate))
+                ->map(fn ($token) => trim((string) $token))
+                ->filter(fn ($token) => $token !== '')
+                ->values();
+
+            if ($tokens->count() >= 5) {
+                for ($size = $tokens->count() - 1; $size >= 5; $size--) {
+                    $likeCandidates->push($tokens->slice(0, $size)->implode('-'));
+                }
+            }
+
+            $likeCandidates = $likeCandidates
+                ->map(fn ($candidate) => trim((string) $candidate, '-_ '))
+                ->filter(fn ($candidate) => $candidate !== '')
+                ->unique()
+                ->values();
+
+            foreach ($likeCandidates as $likeCandidate) {
+                $post = DB::table('wp_posts as p')
+                    ->leftJoin('wp_postmeta as thumb', function ($join) {
+                        $join->on('p.ID', '=', 'thumb.post_id')
+                            ->where('thumb.meta_key', '_thumbnail_id');
+                    })
+                    ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+                    ->where('p.post_type', 'post')
+                    ->where('p.post_status', 'publish')
+                    ->where('p.post_name', 'like', '%' . (string) $likeCandidate . '%')
+                    ->orderByDesc('p.post_date')
+                    ->select(
+                        'p.ID',
+                        'p.post_title',
+                        'p.post_name',
+                        'p.post_excerpt',
+                        'p.post_content',
+                        'p.post_date',
+                        'img.guid as image'
+                    )
+                    ->first();
+
+                if ($post) {
+                    break;
+                }
+            }
         }
     }
 
