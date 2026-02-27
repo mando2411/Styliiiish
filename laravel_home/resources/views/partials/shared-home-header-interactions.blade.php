@@ -541,7 +541,9 @@
 
         if (miniCartClosers.length > 0) miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
 
-        if (accountLoginTrigger) {
+        const isDirectAccountLink = !!(accountLoginTrigger && accountLoginTrigger.tagName === 'A' && accountLoginTrigger.getAttribute('href'));
+
+        if (accountLoginTrigger && !isDirectAccountLink) {
             accountLoginTrigger.addEventListener('click', async () => {
                 if (accountMenu?.classList.contains('is-open')) return closeAccountMenu();
                 let isLoggedIn = accountAuthState === 'logged-in';

@@ -87,7 +87,7 @@
                 <button class="search-btn" type="submit">{{ $ht('search_btn', 'بحث', 'Search') }}</button>
             </form>
             <span class="account-trigger-wrap action-account">
-                <button class="icon-btn account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
+                <a class="icon-btn account-trigger" id="accountLoginTrigger" href="{{ $wpLocalizedAccountUrl }}" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}"><span class="icon" aria-hidden="true">👤</span></a>
                 <div class="account-mini-menu" id="accountMenu" aria-hidden="true">
                     <div class="account-mini-head">
                         <strong class="account-mini-name" id="accountMenuName">{{ $ht('account_loading', 'جاري تحميل بيانات الحساب…', 'Loading account details…') }}</strong>
