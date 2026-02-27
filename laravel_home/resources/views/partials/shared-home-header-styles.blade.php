@@ -89,7 +89,7 @@
         inset-inline-end: calc(100% + 8px);
         z-index: 80;
         min-width: 48px;
-        padding: 8px;
+        transition: transform .28s cubic-bezier(.22, .61, .36, 1), box-shadow .28s ease, background .28s ease;
         border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.22);
         background: rgba(15, 26, 42, 0.94);
@@ -114,8 +114,17 @@
         width: 32px;
         height: 32px;
         border-radius: 999px;
-        border: 1px solid rgba(255, 255, 255, 0.35);
+        transition: transform .32s cubic-bezier(.22, .61, .36, 1);
         background: rgba(255, 255, 255, 0.14);
+
+    .topbar-social-toggle[aria-expanded="true"] {
+        transform: rotate(90deg);
+        box-shadow: 0 14px 28px rgba(10, 17, 30, 0.46);
+        background: rgba(15, 26, 42, 1);
+    }
+
+    .topbar-social-toggle[aria-expanded="true"] svg {
+        transform: scale(1.08);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -143,7 +152,9 @@
     .topbar-mobile-icon.icon-tiktok { color: #111111; }
     .topbar-mobile-icon.icon-google { color: #4285F4; }
 
-    .topbar-mobile-icon.icon-google svg {
+        opacity: 0;
+        transform: translateX(10px) scale(.88);
+        transition: transform .28s cubic-bezier(.22, .61, .36, 1), opacity .22s ease, background .2s ease;
         width: 14px;
         height: 14px;
     }
@@ -576,6 +587,18 @@
         visibility: hidden;
         transform: translateY(8px);
         transition: opacity .22s ease, transform .22s ease, visibility .22s ease;
+
+    .topbar-mobile-icons.is-open .topbar-mobile-icon {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(1) { transition-delay: .02s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(2) { transition-delay: .05s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(3) { transition-delay: .08s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(4) { transition-delay: .11s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(5) { transition-delay: .14s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(6) { transition-delay: .17s; }
         z-index: 90;
     }
 
