@@ -242,7 +242,7 @@
             const params = new URLSearchParams(window.location.search);
             const state = {
                 q: params.get('q') ?? qInput.value ?? '',
-                sort: params.get('sort') ?? sortSelect.value ?? 'newest',
+                sort: params.get('sort') ?? sortSelect.value ?? 'random',
             };
 
             const renderState = {
@@ -261,7 +261,7 @@
             const buildQuery = () => {
                 const query = new URLSearchParams();
                 if (state.q.trim() !== '') query.set('q', state.q.trim());
-                if (state.sort !== 'newest') query.set('sort', state.sort);
+                if (state.sort !== 'random') query.set('sort', state.sort);
                 return query;
             };
 
@@ -414,7 +414,7 @@
             window.addEventListener('popstate', () => {
                 const qs = new URLSearchParams(window.location.search);
                 state.q = qs.get('q') ?? '';
-                state.sort = qs.get('sort') ?? 'newest';
+                state.sort = qs.get('sort') ?? 'random';
                 qInput.value = state.q;
                 sortSelect.value = state.sort;
                 fetchProducts(false);

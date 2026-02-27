@@ -441,7 +441,7 @@ Route::get('/en', fn () => $homeHandler('en'));
 
 $shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes) {
     $search = trim((string) $request->query('q', ''));
-    $sort = (string) $request->query('sort', 'newest');
+    $sort = (string) $request->query('sort', 'random');
 
     $normalizeSearchText = static function (?string $value): string {
         $text = mb_strtolower(trim((string) $value), 'UTF-8');
@@ -452,7 +452,7 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
     };
 
     if (!in_array($sort, ['newest', 'best_selling', 'top_rated', 'discount_desc', 'price_asc', 'price_desc', 'random'], true)) {
-        $sort = 'newest';
+        $sort = 'random';
     }
 
     $query = DB::table('wp_posts as p')
