@@ -12,12 +12,10 @@
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$account_url = $is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
-	$is_account_layout = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي', '/ara/حسابي', '/حسابي'], true);
 	$hour_now = (int) current_time('G');
 	$is_open_now = ($hour_now >= 11 && $hour_now < 19);
 ?>
 
-<?php if ($is_account_layout) : ?>
 <style>
 	.site-footer{margin-top:8px;background:#0f1a2a;color:#fff;border-top:4px solid #d51522}
 	.footer-wrap{width:min(1180px,92%);margin:0 auto}
@@ -101,23 +99,6 @@
 		<a href="<?php echo esc_url(home_url($locale_prefix . '/wishlist')); ?>">Wishlist</a>
 	</div>
 </footer>
-<?php else : ?>
-<footer id="wf_footer" class="wf_footer wf_footer--one clearfix">
-	<div class="footer-shape">
-		<img src="<?php echo esc_url(get_template_directory_uri());?>/assets/images/footer-shape.png" alt="" class="wow fadeInLeft" data-wow-delay="200ms" data-wow-duration="1500ms">
-	</div>
-	<?php 
-		// Footer Top
-		do_action('shopire_footer_top'); 
-		
-		// Footer Widget
-		do_action('shopire_footer_widget');
-
-		// Footer Copyright
-		do_action('shopire_footer_bottom'); 	
-	?>
-</footer>
-<?php endif; ?>
 <?php 
 	// Top Scroller
 	do_action('shopire_top_scroller');

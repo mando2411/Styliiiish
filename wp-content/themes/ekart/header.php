@@ -27,12 +27,10 @@
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
-	$is_account_layout = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي', '/ara/حسابي', '/حسابي'], true);
 	$ar_switch_url = 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 	$en_switch_url = 'https://styliiiish.com/my-account/';
 ?>
 
-<?php if ($is_account_layout) : ?>
 <style>
 	:root{--wf-main-rgb:213,21,34;--wf-main-color:rgb(var(--wf-main-rgb));--wf-secondary-color:#17273B;--line:rgba(189,189,189,.4);--primary:var(--wf-main-color);--secondary:var(--wf-secondary-color);--muted:#5a6678}
 	.container{width:min(1180px,92%);margin:0 auto}
@@ -70,12 +68,10 @@
 	.category-strip-chip:hover{background:#fff4f5;color:var(--primary)}
 	@media (max-width:900px){.main-header-inner{grid-template-columns:1fr;gap:10px;padding:12px 0}.main-nav{justify-content:flex-start}.brand-logo{height:46px!important;max-height:46px!important;max-width:min(220px,70vw)!important}.search-input{min-width:140px}}
 </style>
-<?php endif; ?>
 
 	<div id="page" class="site">
 		<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'ekart' ); ?></a>
 
-	<?php if ($is_account_layout) : ?>
 		<div class="topbar">
 			<div class="container topbar-inner">
 				<div class="topbar-right">
@@ -161,17 +157,6 @@
 				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a>
 			</div>
 		</div>
-	<?php else : ?>
-		<?php 
-			// Theme Header
-			do_action('shopire_site_main_header'); 
-			
-			// Theme Breadcrumb
-			if ( !is_page_template( 'page-templates/frontpage.php' )) {
-					get_template_part('/template-parts/site','breadcrumb');
-			}
-		?>
-	<?php endif; ?>
 	
 	<div id="content" class="site-content">
 	
