@@ -439,7 +439,7 @@ Route::get('/', fn () => $homeHandler('ar'));
 Route::get('/ar', fn () => $homeHandler('ar'));
 Route::get('/en', fn () => $homeHandler('en'));
 
-$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
+$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes) {
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'random');
 
@@ -486,12 +486,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         'p.ID',
         'p.post_title',
         'p.post_name',
+        'p.post_excerpt',
+        'p.post_content',
         'price.meta_value as price',
         'regular.meta_value as regular_price',
         'img.guid as image'
     )->get();
 
-    $products = $localizeProductsCollectionByWpml($products, $locale);
+    $products = $localizeProductsCollectionByWpml($products, $locale, true);
 
     if ($search !== '') {
         $needle = $normalizeSearchText($search);
@@ -503,6 +505,7 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
                 ->values();
 
             $categoryNamesByProduct = collect();
+            $attributeNamesByProduct = collect();
 
             if ($productIds->isNotEmpty()) {
                 $baseCategoryRows = DB::table('wp_term_relationships as rel')
@@ -518,6 +521,20 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
                 $categoryNamesByProduct = $baseCategoryRows
                     ->groupBy('product_id')
                     ->map(fn ($rows) => $rows->pluck('category_name')->filter()->values());
+
+                $baseAttributeRows = DB::table('wp_term_relationships as rel')
+                    ->join('wp_term_taxonomy as tt', function ($join) {
+                        $join->on('rel.term_taxonomy_id', '=', 'tt.term_taxonomy_id')
+                            ->where('tt.taxonomy', 'like', 'pa\\_%');
+                    })
+                    ->join('wp_terms as t', 'tt.term_id', '=', 't.term_id')
+                    ->whereIn('rel.object_id', $productIds->all())
+                    ->select('rel.object_id as product_id', 't.name as attribute_name')
+                    ->get();
+
+                $attributeNamesByProduct = $baseAttributeRows
+                    ->groupBy('product_id')
+                    ->map(fn ($rows) => $rows->pluck('attribute_name')->filter()->values());
 
                 if (Schema::hasTable('wp_icl_translations')) {
                     $translatedCategoryRows = DB::table('wp_term_relationships as rel')
@@ -552,11 +569,80 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
                             });
                     }
                 }
+
+                $languageCodes = $resolveTranslatePressLanguageCodes($locale);
+                if ($languageCodes) {
+                    $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+                    $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+                    if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+                        $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+                        if (Schema::hasTable($dictionaryTable)) {
+                            $lookupTerms = $categoryNamesByProduct
+                                ->flatMap(fn ($items) => collect($items))
+                                ->merge($attributeNamesByProduct->flatMap(fn ($items) => collect($items)))
+                                ->map(fn ($value) => trim((string) $value))
+                                ->filter(fn ($value) => $value !== '')
+                                ->unique()
+                                ->values();
+
+                            if ($lookupTerms->isNotEmpty()) {
+                                $dictionaryRows = DB::table($dictionaryTable)
+                                    ->whereIn('original', $lookupTerms->all())
+                                    ->where('status', '!=', 0)
+                                    ->whereNotNull('translated')
+                                    ->where('translated', '!=', '')
+                                    ->select('original', 'translated')
+                                    ->get();
+
+                                if ($dictionaryRows->isNotEmpty()) {
+                                    $termTranslationMap = [];
+                                    foreach ($dictionaryRows as $dictionaryRow) {
+                                        $original = trim((string) ($dictionaryRow->original ?? ''));
+                                        $translated = trim((string) ($dictionaryRow->translated ?? ''));
+                                        if ($original !== '' && $translated !== '' && !array_key_exists($original, $termTranslationMap)) {
+                                            $termTranslationMap[$original] = $translated;
+                                        }
+                                    }
+
+                                    if (!empty($termTranslationMap)) {
+                                        $translateItems = function ($items) use ($termTranslationMap) {
+                                            return collect($items)
+                                                ->map(function ($item) use ($termTranslationMap) {
+                                                    $value = trim((string) $item);
+                                                    return $termTranslationMap[$value] ?? $value;
+                                                })
+                                                ->filter()
+                                                ->unique()
+                                                ->values();
+                                        };
+
+                                        $categoryNamesByProduct = $categoryNamesByProduct
+                                            ->map(fn ($items) => $translateItems($items));
+
+                                        $attributeNamesByProduct = $attributeNamesByProduct
+                                            ->map(fn ($items) => $translateItems($items));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            $products = $products->filter(function ($product) use ($needle, $normalizeSearchText, $categoryNamesByProduct) {
+            $products = $products->filter(function ($product) use ($needle, $normalizeSearchText, $categoryNamesByProduct, $attributeNamesByProduct) {
                 $title = $normalizeSearchText((string) ($product->post_title ?? ''));
                 if ($title !== '' && str_contains($title, $needle)) {
+                    return true;
+                }
+
+                $excerpt = $normalizeSearchText((string) ($product->post_excerpt ?? ''));
+                if ($excerpt !== '' && str_contains($excerpt, $needle)) {
+                    return true;
+                }
+
+                $content = $normalizeSearchText((string) ($product->post_content ?? ''));
+                if ($content !== '' && str_contains($content, $needle)) {
                     return true;
                 }
 
@@ -564,6 +650,14 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
                 foreach ($categoryNames as $categoryName) {
                     $normalizedCategory = $normalizeSearchText((string) $categoryName);
                     if ($normalizedCategory !== '' && str_contains($normalizedCategory, $needle)) {
+                        return true;
+                    }
+                }
+
+                $attributeNames = $attributeNamesByProduct->get((int) ($product->ID ?? 0), collect());
+                foreach ($attributeNames as $attributeName) {
+                    $normalizedAttribute = $normalizeSearchText((string) $attributeName);
+                    if ($normalizedAttribute !== '' && str_contains($normalizedAttribute, $needle)) {
                         return true;
                     }
                 }
