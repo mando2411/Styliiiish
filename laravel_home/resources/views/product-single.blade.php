@@ -4,8 +4,23 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
-        $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
-    $canonicalPath = $localePrefix . '/item/' . rawurlencode((string) ($product->post_name ?? ''));
+    $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
+    $productSlugForRoutes = trim((string) ($product->post_name ?? ''));
+    if ($productSlugForRoutes === '') {
+        $routeSlug = trim((string) request()->route('slug', ''));
+        if ($routeSlug !== '') {
+            $productSlugForRoutes = $routeSlug;
+        }
+    }
+    if ($productSlugForRoutes === '') {
+        $productSlugForRoutes = 'product-' . (int) ($product->ID ?? 0);
+    }
+    $isOwnerPreview = request()->boolean('od_preview');
+    $ownerPreviewProductId = (int) request()->query('od_product_id', 0);
+    $previewQueryString = ($isOwnerPreview && $ownerPreviewProductId > 0)
+        ? ('?od_preview=1&od_product_id=' . $ownerPreviewProductId)
+        : '';
+    $canonicalPath = $localePrefix . '/item/' . rawurlencode($productSlugForRoutes);
 
     $translations = [
         'ar' => [
@@ -216,24 +231,41 @@
     $regular = (float) ($product->regular_price ?? 0);
     $isSale = $regular > 0 && $price > 0 && $regular > $price;
 
-    $placeholderImage = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png';
-    $image = $product->image ?: $placeholderImage;
+    $placeholderImage = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $normalizePublicAssetUrl = function (?string $url) use ($wpBaseUrl): string {
+        $value = trim((string) $url);
+        if ($value === '') {
+            return '';
+        }
+
+        $normalized = str_replace(
+            ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+            [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $value
+        );
+
+        if (preg_match('#^https?://#i', $normalized) === 1) {
+            return $normalized;
+        }
+
+        $path = ltrim($normalized, '/');
+        $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
+        return rtrim($wpBaseUrl, '/') . '/' . $path;
+    };
+
+    $image = $normalizePublicAssetUrl((string) ($product->image ?? '')) ?: $placeholderImage;
     if (str_ends_with(strtolower((string) $image), '.heic')) {
         $image = $placeholderImage;
     }
 
     $galleryImages = collect($galleryImages ?? [])
-        ->map(function ($url) use ($wpBaseUrl, $placeholderImage) {
+        ->map(function ($url) use ($normalizePublicAssetUrl, $placeholderImage) {
             $value = trim((string) $url);
             if ($value === '') {
                 return null;
             }
 
-            $normalized = str_replace(
-                ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
-                [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
-                $value
-            );
+            $normalized = $normalizePublicAssetUrl($value);
 
             if (str_ends_with(strtolower($normalized), '.heic')) {
                 $normalized = $placeholderImage;
@@ -257,6 +289,16 @@
         $contentHtml = str_replace(
             ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
             [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $contentHtml
+        );
+
+        $contentHtml = preg_replace_callback(
+            '/\b(src|href)\s*=\s*(["\'])(?!https?:\/\/|\/\/|data:|mailto:|tel:|#)([^"\']+)\2/i',
+            function (array $matches) use ($wpBaseUrl): string {
+                $path = ltrim((string) ($matches[3] ?? ''), '/');
+                $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
+                return $matches[1] . '=' . $matches[2] . rtrim($wpBaseUrl, '/') . '/' . $path . $matches[2];
+            },
             $contentHtml
         );
     }
@@ -1538,10 +1580,11 @@
             const tabLoadFailedText = @json($t('tab_load_failed'));
             const leaveReviewText = @json($t('leave_review'));
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
-                const wpCheckoutUrl = @json($wpCheckoutUrl);
+            const wpCheckoutUrl = @json($wpCheckoutUrl);
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            const productSlug = @json((string) ($product->post_name ?? ''));
+            const productSlug = @json($productSlugForRoutes);
             const productId = Number(@json((int) ($product->ID ?? 0))) || 0;
+            const previewQueryString = @json($previewQueryString);
             const wishlistPageUrl = @json($wishlistPageUrl);
 
             const priceNode = document.getElementById('productPrice');
@@ -1986,10 +2029,11 @@
 
             const tabCache = new Map();
 
-            const getTabUrl = (tab) => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/tabs/${encodeURIComponent(tab)}`;
-            const getReportUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/report`;
-            const getReviewUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/review`;
-            const getWishlistAddUrl = () => `${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/wishlist/add`;
+            const withPreviewQuery = (url) => previewQueryString ? `${url}${previewQueryString}` : url;
+            const getTabUrl = (tab) => withPreviewQuery(`${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/tabs/${encodeURIComponent(tab)}`);
+            const getReportUrl = () => withPreviewQuery(`${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/report`);
+            const getReviewUrl = () => withPreviewQuery(`${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/review`);
+            const getWishlistAddUrl = () => withPreviewQuery(`${@json($localePrefix)}/item/${encodeURIComponent(productSlug)}/wishlist/add`);
             const getWishlistCountUrl = () => `${@json($localePrefix)}/item/wishlist/count`;
             const getWishlistItemsUrl = () => `${@json($localePrefix)}/item/wishlist/items`;
             const getWishlistBridgeUrl = () => '/wishlist-bridge.php';

@@ -860,6 +860,14 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
     if ($product) {
         $product = $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+
+        if ($product && trim((string) ($product->post_name ?? '')) === '') {
+            if (trim($slug) !== '') {
+                $product->post_name = trim($slug);
+            } else {
+                $product->post_name = 'product-' . (int) ($product->ID ?? 0);
+            }
+        }
     }
 
     if ($isWpmlDebug) {
@@ -1902,16 +1910,20 @@ Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProduct
 Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
 Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
-$resolveProductForAjaxSections = function (string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml) {
+$resolveProductForAjaxSections = function (Request $request, string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $allowOwnerPreview = $request->boolean('od_preview');
+    $ownerPreviewProductId = (int) $request->query('od_product_id', 0);
     $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
     $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
 
     $product = DB::table('wp_posts as p')
         ->where('p.post_type', 'product')
-        ->where('p.post_status', 'publish')
-        ->where(function ($query) use ($slug, $localizedProductId) {
-            if ($localizedProductId > 0) {
+        ->whereIn('p.post_status', $allowOwnerPreview ? ['publish', 'pending', 'draft'] : ['publish'])
+        ->where(function ($query) use ($slug, $localizedProductId, $allowOwnerPreview, $ownerPreviewProductId) {
+            if ($allowOwnerPreview && $ownerPreviewProductId > 0) {
+                $query->where('p.ID', $ownerPreviewProductId);
+            } elseif ($localizedProductId > 0) {
                 $query->where('p.ID', $localizedProductId);
             } else {
                 $query->where('p.post_name', $slug);
@@ -1924,13 +1936,18 @@ $resolveProductForAjaxSections = function (string $slug, string $locale = 'ar') 
         return null;
     }
 
-    return $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+    $localizedProduct = $localizeProductsCollectionByWpml([$product], $currentLocale, true)->first();
+    if ($localizedProduct && trim((string) ($localizedProduct->post_name ?? '')) === '') {
+        $localizedProduct->post_name = trim($slug) !== '' ? trim($slug) : ('product-' . (int) ($localizedProduct->ID ?? 0));
+    }
+
+    return $localizedProduct;
 };
 
 $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, string $locale = 'ar') use ($resolveProductForAjaxSections, $localizeProductsCollectionByTranslatePress) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
-    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+    $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
     if (!$product) {
         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
@@ -1965,6 +1982,16 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
         $contentHtml = str_replace(
             ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
             [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $contentHtml
+        );
+
+        $contentHtml = preg_replace_callback(
+            '/\b(src|href)\s*=\s*(["\'])(?!https?:\/\/|\/\/|data:|mailto:|tel:|#)([^"\']+)\2/i',
+            function (array $matches) use ($wpBaseUrl): string {
+                $path = ltrim((string) ($matches[3] ?? ''), '/');
+                $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
+                return $matches[1] . '=' . $matches[2] . rtrim($wpBaseUrl, '/') . '/' . $path . $matches[2];
+            },
             $contentHtml
         );
 
@@ -2352,7 +2379,7 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
 
 $reportProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+    $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
     if (!$product) {
         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
@@ -2391,7 +2418,7 @@ $reportProductHandler = function (Request $request, string $slug, string $locale
 
 $submitProductReviewHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+    $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
     if (!$product) {
         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
@@ -2483,7 +2510,7 @@ $wishlistBridgeCall = function (Request $request, array $payload): array {
 
 $wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-    $product = $resolveProductForAjaxSections($slug, $currentLocale);
+    $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
     if (!$product) {
         return response()->json(['success' => false, 'message' => 'Product not found'], 404);
@@ -2565,11 +2592,12 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
 
     if (!$bridge['ok']) {
         return response()->json([
-            'success' => false,
+            'success' => true,
+            'count' => 0,
             'message' => $currentLocale === 'en'
-                ? 'Unable to load wishlist count.'
-                : 'تعذر تحميل عدد المفضلة.',
-        ], 500);
+                ? 'Wishlist count service is temporarily unavailable.'
+                : 'خدمة عداد المفضلة غير متاحة حالياً.',
+        ]);
     }
 
     $response = response()->json([

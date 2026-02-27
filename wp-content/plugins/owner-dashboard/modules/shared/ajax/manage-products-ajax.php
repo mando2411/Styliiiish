@@ -1764,7 +1764,7 @@ if ($is_user) {
                 
                     <p style="margin-top:10px;">
                         For full details, visit:
-                        <a href="https://l.styliiiish.com/%e2%ad%90-how-to-sell-your-dress-in-6-easy-steps-on-styliiiish-marketplace/"
+                        <a href="https://styliiiish.com/%e2%ad%90-how-to-sell-your-dress-in-6-easy-steps-on-styliiiish-marketplace/"
                            target="_blank" rel="noopener noreferrer">
                             ⭐ How to Sell Your Dress in 6 Easy Steps on Styliiiish Marketplace
                         </a>

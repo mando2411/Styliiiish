@@ -164,7 +164,7 @@ function ekart_rewrite_legacy_assets_host_for_account_pages() {
 			}
 
 			$replacements = [
-				'https://l.styliiiish.com/' => 'https://styliiiish.com/',
+				'https://styliiiish.com/' => 'https://styliiiish.com/',
 				'http://l.styliiiish.com/'  => 'https://styliiiish.com/',
 				'//l.styliiiish.com/'       => '//styliiiish.com/',
 			];

@@ -70,9 +70,9 @@ add_action('wp_enqueue_scripts', function() {
 /* add_action('wp_head', function() {
     ?>
     <!-- Preload Hero Images -->
-    <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-2.webp" fetchpriority="high">
-    <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-1.webp" fetchpriority="high">
-    <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-3.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="https://styliiiish.com/wp-content/uploads/2025/12/banner-img-2.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="https://styliiiish.com/wp-content/uploads/2025/12/banner-img-1.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="https://styliiiish.com/wp-content/uploads/2025/12/banner-img-3.webp" fetchpriority="high">
     <?php
 });  */
 
@@ -926,7 +926,7 @@ add_filter( 'wpseo_schema_webpage', function ( $data ) {
         // Store image (optional)
         $data['image'] = [
             '@type' => 'ImageObject',
-            'url'   => 'https://l.styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png',
+            'url'   => 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png',
         ];
 
         // Address (optional – add only if real)
@@ -1021,7 +1021,7 @@ add_filter( 'wpseo_schema_webpage', function ( $data ) {
         '@type' => 'SearchAction',
         'target' => [
             '@type'       => 'EntryPoint',
-            'urlTemplate' => 'https://l.styliiiish.com/?s={search_term_string}'
+            'urlTemplate' => 'https://styliiiish.com/?s={search_term_string}'
         ],
         'query-input' => [
             '@type'      => 'PropertyValueSpecification',
