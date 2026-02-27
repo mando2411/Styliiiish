@@ -47,8 +47,17 @@
 		$path_without_locale = '/';
 	}
 	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي'], true);
-	$ar_switch_path = $is_account_path ? '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/' : ('/ar' . ($path_without_locale === '/' ? '' : $path_without_locale));
-	$en_switch_path = $is_account_path ? '/my-account/' : ($path_without_locale === '/' ? '/' : $path_without_locale);
+	$is_my_dresses_path = in_array($normalized_path, ['/my-dresses', '/ar/فساتيني'], true);
+	if ($is_account_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
+		$en_switch_path = '/my-account/';
+	} elseif ($is_my_dresses_path) {
+		$ar_switch_path = '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
+		$en_switch_path = '/my-dresses/';
+	} else {
+		$ar_switch_path = '/ar' . ($path_without_locale === '/' ? '' : $path_without_locale);
+		$en_switch_path = ($path_without_locale === '/' ? '/' : $path_without_locale);
+	}
 	$query_string = isset($_SERVER['QUERY_STRING']) && (string) $_SERVER['QUERY_STRING'] !== '' ? ('?' . (string) $_SERVER['QUERY_STRING']) : '';
 	$ar_switch_url = rtrim($wp_base_url, '/') . $ar_switch_path . $query_string;
 	$en_switch_url = rtrim($wp_base_url, '/') . $en_switch_path . $query_string;
