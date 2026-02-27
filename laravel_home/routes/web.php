@@ -810,6 +810,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     $isWpmlDebug = $request->boolean('debug_wpml');
+    $allowOwnerPreview = $request->boolean('od_preview');
+    $ownerPreviewProductId = (int) $request->query('od_product_id', 0);
 
     $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
     $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
@@ -833,9 +835,11 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         })
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->where('p.post_type', 'product')
-        ->where('p.post_status', 'publish')
-        ->where(function ($query) use ($slug, $localizedProductId) {
-            if (!empty($localizedProductId)) {
+        ->whereIn('p.post_status', $allowOwnerPreview ? ['publish', 'pending', 'draft'] : ['publish'])
+        ->where(function ($query) use ($slug, $localizedProductId, $ownerPreviewProductId, $allowOwnerPreview) {
+            if ($allowOwnerPreview && $ownerPreviewProductId > 0) {
+                $query->where('p.ID', $ownerPreviewProductId);
+            } elseif (!empty($localizedProductId)) {
                 $query->where('p.ID', (int) $localizedProductId);
             } else {
                 $query->where('p.post_name', $slug);
