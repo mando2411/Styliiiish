@@ -2917,7 +2917,7 @@
 
             .review-shot img {
                 width: 100%;
-                height: 70px;
+                height: 110px;
                 aspect-ratio: auto;
                 max-height: none;
                 border-radius: 9px;
