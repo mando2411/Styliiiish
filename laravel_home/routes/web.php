@@ -838,6 +838,10 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 ->where('thumb.meta_key', '_thumbnail_id');
         })
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->leftJoin('wp_postmeta as img_file', function ($join) {
+            $join->on('img.ID', '=', 'img_file.post_id')
+                ->where('img_file.meta_key', '_wp_attached_file');
+        })
         ->where('p.post_type', 'product')
         ->whereIn('p.post_status', $allowOwnerPreview ? ['publish', 'pending', 'draft'] : ['publish'])
         ->where(function ($query) use ($slug, $localizedProductId, $ownerPreviewProductId, $allowOwnerPreview) {
