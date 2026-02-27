@@ -2872,7 +2872,7 @@
 
                 <div class="actions">
                     <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('shop_now') }}</a>
-                    <a class="btn btn-light" href="{{ $wpLocalizedMyDressesUrl }}">{{ $t('sell_now') }}</a>
+                    <a class="btn btn-light" href="{{ $wpLocalizedMyDressesUrl }}" data-auth-sell-trigger>{{ $t('sell_now') }}</a>
                 </div>
 
                 <div class="hero-mobile-trust" aria-hidden="true">
@@ -3259,6 +3259,7 @@
             const authGoogleButton = document.getElementById('authGoogleButton');
             const authGoogleFallback = document.getElementById('authGoogleFallback');
             const authRedirectField = authLoginForm ? authLoginForm.querySelector('input[name="redirect"]') : null;
+            const authSellTriggers = document.querySelectorAll('[data-auth-sell-trigger]');
             const accountMenu = document.getElementById('accountMenu');
             const accountMenuName = document.getElementById('accountMenuName');
             const accountMenuMeta = document.getElementById('accountMenuMeta');
@@ -3271,6 +3272,7 @@
             let siteKitGoogleInitialized = false;
             let accountSummaryLoaded = false;
             let accountAuthState = 'unknown';
+            let authPendingRedirectUrl = null;
 
             const getSafeCurrentUrl = () => {
                 try {
@@ -3812,9 +3814,8 @@
                         return;
                     }
 
-                    if (authRedirectField) {
-                        authRedirectField.value = getSafeCurrentUrl();
-                    }
+                    authPendingRedirectUrl = getSafeCurrentUrl();
+                    if (authRedirectField) authRedirectField.value = authPendingRedirectUrl;
 
                     openAuthModal();
                     fetchWooLoginNonce().catch(() => {});
@@ -3836,10 +3837,37 @@
                 authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
             }
 
+            if (authSellTriggers.length > 0) {
+                authSellTriggers.forEach((trigger) => {
+                    trigger.addEventListener('click', async (event) => {
+                        const targetUrl = trigger.getAttribute('href') || wpMyAccountUrl;
+                        if (!targetUrl) return;
+
+                        let isLoggedIn = accountAuthState === 'logged-in';
+                        if (!isLoggedIn) {
+                            isLoggedIn = await loadAccountSummary(true).catch(() => false);
+                        }
+
+                        if (isLoggedIn) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        authPendingRedirectUrl = targetUrl;
+                        if (authRedirectField) authRedirectField.value = authPendingRedirectUrl;
+
+                        openAuthModal();
+                        fetchWooLoginNonce().catch(() => {});
+                        const firstField = authModal ? authModal.querySelector('input[name="username"]') : null;
+                        if (firstField) setTimeout(() => firstField.focus(), 40);
+                    });
+                });
+            }
+
             if (authLoginForm) {
                 authLoginForm.addEventListener('submit', async () => {
                     if (authRedirectField) {
-                        authRedirectField.value = getSafeCurrentUrl();
+                        authRedirectField.value = authPendingRedirectUrl || getSafeCurrentUrl();
                     }
                     await fetchWooLoginNonce().catch(() => {});
                 });
