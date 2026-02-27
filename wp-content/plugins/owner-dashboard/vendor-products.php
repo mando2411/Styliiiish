@@ -189,8 +189,11 @@ function sty_filter_vendor_products_cb() {
         if ( ! isset($_POST['nonce']) ) {
             wp_send_json_error(['message' => 'Missing nonce']);
         }
-        
-        if ( ! wp_verify_nonce($_POST['nonce'], 'ajax_nonce') ) {
+
+        $nonce = sanitize_text_field( wp_unslash( (string) $_POST['nonce'] ) );
+
+        $valid_nonce = wp_verify_nonce($nonce, 'styliiiish_nonce') || wp_verify_nonce($nonce, 'ajax_nonce');
+        if ( ! $valid_nonce ) {
             wp_send_json_error(['message' => 'Invalid nonce']);
         }
 
