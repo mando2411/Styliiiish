@@ -1326,7 +1326,7 @@
         .account-menu {
             position: absolute;
             top: calc(100% + 8px);
-            inset-inline-start: 0;
+            inset-inline-end: 0;
             width: min(260px, 78vw);
             background: #fff;
             border: 1px solid var(--line);
