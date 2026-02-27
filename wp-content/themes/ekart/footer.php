@@ -115,7 +115,6 @@
 <?php 
 	// Top Scroller
 	do_action('shopire_top_scroller');
-	do_action('shopire_footer_mobile_menu');
 ?>
 <?php 
 wp_footer(); ?>
