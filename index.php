@@ -108,6 +108,11 @@ $laravel_exact_routes = [
     '/google-reviews',
     '/brand',
     '/favicon.ico',
+    '/حسابي',
+    '/ar/حسابي',
+    '/ara/حسابي',
+    '/my-account',
+    '/en/my-account',
 ];
 
 // Prefix routes (assets/subpaths) handled by Laravel
@@ -145,18 +150,12 @@ $wordpress_exact_routes = [
     '/ar/الدفع/',
     '/ara/الدفع',
     '/ara/الدفع/',
-    '/ar/حسابي',
-    '/ar/حسابي/',
-    '/ara/حسابي',
-    '/ara/حسابي/',
 ];
 
 $wordpress_prefix_routes = [
     '/ar/wp-json/',
     '/en/wp-json/',
     '/ara/wp-json/',
-    '/ar/حسابي/',
-    '/ara/حسابي/',
 ];
 
 $send_to_laravel = null;
