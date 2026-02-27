@@ -57,7 +57,10 @@
 
     .topbar-mobile-social {
         display: none;
-        position: relative;
+        position: fixed;
+        inset-inline-end: 12px;
+        bottom: 16px;
+        z-index: 120;
     }
 
     .topbar-social-toggle {
@@ -82,8 +85,8 @@
 
     .topbar-mobile-icons {
         position: absolute;
-        top: calc(100% + 8px);
-        inset-inline-end: 0;
+        bottom: 0;
+        inset-inline-end: calc(100% + 8px);
         z-index: 80;
         min-width: 48px;
         padding: 8px;
@@ -1103,6 +1106,11 @@
 
         .topbar-mobile-social {
             display: inline-flex;
+        }
+
+        .topbar-mobile-social {
+            inset-inline-end: 10px;
+            bottom: 12px;
         }
 
         .categories-strip-inner {
