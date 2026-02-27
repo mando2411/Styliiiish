@@ -4,6 +4,8 @@
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $wpLogo = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $wpIcon = $wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 
     $translations = [
         'ar' => [
@@ -59,12 +61,15 @@
     <meta name="twitter:title" content="{{ $title !== '' ? $title : $t('page_title_suffix') }}">
     <meta name="twitter:description" content="{{ $metaDesc }}">
     <meta name="twitter:image" content="{{ $articleImage }}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
+    <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/blog/{{ rawurlencode(rawurldecode((string) ($post->post_name ?? ''))) }}">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/blog/{{ rawurlencode(rawurldecode((string) ($post->post_name ?? ''))) }}">
     <title>{{ $title !== '' ? $title . ' | Styliiiish' : $t('page_title_suffix') }}</title>
     <style>
-        :root { --wf-main-rgb: 213, 21, 34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color: #17273B; --bg:#f6f7fb; --card:#fff; --line:rgba(189,189,189,.35); --text:#17273B; --muted:#5a6678; }
+        :root { --wf-main-rgb: 213, 21, 34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color: #17273B; --bg:#f6f7fb; --card:#fff; --line:rgba(189,189,189,.35); --text:#17273B; --muted:#5a6678; --primary: var(--wf-main-color); --secondary: var(--wf-secondary-color); }
         * { box-sizing: border-box; }
         body { margin: 0; font-family: "Segoe UI", Tahoma, Arial, sans-serif; background: var(--bg); color: var(--text); }
         a { color: inherit; text-decoration: none; }
