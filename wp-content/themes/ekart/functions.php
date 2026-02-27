@@ -41,3 +41,36 @@ function ekart_parent_theme_options() {
 	}
 }
 add_action( 'after_switch_theme', 'ekart_parent_theme_options' );
+
+/**
+ * Fix Arabic my-account logout endpoint 404 by redirecting it
+ * to WooCommerce valid logout endpoint while preserving nonce.
+ */
+function ekart_fix_arabic_logout_endpoint_404() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	if ( $normalized !== '/ar/حسابي/customer-logout' ) {
+		return;
+	}
+
+	$target = home_url( '/my-account/customer-logout/' );
+
+	if ( isset( $_GET['_wpnonce'] ) ) {
+		$target = add_query_arg(
+			'_wpnonce',
+			sanitize_text_field( wp_unslash( (string) $_GET['_wpnonce'] ) ),
+			$target
+		);
+	}
+
+	wp_safe_redirect( $target, 302 );
+	exit;
+}
+add_action( 'template_redirect', 'ekart_fix_arabic_logout_endpoint_404', 1 );
