@@ -2884,6 +2884,59 @@
                 display: none;
             }
 
+            .reviews-trust {
+                margin-top: 2px;
+            }
+
+            .reviews-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                margin-bottom: 10px;
+            }
+
+            .reviews-head h3 {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+
+            .reviews-head p {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+
+            .reviews-slider {
+                padding: 0 0 6px;
+            }
+
+            .review-shot {
+                padding: 10px;
+                border-radius: 12px;
+                box-shadow: 0 8px 16px rgba(23, 39, 59, 0.08);
+            }
+
+            .review-shot img {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 4 / 5;
+                border-radius: 9px;
+                object-fit: cover;
+            }
+
+            .review-shot::after {
+                top: 8px;
+                left: 8px;
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .review-meta {
+                right: 8px;
+                bottom: 8px;
+                font-size: 10px;
+                padding: 4px 7px;
+            }
+
             .card {
                 border-radius: 14px;
                 box-shadow: 0 10px 22px rgba(23, 39, 59, 0.07);
