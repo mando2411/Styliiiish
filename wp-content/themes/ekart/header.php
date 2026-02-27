@@ -95,12 +95,15 @@
 	.header-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none}
 	.action-nav-toggle{display:none}
 	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:600}
-	.header-categories-strip{background:#fff;border-bottom:1px solid var(--line)}
-	.categories-strip-inner{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0}
-	.category-strip-chip{display:inline-flex;align-items:center;justify-content:center;padding:7px 12px;border-radius:999px;background:#f6f8fb;color:var(--secondary);font-size:13px;font-weight:700;text-decoration:none;border:1px solid var(--line)}
-	.category-strip-chip:hover{background:#fff4f5;color:var(--primary)}
+	.header-categories-strip{background:linear-gradient(180deg,#ffffff 0%,#fbfcff 100%);border-bottom:1px solid rgba(23,39,59,.08)}
+	.categories-strip-inner{display:flex;align-items:center;gap:8px;padding:10px 0;overflow-x:auto;scrollbar-width:none}
+	.categories-strip-inner::-webkit-scrollbar{display:none}
+	.category-strip-group{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding-inline-end:6px;border-inline-end:1px dashed rgba(23,39,59,.14)}
+	.category-strip-group:last-child{border-inline-end:0;padding-inline-end:0}
+	.category-strip-chip{flex:0 0 auto;min-height:36px;border:1px solid rgba(23,39,59,.12);border-radius:999px;background:#fff;color:var(--secondary);padding:0 14px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 2px 8px rgba(23,39,59,.05);transition:transform .2s ease,border-color .2s ease,color .2s ease,background-color .2s ease,box-shadow .2s ease}
+	.category-strip-chip:hover{border-color:var(--primary);color:var(--primary);background:#fff4f5;box-shadow:0 6px 14px rgba(23,39,59,.1);transform:translateY(-2px)}
 	@media (max-width:980px){.main-header-inner{grid-template-columns:1fr auto;gap:8px;min-height:auto;padding:10px 0}.brand{align-items:center;text-align:center}.brand-logo{height:44px!important;max-height:44px!important;max-width:240px!important}.brand-tag{font-size:11px}.main-nav{grid-column:1 / -1;margin-top:4px;border-radius:10px;padding:5px;gap:6px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:none;display:none;justify-content:flex-start}.main-nav.is-open{display:flex}.main-nav::-webkit-scrollbar{display:none}.main-nav a{font-size:12px;padding:7px 10px;scroll-snap-align:start}.header-actions{justify-content:flex-end;gap:6px;flex-wrap:nowrap}.action-nav-toggle{display:inline-flex}.search-form{display:none}.icon-btn{min-width:34px;min-height:34px;padding:0 8px;font-size:12px;border-radius:8px}.action-wishlist,.action-sell{display:none}.action-account,.action-cart{min-width:46px;justify-content:center}}
-	@media (max-width:640px){.topbar{background:transparent;border-bottom:0;height:0;overflow:visible}.topbar-inner{min-height:0;padding:0}.topbar-left,.topbar-desktop-contact{display:none}.topbar-right{width:100%;justify-content:flex-end}.topbar-mobile-social,.topbar-mobile-lang{display:inline-flex}.topbar-mobile-social{inset-inline-end:10px;bottom:12px}.topbar-mobile-lang{inset-inline-end:10px;bottom:80px}}
+	@media (max-width:640px){.topbar{background:transparent;border-bottom:0;height:0;overflow:visible}.topbar-inner{min-height:0;padding:0}.topbar-left,.topbar-desktop-contact{display:none}.topbar-right{width:100%;justify-content:flex-end}.topbar-mobile-social,.topbar-mobile-lang{display:inline-flex}.topbar-mobile-social{inset-inline-end:10px;bottom:12px}.topbar-mobile-lang{inset-inline-end:10px;bottom:80px}.categories-strip-inner{padding:8px 0;gap:6px}.category-strip-group{gap:5px;padding-inline-end:5px}.category-strip-chip{min-height:32px;padding:0 10px;font-size:12px}}
 	@media (max-width:390px){.action-account,.action-cart{min-width:42px;font-size:11px}.brand-logo{height:36px!important;max-width:200px!important}.main-nav a{font-size:11px;padding:6px 9px}}
 </style>
 
@@ -223,13 +226,13 @@
 		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
 		<div class="header-categories-strip">
 			<div class="container categories-strip-inner">
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=dress')); ?>">Dress</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=bridesmaid-dresses')); ?>">Bridesmaid Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=evening-dresses')); ?>">Evening Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=final-clearance-dresses')); ?>">Final Clearance Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=plus-size-dresses')); ?>">Plus Size Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=mothers-dresses')); ?>">Mother of the Bride Dresses</a>
-				<a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=dress')); ?>">Dress</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=bridesmaid-dresses')); ?>">Bridesmaid Dresses</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=evening-dresses')); ?>">Evening Dresses</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=final-clearance-dresses')); ?>">Final Clearance Dresses</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=plus-size-dresses')); ?>">Plus Size Dresses</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=mothers-dresses')); ?>">Mother of the Bride Dresses</a></div>
+				<div class="category-strip-group"><a class="category-strip-chip" href="<?php echo esc_url($build_localized_url('/shop?category=pre-loved-dresses')); ?>">Pre-Loved Dresses</a></div>
 			</div>
 		</div>
 	
