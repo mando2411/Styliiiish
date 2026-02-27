@@ -548,7 +548,13 @@ document.addEventListener('DOMContentLoaded', () => {
         errorBox.style.display = 'none';
     };
 
-    const isLoggedInFromDoc = (doc) => !!(doc && (doc.querySelector('a[href*="customer-logout"]') || doc.querySelector('.woocommerce-MyAccount-content')));
+    const isLoggedInFromDoc = (doc) => {
+        if (!doc) return false;
+        const hasLogoutLink = !!doc.querySelector('a[href*="customer-logout"]');
+        const hasEditAccountForm = !!doc.querySelector('form.woocommerce-EditAccountForm');
+        const hasAccountEmailField = !!doc.querySelector('input[name="account_email"]');
+        return hasLogoutLink || hasEditAccountForm || hasAccountEmailField;
+    };
 
     const parseWooErrors = (doc) => {
         if (!doc) return '';
@@ -755,6 +761,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const res = await fetch(apiUrl, { credentials: 'same-origin' });
+            if (res.status === 401) {
+                document.getElementById('mainLoader').style.display = 'none';
+                await setupGuestAuth();
+                return;
+            }
             if (!res.ok) throw new Error('Not logged in');
             const json = await res.json();
             if (!json.success) throw new Error('Failed');
