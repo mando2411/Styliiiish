@@ -1951,9 +1951,17 @@
             width: fit-content;
         }
 
-        .badge-hot {
-            background: rgba(23, 39, 59, 0.86);
+        .badge-brand {
+            background: linear-gradient(135deg, rgba(213, 21, 34, 0.96), rgba(183, 15, 26, 0.96));
             color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 6px 14px rgba(213, 21, 34, 0.28);
+        }
+
+        .badge-marketplace {
+            background: rgba(23, 39, 59, 0.9);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.22);
         }
 
         .badge-discount {
@@ -3275,13 +3283,14 @@
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
                         $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
                         $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
+                        $primaryBadgeClass = $isMarketplace ? 'badge-marketplace' : 'badge-brand';
                     @endphp
 
                     <article class="card">
                         <div class="product-media">
                             <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
                             <div class="card-badges">
-                                <span class="badge-chip badge-hot">{{ $primaryBadge }}</span>
+                                <span class="badge-chip {{ $primaryBadgeClass }}">{{ $primaryBadge }}</span>
                                 @if($isSale)
                                     <span class="badge-chip badge-discount">{{ $t('discount_badge') }} {{ $discount }}%</span>
                                 @endif
