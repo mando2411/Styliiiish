@@ -3171,11 +3171,25 @@
             if (slides.length < 2 || dots.length < 2) return;
 
             const isMobile = () => window.innerWidth <= 640;
+            let currentSlideIndex = 0;
+            let autoSlideTimer = null;
 
             const setActiveDot = (index) => {
+                currentSlideIndex = Math.max(0, Math.min(index, slides.length - 1));
                 dots.forEach((dot, dotIndex) => {
-                    dot.classList.toggle('is-active', dotIndex === index);
+                    dot.classList.toggle('is-active', dotIndex === currentSlideIndex);
                 });
+            };
+
+            const goToSlide = (index, behavior = 'smooth') => {
+                const safeIndex = Math.max(0, Math.min(index, slides.length - 1));
+                const slide = slides[safeIndex];
+                if (!slide) return;
+                heroWrap.scrollTo({
+                    left: slide.offsetLeft,
+                    behavior,
+                });
+                setActiveDot(safeIndex);
             };
 
             const detectActiveSlide = () => {
@@ -3202,22 +3216,50 @@
                 setActiveDot(nearestIndex);
             };
 
+            const stopAutoSlide = () => {
+                if (!autoSlideTimer) return;
+                clearInterval(autoSlideTimer);
+                autoSlideTimer = null;
+            };
+
+            const startAutoSlide = () => {
+                stopAutoSlide();
+                if (!isMobile()) return;
+                autoSlideTimer = setInterval(() => {
+                    const nextIndex = (currentSlideIndex + 1) % slides.length;
+                    goToSlide(nextIndex);
+                }, 4000);
+            };
+
             dots.forEach((dot, index) => {
                 dot.addEventListener('click', () => {
                     if (!isMobile()) return;
-                    const slide = slides[index];
-                    if (!slide) return;
-                    heroWrap.scrollTo({
-                        left: slide.offsetLeft,
-                        behavior: 'smooth',
-                    });
-                    setActiveDot(index);
+                    goToSlide(index);
+                    startAutoSlide();
                 });
             });
 
             heroWrap.addEventListener('scroll', detectActiveSlide, { passive: true });
-            window.addEventListener('resize', detectActiveSlide);
+            heroWrap.addEventListener('touchstart', stopAutoSlide, { passive: true });
+            heroWrap.addEventListener('touchend', startAutoSlide, { passive: true });
+            heroWrap.addEventListener('mouseenter', stopAutoSlide);
+            heroWrap.addEventListener('mouseleave', startAutoSlide);
+
+            window.addEventListener('resize', () => {
+                detectActiveSlide();
+                startAutoSlide();
+            });
+
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    stopAutoSlide();
+                } else {
+                    startAutoSlide();
+                }
+            });
+
             detectActiveSlide();
+            startAutoSlide();
         })();
     </script>
 
