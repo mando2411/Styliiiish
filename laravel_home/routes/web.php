@@ -3233,7 +3233,7 @@ Route::get('/blog', fn (Request $request) => $blogHandler($request, 'ar'));
 Route::get('/ar/blog', fn (Request $request) => $blogHandler($request, 'ar'));
 Route::get('/en/blog', fn (Request $request) => $blogHandler($request, 'en'));
 
-$blogSingleHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress) {
+$blogSingleHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress, $resolveTranslatePressLanguageCodes, $normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -3273,6 +3273,87 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     }
 
     $post = $localizeProductsCollectionByTranslatePress([$post], $currentLocale, true)->first();
+
+    if ($currentLocale === 'ar' && $post) {
+        $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+        if ($languageCodes) {
+            $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+            $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+            if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+                $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+                if (Schema::hasTable($dictionaryTable)) {
+                    $normalizeLookupText = static function (?string $value): string {
+                        $decoded = html_entity_decode((string) ($value ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $stripped = trim(strip_tags($decoded));
+                        $collapsed = preg_replace('/\s+/u', ' ', $stripped) ?? $stripped;
+                        return trim((string) $collapsed);
+                    };
+
+                    $lookupStrings = collect([
+                        (string) ($post->post_title ?? ''),
+                        (string) ($post->post_excerpt ?? ''),
+                        (string) ($post->post_content ?? ''),
+                    ])->flatMap(function ($value) use ($normalizeLookupText) {
+                        $raw = trim((string) $value);
+                        $normalized = $normalizeLookupText($raw);
+                        return [$raw, $normalized];
+                    })->filter(fn ($value) => $value !== '')->unique()->values();
+
+                    if ($lookupStrings->isNotEmpty()) {
+                        $dictionaryRows = DB::table($dictionaryTable)
+                            ->whereIn('original', $lookupStrings->all())
+                            ->where('status', '!=', 0)
+                            ->whereNotNull('translated')
+                            ->where('translated', '!=', '')
+                            ->select('original', 'translated')
+                            ->get();
+
+                        if ($dictionaryRows->isNotEmpty()) {
+                            $translationMap = [];
+                            foreach ($dictionaryRows as $row) {
+                                $original = trim((string) ($row->original ?? ''));
+                                $translated = trim((string) ($row->translated ?? ''));
+                                if ($original === '' || $translated === '') {
+                                    continue;
+                                }
+
+                                if (!array_key_exists($original, $translationMap)) {
+                                    $translationMap[$original] = $translated;
+                                }
+
+                                $normalizedOriginal = $normalizeLookupText($original);
+                                if ($normalizedOriginal !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
+                                    $translationMap[$normalizedOriginal] = $translated;
+                                }
+                            }
+
+                            if (!empty($translationMap)) {
+                                $translateField = function (?string $value) use ($translationMap, $normalizeLookupText, $normalizeBrandByLocale): string {
+                                    $raw = trim((string) ($value ?? ''));
+                                    if ($raw === '') {
+                                        return '';
+                                    }
+
+                                    $normalized = $normalizeLookupText($raw);
+                                    $translated = $translationMap[$raw] ?? $translationMap[$normalized] ?? null;
+                                    if (!is_string($translated) || trim($translated) === '') {
+                                        return (string) $value;
+                                    }
+
+                                    return $normalizeBrandByLocale(trim($translated), 'ar');
+                                };
+
+                                $post->post_title = $translateField((string) ($post->post_title ?? ''));
+                                $post->post_excerpt = $translateField((string) ($post->post_excerpt ?? ''));
+                                $post->post_content = $translateField((string) ($post->post_content ?? ''));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     $relatedPosts = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
