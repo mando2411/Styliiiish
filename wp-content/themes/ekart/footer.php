@@ -41,7 +41,7 @@
 	.footer-mini-nav a:hover{color:#fff}
 	@media (max-width:900px){.footer-grid{grid-template-columns:1fr}}
 </style>
-<footer class="site-footer">
+<footer class="site-footer notranslate" translate="no">
 	<div class="footer-wrap footer-grid">
 		<div class="footer-brand">
 			<img src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish" style="height:62px;width:auto;max-width:min(360px,100%);margin-bottom:10px;">

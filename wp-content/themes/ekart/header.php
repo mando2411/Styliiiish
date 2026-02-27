@@ -74,7 +74,7 @@
 		<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'ekart' ); ?></a>
 
 	<?php if ($is_account_layout) : ?>
-		<div class="topbar">
+		<div class="topbar notranslate" translate="no">
 			<div class="container topbar-inner">
 				<div class="topbar-right">
 					<strong><?php echo $is_english ? 'Call us anytime:' : 'اتصلي بنا في أي وقت:'; ?></strong>
@@ -93,7 +93,7 @@
 				</div>
 			</div>
 		</div>
-		<header class="main-header">
+		<header class="main-header notranslate" translate="no">
 			<div class="container main-header-inner">
 				<a class="brand" href="<?php echo esc_url(home_url($locale_prefix)); ?>">
 					<img class="brand-logo" src="<?php echo esc_url($wp_logo); ?>" alt="Styliiiish">
@@ -124,8 +124,8 @@
 				</div>
 			</div>
 		</header>
-		<div class="promo"><?php echo $is_english ? 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days' : 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل'; ?></div>
-		<div class="header-categories-strip">
+		<div class="promo notranslate" translate="no"><?php echo $is_english ? 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days' : 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل'; ?></div>
+		<div class="header-categories-strip notranslate" translate="no">
 			<div class="container categories-strip-inner">
 				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=dress')); ?>"><?php echo $is_english ? 'Dress' : 'فستان'; ?></a>
 				<a class="category-strip-chip" href="<?php echo esc_url(home_url($locale_prefix . '/shop?category=bridesmaid-dresses')); ?>"><?php echo $is_english ? 'Bridesmaid Dresses' : 'فساتين وصيفات العروس'; ?></a>
