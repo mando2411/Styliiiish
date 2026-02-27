@@ -2794,82 +2794,7 @@
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="container topbar-inner">
-            <div class="topbar-right">
-                <strong>{{ $t('contact_anytime') }}</strong>
-                <a class="topbar-phone" href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
-            </div>
-            <div class="topbar-left">
-                <div class="lang-switch {{ $isEnglish ? 'is-en' : 'is-ar' }}" aria-label="Language Switcher">
-                    <span class="lang-indicator" aria-hidden="true"></span>
-                    <a class="{{ $currentLocale === 'ar' ? 'active' : '' }}" href="{{ $arSwitchUrl }}">AR</a>
-                    <a class="{{ $currentLocale === 'en' ? 'active' : '' }}" href="{{ $enSwitchUrl }}">EN</a>
-                </div>
-                <span class="topbar-note">{{ $t('daily_deals') }}</span>
-                <a href="https://www.facebook.com/Styliiish.Egypt/" target="_blank" rel="noopener">{{ $t('facebook') }}</a>
-                <a href="https://www.instagram.com/styliiish.egypt/" target="_blank" rel="noopener">{{ $t('instagram') }}</a>
-                <a href="https://g.page/styliish" target="_blank" rel="noopener">{{ $t('google') }}</a>
-            </div>
-        </div>
-    </div>
-
-    <header class="main-header">
-        <div class="container main-header-inner">
-            <a class="brand" href="{{ $localePrefix }}">
-                <img class="brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
-                <span class="brand-tag">{{ $t('brand_tag') }}</span>
-            </a>
-
-            @include('partials.shared-header-nav', ['navClass' => 'main-nav', 'navId' => 'headerMainNav'])
-
-            <div class="header-actions">
-                <button class="icon-btn nav-toggle action-nav-toggle" id="headerNavToggle" type="button" aria-label="{{ $isEnglish ? 'Menu' : 'القائمة' }}" title="{{ $isEnglish ? 'Menu' : 'القائمة' }}" aria-controls="headerMainNav" aria-expanded="false"><span class="icon" aria-hidden="true">☰</span></button>
-                <form class="search-form" action="{{ $headerSearchUrl }}" method="get">
-                    <input class="search-input" type="search" name="q" required placeholder="{{ $t('search_placeholder') }}" aria-label="{{ $t('search_placeholder') }}">
-                    <button class="search-btn" type="submit">{{ $t('search_btn') }}</button>
-                </form>
-                <span class="account-trigger-wrap action-account">
-                    <button class="icon-btn account-trigger" id="accountLoginTrigger" type="button" aria-label="{{ $t('account') }}" title="{{ $t('account') }}" aria-expanded="false"><span class="icon" aria-hidden="true">👤</span></button>
-                    <div class="account-mini-menu" id="accountMenu" aria-hidden="true">
-                        <div class="account-mini-head">
-                            <strong class="account-mini-name" id="accountMenuName">{{ $t('account_loading') }}</strong>
-                            <span class="account-mini-meta" id="accountMenuMeta">{{ $t('account_logged_in') }}</span>
-                        </div>
-                        <div class="account-mini-actions">
-                            <a class="account-manage-link" id="accountMenuManage" href="{{ $wpLocalizedAccountUrl }}">{{ $t('manage_account') }}</a>
-                            <a class="account-logout-link" id="accountMenuLogout" href="{{ $wpMyAccountUrl }}">{{ $t('logout') }}</a>
-                        </div>
-                    </div>
-                </span>
-                <span class="wishlist-trigger-wrap action-wishlist">
-                    <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $t('wishlist') }}" title="{{ $t('wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>
-                        <span class="wishlist-count" id="wishlistCountBadge">0</span>
-                    </button>
-                    <span class="wishlist-plus-one" id="wishlistPlusOne">+1</span>
-                    <div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="{{ $t('wishlist') }}" aria-hidden="true">
-                        <div class="wishlist-dropdown-list" id="wishlistDropdownList">
-                            <p class="wishlist-dropdown-empty" id="wishlistDropdownLoading">{{ $t('wishlist_loading') }}</p>
-                        </div>
-                        <div class="wishlist-dropdown-footer">
-                            <a class="wishlist-dropdown-all" href="{{ $localePrefix }}/wishlist">{{ $t('view_all_wishlist') }}</a>
-                        </div>
-                    </div>
-                </span>
-                <span class="cart-trigger-wrap action-cart">
-                    <button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="{{ $t('cart') }}" title="{{ $t('cart') }}"><span class="icon" aria-hidden="true">🛒</span>
-                        <span class="cart-count" id="cartCountBadge">0</span>
-                    </button>
-                    <span class="cart-plus-one" id="cartPlusOne">+1</span>
-                </span>
-                <a class="btn btn-primary header-cta action-sell" href="{{ $wpLocalizedMyDressesUrl }}" target="_blank" rel="noopener">{{ $t('start_selling') }}</a>
-            </div>
-        </div>
-    </header>
-
-    <div class="promo">{{ $t('promo_line') }}</div> 
-
-    @include('partials.shared-header-categories-strip')
+    @include('partials.shared-home-header')
 
     <section class="hero">
         <div class="container hero-wrap">
@@ -3275,8 +3200,6 @@
             const authGoogleFallback = document.getElementById('authGoogleFallback');
             const authRedirectField = authLoginForm ? authLoginForm.querySelector('input[name="redirect"]') : null;
             const authSellTriggers = document.querySelectorAll('[data-auth-sell-trigger]');
-            const headerNavToggle = document.getElementById('headerNavToggle');
-            const headerMainNav = document.getElementById('headerMainNav');
             const accountMenu = document.getElementById('accountMenu');
             const accountMenuName = document.getElementById('accountMenuName');
             const accountMenuMeta = document.getElementById('accountMenuMeta');
@@ -3321,12 +3244,6 @@
                 accountMenu.classList.add('is-open');
                 accountMenu.setAttribute('aria-hidden', 'false');
                 accountLoginTrigger.setAttribute('aria-expanded', 'true');
-            };
-
-            const closeHeaderNav = () => {
-                if (!headerMainNav || !headerNavToggle) return;
-                headerMainNav.classList.remove('is-open');
-                headerNavToggle.setAttribute('aria-expanded', 'false');
             };
 
             const parseAccountSummary = (doc) => {
@@ -3820,7 +3737,9 @@
                 miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
             }
 
-            if (accountLoginTrigger) {
+            const isDirectAccountLink = !!(accountLoginTrigger && accountLoginTrigger.tagName === 'A' && accountLoginTrigger.getAttribute('href'));
+
+            if (accountLoginTrigger && !isDirectAccountLink) {
                 accountLoginTrigger.addEventListener('click', async () => {
                     if (accountMenu && accountMenu.classList.contains('is-open')) {
                         closeAccountMenu();
@@ -3858,22 +3777,6 @@
 
             if (authModalClosers.length > 0) {
                 authModalClosers.forEach((node) => node.addEventListener('click', closeAuthModal));
-            }
-
-            if (headerNavToggle && headerMainNav) {
-                headerNavToggle.addEventListener('click', () => {
-                    const willOpen = !headerMainNav.classList.contains('is-open');
-                    headerMainNav.classList.toggle('is-open', willOpen);
-                    headerNavToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-                });
-
-                headerMainNav.querySelectorAll('a').forEach((link) => {
-                    link.addEventListener('click', closeHeaderNav);
-                });
-
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth > 640) closeHeaderNav();
-                });
             }
 
             if (authSellTriggers.length > 0) {
