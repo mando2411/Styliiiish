@@ -3530,6 +3530,105 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
         }
     }
 
+    if ($currentLocale === 'ar' && $post) {
+        $normalizeDictionaryText = static function (?string $value): string {
+            $text = html_entity_decode((string) ($value ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $text = preg_replace('/<[^>]+>/u', ' ', $text) ?? $text;
+            $text = str_replace(["\r\n", "\r", "\n", '’', '“', '”', '–', '—'], [' ', ' ', ' ', "'", '"', '"', '-', '-'], $text);
+            $text = preg_replace('/[^\p{L}\p{N}\s\-\'\"]/u', ' ', $text) ?? $text;
+            $text = mb_strtolower(trim($text), 'UTF-8');
+            $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
+            return trim($text);
+        };
+
+        $looksEnglish = static function (string $value): bool {
+            $hasLatin = preg_match('/[A-Za-z]/u', $value) === 1;
+            $hasArabic = preg_match('/[\x{0600}-\x{06FF}]/u', $value) === 1;
+            return $hasLatin && !$hasArabic;
+        };
+
+        $manualFallbackTranslations = [
+            "Next, think about where you're going. Is it a casual lunch date, a formal wedding, or a fun night out? The occasion will help guide your options and ensure you choose a dress that fits the vibe." => 'بعد ذلك، فكّري في المكان الذي ستذهبين إليه. هل هي مناسبة غداء كاجوال، أم حفل زفاف رسمي، أم سهرة ممتعة؟ طبيعة المناسبة ستساعدك على تضييق الخيارات واختيار فستان يناسب الأجواء.',
+            "No matter how beautiful a dress is, if it doesn’t fit well, you won't feel comfortable in it. Try on different sizes and styles until you find a dress that fits your form perfectly. Consider tailoring if necessary!" => 'مهما كان الفستان جميلًا، إذا لم تكن المقاس مضبوطًا فلن تشعري بالراحة. جرّبي مقاسات وقصّات مختلفة حتى تصلي إلى الفستان الأنسب لقوامك، ولا تترددي في التعديل لدى الخياطة عند الحاجة.',
+            "No matter how beautiful a dress is, if it doesn't fit well, you won't feel comfortable in it. Try on different sizes and styles until you find a dress that fits your form perfectly. Consider tailoring if necessary!" => 'مهما كان الفستان جميلًا، إذا لم تكن المقاس مضبوطًا فلن تشعري بالراحة. جرّبي مقاسات وقصّات مختلفة حتى تصلي إلى الفستان الأنسب لقوامك، ولا تترددي في التعديل لدى الخياطة عند الحاجة.',
+        ];
+
+        $post->post_content = str_replace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_content ?? ''));
+        $post->post_excerpt = str_replace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_excerpt ?? ''));
+
+        $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+        if ($languageCodes) {
+            $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+            $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+            if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+                $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+                if (Schema::hasTable($dictionaryTable)) {
+                    $contentPlain = trim(html_entity_decode(strip_tags((string) ($post->post_content ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                    $candidateLines = collect(preg_split('/\R+/u', $contentPlain) ?: [])
+                        ->map(fn ($line) => trim((string) $line))
+                        ->filter(fn ($line) => $line !== '' && mb_strlen($line) >= 24)
+                        ->filter(fn ($line) => $looksEnglish($line))
+                        ->unique()
+                        ->take(20)
+                        ->values();
+
+                    foreach ($candidateLines as $englishLine) {
+                        $translatedLine = '';
+
+                        $exactRow = DB::table($dictionaryTable)
+                            ->where('original', $englishLine)
+                            ->where('status', '!=', 0)
+                            ->whereNotNull('translated')
+                            ->where('translated', '!=', '')
+                            ->select('translated')
+                            ->first();
+
+                        if ($exactRow && trim((string) ($exactRow->translated ?? '')) !== '') {
+                            $translatedLine = trim((string) $exactRow->translated);
+                        }
+
+                        if ($translatedLine === '') {
+                            $prefix = trim((string) mb_substr($englishLine, 0, 70));
+                            if ($prefix !== '') {
+                                $prefixCandidates = DB::table($dictionaryTable)
+                                    ->where('original', 'like', $prefix . '%')
+                                    ->where('status', '!=', 0)
+                                    ->whereNotNull('translated')
+                                    ->where('translated', '!=', '')
+                                    ->select('original', 'translated')
+                                    ->limit(40)
+                                    ->get();
+
+                                if ($prefixCandidates->isNotEmpty()) {
+                                    $normalizedLine = $normalizeDictionaryText($englishLine);
+                                    foreach ($prefixCandidates as $candidate) {
+                                        $candidateOriginal = trim((string) ($candidate->original ?? ''));
+                                        $candidateTranslated = trim((string) ($candidate->translated ?? ''));
+                                        if ($candidateOriginal === '' || $candidateTranslated === '') {
+                                            continue;
+                                        }
+
+                                        if ($normalizeDictionaryText($candidateOriginal) === $normalizedLine) {
+                                            $translatedLine = $candidateTranslated;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if ($translatedLine !== '') {
+                            $translatedLine = $normalizeBrandByLocale($translatedLine, 'ar');
+                            $post->post_content = str_replace($englishLine, $translatedLine, (string) ($post->post_content ?? ''));
+                            $post->post_excerpt = str_replace($englishLine, $translatedLine, (string) ($post->post_excerpt ?? ''));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     $relatedPosts = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as thumb', function ($join) {
             $join->on('p.ID', '=', 'thumb.post_id')
