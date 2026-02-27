@@ -175,6 +175,12 @@ $wordpress_exact_routes = [
     '/ar/فساتيني/',
     '/ara/فساتيني',
     '/ara/فساتيني/',
+    '/owner-dashboard',
+    '/owner-dashboard/',
+    '/ar/لوحة-معلومات-المالك',
+    '/ar/لوحة-معلومات-المالك/',
+    '/ara/لوحة-معلومات-المالك',
+    '/ara/لوحة-معلومات-المالك/',
 ];
 
 $wordpress_prefix_routes = [
@@ -189,6 +195,9 @@ $wordpress_prefix_routes = [
     '/ar/فساتيني/',
     '/ara/فساتيني/',
     '/فساتيني/',
+    '/owner-dashboard/',
+    '/ar/لوحة-معلومات-المالك/',
+    '/ara/لوحة-معلومات-المالك/',
 ];
 
 $send_to_laravel = null;
