@@ -19,10 +19,14 @@
     $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '/';
     $request_path = parse_url($request_uri, PHP_URL_PATH);
     $request_path = is_string($request_path) ? $request_path : '/';
+	$normalized_path = rawurldecode(strtolower(rtrim($request_path, '/')));
+	if ($normalized_path === '') {
+		$normalized_path = '/';
+	}
     $is_english = preg_match('#^/en(?:/|$)#i', $request_path) === 1;
     $locale_prefix = $is_english ? '/en' : '/ar';
     $account_url = $is_english ? home_url('/my-account/') : home_url('/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/');
-	$is_account_path = preg_match('#^/(?:my-account|en/my-account|ar/حسابي|ara/حسابي)(?:/|$)#u', $request_path) === 1;
+	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي', '/ara/حسابي', '/حسابي'], true);
 	$is_account_layout = $is_account_path || (function_exists('is_account_page') && is_account_page());
 ?>
 
