@@ -3663,6 +3663,42 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
         $post->post_content = str_ireplace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_content ?? ''));
         $post->post_excerpt = str_ireplace(array_keys($manualFallbackTranslations), array_values($manualFallbackTranslations), (string) ($post->post_excerpt ?? ''));
 
+        $regexFallbackTranslations = [
+            '/and\s+we[’\']re\s+excited\s+to\s+welcome\s+you\s+to\s+Styliiiish\s+Marketplace,?\s+the\s+smoothest\s+and\s+most\s+modern\s+platform\s+for\s+selling\s+pre-loved\s+dresses\s+in\s+Egypt\.?/iu' => 'ونسعد باستقبالكم في Styliiiish Marketplace، المنصة الأكثر سلاسة وحداثة لبيع الفساتين المستعملة في مصر.',
+            '/and\s+Terms\s*&\s*Conditions\.?/iu' => 'والشروط والأحكام.',
+            '/Your\s+product\s+name\s+is\s+the\s+first\s+thing\s+shoppers\s+see\s*[—\-]?\s*so\s+choose\s+it\s+carefully\.?/iu' => 'اسم المنتج هو أول ما يراه المتسوقون، لذا اختاريه بعناية.',
+            '/Try\s+something\s+clear\s+and\s+attractive,?\s+for\s+example\s*:?/iu' => 'اختاري اسمًا واضحًا وجذابًا، مثل:',
+            '/Describe\s+your\s+dress\s+honestly\s+and\s+clearly\.?/iu' => 'صِفي فستانك بصدق ووضوح.',
+            '/Include\s*:?/iu' => 'احرصي على تضمين:',
+            '/Good\s+photos\s+make\s+a\s+HUGE\s+difference!?/iu' => 'الصور الجيدة تصنع فرقًا كبيرًا جدًا!',
+            '/We\s+recommend\s*:?/iu' => 'ننصحكِ بـ:',
+            '/High-quality\s+lighting/iu' => 'إضاءة عالية الجودة',
+            '/Full-body\s+front\s*\+\s*back\s+shots/iu' => 'صور كاملة من الأمام والخلف',
+            '/Close-ups\s+of\s+details/iu' => 'لقطات قريبة للتفاصيل',
+            '/Professional\s+photos\s+from\s+your\s+wedding\s+or\s+event\s*\(if\s+available\)/iu' => 'صور احترافية من حفل الزفاف أو المناسبة (إن توفرت)',
+            '/Inside\s+your\s+dashboard,?\s+tap\s+Edit\s+and\s+choose\s*:?/iu' => 'من داخل لوحة التحكم، اضغطي على تعديل ثم اختاري:',
+            '/Choose\s+a\s+price\s+that\s+feels\s+fair\s+and\s+competitive\.?/iu' => 'حددي سعرًا عادلًا وتنافسيًا.',
+            '/Remember\s*:?/iu' => 'وتذكّري:',
+            '/Styliiiish\s+takes\s+a\s+50%\s+marketplace\s+fee\.?/iu' => 'تأخذ Styliiiish عمولة 50% من سعر الماركت بليس.',
+            '/So\s+if\s+you\s+set\s+your\s+price\s+at\s*2,?000\s*EGP,?\s*Styliiiish\s+will\s+deduct\s*1,?000\s*EGP,?\s*And\s+you\s+get\s+paid\s*1,?000\s*EGP\.?/iu' => 'إذا حدّدتِ السعر 2000 جنيه، سيتم خصم 1000 جنيه وتحصلين على 1000 جنيه.',
+            '/If\s+you\s+want\s+to\s+receive\s*2,?000\s*EGP\s+for\s+the\s+dress,?\s+you\s+must\s+set\s+the\s+price\s+at\s*4,?000\s*EGP\.?/iu' => 'وإذا أردتِ استلام 2000 جنيه صافي، يجب ضبط السعر على 4000 جنيه.',
+            '/Step\s*6\s*:\s*Sell\s+Your\s+Dress\s*&\s*Get\s+Your\s+Cash!?/iu' => 'الخطوة 6: بيعي فستانك واحصلي على أرباحك!',
+            '/Pickup/iu' => 'استلام الفستان',
+            '/And\s+you[’\']ll\s+receive\s+your\s+payment\s+smoothly\.?/iu' => 'وسيصل إليكِ المبلغ بسهولة وسلاسة.',
+            '/Your\s+job\s+is\s+simply\s+to\s+list\s+the\s+dress\s*[—\-]?\s*we[’\']ll\s+take\s+care\s+of\s+the\s+rest\.?/iu' => 'مهمتك فقط إدراج الفستان، ونحن نتولى الباقي.',
+            '/Styliiiish\s+offers\s+a\s+next-generation\s+marketplace\s+experience\s*:?/iu' => 'تقدم Styliiiish تجربة ماركت بليس من الجيل الجديد:',
+            '/Our\s+platform\s+is\s+built\s+to\s+make\s+selling\s+your\s+dress\s+as\s+comfortable,?\s+modern,?\s+and\s+effortless\s+as\s+possible\.?/iu' => 'منصتنا مبنية لتجعل بيع فستانك مريحًا وعصريًا وبأقل مجهود ممكن.',
+            '/Marketplace\s+Rules\s*&\s*Policies/iu' => 'قواعد وسياسات الماركت بليس',
+            '/Terms\s*&\s*Conditions/iu' => 'الشروط والأحكام',
+            '/Refund\s*&\s*Return\s+Policy/iu' => 'سياسة الاسترجاع والاستبدال',
+            '/the\s+easy\s+way\.?/iu' => 'بأسهل طريقة.',
+        ];
+
+        foreach ($regexFallbackTranslations as $pattern => $replacement) {
+            $post->post_content = preg_replace($pattern, $replacement, (string) ($post->post_content ?? '')) ?? (string) ($post->post_content ?? '');
+            $post->post_excerpt = preg_replace($pattern, $replacement, (string) ($post->post_excerpt ?? '')) ?? (string) ($post->post_excerpt ?? '');
+        }
+
         $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
         if ($languageCodes) {
             $defaultLanguage = (string) ($languageCodes['default'] ?? '');
