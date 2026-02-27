@@ -3356,6 +3356,100 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     }
 
     if ($currentLocale === 'ar' && $post) {
+        $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+        if ($languageCodes) {
+            $defaultLanguage = (string) ($languageCodes['default'] ?? '');
+            $targetLanguage = (string) ($languageCodes['target'] ?? '');
+
+            if ($defaultLanguage !== '' && $targetLanguage !== '' && $defaultLanguage !== $targetLanguage) {
+                $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+                if (Schema::hasTable($dictionaryTable)) {
+                    $contentRaw = (string) ($post->post_content ?? '');
+                    $contentPlain = trim(html_entity_decode(strip_tags($contentRaw), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+                    $fragments = collect();
+
+                    $titleRaw = trim((string) ($post->post_title ?? ''));
+                    $excerptRaw = trim((string) ($post->post_excerpt ?? ''));
+                    if ($titleRaw !== '') {
+                        $fragments->push($titleRaw);
+                    }
+                    if ($excerptRaw !== '') {
+                        $fragments->push($excerptRaw);
+                    }
+
+                    if ($contentPlain !== '') {
+                        $lineFragments = preg_split('/\R+/u', $contentPlain) ?: [];
+                        foreach ($lineFragments as $line) {
+                            $lineText = trim((string) $line);
+                            if ($lineText !== '' && mb_strlen($lineText) >= 8) {
+                                $fragments->push($lineText);
+                            }
+                        }
+
+                        $paragraphFragments = preg_split('/\n{2,}/u', str_replace(["\r\n", "\r"], "\n", $contentPlain)) ?: [];
+                        foreach ($paragraphFragments as $paragraph) {
+                            $paragraphText = trim((string) $paragraph);
+                            if ($paragraphText !== '' && mb_strlen($paragraphText) >= 12) {
+                                $fragments->push($paragraphText);
+                            }
+                        }
+                    }
+
+                    $fragments = $fragments
+                        ->map(fn ($value) => trim((string) $value))
+                        ->filter(fn ($value) => $value !== '')
+                        ->unique()
+                        ->take(400)
+                        ->values();
+
+                    if ($fragments->isNotEmpty()) {
+                        $dictionaryRows = DB::table($dictionaryTable)
+                            ->whereIn('original', $fragments->all())
+                            ->where('status', '!=', 0)
+                            ->whereNotNull('translated')
+                            ->where('translated', '!=', '')
+                            ->select('original', 'translated')
+                            ->get();
+
+                        if ($dictionaryRows->isNotEmpty()) {
+                            $replacements = [];
+                            foreach ($dictionaryRows as $row) {
+                                $original = trim((string) ($row->original ?? ''));
+                                $translated = trim((string) ($row->translated ?? ''));
+                                if ($original === '' || $translated === '') {
+                                    continue;
+                                }
+                                if (!array_key_exists($original, $replacements)) {
+                                    $replacements[$original] = $normalizeBrandByLocale($translated, 'ar');
+                                }
+                            }
+
+                            if (!empty($replacements)) {
+                                uksort($replacements, function ($left, $right) {
+                                    return mb_strlen((string) $right) <=> mb_strlen((string) $left);
+                                });
+
+                                $replaceAll = function (string $value) use ($replacements): string {
+                                    if ($value === '') {
+                                        return $value;
+                                    }
+
+                                    return str_replace(array_keys($replacements), array_values($replacements), $value);
+                                };
+
+                                $post->post_title = $replaceAll((string) ($post->post_title ?? ''));
+                                $post->post_excerpt = $replaceAll((string) ($post->post_excerpt ?? ''));
+                                $post->post_content = $replaceAll((string) ($post->post_content ?? ''));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if ($currentLocale === 'ar' && $post) {
         $slugValue = trim((string) ($post->post_name ?? ''));
         $candidateUrls = collect([
             $wpBaseUrl . '/ar/' . rawurlencode($slugValue) . '/',
