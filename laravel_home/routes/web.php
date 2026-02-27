@@ -2912,7 +2912,7 @@ Route::get('/ads', fn () => $adsHandler('ar'));
 Route::get('/ar/ads', fn () => $adsHandler('ar'));
 Route::get('/en/ads', fn () => $adsHandler('en'));
 
-$blogHandler = function (Request $request, string $locale = 'ar') {
+$blogHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -2920,6 +2920,26 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
     $arBlogArchivePath = '/' . ltrim((string) $arBlogArchivePath, '/');
     $page = max(1, (int) $request->query('page', 1));
     $perPage = 9;
+
+    $localizeBlogPaginator = function (LengthAwarePaginator $posts) use ($localizeProductsCollectionByTranslatePress, $currentLocale, $request) {
+        $items = collect($posts->items());
+        if ($items->isEmpty()) {
+            return $posts;
+        }
+
+        $localizedItems = $localizeProductsCollectionByTranslatePress($items, $currentLocale, true)->values();
+
+        return new LengthAwarePaginator(
+            $localizedItems,
+            $posts->total(),
+            $posts->perPage(),
+            $posts->currentPage(),
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+    };
 
     $wpApiCandidates = $currentLocale === 'ar'
         ? [
@@ -2998,6 +3018,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                         ]
                     );
 
+                    $posts = $localizeBlogPaginator($posts);
                     return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
                 }
             }
@@ -3072,6 +3093,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                     ]
                 );
 
+                $posts = $localizeBlogPaginator($posts);
                 return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
             } catch (\Throwable $exception) {
             }
@@ -3125,6 +3147,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
                 ]
             );
 
+            $posts = $localizeBlogPaginator($posts);
             return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
         }
     } catch (\Throwable $exception) {
@@ -3202,6 +3225,7 @@ $blogHandler = function (Request $request, string $locale = 'ar') {
 
     $posts = $baseQuery->paginate($perPage);
 
+    $posts = $localizeBlogPaginator($posts);
     return view('blog', compact('posts', 'currentLocale', 'localePrefix', 'wpBaseUrl', 'arBlogArchivePath'));
 };
 
