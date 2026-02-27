@@ -614,6 +614,18 @@
                         $fallbackPostUrl = $wpBaseUrl . $wpBlogArchiveBase . $slug . '/';
                         $postUrl = !empty($post->permalink) ? (string) $post->permalink : $fallbackPostUrl;
                         $excerptSource = trim((string) ($post->post_excerpt ?: strip_tags((string) $post->post_content)));
+                        if (!$isEnglish) {
+                            $hasArabicExcerpt = preg_match('/[\x{0600}-\x{06FF}]/u', $excerptSource) === 1;
+                            if (!$hasArabicExcerpt) {
+                                $contentSource = trim((string) strip_tags((string) ($post->post_content ?? '')));
+                                $hasArabicContent = preg_match('/[\x{0600}-\x{06FF}]/u', $contentSource) === 1;
+                                if ($hasArabicContent) {
+                                    $excerptSource = $contentSource;
+                                } else {
+                                    $excerptSource = 'اكتشفي تفاصيل هذا المقال ونصائح عملية من فريق ستايلش لاختيار الإطلالة الأنسب لمناسبتك.';
+                                }
+                            }
+                        }
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
                         $image = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
                     @endphp
