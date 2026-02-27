@@ -132,7 +132,7 @@
 	.mini-cart-checkout{background:var(--primary);color:#fff}
 	.header-cta{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:700;background:var(--primary);color:#fff;text-decoration:none}
 	.action-nav-toggle{display:none}
-	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-weight:600}
+	.promo{background:linear-gradient(90deg,var(--secondary),#24384f);color:#fff;text-align:center;padding:10px 16px;font-size:12px;font-weight:600}
 	.header-categories-strip{background:linear-gradient(180deg,#ffffff 0%,#fbfcff 100%);border-bottom:1px solid rgba(23,39,59,.08)}
 	.categories-strip-inner{display:flex;align-items:center;gap:8px;padding:10px 0;overflow-x:auto;scrollbar-width:none}
 	.categories-strip-inner::-webkit-scrollbar{display:none}
