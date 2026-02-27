@@ -946,6 +946,10 @@
         font-size: 13px;
     }
 
+    .action-nav-toggle {
+        display: none;
+    }
+
     @media (max-width: 980px) {
         .main-header-inner {
             grid-template-columns: 1fr;
@@ -1049,6 +1053,12 @@
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x proximity;
             scrollbar-width: none;
+            display: none;
+            justify-content: flex-start;
+        }
+
+        .main-nav.is-open {
+            display: flex;
         }
 
         .main-nav::-webkit-scrollbar {
@@ -1095,6 +1105,10 @@
             justify-content: flex-end;
             gap: 6px;
             flex-wrap: nowrap;
+        }
+
+        .action-nav-toggle {
+            display: inline-flex;
         }
 
         .search-form {

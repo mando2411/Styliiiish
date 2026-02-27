@@ -1,5 +1,6 @@
 @php
     $navClass = $navClass ?? 'main-nav';
+    $navId = $navId ?? null;
     $currentLocale = $currentLocale ?? 'ar';
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
     $translate = (isset($t) && is_callable($t)) ? $t : fn (string $key) => $key;
@@ -30,7 +31,7 @@
 
     $isActive = fn (string $targetPath) => $currentPath === $targetPath;
 @endphp
-<nav class="{{ $navClass }}" aria-label="Main Navigation">
+<nav @if($navId) id="{{ $navId }}" @endif class="{{ $navClass }}" aria-label="Main Navigation">
     <a class="{{ $isActive($homePath) ? 'active' : '' }}" href="{{ $localePrefix }}">{{ $nt('nav_home', 'الرئيسية', 'Home') }}</a>
     <a class="{{ $isActive($shopPath) ? 'active' : '' }}" href="{{ $localePrefix }}/shop">{{ $nt('nav_shop', 'المتجر', 'Shop') }}</a>
     <a class="{{ $isActive($blogPath) ? 'active' : '' }}" href="{{ $localePrefix }}/blog">{{ $nt('nav_blog', 'المدونة', 'Blog') }}</a>

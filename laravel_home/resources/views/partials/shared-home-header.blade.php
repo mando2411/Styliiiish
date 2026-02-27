@@ -92,9 +92,12 @@
             <span class="brand-tag">{{ $ht('brand_tag', 'لأن كل امرأة تستحق أن تتألق', 'Because every woman deserves to shine') }}</span>
         </a>
 
-        @include('partials.shared-header-nav', ['navClass' => 'main-nav'])
+        @include('partials.shared-header-nav', ['navClass' => 'main-nav', 'navId' => 'headerMainNav'])
 
         <div class="header-actions">
+            <button class="icon-btn nav-toggle action-nav-toggle" id="headerNavToggle" type="button" aria-label="{{ $ht('menu', 'القائمة', 'Menu') }}" title="{{ $ht('menu', 'القائمة', 'Menu') }}" aria-controls="headerMainNav" aria-expanded="false">
+                <span class="icon" aria-hidden="true">☰</span>
+            </button>
             <form class="search-form" action="{{ $headerSearchUrl }}" method="get">
                 <input class="search-input" type="search" name="q" required placeholder="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}" aria-label="{{ $ht('search_placeholder', 'ابحثي عن فستانك...', 'Search for your dress...') }}">
                 <button class="search-btn" type="submit">{{ $ht('search_btn', 'بحث', 'Search') }}</button>
@@ -126,6 +129,34 @@
         </div>
     </div>
 </header>
+
+<script>
+    (() => {
+        const navToggle = document.getElementById('headerNavToggle');
+        const nav = document.getElementById('headerMainNav');
+
+        if (!navToggle || !nav) return;
+
+        const closeNav = () => {
+            nav.classList.remove('is-open');
+            navToggle.setAttribute('aria-expanded', 'false');
+        };
+
+        navToggle.addEventListener('click', () => {
+            const willOpen = !nav.classList.contains('is-open');
+            nav.classList.toggle('is-open', willOpen);
+            navToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        });
+
+        nav.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', closeNav);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 640) closeNav();
+        });
+    })();
+</script>
 
 <div class="promo">{{ $ht('promo_line', 'لأن كل امرأة تستحق أن تتألق • خصومات تصل إلى 50% • توصيل داخل مصر خلال 2–10 أيام عمل', 'Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days') }}</div>
 
