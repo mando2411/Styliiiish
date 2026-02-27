@@ -48,12 +48,16 @@
 	}
 	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي'], true);
 	$is_my_dresses_path = in_array($normalized_path, ['/my-dresses', '/ar/فساتيني'], true);
+	$is_owner_dashboard_path = in_array($normalized_path, ['/owner-dashboard', '/ar/لوحة-معلومات-المالك'], true);
 	if ($is_account_path) {
 		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 		$en_switch_path = '/my-account/';
 	} elseif ($is_my_dresses_path) {
 		$ar_switch_path = '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
 		$en_switch_path = '/my-dresses/';
+	} elseif ($is_owner_dashboard_path) {
+		$ar_switch_path = '/ar/%d9%84%d9%88%d8%ad%d8%a9-%d9%85%d8%b9%d9%84%d9%88%d9%85%d8%a7%d8%aa-%d8%a7%d9%84%d9%85%d8%a7%d9%84%d9%83/';
+		$en_switch_path = '/owner-dashboard/';
 	} else {
 		$ar_switch_path = '/ar' . ($path_without_locale === '/' ? '' : $path_without_locale);
 		$en_switch_path = ($path_without_locale === '/' ? '/' : $path_without_locale);
