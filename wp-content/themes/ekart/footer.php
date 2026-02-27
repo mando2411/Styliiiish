@@ -7,7 +7,7 @@
 	if ($normalized_path === '') {
 		$normalized_path = '/';
 	}
-	$is_english = preg_match('#^/en(?:/|$)#i', $request_path) === 1;
+	$is_english = (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || ($normalized_path === '/my-account');
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim(home_url('/'), '/');
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
