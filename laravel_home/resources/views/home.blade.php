@@ -510,6 +510,7 @@
         .topbar-mobile-icon.icon-whatsapp { color: #25D366; }
         .topbar-mobile-icon.icon-facebook { color: #1877F2; }
         .topbar-mobile-icon.icon-instagram { color: #E1306C; }
+        .topbar-mobile-icon.icon-tiktok { color: #111111; }
         .topbar-mobile-icon.icon-google { color: #4285F4; }
 
         .topbar-mobile-icon.icon-google svg {

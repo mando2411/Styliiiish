@@ -85,6 +85,9 @@
                 <a class="topbar-mobile-icon icon-instagram" href="https://www.instagram.com/styliiiish.egypt/" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5zm8.95 1.35a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.8A3.2 3.2 0 1 0 12 15.2 3.2 3.2 0 0 0 12 8.8z"/></svg>
                 </a>
+                <a class="topbar-mobile-icon icon-tiktok" href="https://www.tiktok.com/@styliiiish.egypt" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.13V2h-3.1v12.4a2.74 2.74 0 1 1-1.88-2.6V8.67a5.84 5.84 0 1 0 5 5.79V8.17a7.91 7.91 0 0 0 4.62 1.48V6.69h-.87z"/></svg>
+                </a>
                 <a class="topbar-mobile-icon icon-google" href="https://g.page/styliish" target="_blank" rel="noopener" aria-label="Google" title="Google">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 12.27c0-.82-.07-1.4-.23-2H12v4.26h6.61c-.13 1.06-.86 2.66-2.47 3.74l-.02.14 3.58 2.77.25.03c2.28-2.1 3.55-5.2 3.55-8.94zM12 24c3.24 0 5.95-1.07 7.93-2.92l-3.78-2.92c-1.01.7-2.37 1.19-4.15 1.19-3.17 0-5.86-2.1-6.82-5l-.13.01-3.73 2.88-.04.12A12 12 0 0 0 12 24zM5.18 14.35A7.2 7.2 0 0 1 4.78 12c0-.82.14-1.62.38-2.35l-.01-.16L1.38 6.57l-.12.06A11.98 11.98 0 0 0 0 12c0 1.93.46 3.75 1.27 5.37l3.91-3.02zM12 4.65c2.24 0 3.75.97 4.61 1.78l3.36-3.28C17.94 1.25 15.24 0 12 0A12 12 0 0 0 1.27 6.63l3.9 3.02c.97-2.9 3.66-5 6.83-5z"/></svg>
                 </a>
