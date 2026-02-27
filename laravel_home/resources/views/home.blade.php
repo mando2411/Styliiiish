@@ -2637,6 +2637,7 @@
                 display: none;
             }
 
+            .hero-mobile-trust span {
                 opacity: 0;
                 transform: translateX(10px) scale(.88);
                 transition: transform .28s cubic-bezier(.22, .61, .36, 1), opacity .22s ease, background .2s ease;

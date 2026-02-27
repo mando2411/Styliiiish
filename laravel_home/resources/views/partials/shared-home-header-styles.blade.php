@@ -75,12 +75,24 @@
         justify-content: center;
         box-shadow: 0 10px 24px rgba(10, 17, 30, 0.38);
         cursor: pointer;
+        transition: transform .28s cubic-bezier(.22, .61, .36, 1), box-shadow .28s ease, background .28s ease;
     }
 
     .topbar-social-toggle svg {
         width: 20px;
         height: 20px;
         fill: currentColor;
+        transition: transform .32s cubic-bezier(.22, .61, .36, 1);
+    }
+
+    .topbar-social-toggle[aria-expanded="true"] {
+        transform: rotate(90deg);
+        box-shadow: 0 14px 28px rgba(10, 17, 30, 0.46);
+        background: rgba(15, 26, 42, 1);
+    }
+
+    .topbar-social-toggle[aria-expanded="true"] svg {
+        transform: scale(1.08);
     }
 
     .topbar-mobile-icons {
@@ -89,11 +101,12 @@
         inset-inline-end: calc(100% + 8px);
         z-index: 80;
         min-width: 48px;
-        transition: transform .28s cubic-bezier(.22, .61, .36, 1), box-shadow .28s ease, background .28s ease;
+        padding: 8px;
         border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.22);
         background: rgba(15, 26, 42, 0.94);
         box-shadow: 0 14px 30px rgba(10, 17, 30, 0.32);
+        transition: transform .28s cubic-bezier(.22, .61, .36, 1), box-shadow .28s ease, background .28s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -101,7 +114,7 @@
         opacity: 0;
         transform: translateX(8px);
         pointer-events: none;
-        transition: .2s ease;
+        transition: opacity .2s ease, transform .28s cubic-bezier(.22, .61, .36, 1);
     }
 
     .topbar-mobile-icons.is-open {
@@ -114,17 +127,8 @@
         width: 32px;
         height: 32px;
         border-radius: 999px;
-        transition: transform .32s cubic-bezier(.22, .61, .36, 1);
+        border: 1px solid rgba(255, 255, 255, 0.35);
         background: rgba(255, 255, 255, 0.14);
-
-    .topbar-social-toggle[aria-expanded="true"] {
-        transform: rotate(90deg);
-        box-shadow: 0 14px 28px rgba(10, 17, 30, 0.46);
-        background: rgba(15, 26, 42, 1);
-    }
-
-    .topbar-social-toggle[aria-expanded="true"] svg {
-        transform: scale(1.08);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -132,7 +136,22 @@
         text-decoration: none;
         line-height: 1;
         box-shadow: 0 3px 10px rgba(10, 17, 30, 0.2);
+        opacity: 0;
+        transform: translateX(10px) scale(.88);
+        transition: transform .28s cubic-bezier(.22, .61, .36, 1), opacity .22s ease, background .2s ease;
     }
+
+    .topbar-mobile-icons.is-open .topbar-mobile-icon {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(1) { transition-delay: .02s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(2) { transition-delay: .05s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(3) { transition-delay: .08s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(4) { transition-delay: .11s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(5) { transition-delay: .14s; }
+    .topbar-mobile-icons .topbar-mobile-icon:nth-child(6) { transition-delay: .17s; }
 
     .topbar-mobile-icon:hover {
         transform: translateY(-1px);
@@ -152,9 +171,7 @@
     .topbar-mobile-icon.icon-tiktok { color: #111111; }
     .topbar-mobile-icon.icon-google { color: #4285F4; }
 
-        opacity: 0;
-        transform: translateX(10px) scale(.88);
-        transition: transform .28s cubic-bezier(.22, .61, .36, 1), opacity .22s ease, background .2s ease;
+    .topbar-mobile-icon.icon-google svg {
         width: 14px;
         height: 14px;
     }
