@@ -1646,6 +1646,10 @@
             align-items: stretch;
         }
 
+        .hero-mobile-slider-dots {
+            display: none;
+        }
+
         .hero-main, .hero-side {
             background: var(--card);
             border: 1px solid var(--line);
@@ -2654,7 +2658,16 @@
             }
 
             .hero-wrap {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
                 gap: 12px;
+                scrollbar-width: none;
+            }
+
+            .hero-wrap::-webkit-scrollbar {
+                display: none;
             }
 
             .hero-main,
@@ -2662,6 +2675,9 @@
                 border-radius: 14px;
                 padding: 16px;
                 box-shadow: 0 8px 20px rgba(23, 39, 59, 0.05);
+                flex: 0 0 100%;
+                min-width: 100%;
+                scroll-snap-align: start;
             }
 
             .hero-main {
@@ -2672,6 +2688,29 @@
             .hero-side {
                 border-top: 3px solid var(--secondary);
                 background: #fff;
+            }
+
+            .hero-mobile-slider-dots {
+                margin-top: 10px;
+                display: flex;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .hero-mobile-slider-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 999px;
+                border: 0;
+                background: rgba(23, 39, 59, 0.25);
+                padding: 0;
+                cursor: pointer;
+                transition: transform .2s ease, background .2s ease;
+            }
+
+            .hero-mobile-slider-dot.is-active {
+                background: var(--primary);
+                transform: scale(1.2);
             }
 
             .badge {
@@ -3109,9 +3148,78 @@
                 </div>
             </aside>
         </div>
+        <div class="container hero-mobile-slider-dots" id="heroMobileSliderDots" aria-hidden="true">
+            <button class="hero-mobile-slider-dot is-active" type="button" data-hero-slide="0" aria-label="Hero slide 1"></button>
+            <button class="hero-mobile-slider-dot" type="button" data-hero-slide="1" aria-label="Hero slide 2"></button>
+        </div>
     </section>
 
    
+
+    <script>
+        (() => {
+            const heroWrap = document.querySelector('.hero-wrap');
+            const dotsWrap = document.getElementById('heroMobileSliderDots');
+            if (!heroWrap || !dotsWrap) return;
+
+            const slides = [
+                heroWrap.querySelector('.hero-main'),
+                heroWrap.querySelector('.hero-side'),
+            ].filter(Boolean);
+
+            const dots = Array.from(dotsWrap.querySelectorAll('.hero-mobile-slider-dot'));
+            if (slides.length < 2 || dots.length < 2) return;
+
+            const isMobile = () => window.innerWidth <= 640;
+
+            const setActiveDot = (index) => {
+                dots.forEach((dot, dotIndex) => {
+                    dot.classList.toggle('is-active', dotIndex === index);
+                });
+            };
+
+            const detectActiveSlide = () => {
+                if (!isMobile()) {
+                    setActiveDot(0);
+                    return;
+                }
+
+                const wrapRect = heroWrap.getBoundingClientRect();
+                const wrapCenter = wrapRect.left + (wrapRect.width / 2);
+                let nearestIndex = 0;
+                let nearestDistance = Number.POSITIVE_INFINITY;
+
+                slides.forEach((slide, index) => {
+                    const rect = slide.getBoundingClientRect();
+                    const center = rect.left + (rect.width / 2);
+                    const distance = Math.abs(center - wrapCenter);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestIndex = index;
+                    }
+                });
+
+                setActiveDot(nearestIndex);
+            };
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    if (!isMobile()) return;
+                    const slide = slides[index];
+                    if (!slide) return;
+                    heroWrap.scrollTo({
+                        left: slide.offsetLeft,
+                        behavior: 'smooth',
+                    });
+                    setActiveDot(index);
+                });
+            });
+
+            heroWrap.addEventListener('scroll', detectActiveSlide, { passive: true });
+            window.addEventListener('resize', detectActiveSlide);
+            detectActiveSlide();
+        })();
+    </script>
 
     <section class="section">
         <div class="container">
