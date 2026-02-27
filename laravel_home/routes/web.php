@@ -632,7 +632,17 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         'price.meta_value as price',
         'regular.meta_value as regular_price',
         'img.guid as image'
-    )->get();
+    )
+    ->selectRaw("EXISTS (
+        SELECT 1
+        FROM wp_term_relationships tr
+        INNER JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+        INNER JOIN wp_terms t ON t.term_id = tt.term_id
+        WHERE tr.object_id = p.ID
+          AND tt.taxonomy = 'product_cat'
+          AND t.slug = 'used-dress'
+    ) as is_marketplace")
+    ->get();
 
     $products = $localizeProductsCollectionByWpml($products, $locale, true);
 
@@ -832,6 +842,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
                 'price' => $price,
                 'regular_price' => $regular,
                 'is_sale' => $isSale,
+                'is_marketplace' => (int) ($product->is_marketplace ?? 0) === 1,
                 'discount' => $discount,
                 'saving' => $saving,
                 'image' => $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png',

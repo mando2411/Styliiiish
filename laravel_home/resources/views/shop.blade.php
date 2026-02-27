@@ -27,9 +27,10 @@
             'currency' => 'ج.م',
             'contact_price' => 'تواصل لمعرفة السعر',
             'discount_badge' => 'خصم',
+            'badge_marketplace' => 'ماركت بليس',
+            'badge_brand' => 'ستايلش',
             'save_prefix' => 'وفّري',
-            'buy_now' => 'اطلبي الآن',
-            'preview' => 'معاينة',
+            'view_product' => 'تفاصيل الفستان',
             'results_none' => 'لا توجد نتائج حاليًا.',
             'results_showing' => 'عرض :rendered من :total منتج',
             'load_more' => 'جاري تحميل المزيد...',
@@ -56,9 +57,10 @@
             'currency' => 'EGP',
             'contact_price' => 'Contact for price',
             'discount_badge' => 'OFF',
+            'badge_marketplace' => 'Marketplace',
+            'badge_brand' => 'Styliiiish',
             'save_prefix' => 'Save',
-            'buy_now' => 'Order Now',
-            'preview' => 'Preview',
+            'view_product' => 'Dress Details',
             'results_none' => 'No results right now.',
             'results_showing' => 'Showing :rendered of :total products',
             'load_more' => 'Loading more products...',
@@ -154,17 +156,19 @@
         .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(23,39,59,.05); }
         .media { position: relative; }
         .thumb { width: 100%; aspect-ratio: 3/4; object-fit: cover; background: #f2f2f5; }
-        .badge { position: absolute; top: 10px; right: 10px; background: rgba(213,21,34,.92); color: #fff; border-radius: 999px; padding: 5px 9px; font-size: 11px; font-weight: 800; }
+        .card-badges { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+        .badge-chip { border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 800; line-height: 1; backdrop-filter: blur(3px); width: fit-content; }
+        .badge-brand { background: linear-gradient(135deg, rgba(213, 21, 34, 0.96), rgba(183, 15, 26, 0.96)); color: #fff; border: 1px solid rgba(255, 255, 255, 0.28); box-shadow: 0 6px 14px rgba(213, 21, 34, 0.28); }
+        .badge-marketplace { background: rgba(23, 39, 59, 0.9); color: #fff; border: 1px solid rgba(255, 255, 255, 0.22); }
+        .badge-discount { background: rgba(213, 21, 34, 0.9); color: #fff; }
         .content { padding: 11px; display: flex; flex-direction: column; gap: 8px; height: 100%; }
         .name { margin: 0; font-size: 14px; line-height: 1.4; min-height: 40px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
         .prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .price { color: var(--primary); font-weight: 900; font-size: 17px; }
         .old { color: #8b8b97; text-decoration: line-through; font-size: 13px; }
         .save { display: inline-flex; width: fit-content; padding: 4px 8px; border-radius: 999px; background: #fff3f4; color: var(--primary); font-size: 11px; font-weight: 800; }
-        .actions { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-buy, .btn-view { min-height: 40px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
-        .btn-buy { background: var(--primary); color: #fff; }
-        .btn-view { border: 1px solid var(--line); color: var(--secondary); background: #fff; }
+        .actions { margin-top: auto; display: grid; grid-template-columns: 1fr; gap: 8px; }
+        .product-details-btn { min-height: 42px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; line-height: 1; text-align: center; background: var(--primary); color: #fff; }
 
         .skeleton {
             border-radius: 12px;
@@ -315,9 +319,10 @@
                 currency: @json($t('currency')),
                 contactPrice: @json($t('contact_price')),
                 discountBadge: @json($t('discount_badge')),
+                badgeMarketplace: @json($t('badge_marketplace')),
+                badgeBrand: @json($t('badge_brand')),
                 savePrefix: @json($t('save_prefix')),
-                buyNow: @json($t('buy_now')),
-                preview: @json($t('preview')),
+                viewProduct: @json($t('view_product')),
                 resultsNone: @json($t('results_none')),
                 resultsShowing: @json($t('results_showing')),
                 loadMore: @json($t('load_more')),
@@ -352,14 +357,19 @@
             const productCard = (product) => {
                 const priceText = product.price > 0 ? `${fmt.format(product.price)} ${i18n.currency}` : i18n.contactPrice;
                 const oldText = product.is_sale ? `<span class="old">${fmt.format(product.regular_price)} ${i18n.currency}</span>` : '';
-                const badge = product.is_sale ? `<span class="badge">${i18n.discountBadge} ${product.discount}%</span>` : '';
+                const primaryBadgeText = product.is_marketplace ? i18n.badgeMarketplace : i18n.badgeBrand;
+                const primaryBadgeClass = product.is_marketplace ? 'badge-marketplace' : 'badge-brand';
+                const discountBadge = product.is_sale ? `<span class="badge-chip badge-discount">${i18n.discountBadge} ${product.discount}%</span>` : '';
                 const save = product.is_sale ? `<span class="save">${i18n.savePrefix} ${fmt.format(product.saving)} ${i18n.currency}</span>` : '';
 
                 return `
                     <article class="card">
                         <div class="media">
                             <img class="thumb" src="${product.image}" alt="${product.title}" loading="lazy">
-                            ${badge}
+                            <div class="card-badges">
+                                <span class="badge-chip ${primaryBadgeClass}">${primaryBadgeText}</span>
+                                ${discountBadge}
+                            </div>
                         </div>
                         <div class="content">
                             <h3 class="name">${product.title}</h3>
@@ -369,8 +379,7 @@
                             </div>
                             ${save}
                             <div class="actions">
-                                <a class="btn-buy" href="${localePrefix}/item/${product.slug}">${i18n.buyNow}</a>
-                                <a class="btn-view" href="${localePrefix}/item/${product.slug}">${i18n.preview}</a>
+                                <a class="product-details-btn" href="${localePrefix}/item/${product.slug}">${i18n.viewProduct}</a>
                             </div>
                         </div>
                     </article>
