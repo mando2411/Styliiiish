@@ -47,6 +47,19 @@
             'go_to_login' => 'تسجيل الدخول',
             'success_update' => 'تم التحديث بنجاح!',
             'guest_auth_title' => 'سجّل الدخول أو أنشئ حسابًا جديدًا',
+            'guest_login_tab' => 'تسجيل الدخول',
+            'guest_register_tab' => 'إنشاء حساب',
+            'login_username' => 'اسم المستخدم أو البريد الإلكتروني',
+            'login_password' => 'كلمة المرور',
+            'remember_me' => 'تذكرني',
+            'sign_in' => 'تسجيل الدخول',
+            'register_username' => 'اسم المستخدم',
+            'register_email' => 'البريد الإلكتروني',
+            'create_account' => 'إنشاء حساب',
+            'sign_in_google' => 'المتابعة عبر Google',
+            'password_mismatch' => 'كلمتا المرور غير متطابقتين.',
+            'auth_failed' => 'تعذر تسجيل الدخول. تحقق من البيانات وحاول مرة أخرى.',
+            'register_disabled' => 'إنشاء الحساب غير متاح حالياً.',
         ],
         'en' => [
             'page_title' => 'My Account | Styliiiish',
@@ -86,6 +99,19 @@
             'go_to_login' => 'Log in',
             'success_update' => 'Updated successfully!',
             'guest_auth_title' => 'Log in or create a new account',
+            'guest_login_tab' => 'Sign In',
+            'guest_register_tab' => 'Create account',
+            'login_username' => 'Username or email',
+            'login_password' => 'Password',
+            'remember_me' => 'Remember me',
+            'sign_in' => 'Sign In',
+            'register_username' => 'Username',
+            'register_email' => 'Email address',
+            'create_account' => 'Create account',
+            'sign_in_google' => 'Continue with Google',
+            'password_mismatch' => 'Passwords do not match.',
+            'auth_failed' => 'Unable to sign in. Please check your credentials and try again.',
+            'register_disabled' => 'Registration is currently unavailable.',
         ],
     ];
 
@@ -263,6 +289,24 @@
         .alert-success { background: #e6f9f0; color: #0a8f5b; border: 1px solid #b3ebd2; }
         .alert-error { background: #fff0f0; color: #d51522; border: 1px solid #ffd6d6; }
 
+        .guest-auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .guest-auth-tab {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 16px;
+            background: #fff;
+            color: var(--secondary);
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .guest-auth-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .guest-auth-pane { display: none; }
+        .guest-auth-pane.active { display: block; }
+        .guest-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .guest-auth-google { margin-top: 16px; }
+        .guest-auth-divider { text-align: center; color: var(--muted); margin: 14px 0; }
+        .auth-google-fallback { display: inline-flex; align-items: center; justify-content: center; width: 100%; }
+
         @media (max-width: 900px) {
             .account-wrap { grid-template-columns: 1fr; }
             .account-nav {
@@ -271,6 +315,7 @@
             }
             .account-nav button, .account-nav a { width: auto; white-space: nowrap; padding: 10px 16px; }
             .grid-2 { grid-template-columns: 1fr; }
+            .guest-auth-grid { grid-template-columns: 1fr; }
             .account-content { padding: 20px; }
         }
     </style>
@@ -288,13 +333,66 @@
     <div id="guestAuth" style="display: none; grid-column: 1 / -1;">
         <section class="account-content" style="max-width: 960px; margin: 0 auto;">
             <h2>{{ $t('guest_auth_title') }}</h2>
-            <iframe
-                id="guestAuthFrame"
-                src="{{ $wpAccountUrl }}"
-                style="width: 100%; min-height: 980px; border: 1px solid var(--line); border-radius: 14px; background: #fff;"
-                loading="lazy"
-                referrerpolicy="strict-origin-when-cross-origin"
-            ></iframe>
+            <div class="alert alert-error" id="guestAuthError"></div>
+
+            <div class="guest-auth-tabs">
+                <button type="button" class="guest-auth-tab active" data-auth-tab="login">{{ $t('guest_login_tab') }}</button>
+                <button type="button" class="guest-auth-tab" data-auth-tab="register" id="guestRegisterTab">{{ $t('guest_register_tab') }}</button>
+            </div>
+
+            <div class="guest-auth-pane active" id="guestAuthPane-login">
+                <form id="guestLoginForm" class="guest-auth-grid" autocomplete="on">
+                    <input type="hidden" id="guestLoginNonce" value="">
+                    <div class="form-group">
+                        <label for="guestLoginUsername">{{ $t('login_username') }}</label>
+                        <input id="guestLoginUsername" class="form-control" type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestLoginPassword">{{ $t('login_password') }}</label>
+                        <input id="guestLoginPassword" class="form-control" type="password" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1; margin-top: -8px;">
+                        <label style="display: inline-flex; align-items: center; gap: 8px; margin: 0; font-weight: 600; color: var(--muted);">
+                            <input id="guestRemember" type="checkbox" value="forever">
+                            <span>{{ $t('remember_me') }}</span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                        <button class="btn btn-primary" id="guestLoginSubmit" type="submit">{{ $t('sign_in') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="guest-auth-pane" id="guestAuthPane-register">
+                <form id="guestRegisterForm" class="guest-auth-grid" autocomplete="on">
+                    <input type="hidden" id="guestRegisterNonce" value="">
+                    <div class="form-group">
+                        <label for="guestRegisterUsername">{{ $t('register_username') }}</label>
+                        <input id="guestRegisterUsername" class="form-control" type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestRegisterEmail">{{ $t('register_email') }}</label>
+                        <input id="guestRegisterEmail" class="form-control" type="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestRegisterPassword">{{ $t('new_password') }}</label>
+                        <input id="guestRegisterPassword" class="form-control" type="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestRegisterPasswordConfirm">{{ $t('confirm_password') }}</label>
+                        <input id="guestRegisterPasswordConfirm" class="form-control" type="password" required>
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 0;">
+                        <button class="btn btn-primary" id="guestRegisterSubmit" type="submit">{{ $t('create_account') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="guest-auth-divider">or</div>
+            <div class="guest-auth-google">
+                <div class="googlesitekit-sign-in-with-google__frontend-output-button" id="accountGoogleButton" data-googlesitekit-siwg-shape="pill" data-googlesitekit-siwg-text="continue_with" data-googlesitekit-siwg-theme="filled_blue" aria-label="{{ $t('sign_in_google') }}"></div>
+                <a class="btn btn-light auth-google-fallback" id="accountGoogleFallback" href="{{ $wpAccountUrl }}">{{ $t('sign_in_google') }}</a>
+            </div>
         </section>
     </div>
 
@@ -420,13 +518,270 @@ window.disableWishlistRequests = true;
 document.addEventListener('DOMContentLoaded', () => {
     const apiUrl = '{{ $wpBaseUrl }}/wp-json/styliiiish/v1/account';
     const wpAccountUrl = '{{ $wpAccountUrl }}';
+    const authFailedText = @json($t('auth_failed'));
+    const passwordMismatchText = @json($t('password_mismatch'));
+    const registerDisabledText = @json($t('register_disabled'));
     let accountData = null;
+    let authContext = { loginNonce: '', registerNonce: '', canRegister: true, googleConfig: null };
 
     const showMsg = (id, text) => {
         const el = document.getElementById(id);
         el.textContent = text;
         el.style.display = 'block';
         setTimeout(() => el.style.display = 'none', 5000);
+    };
+
+    const showGuestAuthError = (text) => {
+        const errorBox = document.getElementById('guestAuthError');
+        if (!errorBox) return;
+        errorBox.textContent = text || authFailedText;
+        errorBox.style.display = 'block';
+    };
+
+    const clearGuestAuthError = () => {
+        const errorBox = document.getElementById('guestAuthError');
+        if (!errorBox) return;
+        errorBox.textContent = '';
+        errorBox.style.display = 'none';
+    };
+
+    const isLoggedInFromDoc = (doc) => !!(doc && (doc.querySelector('a[href*="customer-logout"]') || doc.querySelector('.woocommerce-MyAccount-content')));
+
+    const parseWooErrors = (doc) => {
+        if (!doc) return '';
+        const selectors = ['.woocommerce-error li', 'ul.woocommerce-error li', '.woocommerce-error', '.woocommerce-notices-wrapper .woocommerce-error li'];
+        for (const selector of selectors) {
+            const node = doc.querySelector(selector);
+            const text = (node?.textContent || '').trim();
+            if (text) return text;
+        }
+        return '';
+    };
+
+    const extractSiteKitGoogleConfig = (doc) => {
+        if (!doc) return null;
+        const scripts = Array.from(doc.querySelectorAll('script'));
+        for (const scriptTag of scripts) {
+            const text = String(scriptTag.textContent || '');
+            if (!text.includes('googlesitekit_auth') || !text.includes('google.accounts.id.initialize')) continue;
+            const endpointMatch = text.match(/fetch\('([^']*action=googlesitekit_auth[^']*)'/);
+            const clientMatch = text.match(/client_id:'([^']+)'/);
+            if (!endpointMatch || !clientMatch) continue;
+            return { endpoint: endpointMatch[1], clientId: clientMatch[1] };
+        }
+        return null;
+    };
+
+    const loadGoogleIdentityScript = async () => {
+        if (window.google?.accounts?.id) return;
+        const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+        if (existingScript) {
+            await new Promise((resolve) => {
+                if (window.google?.accounts?.id) return resolve();
+                existingScript.addEventListener('load', resolve, { once: true });
+                existingScript.addEventListener('error', resolve, { once: true });
+            });
+            return;
+        }
+        await new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = resolve;
+            script.onerror = resolve;
+            document.head.appendChild(script);
+        });
+    };
+
+    const fetchAuthContext = async () => {
+        const response = await fetch(`${wpAccountUrl}?_=${Date.now()}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+        if (!response.ok) return;
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        authContext.loginNonce = doc.querySelector('input[name="woocommerce-login-nonce"]')?.value || '';
+        authContext.registerNonce = doc.querySelector('input[name="woocommerce-register-nonce"]')?.value || '';
+        authContext.canRegister = authContext.registerNonce !== '';
+        authContext.googleConfig = extractSiteKitGoogleConfig(doc);
+
+        const loginNonceInput = document.getElementById('guestLoginNonce');
+        const registerNonceInput = document.getElementById('guestRegisterNonce');
+        if (loginNonceInput) loginNonceInput.value = authContext.loginNonce;
+        if (registerNonceInput) registerNonceInput.value = authContext.registerNonce;
+
+        const registerTab = document.getElementById('guestRegisterTab');
+        if (registerTab) {
+            registerTab.style.display = authContext.canRegister ? 'inline-flex' : 'none';
+        }
+    };
+
+    const setSiteKitRedirectCookie = (redirectUrl) => {
+        const expires = new Date(Date.now() + (5 * 60 * 1000)).toUTCString();
+        document.cookie = `googlesitekit_auth_redirect_to=${redirectUrl};expires=${expires};path=/`;
+    };
+
+    const initAccountGoogleButton = async () => {
+        const googleButton = document.getElementById('accountGoogleButton');
+        const googleFallback = document.getElementById('accountGoogleFallback');
+        if (!googleButton || !authContext.googleConfig) return;
+
+        await loadGoogleIdentityScript();
+        if (!window.google?.accounts?.id) return;
+
+        const endpointUrl = String(authContext.googleConfig.endpoint || '');
+        const absoluteEndpoint = endpointUrl.startsWith('http') ? endpointUrl : new URL(endpointUrl, wpAccountUrl).toString();
+
+        const handleGoogleCredentialResponse = async (response) => {
+            response.integration = 'woocommerce';
+            const redirectTarget = window.location.href;
+            setSiteKitRedirectCookie(redirectTarget);
+            try {
+                const result = await fetch(absoluteEndpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(response),
+                    credentials: 'same-origin'
+                });
+                if (result.ok && result.redirected) {
+                    location.assign(result.url);
+                    return;
+                }
+            } catch (error) {}
+            location.assign(redirectTarget);
+        };
+
+        window.google.accounts.id.initialize({ client_id: authContext.googleConfig.clientId, callback: handleGoogleCredentialResponse, library_name: 'Site-Kit' });
+        googleButton.innerHTML = '';
+        window.google.accounts.id.renderButton(googleButton, {
+            shape: googleButton.getAttribute('data-googlesitekit-siwg-shape') || 'pill',
+            text: googleButton.getAttribute('data-googlesitekit-siwg-text') || 'continue_with',
+            theme: googleButton.getAttribute('data-googlesitekit-siwg-theme') || 'filled_blue'
+        });
+        if (googleFallback) googleFallback.style.display = 'none';
+    };
+
+    const setupGuestAuth = async () => {
+        const guestAuth = document.getElementById('guestAuth');
+        if (!guestAuth) return;
+        guestAuth.style.display = 'block';
+
+        const tabButtons = Array.from(document.querySelectorAll('[data-auth-tab]'));
+        const switchTab = (tab) => {
+            tabButtons.forEach((button) => button.classList.toggle('active', button.dataset.authTab === tab));
+            document.querySelectorAll('.guest-auth-pane').forEach((pane) => pane.classList.remove('active'));
+            const targetPane = document.getElementById(`guestAuthPane-${tab}`);
+            if (targetPane) targetPane.classList.add('active');
+            clearGuestAuthError();
+        };
+        tabButtons.forEach((button) => button.addEventListener('click', () => switchTab(button.dataset.authTab)));
+
+        await fetchAuthContext();
+        await initAccountGoogleButton();
+
+        const loginForm = document.getElementById('guestLoginForm');
+        const loginSubmit = document.getElementById('guestLoginSubmit');
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                clearGuestAuthError();
+                if (!authContext.loginNonce) await fetchAuthContext();
+                if (!authContext.loginNonce) {
+                    showGuestAuthError(authFailedText);
+                    return;
+                }
+
+                const params = new URLSearchParams();
+                params.set('username', document.getElementById('guestLoginUsername').value.trim());
+                params.set('password', document.getElementById('guestLoginPassword').value);
+                if (document.getElementById('guestRemember')?.checked) params.set('rememberme', 'forever');
+                params.set('woocommerce-login-nonce', authContext.loginNonce);
+                params.set('login', 'Log in');
+                params.set('redirect', window.location.href);
+
+                if (loginSubmit) loginSubmit.disabled = true;
+                try {
+                    const response = await fetch(wpAccountUrl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
+                        body: params.toString()
+                    });
+                    const html = await response.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    if (isLoggedInFromDoc(doc)) {
+                        location.reload();
+                        return;
+                    }
+                    showGuestAuthError(parseWooErrors(doc) || authFailedText);
+                } catch (error) {
+                    showGuestAuthError(authFailedText);
+                } finally {
+                    if (loginSubmit) loginSubmit.disabled = false;
+                }
+            });
+        }
+
+        const registerForm = document.getElementById('guestRegisterForm');
+        const registerSubmit = document.getElementById('guestRegisterSubmit');
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                clearGuestAuthError();
+
+                if (!authContext.canRegister) {
+                    showGuestAuthError(registerDisabledText);
+                    return;
+                }
+
+                if (!authContext.registerNonce) await fetchAuthContext();
+                if (!authContext.registerNonce) {
+                    showGuestAuthError(registerDisabledText);
+                    return;
+                }
+
+                const password = document.getElementById('guestRegisterPassword').value;
+                const passwordConfirm = document.getElementById('guestRegisterPasswordConfirm').value;
+                if (password !== passwordConfirm) {
+                    showGuestAuthError(passwordMismatchText);
+                    return;
+                }
+
+                const params = new URLSearchParams();
+                params.set('username', document.getElementById('guestRegisterUsername').value.trim());
+                params.set('email', document.getElementById('guestRegisterEmail').value.trim());
+                params.set('password', password);
+                params.set('woocommerce-register-nonce', authContext.registerNonce);
+                params.set('register', 'Register');
+                params.set('redirect', window.location.href);
+
+                if (registerSubmit) registerSubmit.disabled = true;
+                try {
+                    const response = await fetch(wpAccountUrl, {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' },
+                        body: params.toString()
+                    });
+                    const html = await response.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    if (isLoggedInFromDoc(doc)) {
+                        location.reload();
+                        return;
+                    }
+                    showGuestAuthError(parseWooErrors(doc) || authFailedText);
+                } catch (error) {
+                    showGuestAuthError(authFailedText);
+                } finally {
+                    if (registerSubmit) registerSubmit.disabled = false;
+                }
+            });
+        }
     };
 
     const fetchAccountData = async () => {
@@ -442,14 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('accountContent').style.display = 'block';
         } catch (e) {
             document.getElementById('mainLoader').style.display = 'none';
-            const guestAuth = document.getElementById('guestAuth');
-            const guestAuthFrame = document.getElementById('guestAuthFrame');
-            if (guestAuthFrame && !guestAuthFrame.getAttribute('src')) {
-                guestAuthFrame.setAttribute('src', wpAccountUrl);
-            }
-            if (guestAuth) {
-                guestAuth.style.display = 'block';
-            }
+            await setupGuestAuth();
         }
     };
 
