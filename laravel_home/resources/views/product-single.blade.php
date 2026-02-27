@@ -231,7 +231,7 @@
     $regular = (float) ($product->regular_price ?? 0);
     $isSale = $regular > 0 && $price > 0 && $regular > $price;
 
-    $placeholderImage = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $placeholderImage = $wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png';
     $normalizePublicAssetUrl = function (?string $url) use ($wpBaseUrl): string {
         $value = trim((string) $url);
         if ($value === '') {
@@ -274,9 +274,12 @@
             return $normalized;
         })
         ->filter(fn ($url) => is_string($url) && $url !== '')
-        ->prepend($image)
         ->unique()
         ->values();
+
+    if ($image !== '' && $image !== $placeholderImage) {
+        $galleryImages = $galleryImages->prepend($image)->unique()->values();
+    }
 
     if ($galleryImages->isEmpty()) {
         $galleryImages = collect([$image]);

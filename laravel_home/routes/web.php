@@ -481,6 +481,10 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
                 ->where('thumb.meta_key', '_thumbnail_id');
         })
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->leftJoin('wp_postmeta as img_file', function ($join) {
+            $join->on('img.ID', '=', 'img_file.post_id')
+                ->where('img_file.meta_key', '_wp_attached_file');
+        })
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish');
 
@@ -854,7 +858,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             'price.meta_value as price',
             'regular.meta_value as regular_price',
             'sale.meta_value as sale_price',
-            'img.guid as image'
+            'img.guid as image',
+            'img_file.meta_value as image_file'
         )
         ->first();
 
@@ -937,6 +942,22 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
     };
 
+    $resolveAttachmentUrl = function (?string $guid, ?string $attachedFile) use ($wpBaseUrl, $isAbsoluteUrl): string {
+        $guidValue = trim((string) $guid);
+        if ($guidValue !== '' && $isAbsoluteUrl($guidValue)) {
+            return $guidValue;
+        }
+
+        $fileValue = ltrim(trim((string) $attachedFile), '/');
+        if ($fileValue !== '') {
+            return rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $fileValue;
+        }
+
+        return '';
+    };
+
+    $product->image = $resolveAttachmentUrl((string) ($product->image ?? ''), (string) ($product->image_file ?? ''));
+
     $galleryImages = [];
 
     if (!empty($product->image) && $isAbsoluteUrl((string) $product->image)) {
@@ -952,16 +973,23 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
         if ($galleryIds->isNotEmpty()) {
             $galleryRows = DB::table('wp_posts')
+                ->leftJoin('wp_postmeta as file_meta', function ($join) {
+                    $join->on('wp_posts.ID', '=', 'file_meta.post_id')
+                        ->where('file_meta.meta_key', '_wp_attached_file');
+                })
                 ->whereIn('ID', $galleryIds->all())
                 ->where('post_type', 'attachment')
-                ->select('ID', 'guid')
+                ->select('wp_posts.ID', 'wp_posts.guid', 'file_meta.meta_value as attached_file')
                 ->get()
                 ->keyBy('ID');
 
             foreach ($galleryIds as $galleryId) {
                 $galleryRow = $galleryRows->get($galleryId);
-                $url = trim((string) ($galleryRow->guid ?? ''));
-                if ($url !== '' && $isAbsoluteUrl($url)) {
+                $url = $resolveAttachmentUrl(
+                    (string) ($galleryRow->guid ?? ''),
+                    (string) ($galleryRow->attached_file ?? '')
+                );
+                if ($url !== '') {
                     $galleryImages[] = $url;
                 }
             }
