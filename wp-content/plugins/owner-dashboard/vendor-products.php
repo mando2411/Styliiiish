@@ -572,17 +572,10 @@ function sty_render_vendor_single_card($product_id){
     $post_author_id = (int) get_post_field('post_author', $product_id);
     $post_author = $post_author_id ? get_userdata($post_author_id) : false;
     $source = ($post_author && !empty($post_author->user_email)) ? $post_author->user_email : 'Unknown';
-    $post_status = get_post_status($product_id);
+    $product_slug = (string) get_post_field('post_name', $product_id);
     $view_url = get_permalink($product_id);
-    if ($post_status && $post_status !== 'publish') {
-        $view_url = add_query_arg(
-            [
-                'post_type' => 'product',
-                'p'         => $product_id,
-                'preview'   => 'true',
-            ],
-            home_url('/')
-        );
+    if ($product_slug !== '') {
+        $view_url = home_url('/item/' . $product_slug);
     }
     $thumb      = $p->get_image('thumbnail');
 

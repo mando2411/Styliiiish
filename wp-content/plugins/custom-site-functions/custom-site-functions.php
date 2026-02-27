@@ -67,14 +67,14 @@ add_action('wp_enqueue_scripts', function() {
 
 
 /********************************* site speed ************************************/
-add_action('wp_head', function() {
+/* add_action('wp_head', function() {
     ?>
     <!-- Preload Hero Images -->
     <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-2.webp" fetchpriority="high">
     <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-1.webp" fetchpriority="high">
     <link rel="preload" as="image" href="https://l.styliiiish.com/wp-content/uploads/2025/12/banner-img-3.webp" fetchpriority="high">
     <?php
-});
+});  */
 
 
 
