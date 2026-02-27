@@ -23,7 +23,7 @@
 	if ($normalized_path === '') {
 		$normalized_path = '/';
 	}
-	$is_english = in_array($normalized_path, ['/my-account', '/en/my-account'], true);
+	$is_english = (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || in_array($normalized_path, ['/my-account', '/en/my-account'], true);
 	$locale_prefix = $is_english ? '/en' : '/ar';
 	$wp_base_url = rtrim((string) get_option('home'), '/');
 	if ($wp_base_url === '') {
@@ -40,8 +40,18 @@
 	};
 	$wp_logo = $wp_base_url . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 	$my_dresses_url = $is_english ? 'https://styliiiish.com/my-dresses/' : 'https://styliiiish.com/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/';
-	$ar_switch_url = 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
-	$en_switch_url = 'https://styliiiish.com/my-account/';
+	$path_without_locale = preg_replace('#^/(ar|en)(?=/|$)#i', '', $request_path);
+	$path_without_locale = is_string($path_without_locale) ? $path_without_locale : $request_path;
+	$path_without_locale = '/' . ltrim($path_without_locale, '/');
+	if ($path_without_locale === '//') {
+		$path_without_locale = '/';
+	}
+	$is_account_path = in_array($normalized_path, ['/my-account', '/en/my-account', '/ar/حسابي'], true);
+	$ar_switch_path = $is_account_path ? '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/' : ('/ar' . ($path_without_locale === '/' ? '' : $path_without_locale));
+	$en_switch_path = $is_account_path ? '/my-account/' : ('/en' . ($path_without_locale === '/' ? '' : $path_without_locale));
+	$query_string = isset($_SERVER['QUERY_STRING']) && (string) $_SERVER['QUERY_STRING'] !== '' ? ('?' . (string) $_SERVER['QUERY_STRING']) : '';
+	$ar_switch_url = rtrim($wp_base_url, '/') . $ar_switch_path . $query_string;
+	$en_switch_url = rtrim($wp_base_url, '/') . $en_switch_path . $query_string;
 ?>
 
 <style>
