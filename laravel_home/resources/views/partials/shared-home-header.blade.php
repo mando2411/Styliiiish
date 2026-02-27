@@ -138,6 +138,14 @@
             </form>
             <span class="account-trigger-wrap action-account">
                 <a class="icon-btn account-trigger" id="accountLoginTrigger" href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" title="{{ $ht('account', 'حسابي', 'My Account') }}"><span class="icon" aria-hidden="true">👤</span></a>
+                <div class="account-menu" id="accountMenu" role="dialog" aria-label="{{ $ht('account', 'حسابي', 'My Account') }}" aria-hidden="true">
+                    <div class="account-menu-head">
+                        <strong id="accountMenuName">{{ $ht('account_logged_in', 'مستخدم مسجل دخول', 'Logged-in user') }}</strong>
+                        <span id="accountMenuMeta">{{ $ht('account_loading', 'جاري تحميل بيانات الحساب…', 'Loading account details…') }}</span>
+                    </div>
+                    <a id="accountMenuManage" href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener">{{ $ht('manage_account', 'إدارة حسابك', 'Manage your account') }}</a>
+                    <a id="accountMenuLogout" href="{{ $wpMyAccountUrl }}">{{ $ht('logout', 'تسجيل خروج', 'Log out') }}</a>
+                </div>
             </span>
             <span class="wishlist-trigger-wrap action-wishlist">
                 <button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}" title="{{ $ht('wishlist', 'قائمة الأمنيات', 'Wishlist') }}" aria-expanded="false" aria-controls="wishlistDropdown"><span class="icon" aria-hidden="true">❤</span>

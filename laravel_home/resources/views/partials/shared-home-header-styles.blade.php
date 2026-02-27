@@ -813,6 +813,66 @@
         position: relative;
     }
 
+    .account-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        inset-inline-start: 0;
+        width: min(260px, 78vw);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 12px 26px rgba(23, 39, 59, 0.18);
+        padding: 10px;
+        display: none;
+        z-index: 70;
+    }
+
+    .account-menu.is-open {
+        display: grid;
+        gap: 6px;
+    }
+
+    .account-menu-head {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 8px;
+        margin-bottom: 2px;
+        display: grid;
+        gap: 2px;
+    }
+
+    .account-menu-head strong {
+        color: var(--secondary);
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .account-menu-head span {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .account-menu a {
+        min-height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    #accountMenuManage {
+        background: var(--secondary);
+        color: #fff;
+    }
+
+    #accountMenuLogout {
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--secondary);
+    }
+
     .wishlist-count,
     .cart-count {
         position: absolute;
