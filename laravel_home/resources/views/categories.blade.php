@@ -222,7 +222,7 @@
                     $desc = trim(strip_tags((string) ($category->description ?? '')));
                     $shortDesc = $desc !== '' ? (mb_strlen($desc) > 90 ? mb_substr($desc, 0, 90) . '…' : $desc) : '';
                     $image = $category->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
-                    $link = $localePrefix . '/shop?q=' . rawurlencode((string) $category->name);
+                    $link = $localePrefix . '/shop?category=' . rawurlencode((string) $category->slug);
                 @endphp
                 <article class="card" data-name="{{ mb_strtolower((string) $category->name) }}" data-desc="{{ mb_strtolower($desc) }}">
                     <div class="thumb-wrap"><img class="thumb" src="{{ $image }}" alt="{{ $category->name }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/uploads/woocommerce-placeholder.png';"></div>
