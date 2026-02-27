@@ -56,6 +56,41 @@ $resolveTranslatePressLanguageCodes = function (string $locale): ?array {
     ];
 };
 
+$buildProductSlugCandidates = function (string $slug): array {
+    $source = trim((string) $slug);
+    if ($source === '') {
+        return [];
+    }
+
+    $variants = [];
+    $push = function (string $value) use (&$variants): void {
+        $normalized = trim($value);
+        if ($normalized !== '' && !in_array($normalized, $variants, true)) {
+            $variants[] = $normalized;
+        }
+    };
+
+    $push($source);
+
+    $decoded = rawurldecode($source);
+    $push($decoded);
+
+    $doubleDecoded = rawurldecode($decoded);
+    $push($doubleDecoded);
+
+    $push(rawurlencode($source));
+    $push(rawurlencode($decoded));
+    $push(rawurlencode($doubleDecoded));
+
+    if (function_exists('sanitize_title')) {
+        $push((string) sanitize_title($source));
+        $push((string) sanitize_title($decoded));
+        $push((string) sanitize_title($doubleDecoded));
+    }
+
+    return $variants;
+};
+
 $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, bool $includeContentFields = false) use ($resolveTranslatePressLanguageCodes, $normalizeBrandByLocale) {
     $collection = collect($rows);
     if ($collection->isEmpty()) {
@@ -177,7 +212,7 @@ $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, b
     });
 };
 
-$resolveWpmlProductLocalization = function (string $slug, string $locale) use ($mapLocaleToWpmlCode): array {
+$resolveWpmlProductLocalization = function (string $slug, string $locale) use ($mapLocaleToWpmlCode, $buildProductSlugCandidates): array {
     $result = [
         'has_wpml_table' => Schema::hasTable('wp_icl_translations'),
         'wpml_code' => $mapLocaleToWpmlCode($locale),
@@ -192,10 +227,15 @@ $resolveWpmlProductLocalization = function (string $slug, string $locale) use ($
         return $result;
     }
 
+    $slugCandidates = $buildProductSlugCandidates($slug);
+    if (empty($slugCandidates)) {
+        return $result;
+    }
+
     $baseProductId = DB::table('wp_posts')
         ->where('post_type', 'product')
         ->where('post_status', 'publish')
-        ->where('post_name', $slug)
+        ->whereIn('post_name', $slugCandidates)
         ->value('ID');
 
     if (!$baseProductId) {
@@ -809,13 +849,14 @@ Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes) {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes, $buildProductSlugCandidates) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     $isWpmlDebug = $request->boolean('debug_wpml');
     $allowOwnerPreview = $request->boolean('od_preview');
     $ownerPreviewProductId = (int) $request->query('od_product_id', 0);
+    $slugCandidates = $buildProductSlugCandidates($slug);
 
     $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
     $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
@@ -844,13 +885,17 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         })
         ->where('p.post_type', 'product')
         ->whereIn('p.post_status', $allowOwnerPreview ? ['publish', 'pending', 'draft'] : ['publish'])
-        ->where(function ($query) use ($slug, $localizedProductId, $ownerPreviewProductId, $allowOwnerPreview) {
+        ->where(function ($query) use ($slug, $slugCandidates, $localizedProductId, $ownerPreviewProductId, $allowOwnerPreview) {
             if ($allowOwnerPreview && $ownerPreviewProductId > 0) {
                 $query->where('p.ID', $ownerPreviewProductId);
             } elseif (!empty($localizedProductId)) {
                 $query->where('p.ID', (int) $localizedProductId);
             } else {
-                $query->where('p.post_name', $slug);
+                if (!empty($slugCandidates)) {
+                    $query->whereIn('p.post_name', $slugCandidates);
+                } else {
+                    $query->where('p.post_name', $slug);
+                }
             }
         })
         ->select(
@@ -1981,23 +2026,28 @@ Route::get('/att-{token}', fn (Request $request, string $token) => $attachmentSl
 Route::get('/ar/att-{token}', fn (Request $request, string $token) => $attachmentSlugHandler($request, 'att-' . $token))->where('token', '[A-Za-z0-9_-]+');
 Route::get('/en/att-{token}', fn (Request $request, string $token) => $attachmentSlugHandler($request, 'att-' . $token))->where('token', '[A-Za-z0-9_-]+');
 
-$resolveProductForAjaxSections = function (Request $request, string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml) {
+$resolveProductForAjaxSections = function (Request $request, string $slug, string $locale = 'ar') use ($resolveWpmlProductLocalization, $localizeProductsCollectionByWpml, $buildProductSlugCandidates) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $allowOwnerPreview = $request->boolean('od_preview');
     $ownerPreviewProductId = (int) $request->query('od_product_id', 0);
+    $slugCandidates = $buildProductSlugCandidates($slug);
     $wpmlResolution = $resolveWpmlProductLocalization($slug, $currentLocale);
     $localizedProductId = (int) ($wpmlResolution['localized_product_id'] ?? 0);
 
     $product = DB::table('wp_posts as p')
         ->where('p.post_type', 'product')
         ->whereIn('p.post_status', $allowOwnerPreview ? ['publish', 'pending', 'draft'] : ['publish'])
-        ->where(function ($query) use ($slug, $localizedProductId, $allowOwnerPreview, $ownerPreviewProductId) {
+        ->where(function ($query) use ($slug, $slugCandidates, $localizedProductId, $allowOwnerPreview, $ownerPreviewProductId) {
             if ($allowOwnerPreview && $ownerPreviewProductId > 0) {
                 $query->where('p.ID', $ownerPreviewProductId);
             } elseif ($localizedProductId > 0) {
                 $query->where('p.ID', $localizedProductId);
             } else {
-                $query->where('p.post_name', $slug);
+                if (!empty($slugCandidates)) {
+                    $query->whereIn('p.post_name', $slugCandidates);
+                } else {
+                    $query->where('p.post_name', $slug);
+                }
             }
         })
         ->select('p.ID', 'p.post_title', 'p.post_name', 'p.post_content', 'p.post_excerpt', 'p.post_date')
