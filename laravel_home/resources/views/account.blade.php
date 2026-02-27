@@ -6,6 +6,7 @@
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
     $wpLogo = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = $wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $wpAccountUrl = $isEnglish ? ($wpBaseUrl . '/my-account/') : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/');
 
     $translations = [
         'ar' => [
@@ -45,6 +46,7 @@
             'login_required' => 'يجب تسجيل الدخول للوصول إلى هذه الصفحة.',
             'go_to_login' => 'تسجيل الدخول',
             'success_update' => 'تم التحديث بنجاح!',
+            'guest_auth_title' => 'سجّل الدخول أو أنشئ حسابًا جديدًا',
         ],
         'en' => [
             'page_title' => 'My Account | Styliiiish',
@@ -83,6 +85,7 @@
             'login_required' => 'You must be logged in to access this page.',
             'go_to_login' => 'Log in',
             'success_update' => 'Updated successfully!',
+            'guest_auth_title' => 'Log in or create a new account',
         ],
     ];
 
@@ -282,9 +285,17 @@
         <span>{{ $t('loading') }}</span>
     </div>
 
-    <div class="alert alert-error" id="authError" style="display: none; grid-column: 1 / -1;">
-        {{ $t('login_required') }} <br><br>
-        <a href="{{ $wpBaseUrl }}/my-account/" class="btn btn-primary">{{ $t('go_to_login') }}</a>
+    <div id="guestAuth" style="display: none; grid-column: 1 / -1;">
+        <section class="account-content" style="max-width: 960px; margin: 0 auto;">
+            <h2>{{ $t('guest_auth_title') }}</h2>
+            <iframe
+                id="guestAuthFrame"
+                src="{{ $wpAccountUrl }}"
+                style="width: 100%; min-height: 980px; border: 1px solid var(--line); border-radius: 14px; background: #fff;"
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+            ></iframe>
+        </section>
     </div>
 
     <aside class="account-nav" id="accountNav" style="display: none;">
@@ -408,6 +419,7 @@ window.disableWishlistRequests = true;
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const apiUrl = '{{ $wpBaseUrl }}/wp-json/styliiiish/v1/account';
+    const wpAccountUrl = '{{ $wpAccountUrl }}';
     let accountData = null;
 
     const showMsg = (id, text) => {
@@ -430,7 +442,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('accountContent').style.display = 'block';
         } catch (e) {
             document.getElementById('mainLoader').style.display = 'none';
-            document.getElementById('authError').style.display = 'block';
+            const guestAuth = document.getElementById('guestAuth');
+            const guestAuthFrame = document.getElementById('guestAuthFrame');
+            if (guestAuthFrame && !guestAuthFrame.getAttribute('src')) {
+                guestAuthFrame.setAttribute('src', wpAccountUrl);
+            }
+            if (guestAuth) {
+                guestAuth.style.display = 'block';
+            }
         }
     };
 
