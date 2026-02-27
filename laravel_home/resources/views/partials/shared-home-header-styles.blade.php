@@ -400,6 +400,19 @@
         transform: translateY(-2px);
     }
 
+    .category-strip-chip.is-active {
+        border-color: var(--primary);
+        color: #fff;
+        background: var(--primary);
+        box-shadow: 0 8px 18px rgba(213, 21, 34, 0.28);
+        transform: translateY(-1px);
+    }
+
+    .category-strip-chip.is-active:hover {
+        color: #fff;
+        background: var(--primary);
+    }
+
     @keyframes categoryChipIn {
         from { opacity: 0; transform: translateY(6px); }
         to { opacity: 1; transform: translateY(0); }

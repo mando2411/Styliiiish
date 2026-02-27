@@ -2,6 +2,7 @@
     $pathLocale = strtolower((string) request()->segment(1));
     $currentLocale = in_array($pathLocale, ['ar', 'en'], true) ? $pathLocale : ($currentLocale ?? 'ar');
     $localePrefix = $localePrefix ?? ($currentLocale === 'en' ? '/en' : '/ar');
+    $activeCategorySlug = strtolower(trim((string) request()->query('category', '')));
 
     $categoryGroups = collect();
 
@@ -125,13 +126,19 @@
                 @php
                     $parent = $group['parent'];
                     $children = $group['children'];
+                    $parentSlug = strtolower(trim((string) ($parent->slug ?? '')));
+                    $isParentActive = $activeCategorySlug !== '' && $parentSlug === $activeCategorySlug;
                 @endphp
                 <span class="category-strip-group">
-                    <a class="category-strip-chip category-strip-parent" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $parent->slug) }}">
+                    <a class="category-strip-chip category-strip-parent {{ $isParentActive ? 'is-active' : '' }}" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $parent->slug) }}" @if($isParentActive) aria-current="page" @endif>
                         {{ $parent->name }}
                     </a>
                     @foreach($children->take(6) as $child)
-                        <a class="category-strip-chip category-strip-sub" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $child->slug) }}">
+                        @php
+                            $childSlug = strtolower(trim((string) ($child->slug ?? '')));
+                            $isChildActive = $activeCategorySlug !== '' && $childSlug === $activeCategorySlug;
+                        @endphp
+                        <a class="category-strip-chip category-strip-sub {{ $isChildActive ? 'is-active' : '' }}" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $child->slug) }}" @if($isChildActive) aria-current="page" @endif>
                             {{ $child->name }}
                         </a>
                     @endforeach
