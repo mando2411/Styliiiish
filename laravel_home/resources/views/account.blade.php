@@ -399,6 +399,10 @@
     </section>
 </main>
 
+<script>
+window.disableWishlistRequests = true;
+</script>
+
 @include('partials.shared-home-footer')
 
 <script>

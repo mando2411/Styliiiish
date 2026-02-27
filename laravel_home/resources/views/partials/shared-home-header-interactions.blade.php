@@ -183,6 +183,7 @@
         let currentCartCount = 0;
         let wishlistItemsCache = [];
         let cartPayloadCache = null;
+        const disableWishlistRequests = !!window.disableWishlistRequests;
 
         const getSafeCurrentUrl = () => {
             try {
@@ -426,6 +427,12 @@
 
         const loadWishlistItems = async (forceReload = false) => {
             if (!wishlistDropdownList) return wishlistItemsCache;
+            if (disableWishlistRequests) {
+                setWishlistCount(0);
+                wishlistItemsCache = [];
+                renderWishlistDropdown(wishlistItemsCache);
+                return wishlistItemsCache;
+            }
             if (!forceReload && wishlistItemsCache.length > 0) {
                 renderWishlistDropdown(wishlistItemsCache);
                 return wishlistItemsCache;
@@ -442,6 +449,10 @@
         };
 
         const refreshWishlistCount = async (withAnimation = false) => {
+            if (disableWishlistRequests) {
+                setWishlistCount(0);
+                return;
+            }
             const response = await fetch(`${localePrefix}/item/wishlist/count?_=${Date.now()}`, { method: 'GET', credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' } });
             if (!response.ok) throw new Error('wishlist_count_failed');
             const result = await response.json();

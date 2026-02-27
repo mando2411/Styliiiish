@@ -8,34 +8,60 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function styliiiish_resolve_account_user_id(): int {
+    if (is_user_logged_in()) {
+        return (int) get_current_user_id();
+    }
+
+    if (!defined('LOGGED_IN_COOKIE') || empty($_COOKIE[LOGGED_IN_COOKIE])) {
+        return 0;
+    }
+
+    $cookie = wp_unslash((string) $_COOKIE[LOGGED_IN_COOKIE]);
+    $user_id = (int) wp_validate_auth_cookie($cookie, 'logged_in');
+    if ($user_id <= 0) {
+        return 0;
+    }
+
+    wp_set_current_user($user_id);
+    return $user_id;
+}
+
+function styliiiish_account_permission_check(): bool {
+    return styliiiish_resolve_account_user_id() > 0;
+}
+
 add_action('rest_api_init', function () {
     register_rest_route('styliiiish/v1', '/account', [
         'methods' => 'GET',
         'callback' => 'styliiiish_get_account_data',
-        'permission_callback' => function () { return is_user_logged_in(); }
+        'permission_callback' => 'styliiiish_account_permission_check'
     ]);
 
     register_rest_route('styliiiish/v1', '/account/details', [
         'methods' => 'POST',
         'callback' => 'styliiiish_update_account_details',
-        'permission_callback' => function () { return is_user_logged_in(); }
+        'permission_callback' => 'styliiiish_account_permission_check'
     ]);
 
     register_rest_route('styliiiish/v1', '/account/addresses', [
         'methods' => 'POST',
         'callback' => 'styliiiish_update_account_addresses',
-        'permission_callback' => function () { return is_user_logged_in(); }
+        'permission_callback' => 'styliiiish_account_permission_check'
     ]);
 
     register_rest_route('styliiiish/v1', '/account/paymob-card/(?P<id>\d+)', [
         'methods' => 'DELETE',
         'callback' => 'styliiiish_delete_paymob_card',
-        'permission_callback' => function () { return is_user_logged_in(); }
+        'permission_callback' => 'styliiiish_account_permission_check'
     ]);
 });
 
 function styliiiish_get_account_data() {
-    $user_id = get_current_user_id();
+    $user_id = styliiiish_resolve_account_user_id();
+    if ($user_id <= 0) {
+        return new WP_Error('not_authenticated', 'Authentication required.', ['status' => 401]);
+    }
     $user = get_userdata($user_id);
     $customer = new WC_Customer($user_id);
 
@@ -98,7 +124,10 @@ function styliiiish_get_account_data() {
 }
 
 function styliiiish_update_account_details($request) {
-    $user_id = get_current_user_id();
+    $user_id = styliiiish_resolve_account_user_id();
+    if ($user_id <= 0) {
+        return new WP_Error('not_authenticated', 'Authentication required.', ['status' => 401]);
+    }
     $customer = new WC_Customer($user_id);
 
     $first_name = sanitize_text_field($request->get_param('first_name'));
@@ -138,7 +167,10 @@ function styliiiish_update_account_details($request) {
 }
 
 function styliiiish_update_account_addresses($request) {
-    $user_id = get_current_user_id();
+    $user_id = styliiiish_resolve_account_user_id();
+    if ($user_id <= 0) {
+        return new WP_Error('not_authenticated', 'Authentication required.', ['status' => 401]);
+    }
     $customer = new WC_Customer($user_id);
     $type = sanitize_text_field($request->get_param('type'));
 
@@ -180,7 +212,10 @@ function styliiiish_update_account_addresses($request) {
 }
 
 function styliiiish_delete_paymob_card($request) {
-    $user_id = get_current_user_id();
+    $user_id = styliiiish_resolve_account_user_id();
+    if ($user_id <= 0) {
+        return new WP_Error('not_authenticated', 'Authentication required.', ['status' => 401]);
+    }
     $card_id = (int) $request->get_param('id');
 
     global $wpdb;
