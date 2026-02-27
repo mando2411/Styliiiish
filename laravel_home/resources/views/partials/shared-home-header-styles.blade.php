@@ -1193,6 +1193,13 @@
     }
 
     @media (max-width: 640px) {
+        .topbar {
+            background: transparent;
+            border-bottom: 0;
+            height: 0;
+            overflow: visible;
+        }
+
         .promo {
             font-size: 12px;
             line-height: 1.45;
@@ -1201,7 +1208,8 @@
 
         .topbar-inner {
             justify-content: center;
-            min-height: 36px;
+            min-height: 0;
+            padding: 0;
         }
 
         .topbar-left {

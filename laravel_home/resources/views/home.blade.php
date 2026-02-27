@@ -2458,6 +2458,13 @@
                 width: min(1180px, 94%);
             }
 
+            .topbar {
+                background: transparent;
+                border-bottom: 0;
+                height: 0;
+                overflow: visible;
+            }
+
             .hero,
             .section {
                 padding-top: 14px;
@@ -2471,7 +2478,8 @@
 
             .topbar-inner {
                 justify-content: center;
-                min-height: 36px;
+                min-height: 0;
+                padding: 0;
             }
 
             .topbar-left {
