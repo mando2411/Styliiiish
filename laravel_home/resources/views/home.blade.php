@@ -105,7 +105,7 @@
             'contact_for_price' => 'تواصل لمعرفة السعر',
             'save_prefix' => 'وفّري',
             'order_now' => 'اطلبي الآن',
-            'view_product' => 'معاينة المنتج',
+            'view_product' => 'تفاصيل الفستان',
             'trust_1_t' => '🚚 شحن سريع داخل مصر',
             'trust_1_d' => 'توصيل الطلبات خلال 2–10 أيام عمل حسب المحافظة.',
             'trust_2_t' => '💬 دعم ومتابعة قبل الشراء',
@@ -238,7 +238,7 @@
             'contact_for_price' => 'Contact for Price',
             'save_prefix' => 'Save',
             'order_now' => 'Order Now',
-            'view_product' => 'View Product',
+            'view_product' => 'Dress Details',
             'trust_1_t' => '🚚 Fast Shipping Across Egypt',
             'trust_1_d' => 'Orders delivered within 2–10 business days depending on location.',
             'trust_2_t' => '💬 Pre-purchase Support',
@@ -2030,7 +2030,7 @@
         .card-actions {
             margin-top: auto;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 8px;
         }
 
@@ -2038,7 +2038,7 @@
             align-items: stretch;
         }
 
-        .buy {
+        .product-details-btn {
             margin-top: auto;
             display: inline-flex;
             align-items: center;
@@ -2047,26 +2047,15 @@
             color: #fff;
             padding: 10px;
             border-radius: 10px;
-            font-weight: 700;
-            min-height: 42px;
-        }
-
-        .view-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--line);
-            color: var(--secondary);
-            border-radius: 10px;
-            min-height: 42px;
+            min-height: 44px;
             font-size: 13px;
-            font-weight: 700;
-            background: #fff;
+            font-weight: 800;
+            line-height: 1;
+            text-align: center;
         }
 
-        .view-link:hover {
-            border-color: var(--primary);
-            color: var(--primary);
+        .product-details-btn:hover {
+            background: var(--primary-2);
         }
 
         .trust {
@@ -2885,6 +2874,7 @@
 
             .card {
                 border-radius: 14px;
+                box-shadow: 0 10px 22px rgba(23, 39, 59, 0.07);
             }
 
             .card-badges {
@@ -2898,12 +2888,12 @@
             }
 
             .products-section .content {
-                padding: 10px;
-                gap: 6px;
+                padding: 11px;
+                gap: 7px;
             }
 
             .products-section .name {
-                min-height: auto;
+                min-height: 38px;
                 font-size: 13px;
                 line-height: 1.4;
                 -webkit-line-clamp: 2;
@@ -2914,7 +2904,7 @@
             }
 
             .products-section .price {
-                font-size: 15px;
+                font-size: 16px;
             }
 
             .products-section .old {
@@ -2933,20 +2923,18 @@
 
             .products-section .card-actions {
                 grid-template-columns: 1fr;
-                gap: 6px;
+                gap: 0;
+                margin-top: 6px;
             }
 
-            .products-section .buy {
-                min-height: 42px;
+            .products-section .product-details-btn {
+                min-height: 43px;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 13px;
-            }
-
-            .products-section .view-link {
-                min-height: 40px;
-                font-size: 12px;
+                border-radius: 10px;
+                width: 100%;
             }
 
             .trust-item {
@@ -3055,8 +3043,7 @@
                 grid-template-columns: 1fr;
             }
 
-            .products-section .buy,
-            .products-section .view-link {
+            .products-section .product-details-btn {
                 min-height: 38px;
             }
         }
@@ -3321,8 +3308,7 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="buy" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('order_now') }}</a>
-                                <a class="view-link" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('view_product') }}</a>
+                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>
