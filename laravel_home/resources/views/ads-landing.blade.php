@@ -8,8 +8,14 @@
 
     $translations = [
         'ar' => [
-            'page_title' => 'عروض خاصة | ستايلش',
-            'meta_desc' => 'اكتشفي عروض ستايلش الحصرية على فساتين السهرة والزفاف والخطوبة بخصومات قوية لفترة محدودة مع توصيل سريع داخل مصر.',
+            'meta_title' => 'عروض فساتين سهرة وزفاف وخطوبة بخصومات قوية | Styliiiish مصر',
+            'meta_desc' => 'اكتشفي أفضل عروض Styliiiish على فساتين السهرة والزفاف والخطوبة في مصر بخصومات حقيقية لفترة محدودة، شحن سريع، ودعم قبل وبعد الطلب.',
+            'meta_keywords' => 'فساتين سهرة, فساتين زفاف, فساتين خطوبة, عروض فساتين, خصومات فساتين, شراء فستان اونلاين, ستايلش مصر, styliiiish',
+            'og_title' => 'عروض خاصة على الفساتين الآن | Styliiiish Egypt',
+            'og_desc' => 'عروض محدودة على فساتين السهرة والزفاف والخطوبة مع توصيل سريع داخل مصر وتجربة شراء موثوقة.',
+            'twitter_title' => 'عروض فساتين حصرية الآن | Styliiiish',
+            'twitter_desc' => 'خصومات قوية لفترة محدودة على موديلات مختارة مع شحن سريع داخل مصر.',
+            'og_image_alt' => 'عروض Styliiiish على فساتين المناسبات في مصر',
             'badge_offer' => 'عرض خاص من Styliiiish',
             'hero_title' => 'احجزي إطلالتك الآن بخصم يصل إلى 50%',
             'hero_lead' => 'اكتشفي موديلات السهرة والزفاف والخطوبة الأكثر طلبًا مع توصيل سريع داخل مصر وسياسات واضحة.',
@@ -56,8 +62,14 @@
             'sticky_shop' => 'ابدئي الشراء الآن',
         ],
         'en' => [
-            'page_title' => 'Special Offers | Styliiiish',
-            'meta_desc' => 'Discover exclusive Styliiiish offers on evening, bridal, and engagement dresses with limited-time discounts and fast delivery across Egypt.',
+            'meta_title' => 'Evening, Bridal & Engagement Dress Deals | Styliiiish Egypt',
+            'meta_desc' => 'Discover top Styliiiish deals on evening, bridal, and engagement dresses in Egypt with real limited-time discounts, fast delivery, and trusted support.',
+            'meta_keywords' => 'evening dresses egypt, bridal dresses egypt, engagement dresses, dress deals, discounted dresses, buy dress online, styliiiish egypt',
+            'og_title' => 'Special Dress Offers Live Now | Styliiiish Egypt',
+            'og_desc' => 'Limited-time offers on evening, bridal, and engagement dresses with fast Egypt-wide delivery.',
+            'twitter_title' => 'Exclusive Dress Offers | Styliiiish',
+            'twitter_desc' => 'Shop selected styles with strong discounts and quick delivery across Egypt.',
+            'og_image_alt' => 'Styliiiish special offers on occasion dresses in Egypt',
             'badge_offer' => 'Special Offer from Styliiiish',
             'hero_title' => 'Book Your Look Now with Up to 50% Off',
             'hero_lead' => 'Discover the most requested evening, bridal, and engagement styles with fast delivery across Egypt and clear policies.',
@@ -142,26 +154,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="{{ $t('meta_title') }}">
     <meta name="description" content="{{ $t('meta_desc') }}">
+    <meta name="keywords" content="{{ $t('meta_keywords') }}">
+    <meta name="author" content="Styliiiish">
+    <meta name="publisher" content="Styliiiish">
+    <meta name="language" content="{{ $isEnglish ? 'English' : 'Arabic' }}">
+    <meta name="theme-color" content="#d51522">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/ads">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/ads">
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/ads">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
-    <meta property="og:title" content="{{ $t('page_title') }}">
-    <meta property="og:description" content="{{ $t('meta_desc') }}">
+    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_EG' }}">
+    <meta property="og:locale:alternate" content="{{ $isEnglish ? 'ar_EG' : 'en_US' }}">
+    <meta property="og:title" content="{{ $t('og_title') }}">
+    <meta property="og:description" content="{{ $t('og_desc') }}">
     <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <meta property="og:image" content="{{ $wpIcon }}">
+    <meta property="og:image:alt" content="{{ $t('og_image_alt') }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $t('page_title') }}">
-    <meta name="twitter:description" content="{{ $t('meta_desc') }}">
+    <meta name="twitter:title" content="{{ $t('twitter_title') }}">
+    <meta name="twitter:description" content="{{ $t('twitter_desc') }}">
     <meta name="twitter:image" content="{{ $wpIcon }}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>{{ $t('page_title') }}</title>
+    <title>{{ $t('meta_title') }}</title>
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => $t('meta_title'),
+            'description' => $t('meta_desc'),
+            'url' => $wpBaseUrl . $canonicalPath,
+            'inLanguage' => $isEnglish ? 'en' : 'ar',
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => 'Styliiiish',
+                'url' => $wpBaseUrl,
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => 'Styliiiish',
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $wpLogo,
+                ],
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+    </script>
     <style>
         :root {
             --primary: #d51522;
