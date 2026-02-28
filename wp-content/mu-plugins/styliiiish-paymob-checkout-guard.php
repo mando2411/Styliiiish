@@ -42,16 +42,39 @@ add_action('wp_enqueue_scripts', function () {
         window.previousTotalBlock = null;
     }
     try {
-        window.eval('var previousTotalBlock = window.previousTotalBlock;');
+        window.eval('if (typeof previousTotalBlock === "undefined") { var previousTotalBlock = null; }');
     } catch (error) {
     }
 
-    // Slow down only very aggressive short polling intervals to prevent UI freeze.
+    // Block/slow only very aggressive short polling intervals to prevent UI freeze.
     const nativeSetInterval = window.setInterval;
     window.setInterval = function (callback, delay) {
-        const ms = Number(delay);
-        if (!Number.isNaN(ms) && ms > 0 && ms <= 250) {
-            return nativeSetInterval.call(this, callback, 1200);
+        try {
+            const ms = Number(delay);
+            const cbText = typeof callback === 'function'
+                ? Function.prototype.toString.call(callback)
+                : String(callback || '');
+
+            const stack = String((new Error()).stack || '');
+            const fromPaymob = stack.indexOf('paymob-pixel_block.js') !== -1;
+            const isAggressivePaymobPoll = fromPaymob
+                && ms > 0
+                && ms <= 250
+                && (
+                    cbText.indexOf('wc/store/cart') !== -1
+                    || cbText.indexOf('cartTotals') !== -1
+                    || cbText.indexOf('previousTotalBlock') !== -1
+                    || cbText.indexOf('updateCheckoutData') !== -1
+                );
+
+            if (isAggressivePaymobPoll) {
+                return 0;
+            }
+
+            if (!Number.isNaN(ms) && ms > 0 && ms <= 250) {
+                return nativeSetInterval.call(this, callback, 1200);
+            }
+        } catch (error) {
         }
         return nativeSetInterval.apply(this, arguments);
     };
@@ -86,6 +109,7 @@ JS;
     const MIN_UPDATE_INTERVAL_MS = 1500;
     let lastUpdateCallAt = 0;
     let loaderTimer = null;
+    let activeUpdateXhr = null;
 
     function hasPaymobWidget() {
         const root = document.getElementById('paymob-elements');
@@ -154,12 +178,31 @@ JS;
 
         if (isPixelUpdate) {
             const now = Date.now();
+
+            if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
+                try {
+                    activeUpdateXhr.abort('styliiiish_prevent_overlap');
+                } catch (error) {
+                }
+            }
+
             if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                 options.global = false;
             }
             lastUpdateCallAt = now;
             armLoaderTimeout();
         }
+    });
+
+    $(document).ajaxSend(function (_event, jqXHR, settings) {
+        const url = String(settings?.url || '');
+        const data = String(settings?.data || '');
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1;
+        if (!isPixelUpdate) {
+            return;
+        }
+
+        activeUpdateXhr = jqXHR;
     });
 
     $(document).ajaxError(function (_event, jqXHR, settings, thrownError) {
@@ -186,6 +229,10 @@ JS;
 
         if (hasPaymobWidget()) {
             clearLoader();
+        }
+
+        if (activeUpdateXhr === _jqXHR) {
+            activeUpdateXhr = null;
         }
     });
 
