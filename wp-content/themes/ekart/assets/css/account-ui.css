@@ -184,7 +184,7 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
     line-height: 1.7;
 }
 
-.woocommerce-account .woocommerce-MyAccount-content a {
+.woocommerce-account .woocommerce-MyAccount-content a:not(.button):not(.woocommerce-Button):not(.wc-forward) {
     color: var(--ekart-account-primary);
 }
 
@@ -193,7 +193,14 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
 .woocommerce-account .woocommerce-MyAccount-content button,
 .woocommerce-account .woocommerce-MyAccount-content input[type="submit"] {
     border-radius: 10px !important;
+    color: #fff !important;
     transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content a.button,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward {
+    color: #fff !important;
 }
 
 .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:hover,
