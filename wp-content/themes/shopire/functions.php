@@ -435,7 +435,14 @@ add_action('template_redirect', function () {
 		return;
 	}
 
-	wp_safe_redirect(home_url($target_path), 301);
+	$current_path = '/' . ltrim((string) parse_url($request_uri, PHP_URL_PATH), '/');
+	$target_url = home_url($target_path);
+	$target_only_path = (string) parse_url($target_url, PHP_URL_PATH);
+	if (untrailingslashit(rawurldecode($current_path)) === untrailingslashit(rawurldecode($target_only_path))) {
+		return;
+	}
+
+	wp_safe_redirect($target_url, 301);
 	exit;
 }, 0);
 
@@ -454,6 +461,12 @@ add_action('template_redirect', function () {
 
 	$target_path = '/' . $locale . '/item/' . rawurlencode((string) $slug);
 	$target_url = home_url($target_path);
+
+	$current_path = '/' . ltrim((string) parse_url($request_uri, PHP_URL_PATH), '/');
+	$target_only_path = (string) parse_url($target_url, PHP_URL_PATH);
+	if (untrailingslashit(rawurldecode($current_path)) === untrailingslashit(rawurldecode($target_only_path))) {
+		return;
+	}
 
 	wp_safe_redirect($target_url, 302);
 	exit;
