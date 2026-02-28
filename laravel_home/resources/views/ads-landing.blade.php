@@ -732,7 +732,7 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('view_product') }}</a>
+                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1" aria-label="{{ $t('view_product') }}: {{ $product->post_title }}">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>

@@ -74,7 +74,7 @@
 
 <div class="mini-cart" id="miniCart" aria-hidden="true">
     <div class="mini-cart-backdrop" data-close-mini-cart></div>
-    <aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $translate('cart_title') }}">
+    <div class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $translate('cart_title') }}">
         <div class="mini-cart-head">
             <h3>{{ $translate('cart_title') }}</h3>
             <button class="mini-cart-close" type="button" data-close-mini-cart>{{ $translate('close') }}</button>
@@ -87,7 +87,7 @@
                 <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpCheckoutUrl }}">{{ $translate('checkout') }}</a>
             </div>
         </div>
-    </aside>
+    </div>
 </div>
 
 <div class="auth-modal" id="authModal" aria-hidden="true">

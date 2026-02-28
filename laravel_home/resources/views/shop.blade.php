@@ -435,7 +435,7 @@
                             </div>
                             ${save}
                             <div class="actions">
-                                <a class="product-details-btn" href="${localePrefix}/item/${product.slug}">${i18n.viewProduct}</a>
+                                <a class="product-details-btn" href="${localePrefix}/item/${product.slug}" aria-label="${i18n.viewProduct}: ${product.title}">${i18n.viewProduct}</a>
                             </div>
                         </div>
                     </article>

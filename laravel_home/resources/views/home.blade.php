@@ -3222,7 +3222,7 @@
             </div>
 
             <aside class="hero-side">
-                <h3>{{ $t('why_sty') }}</h3>
+                <h2>{{ $t('why_sty') }}</h2>
                 <p class="hero-side-note">{{ $t('why_note') }}</p>
                 <ul class="list">
                     <li>{{ $t('why_1') }}</li>
@@ -3397,10 +3397,6 @@
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
-                        $optimizedImage = $image;
-                        if (str_contains((string) $image, '/wp-content/uploads/')) {
-                            $optimizedImage = (string) preg_replace('/\.(jpe?g|png|webp)(\?.*)?$/i', '-768x1024.$1$2', (string) $image);
-                        }
                         $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
                         $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                         $primaryBadgeClass = $isMarketplace ? 'badge-marketplace' : 'badge-brand';
@@ -3408,7 +3404,7 @@
 
                     <article class="card">
                         <div class="product-media">
-                            <img class="thumb" src="{{ $optimizedImage }}" alt="{{ $product->post_title }}" width="600" height="800" sizes="(max-width: 640px) 48vw, (max-width: 900px) 31vw, 23vw" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ $image }}';">
+                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" width="600" height="800" sizes="(max-width: 640px) 48vw, (max-width: 900px) 31vw, 23vw" loading="lazy" decoding="async">
                             <div class="card-badges">
                                 <span class="badge-chip {{ $primaryBadgeClass }}">{{ $primaryBadge }}</span>
                                 @if($isSale)
@@ -3443,7 +3439,7 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('view_product') }}</a>
+                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}" aria-label="{{ $t('view_product') }}: {{ $product->post_title }}">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>
@@ -3455,15 +3451,15 @@
     <section class="section">
         <div class="container trust">
             <article class="trust-item">
-                <h4>{{ $t('trust_1_t') }}</h4>
+                <h3>{{ $t('trust_1_t') }}</h3>
                 <p>{{ $t('trust_1_d') }}</p>
             </article>
             <article class="trust-item">
-                <h4>{{ $t('trust_2_t') }}</h4>
+                <h3>{{ $t('trust_2_t') }}</h3>
                 <p>{{ $t('trust_2_d') }}</p>
             </article>
             <article class="trust-item">
-                <h4>{{ $t('trust_3_t') }}</h4>
+                <h3>{{ $t('trust_3_t') }}</h3>
                 <p>{{ $t('trust_3_d') }}</p>
             </article>
         </div>
@@ -3597,7 +3593,7 @@
 
     <div class="mini-cart" id="miniCart" aria-hidden="true">
         <div class="mini-cart-backdrop" data-close-mini-cart></div>
-        <aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $t('cart_title') }}">
+        <div class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="{{ $t('cart_title') }}">
             <div class="mini-cart-head">
                 <h3>{{ $t('cart_title') }}</h3>
                 <button class="mini-cart-close" type="button" data-close-mini-cart>{{ $t('close') }}</button>
@@ -3610,7 +3606,7 @@
                     <a class="mini-cart-checkout" id="miniCartCheckout" href="{{ $wpCheckoutUrl }}">{{ $t('checkout') }}</a>
                 </div>
             </div>
-        </aside>
+        </div>
     </div>
 
     <div class="auth-modal" id="authModal" aria-hidden="true">
