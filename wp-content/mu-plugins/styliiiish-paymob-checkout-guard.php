@@ -95,6 +95,107 @@ add_action('send_headers', function () {
     header('Permissions-Policy: payment=(self "https://accept.paymob.com" "https://pay.google.com")', true);
 }, 30);
 
+add_action('wp_enqueue_scripts', function () {
+    if (!styliiiish_is_checkout_like_request()) {
+        return;
+    }
+
+    wp_register_script('styliiiish-paymob-permission-guard', false, [], '1.0.0', false);
+    wp_enqueue_script('styliiiish-paymob-permission-guard');
+
+    $inline = <<<'JS'
+(function (window, document) {
+    if (window.__styliiiishPaymobPermissionGuard) {
+        return;
+    }
+    window.__styliiiishPaymobPermissionGuard = true;
+
+    function enforcePaymentIframeAllow(scope) {
+        const root = scope && scope.querySelectorAll ? scope : document;
+        const frames = root.querySelectorAll
+            ? root.querySelectorAll('iframe[src*="accept.paymob.com"], iframe[src*="paymob"], iframe[name*="paymob"]')
+            : [];
+
+        frames.forEach(function (frame) {
+            const currentAllow = String(frame.getAttribute('allow') || '').trim();
+            if (currentAllow.indexOf('payment') !== -1) {
+                return;
+            }
+
+            frame.setAttribute('allow', (currentAllow ? currentAllow + '; ' : '') + 'payment *');
+        });
+    }
+
+    function disableGooglePayPath() {
+        try {
+            if (typeof window.pxl_object === 'object' && window.pxl_object !== null) {
+                window.pxl_object.googleenabled = 0;
+            }
+            window.googleenabled = 0;
+        } catch (error) {
+        }
+    }
+
+    const originalAppendChild = Element.prototype.appendChild;
+    Element.prototype.appendChild = function (node) {
+        try {
+            if (node && node.tagName === 'SCRIPT') {
+                const src = String(node.src || '');
+                if (src.indexOf('pay.google.com/gp/p/js/pay.js') !== -1) {
+                    return node;
+                }
+            }
+        } catch (error) {
+        }
+
+        return originalAppendChild.call(this, node);
+    };
+
+    disableGooglePayPath();
+    enforcePaymentIframeAllow(document);
+
+    if (window.MutationObserver) {
+        const observer = new MutationObserver(function (mutations) {
+            disableGooglePayPath();
+
+            mutations.forEach(function (mutation) {
+                if (!mutation.addedNodes || !mutation.addedNodes.length) {
+                    return;
+                }
+
+                mutation.addedNodes.forEach(function (node) {
+                    if (!node || node.nodeType !== 1) {
+                        return;
+                    }
+
+                    if (node.tagName === 'IFRAME') {
+                        enforcePaymentIframeAllow(node.parentNode || document);
+                        return;
+                    }
+
+                    enforcePaymentIframeAllow(node);
+                });
+            });
+        });
+
+        observer.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        window.setTimeout(function () {
+            try {
+                observer.disconnect();
+            } catch (error) {
+            }
+        }, 25000);
+    }
+})(window, document);
+JS;
+
+    wp_add_inline_script('styliiiish-paymob-permission-guard', $inline, 'after');
+}, 5);
+
 add_action('wp_print_styles', function () {
     global $wp_styles;
 
