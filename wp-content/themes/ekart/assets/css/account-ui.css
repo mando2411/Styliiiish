@@ -203,6 +203,12 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
     color: #fff !important;
 }
 
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"],
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background-color"],
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background:"] {
+    color: #fff !important;
+}
+
 .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:hover,
 .woocommerce-account .woocommerce-MyAccount-content .button:hover,
 .woocommerce-account .woocommerce-MyAccount-content button:hover,
