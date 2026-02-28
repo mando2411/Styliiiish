@@ -586,6 +586,64 @@ body.rtl.woocommerce-account .woocommerce-Addresses address {
     }
 }
 
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address {
+    width: auto !important;
+    float: none !important;
+    box-sizing: border-box;
+    height: auto;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title,
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title.title {
+    position: static !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .6rem;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title h2,
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title h3 {
+    margin: 0;
+    font-size: 1.9rem;
+    line-height: 1.4;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title a.edit {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    float: none !important;
+    display: inline-flex;
+    line-height: 1.4;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses address,
+.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses p {
+    margin: 0;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+}
+
+body.rtl.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title,
+body.rtl.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses address,
+body.rtl.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses p {
+    align-items: flex-end;
+    text-align: right;
+}
+
+@media (max-width: 991px) {
+    .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses {
+        grid-template-columns: 1fr;
+    }
+}
+
 .wp-block-button.is-style-outline a.wp-block-button__link {
     border-color: inherit;
     background: transparent
