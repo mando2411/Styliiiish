@@ -13,11 +13,14 @@
             'badge_offer' => 'عرض خاص من Styliiiish',
             'hero_title' => 'احجزي إطلالتك الآن بخصم يصل إلى 50%',
             'hero_lead' => 'اكتشفي موديلات السهرة والزفاف والخطوبة الأكثر طلبًا مع توصيل سريع داخل مصر وسياسات واضحة.',
+            'offer_urgency' => '⏳ العروض الحالية لفترة محدودة — احجزي قبل نفاد الكميات',
             'hero_p1' => '✔️ خصومات حقيقية على منتجات مختارة',
             'hero_p2' => '✔️ شحن داخل مصر خلال 2–10 أيام',
             'hero_p3' => '✔️ شراء آمن وتجربة سلسة',
             'shop_now' => 'تسوقي الآن',
             'sell_dress' => 'بيعي فستانك',
+            'order_whatsapp' => 'اطلبي عبر واتساب',
+            'call_now' => 'اتصال سريع',
             'discount_selected' => 'خصم على مختارات مميزة',
             'products_ready' => 'منتج جاهز للطلب الآن',
             'delivery_time' => '2-10 أيام',
@@ -25,11 +28,16 @@
             'section_title' => 'اشتري الآن مباشرة',
             'section_sub' => 'منتجات ظاهرة فورًا لتسهيل الشراء من الإعلانات بدون أي خطوات إضافية.',
             'view_all_products' => 'عرض كل المنتجات',
+            'trust_1' => '💯 خامات موثوقة واختيار مدروس',
+            'trust_2' => '🚚 توصيل سريع لكل المحافظات',
+            'trust_3' => '📦 دعم قبل وبعد الطلب',
             'sale_badge' => 'خصم',
             'contact_for_price' => 'تواصل لمعرفة السعر',
             'save_prefix' => 'وفّري',
             'buy_now' => 'اشتري الآن',
             'preview' => 'معاينة',
+            'empty_title' => 'يتم تجهيز أقوى العروض الآن',
+            'empty_desc' => 'تصفحي المتجر الكامل الآن لاختيار الفستان المناسب فورًا.',
             'bottom_cta_title' => 'جاهزة تختاري فستانك الآن؟',
             'bottom_cta_sub' => 'أكملي الشراء فورًا أو تصفحي المتجر بالكامل للحصول على خيارات أكثر.',
             'go_full_shop' => 'الانتقال للمتجر الكامل',
@@ -40,6 +48,7 @@
             'card_3_t' => 'ثقة ووضوح',
             'card_3_d' => 'روابط وسياسات واضحة لدعم قرار الشراء بسرعة.',
             'currency' => 'ج.م',
+            'sticky_shop' => 'ابدئي الشراء الآن',
         ],
         'en' => [
             'page_title' => 'Special Offers | Styliiiish',
@@ -47,11 +56,14 @@
             'badge_offer' => 'Special Offer from Styliiiish',
             'hero_title' => 'Book Your Look Now with Up to 50% Off',
             'hero_lead' => 'Discover the most requested evening, bridal, and engagement styles with fast delivery across Egypt and clear policies.',
+            'offer_urgency' => '⏳ Limited-time offers — reserve your style before stock runs out',
             'hero_p1' => '✔️ Real discounts on selected products',
             'hero_p2' => '✔️ Egypt-wide shipping in 2–10 days',
             'hero_p3' => '✔️ Secure checkout and smooth experience',
             'shop_now' => 'Shop Now',
             'sell_dress' => 'Sell Your Dress',
+            'order_whatsapp' => 'Order via WhatsApp',
+            'call_now' => 'Quick Call',
             'discount_selected' => 'Discount on selected picks',
             'products_ready' => 'Products ready to order now',
             'delivery_time' => '2-10 Days',
@@ -59,11 +71,16 @@
             'section_title' => 'Buy Directly Now',
             'section_sub' => 'Visible products instantly to simplify ad-driven purchases without extra steps.',
             'view_all_products' => 'View All Products',
+            'trust_1' => '💯 Trusted quality and curated picks',
+            'trust_2' => '🚚 Fast delivery across all governorates',
+            'trust_3' => '📦 Support before and after order',
             'sale_badge' => 'OFF',
             'contact_for_price' => 'Contact for price',
             'save_prefix' => 'Save',
             'buy_now' => 'Buy Now',
             'preview' => 'Preview',
+            'empty_title' => 'Top offers are being refreshed now',
+            'empty_desc' => 'Browse the full store now and pick the right dress instantly.',
             'bottom_cta_title' => 'Ready to pick your dress now?',
             'bottom_cta_sub' => 'Complete your purchase instantly or browse the full store for more options.',
             'go_full_shop' => 'Go to Full Store',
@@ -74,6 +91,7 @@
             'card_3_t' => 'Trust & Clarity',
             'card_3_d' => 'Clear links and policies that support faster purchase decisions.',
             'currency' => 'EGP',
+            'sticky_shop' => 'Start Shopping Now',
         ],
     ];
 
@@ -84,9 +102,31 @@
 
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+    $whatsappLink = 'https://wa.me/201050874255';
+    $callLink = 'tel:+201050874255';
     $wpLocalizedMyDressesUrl = $isEnglish
         ? ($wpBaseUrl . '/my-dresses/')
         : ($wpBaseUrl . '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/');
+
+    $trackingKeys = [
+        'gclid',
+        'gbraid',
+        'wbraid',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'utm_term',
+        'utm_content',
+        'fbclid',
+    ];
+    $requestQuery = request()->query();
+    $trackingQuery = [];
+    foreach ($trackingKeys as $trackingKey) {
+        if (array_key_exists($trackingKey, $requestQuery) && (string) $requestQuery[$trackingKey] !== '') {
+            $trackingQuery[$trackingKey] = (string) $requestQuery[$trackingKey];
+        }
+    }
+    $trackingQueryString = http_build_query($trackingQuery);
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -155,14 +195,20 @@
         }
         h1 { margin: 8px 0 6px; font-size: clamp(22px, 3.3vw, 32px); line-height: 1.2; }
         .lead { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+        .urgency { margin: 0 0 10px; padding: 8px 10px; border-radius: 10px; background: rgba(213,21,34,.08); border: 1px dashed rgba(213,21,34,.32); color: #99121b; font-size: 12px; font-weight: 800; }
 
         .points { margin: 0 0 10px; padding: 0; list-style: none; display: grid; gap: 6px; }
         .points li { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; font-size: 12px; font-weight: 700; }
+
+        .trust-row { margin: 12px 0 0; padding: 0; list-style: none; display: flex; gap: 8px; flex-wrap: wrap; }
+        .trust-row li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700; }
 
         .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { min-height: 38px; padding: 0 14px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-light { background: #fff; border: 1px solid var(--line); }
+        .btn-wa { background: #25D366; color: #fff; }
+        .btn-call { background: #fff; color: var(--secondary); border: 1px solid rgba(23,39,59,.22); }
 
         .promo-box {
             background: var(--card);
@@ -271,6 +317,33 @@
         .card h3 { margin: 0 0 6px; font-size: 17px; }
         .card p { margin: 0; color: var(--muted); font-size: 14px; }
 
+        .empty-state {
+            border: 1px dashed rgba(23,39,59,.25);
+            background: #fff;
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+        .empty-state h3 { margin: 0 0 8px; font-size: 20px; }
+        .empty-state p { margin: 0 0 12px; color: var(--muted); }
+
+        .ads-sticky-cta {
+            position: sticky;
+            bottom: 10px;
+            z-index: 25;
+            margin: 0 auto 10px;
+            width: min(520px, 94%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 999px;
+            background: rgba(23,39,59,.92);
+            box-shadow: 0 10px 30px rgba(23,39,59,.22);
+        }
+        .ads-sticky-cta .btn { min-height: 40px; }
+
         .site-footer { margin-top: 10px; background: #0f1a2a; color: #fff; border-top: 4px solid var(--primary); }
         .footer-grid { padding: 32px 0 20px; display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.1fr; gap: 20px; }
         .footer-brand-logo { width: 156px; max-width: 100%; object-fit: contain; margin-bottom: 10px; display: block; }
@@ -301,6 +374,7 @@
             .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
             .card-actions { grid-template-columns: 1fr; }
             .bottom-cta .btn-light { width: 100%; }
+            .ads-sticky-cta { display: flex; }
         }
 
         @media (max-width: 390px) {
@@ -323,6 +397,7 @@
                     <span class="badge">{{ $t('badge_offer') }}</span>
                     <h1>{{ $t('hero_title') }}</h1>
                     <p class="lead">{{ $t('hero_lead') }}</p>
+                    <p class="urgency">{{ $t('offer_urgency') }}</p>
 
                     <ul class="points">
                         <li>{{ $t('hero_p1') }}</li>
@@ -331,9 +406,17 @@
                     </ul>
 
                     <div class="actions">
-                        <a class="btn btn-primary" href="{{ $localePrefix }}/shop">{{ $t('shop_now') }}</a>
+                        <a class="btn btn-primary" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('shop_now') }}</a>
+                        <a class="btn btn-wa" href="{{ $whatsappLink }}" target="_blank" rel="noopener" data-track-link="1">{{ $t('order_whatsapp') }}</a>
+                        <a class="btn btn-call" href="{{ $callLink }}">{{ $t('call_now') }}</a>
                         <a class="btn btn-light" href="{{ $wpLocalizedMyDressesUrl }}" target="_blank" rel="noopener">{{ $t('sell_dress') }}</a>
                     </div>
+
+                    <ul class="trust-row">
+                        <li>{{ $t('trust_1') }}</li>
+                        <li>{{ $t('trust_2') }}</li>
+                        <li>{{ $t('trust_3') }}</li>
+                    </ul>
                 </div>
 
                 <aside class="promo-box">
@@ -357,9 +440,10 @@
                     <h2>{{ $t('section_title') }}</h2>
                     <p>{{ $t('section_sub') }}</p>
                 </div>
-                <a class="btn btn-light" href="{{ $localePrefix }}/shop">{{ $t('view_all_products') }}</a>
+                <a class="btn btn-light" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('view_all_products') }}</a>
             </div>
 
+            @if(($products ?? collect())->count() > 0)
             <div class="grid">
                 @foreach(($products ?? collect()) as $product)
                     @php
@@ -398,20 +482,27 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="btn-buy" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('buy_now') }}</a>
-                                <a class="btn-view" href="{{ $localePrefix }}/item/{{ $product->post_name }}">{{ $t('preview') }}</a>
+                                <a class="btn-buy" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('buy_now') }}</a>
+                                <a class="btn-view" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('preview') }}</a>
                             </div>
                         </div>
                     </article>
                 @endforeach
             </div>
+            @else
+            <div class="empty-state">
+                <h3>{{ $t('empty_title') }}</h3>
+                <p>{{ $t('empty_desc') }}</p>
+                <a class="btn btn-primary" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('view_all_products') }}</a>
+            </div>
+            @endif
 
             <div class="bottom-cta">
                 <div>
                     <strong>{{ $t('bottom_cta_title') }}</strong>
                     <p>{{ $t('bottom_cta_sub') }}</p>
                 </div>
-                <a class="btn btn-light" href="{{ $localePrefix }}/shop">{{ $t('go_full_shop') }}</a>
+                <a class="btn btn-light" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('go_full_shop') }}</a>
             </div>
         </section>
 
@@ -432,6 +523,43 @@
             </div>
         </section>
     </main>
+
+    <div class="ads-sticky-cta" aria-label="Ads quick actions">
+        <a class="btn btn-primary" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('sticky_shop') }}</a>
+        <a class="btn btn-wa" href="{{ $whatsappLink }}" target="_blank" rel="noopener" data-track-link="1">{{ $t('order_whatsapp') }}</a>
+    </div>
+
+    @if(!empty($trackingQueryString))
+    <script>
+        (() => {
+            const trackingQuery = @json($trackingQueryString);
+            if (!trackingQuery) return;
+
+            const shouldSkip = (href) => {
+                if (!href) return true;
+                const lower = href.toLowerCase();
+                return (
+                    lower.startsWith('#') ||
+                    lower.startsWith('javascript:') ||
+                    lower.startsWith('mailto:') ||
+                    lower.startsWith('tel:')
+                );
+            };
+
+            document.querySelectorAll('a[data-track-link="1"]').forEach((link) => {
+                const href = link.getAttribute('href') || '';
+                if (shouldSkip(href)) return;
+                if (href.includes('wa.me')) return;
+
+                const separator = href.includes('?') ? '&' : '?';
+                if (!href.includes('gclid=') && !href.includes('utm_source=')) {
+                    link.setAttribute('href', `${href}${separator}${trackingQuery}`);
+                }
+            });
+        })();
+    </script>
+    @endif
+
     @include('partials.shared-home-footer')
 </body>
 </html>
