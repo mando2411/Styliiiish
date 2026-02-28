@@ -825,12 +825,6 @@ if (!function_exists('shopire_styliiiish_rewrite_broken_checkout_domains')) {
 			"'banner-img-3.webp'" => "'" . $siteBase . "/wp-content/uploads/2025/12/banner-img-3.webp'",
 		];
 
-		$html = preg_replace(
-			'#<script[^>]+src=["\"][^"\"]*pay\.google\.com/gp/p/js/pay\.js[^"\"]*["\"][^>]*>\s*</script>#i',
-			'',
-			$html
-		);
-
 		return str_replace(array_keys($checkoutBannerMap), array_values($checkoutBannerMap), $html);
 	}
 }
@@ -880,3 +874,19 @@ if (!function_exists('shopire_styliiiish_checkout_permissions_policy')) {
 	}
 }
 add_action('send_headers', 'shopire_styliiiish_checkout_permissions_policy', 20);
+
+if (!function_exists('shopire_styliiiish_dequeue_checkout_theme_scripts')) {
+	function shopire_styliiiish_dequeue_checkout_theme_scripts() {
+		if (is_admin() || wp_doing_ajax()) {
+			return;
+		}
+
+		if (!function_exists('is_checkout') || !is_checkout()) {
+			return;
+		}
+
+		wp_dequeue_script('shopire-theme');
+		wp_dequeue_script('shopire-custom-js');
+	}
+}
+add_action('wp_enqueue_scripts', 'shopire_styliiiish_dequeue_checkout_theme_scripts', 999);
