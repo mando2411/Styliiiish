@@ -4,4 +4,4 @@ Disallow: /wp-admin/
 Allow: /wp-admin/admin-ajax.php
 
 Sitemap: https://styliiiish.com/sitemap_index.xml
-Sitemap: https://styliiiish.com/en/sitemap_index.xml
+Sitemap: https://styliiiish.com/laravel-sitemap.xml
