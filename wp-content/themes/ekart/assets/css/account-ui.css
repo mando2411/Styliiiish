@@ -344,20 +344,30 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
 @media (min-width: 992px) {
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-EditAccountForm p#account_email_field,
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-form-edit-account p#account_email_field {
-        display: grid;
-        grid-template-columns: 210px minmax(0, 1fr);
-        align-items: center;
-        gap: 10px 14px;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        flex-wrap: nowrap !important;
     }
 
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-EditAccountForm p#account_email_field > label,
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-form-edit-account p#account_email_field > label {
-        margin-bottom: 0;
+        margin: 0 !important;
+        flex: 0 0 210px !important;
+        max-width: 210px !important;
     }
 
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-EditAccountForm p#account_email_field > .woocommerce-input-wrapper,
     .woocommerce-account .woocommerce-MyAccount-content .woocommerce-form-edit-account p#account_email_field > .woocommerce-input-wrapper {
-        margin: 0;
+        margin: 0 !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    .woocommerce-account .woocommerce-MyAccount-content .woocommerce-EditAccountForm p#account_email_field input[type="email"],
+    .woocommerce-account .woocommerce-MyAccount-content .woocommerce-form-edit-account p#account_email_field input[type="email"] {
+        width: 100% !important;
+        margin: 0 !important;
     }
 }
 
