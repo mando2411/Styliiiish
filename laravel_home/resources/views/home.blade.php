@@ -350,6 +350,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('title') }}</title>
+    @include('partials.shared-seo-meta')
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',

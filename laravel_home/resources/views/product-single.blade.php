@@ -489,6 +489,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>{{ $seoTitle }}</title>
+    @include('partials.shared-seo-meta')
     <meta name="description" content="{{ $seoDescription }}">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     @if($seoKeywords !== '')

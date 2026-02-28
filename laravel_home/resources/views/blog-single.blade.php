@@ -68,6 +68,7 @@
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/blog/{{ rawurlencode(rawurldecode((string) ($post->post_name ?? ''))) }}">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/blog/{{ rawurlencode(rawurldecode((string) ($post->post_name ?? ''))) }}">
     <title>{{ $title !== '' ? $title . ' | Styliiiish' : $t('page_title_suffix') }}</title>
+    @include('partials.shared-seo-meta')
     <style>
         :root { --wf-main-rgb: 213, 21, 34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color: #17273B; --bg:#f6f7fb; --card:#fff; --line:rgba(189,189,189,.35); --text:#17273B; --muted:#5a6678; --primary: var(--wf-main-color); --secondary: var(--wf-secondary-color); }
         * { box-sizing: border-box; }

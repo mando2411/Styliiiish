@@ -16,6 +16,7 @@
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 
         <title>{{ $seoTitle }}</title>
+        @include('partials.shared-seo-meta')
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

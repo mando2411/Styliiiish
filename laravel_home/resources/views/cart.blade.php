@@ -168,6 +168,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('page_title') }}</title>
+    @include('partials.shared-seo-meta')
     <style>
         :root { --wf-main-rgb: 213,21,34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color:#17273B; --bg:#f6f7fb; --line:rgba(189,189,189,.4); --primary:var(--wf-main-color); --secondary:var(--wf-secondary-color); --danger:#dc2626; }
         *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:#17273B} a{text-decoration:none;color:inherit}
