@@ -112,7 +112,7 @@ JS;
     const LOADER_ID = 'paymob-loading-indicator';
     const NOTICE_ID = 'styliiiish-paymob-guard-notice';
     const AJAX_TIMEOUT_MS = 20000;
-    const MIN_UPDATE_INTERVAL_MS = 1500;
+    const MIN_UPDATE_INTERVAL_MS = 4000;
     const DUPLICATE_WINDOW_MS = 1800;
     let lastUpdateCallAt = 0;
     let lastUpdateSignature = null;
@@ -257,7 +257,10 @@ JS;
             }
 
             if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
-                options.global = false;
+                options.beforeSend = function () {
+                    return false;
+                };
+                return;
             }
             lastUpdateCallAt = now;
             lastUpdateSignature = signature;
@@ -315,9 +318,8 @@ JS;
         if (hasUpdateCheckoutData && !window.__styliiiishWrappedUpdateCheckoutData) {
             const originalUpdateCheckoutData = window.updateCheckoutData;
             window.updateCheckoutData = function () {
-                const forceReload = !!arguments[0];
                 const now = Date.now();
-                if (!forceReload && (now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
+                if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
                 lastUpdateCallAt = now;
@@ -329,12 +331,11 @@ JS;
         if (hasAjaxCall && !window.__styliiiishWrappedAjaxCall) {
             const originalAjaxCall = window.ajaxCall;
             window.ajaxCall = function () {
-                const forceReload = !!arguments[2];
                 const now = Date.now();
                 if (!isPaymobSelected()) {
                     return;
                 }
-                if (!forceReload && (now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
+                if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
                 lastUpdateCallAt = now;
