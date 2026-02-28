@@ -314,4 +314,192 @@ JS;
         host.prepend(node);
     }
 
-  
+    function armLoaderTimeout() {
+        if (loaderTimer) {
+            clearTimeout(loaderTimer);
+        }
+        loaderTimer = setTimeout(function () {
+            if (!hasPaymobWidget()) {
+                clearLoader();
+                showNotice('Paymob checkout is taking too long. Please refresh and try again.');
+            }
+        }, AJAX_TIMEOUT_MS);
+    }
+
+    $.ajaxPrefilter(function (options, originalOptions) {
+        const url = String(options?.url || originalOptions?.url || '');
+        const rawData = options?.data ?? originalOptions?.data ?? '';
+        const action = getAjaxAction(rawData);
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && action === 'update_pixel_data';
+        const isOrderSession = url.indexOf('admin-ajax.php') !== -1 && action === 'get_order_id_from_session';
+        const isPaymobCallback = url.indexOf('wc-api=paymob_callback') !== -1;
+
+        if (!(isPixelUpdate || isOrderSession || isPaymobCallback)) {
+            return;
+        }
+
+        if (options.async === false) {
+            options.async = true;
+        }
+
+        if (!options.timeout || options.timeout < AJAX_TIMEOUT_MS) {
+            options.timeout = AJAX_TIMEOUT_MS;
+        }
+
+        if (isPixelUpdate) {
+            const now = Date.now();
+            const signature = getPayloadSignature(rawData);
+
+            if (signature && signature === lastUpdateSignature && (now - lastUpdateSignatureAt) < DUPLICATE_WINDOW_MS) {
+                options.beforeSend = function () {
+                    return false;
+                };
+                return;
+            }
+
+            if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
+                try {
+                    activeUpdateXhr.abort('styliiiish_prevent_overlap');
+                } catch (error) {
+                }
+            }
+
+            if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
+                options.beforeSend = function () {
+                    return false;
+                };
+                return;
+            }
+            lastUpdateCallAt = now;
+            lastUpdateSignature = signature;
+            lastUpdateSignatureAt = now;
+            armLoaderTimeout();
+        }
+    });
+
+    $(document).ajaxSend(function (_event, jqXHR, settings) {
+        const url = String(settings?.url || '');
+        const action = getAjaxAction(settings?.data || '');
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && action === 'update_pixel_data';
+        if (!isPixelUpdate) {
+            return;
+        }
+
+        activeUpdateXhr = jqXHR;
+    });
+
+    $(document).ajaxError(function (_event, jqXHR, settings, thrownError) {
+        const url = String(settings?.url || '');
+        const action = getAjaxAction(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || action !== 'update_pixel_data') {
+            return;
+        }
+        clearLoader();
+        showNotice(jqXHR?.responseJSON?.data || thrownError || 'Payment service failed. Please retry.');
+    });
+
+    $(document).ajaxComplete(function (_event, _jqXHR, settings) {
+        const url = String(settings?.url || '');
+        const action = getAjaxAction(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || action !== 'update_pixel_data') {
+            return;
+        }
+
+        if (loaderTimer) {
+            clearTimeout(loaderTimer);
+            loaderTimer = null;
+        }
+
+        if (hasPaymobWidget()) {
+            clearLoader();
+        }
+
+        if (activeUpdateXhr === _jqXHR) {
+            activeUpdateXhr = null;
+        }
+    });
+
+    const patchInterval = window.setInterval(function () {
+        const hasUpdateCheckoutData = typeof window.updateCheckoutData === 'function';
+        const hasAjaxCall = typeof window.ajaxCall === 'function';
+        const hasInitializePaymobElement = typeof window.initializePaymobElement === 'function';
+
+        if (hasUpdateCheckoutData && !window.__styliiiishWrappedUpdateCheckoutData) {
+            const originalUpdateCheckoutData = window.updateCheckoutData;
+            window.updateCheckoutData = function () {
+                const now = Date.now();
+                if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
+                    return;
+                }
+                lastUpdateCallAt = now;
+                return originalUpdateCheckoutData.apply(this, arguments);
+            };
+            window.__styliiiishWrappedUpdateCheckoutData = true;
+        }
+
+        if (hasAjaxCall && !window.__styliiiishWrappedAjaxCall) {
+            const originalAjaxCall = window.ajaxCall;
+            window.ajaxCall = function () {
+                const now = Date.now();
+                if (!isPaymobSelected()) {
+                    return;
+                }
+                if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
+                    return;
+                }
+                lastUpdateCallAt = now;
+                return originalAjaxCall.apply(this, arguments);
+            };
+            window.__styliiiishWrappedAjaxCall = true;
+        }
+
+        if (hasInitializePaymobElement && !window.__styliiiishWrappedInitializePaymobElement) {
+            const originalInitializePaymobElement = window.initializePaymobElement;
+            window.initializePaymobElement = function () {
+                const context = this;
+                const args = arguments;
+                const MAX_PIXEL_WAIT_ATTEMPTS = 40;
+                const PIXEL_WAIT_MS = 250;
+
+                function runWhenPixelReady(attempt) {
+                    if (typeof window.Pixel === 'function') {
+                        try {
+                            return originalInitializePaymobElement.apply(context, args);
+                        } catch (error) {
+                            clearLoader();
+                            showNotice('Unable to initialize card payments. Please refresh and try again.');
+                            return;
+                        }
+                    }
+
+                    if (attempt >= MAX_PIXEL_WAIT_ATTEMPTS) {
+                        clearLoader();
+                        showNotice('Card payments are taking too long to load. Please refresh and try again.');
+                        return;
+                    }
+
+                    window.setTimeout(function () {
+                        runWhenPixelReady(attempt + 1);
+                    }, PIXEL_WAIT_MS);
+                }
+
+                runWhenPixelReady(0);
+            };
+            window.__styliiiishWrappedInitializePaymobElement = true;
+        }
+
+        if ((window.__styliiiishWrappedUpdateCheckoutData || !hasUpdateCheckoutData)
+            && (window.__styliiiishWrappedAjaxCall || !hasAjaxCall)
+            && (window.__styliiiishWrappedInitializePaymobElement || !hasInitializePaymobElement)) {
+            window.clearInterval(patchInterval);
+        }
+    }, 300);
+
+    window.setTimeout(function () {
+        window.clearInterval(patchInterval);
+    }, 15000);
+})(window, document, window.jQuery);
+JS;
+
+    wp_add_inline_script('styliiiish-paymob-checkout-guard', $inline_js, 'after');
+}, 99999);
