@@ -8,6 +8,7 @@
 
     var navSelector = '.woocommerce-MyAccount-navigation';
     var contentSelector = '.woocommerce-MyAccount-content';
+    var activeRequest = null;
 
     var isArabicPath = function (url) {
         var path = normalizePath(url || window.location.href);
@@ -61,6 +62,25 @@
         } catch (e) {
             return '';
         }
+    };
+
+    var normalizeUrlSignature = function (url) {
+        try {
+            var parsed = new URL(url, window.location.origin);
+            var path = parsed.pathname.replace(/\/$/, '');
+            if (!path) {
+                path = '/';
+            }
+            return path + parsed.search;
+        } catch (e) {
+            return '';
+        }
+    };
+
+    var lastLoadedSignature = normalizeUrlSignature(window.location.href);
+
+    var isSamePageUrl = function (url) {
+        return normalizeUrlSignature(url) === normalizeUrlSignature(window.location.href);
     };
 
     var isAccountUrl = function (url) {
@@ -118,8 +138,22 @@
     };
 
     var loadAccountUrl = function (url, pushState) {
+        var targetSignature = normalizeUrlSignature(url);
+        if (!targetSignature) {
+            window.location.href = url;
+            return Promise.resolve();
+        }
+
+        if (activeRequest) {
+            return activeRequest;
+        }
+
+        if (!pushState && targetSignature === lastLoadedSignature) {
+            return Promise.resolve();
+        }
+
         setLoading(true);
-        return fetchPage(url).then(function (html) {
+        activeRequest = fetchPage(url).then(function (html) {
             var doc = parseHTML(html);
             var applied = replaceAccountSections(doc);
             if (!applied) {
@@ -130,6 +164,8 @@
             if (pushState) {
                 window.history.pushState({ ekartAccountAjax: true }, '', url);
             }
+
+            lastLoadedSignature = targetSignature;
 
             applyArabicNoTranslateGuards(document);
 
@@ -142,8 +178,11 @@
         }).catch(function () {
             window.location.href = url;
         }).finally(function () {
+            activeRequest = null;
             setLoading(false);
         });
+
+        return activeRequest;
     };
 
     document.addEventListener('click', function (event) {
@@ -158,6 +197,10 @@
 
         var href = link.getAttribute('href') || '';
         if (!href || shouldSkipAjaxLink(href)) {
+            return;
+        }
+
+        if (isSamePageUrl(link.href)) {
             return;
         }
 
@@ -212,6 +255,9 @@
 
     window.addEventListener('popstate', function () {
         if (!isAccountUrl(window.location.href)) {
+            return;
+        }
+        if (normalizeUrlSignature(window.location.href) === lastLoadedSignature) {
             return;
         }
         loadAccountUrl(window.location.href, false);
