@@ -185,17 +185,46 @@ function ekart_output_no_translation_guard_script() {
 		var markerSelector='[data-no-translation]';
 		var arabicPattern=/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
 		var skipTagMap={SCRIPT:1,STYLE:1,NOSCRIPT:1,TEXTAREA:1,INPUT:1,OPTION:1};
+		var arabicTextLocks=new WeakMap();
+		var arabicElementLocks=new WeakMap();
 		var markNode=function(node){
 			if(!node||node.nodeType!==1){return;}
 			if(node.closest&&node.closest('[data-allow-ar-translation]')){return;}
 			node.setAttribute('translate','no');
 			node.classList.add('notranslate','trp-no-translate');
 		};
+		var lockElementArabicText=function(element){
+			if(!element||element.nodeType!==1){return;}
+			if(skipTagMap[element.tagName]){return;}
+			if(element.closest&&element.closest('[data-allow-ar-translation]')){return;}
+			if(element.children&&element.children.length===0){
+				var textValue=String(element.textContent||'').trim();
+				if(textValue!==''&&arabicPattern.test(textValue)&&!arabicElementLocks.has(element)){
+					arabicElementLocks.set(element,textValue);
+					markNode(element);
+				}
+			}
+		};
+		var restoreLockedElement=function(element){
+			if(!element||element.nodeType!==1){return;}
+			var original=arabicElementLocks.get(element);
+			if(typeof original==='string'){
+				var current=String(element.textContent||'').trim();
+				if(current!==original){
+					element.textContent=original;
+				}
+				markNode(element);
+			}
+		};
 		var markArabicTextContainers=function(root){
 			if(!root){return;}
 			if(root.nodeType===3){
 				var textValue=String(root.nodeValue||'').trim();
 				if(textValue!==''&&arabicPattern.test(textValue)&&root.parentElement){
+					if(!arabicTextLocks.has(root)){
+						arabicTextLocks.set(root,String(root.nodeValue||''));
+					}
+					lockElementArabicText(root.parentElement);
 					markNode(root.parentElement);
 				}
 				return;
@@ -209,6 +238,10 @@ function ekart_output_no_translation_guard_script() {
 				if(!parent||skipTagMap[parent.tagName]){continue;}
 				var value=String(current.nodeValue||'').trim();
 				if(value!==''&&arabicPattern.test(value)){
+					if(!arabicTextLocks.has(current)){
+						arabicTextLocks.set(current,String(current.nodeValue||''));
+					}
+					lockElementArabicText(parent);
 					markNode(parent);
 				}
 			}
@@ -226,16 +259,41 @@ function ekart_output_no_translation_guard_script() {
 		if(!window.MutationObserver){return;}
 		var observer=new MutationObserver(function(mutations){
 			mutations.forEach(function(mutation){
+				if(mutation.type==='characterData'){
+					var textNode=mutation.target;
+					var lockedText=arabicTextLocks.get(textNode);
+					if(typeof lockedText==='string'){
+						if(String(textNode.nodeValue||'')!==lockedText){
+							textNode.nodeValue=lockedText;
+						}
+						if(textNode.parentElement){
+							restoreLockedElement(textNode.parentElement);
+						}
+						return;
+					}
+					if(arabicPattern.test(String(textNode.nodeValue||''))){
+						arabicTextLocks.set(textNode,String(textNode.nodeValue||''));
+						if(textNode.parentElement){
+							lockElementArabicText(textNode.parentElement);
+							markNode(textNode.parentElement);
+						}
+					}
+					return;
+				}
+				restoreLockedElement(mutation.target&&mutation.target.nodeType===1?mutation.target:null);
 				if(!mutation.addedNodes||!mutation.addedNodes.length){return;}
 				mutation.addedNodes.forEach(function(added){
 					markTree(added);
 					markArabicTextContainers(added);
+					if(added&&added.nodeType===1){
+						restoreLockedElement(added);
+					}
 				});
 			});
 		});
-		observer.observe(document.documentElement,{childList:true,subtree:true});
+		observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
 	})();
 	</script>
 	<?php
 }
-add_action( 'wp_footer', 'ekart_output_no_translation_guard_script', 99 );
+add_action( 'wp_head', 'ekart_output_no_translation_guard_script', 0 );
