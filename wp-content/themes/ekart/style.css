@@ -644,6 +644,46 @@ body.rtl.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Address
     }
 }
 
+@media (min-width: 992px) {
+    body.woocommerce-account .woo-products .wf-row {
+        display: block !important;
+    }
+
+    body.woocommerce-account #wf-sidebar,
+    body.woocommerce-account .woo-products #wf-sidebar {
+        display: none !important;
+        width: 0 !important;
+        max-width: 0 !important;
+        flex: 0 0 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.woocommerce-account #wf-main,
+    body.woocommerce-account .woo-products #wf-main,
+    body.woocommerce-account .woo-products .wf-col-lg-8,
+    body.woocommerce-account .woo-products .wf-col-md-12,
+    body.woocommerce-account .woo-products .wf-col-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+
+    body.woocommerce-account .woo-products .woocommerce {
+        display: grid !important;
+        grid-template-columns: minmax(260px, 300px) minmax(0, 1fr) !important;
+        gap: 24px !important;
+        align-items: start !important;
+    }
+
+    body.woocommerce-account .woo-products .woocommerce .woocommerce-MyAccount-navigation,
+    body.woocommerce-account .woo-products .woocommerce .woocommerce-MyAccount-content {
+        float: none !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+}
+
 .wp-block-button.is-style-outline a.wp-block-button__link {
     border-color: inherit;
     background: transparent
