@@ -28,10 +28,14 @@
             'section_title' => 'اشتري الآن مباشرة',
             'section_sub' => 'منتجات ظاهرة فورًا لتسهيل الشراء من الإعلانات بدون أي خطوات إضافية.',
             'view_all_products' => 'عرض كل المنتجات',
+            'badge_brand' => 'ستايلش',
+            'available_label' => 'متوفر الآن',
+            'delivery_label' => 'توصيل سريع',
             'trust_1' => '💯 خامات موثوقة واختيار مدروس',
             'trust_2' => '🚚 توصيل سريع لكل المحافظات',
             'trust_3' => '📦 دعم قبل وبعد الطلب',
             'sale_badge' => 'خصم',
+            'view_product' => 'تفاصيل الفستان',
             'contact_for_price' => 'تواصل لمعرفة السعر',
             'save_prefix' => 'وفّري',
             'buy_now' => 'اشتري الآن',
@@ -71,10 +75,14 @@
             'section_title' => 'Buy Directly Now',
             'section_sub' => 'Visible products instantly to simplify ad-driven purchases without extra steps.',
             'view_all_products' => 'View All Products',
+            'badge_brand' => 'Styliiiish',
+            'available_label' => 'In Stock',
+            'delivery_label' => 'Fast Delivery',
             'trust_1' => '💯 Trusted quality and curated picks',
             'trust_2' => '🚚 Fast delivery across all governorates',
             'trust_3' => '📦 Support before and after order',
             'sale_badge' => 'OFF',
+            'view_product' => 'Dress Details',
             'contact_for_price' => 'Contact for price',
             'save_prefix' => 'Save',
             'buy_now' => 'Buy Now',
@@ -232,68 +240,143 @@
         .section-head h2 { margin: 0; font-size: clamp(22px, 3vw, 31px); }
         .section-head p { margin: 0; color: var(--muted); font-size: 14px; }
 
-        .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
 
-        .product-card {
+        .ads-products .card {
             background: #fff;
             border: 1px solid var(--line);
             border-radius: 16px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 8px 20px rgba(23,39,59,.05);
+            box-shadow: 0 8px 20px rgba(23, 39, 59, 0.04);
             transition: .25s ease;
         }
 
-        .product-card:hover {
+        .ads-products .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 16px 30px rgba(23,39,59,.12);
+            box-shadow: 0 14px 28px rgba(23, 39, 59, 0.12);
             border-color: rgba(213,21,34,.35);
         }
 
-        .media { position: relative; }
-        .thumb { width: 100%; aspect-ratio: 3/4; object-fit: cover; background: #f2f2f5; }
-        .sale-badge {
+        .ads-products .product-media { position: relative; }
+        .ads-products .thumb {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            background: #f2f2f5;
+            transition: .35s ease;
+        }
+        .ads-products .card:hover .thumb {
+            transform: scale(1.03);
+        }
+
+        .ads-products .card-badges {
             position: absolute;
             top: 10px;
             right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .ads-products .badge-chip {
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1;
+            backdrop-filter: blur(3px);
+            width: fit-content;
+        }
+
+        .ads-products .badge-brand {
+            background: linear-gradient(135deg, rgba(213, 21, 34, 0.96), rgba(183, 15, 26, 0.96));
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 6px 14px rgba(213, 21, 34, 0.28);
+        }
+
+        .ads-products .badge-discount {
             background: rgba(213,21,34,.9);
             color: #fff;
+        }
+
+        .ads-products .content { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .ads-products .name {
+            margin: 0;
+            font-size: 15px;
+            line-height: 1.45;
+            min-height: 46px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .ads-products .meta {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .ads-products .prices {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+
+        .ads-products .price { color: var(--primary); font-size: 17px; font-weight: 900; }
+        .ads-products .old { color: #8b8b97; text-decoration: line-through; font-size: 14px; }
+
+        .ads-products .sale {
+            display: inline-flex;
+            background: #f2fff8;
+            color: var(--success);
             border-radius: 999px;
-            padding: 5px 9px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .ads-products .save {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: #fff3f4;
+            color: var(--primary);
             font-size: 11px;
             font-weight: 800;
         }
 
-        .content { padding: 11px; display: flex; flex-direction: column; gap: 8px; height: 100%; }
-        .name {
-            margin: 0;
-            font-size: 14px;
-            line-height: 1.45;
-            min-height: 40px;
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            overflow: hidden;
-        }
+        .ads-products .card-actions { margin-top: auto; display: grid; grid-template-columns: 1fr; gap: 8px; }
 
-        .prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-        .price { color: var(--primary); font-size: 17px; font-weight: 900; }
-        .old { color: #8b8b97; text-decoration: line-through; font-size: 13px; }
-        .save { display: inline-flex; width: fit-content; padding: 4px 8px; border-radius: 999px; background: #f2fff8; color: var(--success); font-size: 11px; font-weight: 800; }
-
-        .card-actions { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn-buy, .btn-view {
-            min-height: 40px;
-            border-radius: 10px;
+        .ads-products .product-details-btn {
+            margin-top: auto;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            background: var(--primary);
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            min-height: 44px;
             font-size: 13px;
             font-weight: 800;
+            line-height: 1;
+            text-align: center;
         }
-        .btn-buy { background: var(--primary); color: #fff; }
-        .btn-view { background: #fff; border: 1px solid var(--line); }
+
+        .ads-products .product-details-btn:hover { background: #b8101c; }
 
         .bottom-cta {
             margin-top: 16px;
@@ -313,9 +396,9 @@
         .bottom-cta .btn-light { min-width: 180px; }
 
         .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-        .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
-        .card h3 { margin: 0 0 6px; font-size: 17px; }
-        .card p { margin: 0; color: var(--muted); font-size: 14px; }
+        .benefit-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+        .benefit-card h3 { margin: 0 0 6px; font-size: 17px; }
+        .benefit-card p { margin: 0; color: var(--muted); font-size: 14px; }
 
         .empty-state {
             border: 1px dashed rgba(23,39,59,.25);
@@ -434,7 +517,7 @@
             </div>
         </section>
 
-        <section class="section">
+        <section class="section ads-products">
             <div class="section-head">
                 <div>
                     <h2>{{ $t('section_title') }}</h2>
@@ -455,15 +538,23 @@
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
                     @endphp
 
-                    <article class="product-card">
-                        <div class="media">
+                    <article class="card">
+                        <div class="product-media">
                             <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
-                            @if($isSale)
-                                <span class="sale-badge">{{ $t('sale_badge') }} {{ $discount }}%</span>
-                            @endif
+                            <div class="card-badges">
+                                <span class="badge-chip badge-brand">{{ $t('badge_brand') }}</span>
+                                @if($isSale)
+                                    <span class="badge-chip badge-discount">{{ $t('sale_badge') }} {{ $discount }}%</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="content">
                             <h3 class="name">{{ $product->post_title }}</h3>
+                            <div class="meta">
+                                <span>{{ $t('available_label') }}</span>
+                                <span>{{ $t('delivery_label') }}</span>
+                            </div>
+
                             <div class="prices">
                                 <span class="price">
                                     @if($price > 0)
@@ -474,6 +565,7 @@
                                 </span>
                                 @if($isSale)
                                     <span class="old">{{ number_format($regular) }} {{ $t('currency') }}</span>
+                                    <span class="sale">{{ $t('sale_badge') }} {{ $discount }}%</span>
                                 @endif
                             </div>
 
@@ -482,8 +574,7 @@
                             @endif
 
                             <div class="card-actions">
-                                <a class="btn-buy" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('buy_now') }}</a>
-                                <a class="btn-view" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('preview') }}</a>
+                                <a class="product-details-btn" href="{{ $localePrefix }}/item/{{ $product->post_name }}" data-track-link="1">{{ $t('view_product') }}</a>
                             </div>
                         </div>
                     </article>
@@ -508,15 +599,15 @@
 
         <section class="section">
             <div class="cards">
-                <article class="card">
+                <article class="benefit-card">
                     <h3>{{ $t('card_1_t') }}</h3>
                     <p>{{ $t('card_1_d') }}</p>
                 </article>
-                <article class="card">
+                <article class="benefit-card">
                     <h3>{{ $t('card_2_t') }}</h3>
                     <p>{{ $t('card_2_d') }}</p>
                 </article>
-                <article class="card">
+                <article class="benefit-card">
                     <h3>{{ $t('card_3_t') }}</h3>
                     <p>{{ $t('card_3_d') }}</p>
                 </article>
