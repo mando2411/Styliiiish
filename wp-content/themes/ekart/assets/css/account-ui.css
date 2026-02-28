@@ -1,9 +1,25 @@
 /* My Account UI Refresh */
+body.woocommerce-account #wf-sidebar {
+    display: none !important;
+}
+
+body.woocommerce-account #wf-main {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+}
+
 .woocommerce-account .woocommerce {
     display: grid;
     grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
     gap: 24px;
     align-items: start;
+}
+
+.woocommerce-account .woocommerce-MyAccount-navigation,
+.woocommerce-account .woocommerce-MyAccount-content {
+    float: none !important;
+    width: auto !important;
 }
 
 .woocommerce-account .woocommerce-MyAccount-navigation,

@@ -9,6 +9,44 @@
     var navSelector = '.woocommerce-MyAccount-navigation';
     var contentSelector = '.woocommerce-MyAccount-content';
 
+    var isArabicPath = function (url) {
+        var path = normalizePath(url || window.location.href);
+        return path.indexOf('/ar') === 0 || path.indexOf('/حسابي') !== -1;
+    };
+
+    var markNoTranslate = function (element) {
+        if (!element || element.nodeType !== 1) {
+            return;
+        }
+        element.setAttribute('data-no-translation', '');
+        element.setAttribute('translate', 'no');
+        element.classList.add('notranslate', 'trp-no-translate');
+    };
+
+    var applyArabicNoTranslateGuards = function (root) {
+        if (!isArabicPath(window.location.href)) {
+            return;
+        }
+
+        var scope = root && root.nodeType === 1 ? root : document;
+        var guards = [];
+        var nav = scope.querySelector(navSelector);
+        var content = scope.querySelector(contentSelector);
+
+        if (nav) {
+            guards.push(nav);
+        }
+
+        if (content) {
+            guards.push(content);
+        }
+
+        guards.forEach(function (block) {
+            markNoTranslate(block);
+            block.querySelectorAll('a, span, p, h1, h2, h3, h4, h5, h6, label, th, td, legend, button').forEach(markNoTranslate);
+        });
+    };
+
     var isSameOrigin = function (url) {
         try {
             return new URL(url, window.location.origin).origin === window.location.origin;
@@ -93,6 +131,8 @@
                 window.history.pushState({ ekartAccountAjax: true }, '', url);
             }
 
+            applyArabicNoTranslateGuards(document);
+
             window.requestAnimationFrame(function () {
                 var content = document.querySelector(contentSelector);
                 if (content) {
@@ -162,6 +202,7 @@
                 return;
             }
             window.history.replaceState({ ekartAccountAjax: true }, '', action);
+            applyArabicNoTranslateGuards(document);
         }).catch(function () {
             window.location.reload();
         }).finally(function () {
@@ -175,4 +216,6 @@
         }
         loadAccountUrl(window.location.href, false);
     });
+
+    applyArabicNoTranslateGuards(document);
 })();
