@@ -415,7 +415,10 @@ function ekart_output_no_translation_guard_script() {
 				});
 			});
 		});
-		observer.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+		observer.observe(document.documentElement,{childList:true,subtree:true,characterData:false});
+		setTimeout(function(){
+			try{observer.disconnect();}catch(e){}
+		},8000);
 	})();
 	</script>
 	<?php
