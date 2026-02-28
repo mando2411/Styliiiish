@@ -7,6 +7,37 @@
     --ekart-account-shadow: 0 10px 30px rgba(23, 39, 59, 0.08);
 }
 
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100%;
+}
+
+body.woocommerce-account {
+    background: linear-gradient(180deg, #f4f7fb 0%, #eef3f9 100%);
+    color: var(--ekart-account-secondary);
+    overflow-x: hidden;
+}
+
+body.woocommerce-account #page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body.woocommerce-account .woo-products {
+    flex: 1 0 auto;
+    margin: 0 !important;
+    padding: 26px 0 34px !important;
+    background: transparent;
+}
+
+body.woocommerce-account .site-footer {
+    margin-top: 0 !important;
+    flex-shrink: 0;
+}
+
 body.woocommerce-account #wf-sidebar {
     display: none !important;
 }
