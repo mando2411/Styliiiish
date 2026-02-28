@@ -99,6 +99,18 @@ add_action('wp_enqueue_scripts', function () {
     }
     window.__styliiiishPaymobBeforeGuardApplied = true;
 
+    try {
+        const path = decodeURIComponent(String(window.location && window.location.pathname ? window.location.pathname : ''));
+        if (path.indexOf('/ar/') !== -1 || path.indexOf('الدفع') !== -1) {
+            if (window.document && window.document.documentElement) {
+                window.document.documentElement.setAttribute('lang', 'ar');
+                window.document.documentElement.setAttribute('dir', 'rtl');
+            }
+            window.__styliiiishPreferredCheckoutLang = 'ar';
+        }
+    } catch (error) {
+    }
+
     // Fix missing global used by paymob-pixel_block.js logs/comparisons.
     if (typeof window.previousTotalBlock === 'undefined') {
         window.previousTotalBlock = null;
@@ -376,6 +388,7 @@ JS;
     const patchInterval = window.setInterval(function () {
         const hasUpdateCheckoutData = typeof window.updateCheckoutData === 'function';
         const hasAjaxCall = typeof window.ajaxCall === 'function';
+        const hasInitializePaymobElement = typeof window.initializePaymobElement === 'function';
 
         if (hasUpdateCheckoutData && !window.__styliiiishWrappedUpdateCheckoutData) {
             const originalUpdateCheckoutData = window.updateCheckoutData;
@@ -406,8 +419,44 @@ JS;
             window.__styliiiishWrappedAjaxCall = true;
         }
 
+        if (hasInitializePaymobElement && !window.__styliiiishWrappedInitializePaymobElement) {
+            const originalInitializePaymobElement = window.initializePaymobElement;
+            window.initializePaymobElement = function () {
+                const context = this;
+                const args = arguments;
+                const MAX_PIXEL_WAIT_ATTEMPTS = 40;
+                const PIXEL_WAIT_MS = 250;
+
+                function runWhenPixelReady(attempt) {
+                    if (typeof window.Pixel === 'function') {
+                        try {
+                            return originalInitializePaymobElement.apply(context, args);
+                        } catch (error) {
+                            clearLoader();
+                            showNotice('Unable to initialize card payments. Please refresh and try again.');
+                            return;
+                        }
+                    }
+
+                    if (attempt >= MAX_PIXEL_WAIT_ATTEMPTS) {
+                        clearLoader();
+                        showNotice('Card payments are taking too long to load. Please refresh and try again.');
+                        return;
+                    }
+
+                    window.setTimeout(function () {
+                        runWhenPixelReady(attempt + 1);
+                    }, PIXEL_WAIT_MS);
+                }
+
+                runWhenPixelReady(0);
+            };
+            window.__styliiiishWrappedInitializePaymobElement = true;
+        }
+
         if ((window.__styliiiishWrappedUpdateCheckoutData || !hasUpdateCheckoutData)
-            && (window.__styliiiishWrappedAjaxCall || !hasAjaxCall)) {
+            && (window.__styliiiishWrappedAjaxCall || !hasAjaxCall)
+            && (window.__styliiiishWrappedInitializePaymobElement || !hasInitializePaymobElement)) {
             window.clearInterval(patchInterval);
         }
     }, 300);
