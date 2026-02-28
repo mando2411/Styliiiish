@@ -107,9 +107,57 @@ JS;
     const NOTICE_ID = 'styliiiish-paymob-guard-notice';
     const AJAX_TIMEOUT_MS = 20000;
     const MIN_UPDATE_INTERVAL_MS = 1500;
+    const DUPLICATE_WINDOW_MS = 1800;
     let lastUpdateCallAt = 0;
+    let lastUpdateSignature = null;
+    let lastUpdateSignatureAt = 0;
     let loaderTimer = null;
     let activeUpdateXhr = null;
+
+    function getAjaxAction(rawData) {
+        if (!rawData) {
+            return '';
+        }
+
+        if (typeof rawData === 'object' && rawData !== null) {
+            if (typeof rawData.action === 'string') {
+                return rawData.action;
+            }
+            if (rawData instanceof FormData) {
+                const action = rawData.get('action');
+                return typeof action === 'string' ? action : '';
+            }
+            return '';
+        }
+
+        const text = String(rawData);
+        const match = text.match(/(?:^|&)action=([^&]+)/);
+        return match ? decodeURIComponent(match[1].replace(/\+/g, ' ')) : '';
+    }
+
+    function getPayloadSignature(rawData) {
+        if (!rawData) {
+            return '';
+        }
+        if (typeof rawData === 'string') {
+            return rawData;
+        }
+        if (rawData instanceof FormData) {
+            try {
+                return JSON.stringify(Array.from(rawData.entries()));
+            } catch (error) {
+                return '';
+            }
+        }
+        if (typeof rawData === 'object') {
+            try {
+                return JSON.stringify(rawData);
+            } catch (error) {
+                return '';
+            }
+        }
+        return '';
+    }
 
     function hasPaymobWidget() {
         const root = document.getElementById('paymob-elements');
@@ -160,11 +208,13 @@ JS;
 
     $.ajaxPrefilter(function (options, originalOptions) {
         const url = String(options?.url || originalOptions?.url || '');
-        const data = String(options?.data || originalOptions?.data || '');
-        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1;
-        const isOrderSession = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=get_order_id_from_session') !== -1;
+        const rawData = options?.data ?? originalOptions?.data ?? '';
+        const action = getAjaxAction(rawData);
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && action === 'update_pixel_data';
+        const isOrderSession = url.indexOf('admin-ajax.php') !== -1 && action === 'get_order_id_from_session';
+        const isPaymobCallback = url.indexOf('wc-api=paymob_callback') !== -1;
 
-        if (!(isPixelUpdate || isOrderSession)) {
+        if (!(isPixelUpdate || isOrderSession || isPaymobCallback)) {
             return;
         }
 
@@ -178,6 +228,14 @@ JS;
 
         if (isPixelUpdate) {
             const now = Date.now();
+            const signature = getPayloadSignature(rawData);
+
+            if (signature && signature === lastUpdateSignature && (now - lastUpdateSignatureAt) < DUPLICATE_WINDOW_MS) {
+                options.beforeSend = function () {
+                    return false;
+                };
+                return;
+            }
 
             if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
                 try {
@@ -190,14 +248,16 @@ JS;
                 options.global = false;
             }
             lastUpdateCallAt = now;
+            lastUpdateSignature = signature;
+            lastUpdateSignatureAt = now;
             armLoaderTimeout();
         }
     });
 
     $(document).ajaxSend(function (_event, jqXHR, settings) {
         const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1;
+        const action = getAjaxAction(settings?.data || '');
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && action === 'update_pixel_data';
         if (!isPixelUpdate) {
             return;
         }
@@ -207,8 +267,8 @@ JS;
 
     $(document).ajaxError(function (_event, jqXHR, settings, thrownError) {
         const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
+        const action = getAjaxAction(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || action !== 'update_pixel_data') {
             return;
         }
         clearLoader();
@@ -217,8 +277,8 @@ JS;
 
     $(document).ajaxComplete(function (_event, _jqXHR, settings) {
         const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
+        const action = getAjaxAction(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || action !== 'update_pixel_data') {
             return;
         }
 
