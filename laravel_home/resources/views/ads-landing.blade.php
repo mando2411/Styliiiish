@@ -314,8 +314,8 @@
 
         .ads-products .product-media {
             position: relative;
-            aspect-ratio: 4 / 3;
-            max-height: 320px;
+            aspect-ratio: 6 / 5;
+            max-height: 500px;
             overflow: hidden;
         }
         .ads-products .thumb {
