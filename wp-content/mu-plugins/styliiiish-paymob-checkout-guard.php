@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Styliiiish Paymob Checkout Guard
- * Description: Checkout isolation + Paymob Pixel safety guard (without editing payment plugin files).
+ * Description: Targeted Paymob Pixel freeze guard (without editing payment plugin files).
  */
 
 if (!defined('ABSPATH')) {
@@ -25,140 +25,45 @@ function styliiiish_paymob_guard_is_enabled(): bool {
     return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
 }
 
-function styliiiish_paymob_guard_allow_script(string $handle, string $src): bool {
-    $handle = strtolower($handle);
-    $src = strtolower($src);
-
-    $allowed_handle_prefixes = [
-        'jquery',
-        'wc-',
-        'woocommerce',
-        'select2',
-        'selectwoo',
-        'wp-hooks',
-        'wp-i18n',
-        'wp-element',
-        'wp-components',
-        'wp-data',
-        'wp-api-fetch',
-        'wp-url',
-        'wp-polyfill',
-        'regenerator-runtime',
-        'underscore',
-        'backbone',
-        'imagesloaded',
-        'paymob',
-    ];
-
-    foreach ($allowed_handle_prefixes as $prefix) {
-        if (str_starts_with($handle, $prefix)) {
-            return true;
-        }
-    }
-
-    $allowed_src_fragments = [
-        '/woocommerce/',
-        '/paymob-for-woocommerce/',
-        '/wc-blocks/',
-        '/wp-includes/js/',
-    ];
-
-    foreach ($allowed_src_fragments as $fragment) {
-        if ($fragment !== '' && strpos($src, $fragment) !== false) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function styliiiish_paymob_guard_allow_style(string $handle, string $src): bool {
-    $handle = strtolower($handle);
-    $src = strtolower($src);
-
-    $allowed_handle_prefixes = [
-        'woocommerce',
-        'wc-',
-        'paymob',
-        'select2',
-        'selectwoo',
-        'wp-components',
-        'dashicons',
-    ];
-
-    foreach ($allowed_handle_prefixes as $prefix) {
-        if (str_starts_with($handle, $prefix)) {
-            return true;
-        }
-    }
-
-    $allowed_src_fragments = [
-        '/woocommerce/',
-        '/paymob-for-woocommerce/',
-        '/wc-blocks/',
-        '/wp-includes/css/',
-    ];
-
-    foreach ($allowed_src_fragments as $fragment) {
-        if ($fragment !== '' && strpos($src, $fragment) !== false) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 add_action('wp_enqueue_scripts', function () {
     if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
         return;
     }
 
-    // Remove unrelated head noise that may add heavy JS.
-    remove_action('wp_head', 'print_emoji_detection_script', 7);
-    remove_action('wp_print_styles', 'print_emoji_styles');
-    remove_action('wp_head', 'wp_oembed_add_discovery_links');
-    remove_action('wp_head', 'wp_oembed_add_host_js');
-}, 1);
-
-add_action('wp_enqueue_scripts', function () {
-    if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
+    $before_inline = <<<'JS'
+(function (window) {
+    if (window.__styliiiishPaymobBeforeGuardApplied) {
         return;
     }
+    window.__styliiiishPaymobBeforeGuardApplied = true;
 
-    global $wp_scripts, $wp_styles;
-
-    if ($wp_scripts instanceof WP_Scripts) {
-        foreach ((array) $wp_scripts->queue as $handle) {
-            $src = '';
-            if (isset($wp_scripts->registered[$handle])) {
-                $src = (string) $wp_scripts->registered[$handle]->src;
-            }
-
-            if (!styliiiish_paymob_guard_allow_script($handle, $src)) {
-                wp_dequeue_script($handle);
-                wp_deregister_script($handle);
-            }
-        }
+    // Fix missing global used by paymob-pixel_block.js logs/comparisons.
+    if (typeof window.previousTotalBlock === 'undefined') {
+        window.previousTotalBlock = null;
+    }
+    try {
+        window.eval('var previousTotalBlock = window.previousTotalBlock;');
+    } catch (error) {
     }
 
-    if ($wp_styles instanceof WP_Styles) {
-        foreach ((array) $wp_styles->queue as $handle) {
-            $src = '';
-            if (isset($wp_styles->registered[$handle])) {
-                $src = (string) $wp_styles->registered[$handle]->src;
-            }
-
-            if (!styliiiish_paymob_guard_allow_style($handle, $src)) {
-                wp_dequeue_style($handle);
-                wp_deregister_style($handle);
-            }
+    // Slow down only very aggressive short polling intervals to prevent UI freeze.
+    const nativeSetInterval = window.setInterval;
+    window.setInterval = function (callback, delay) {
+        const ms = Number(delay);
+        if (!Number.isNaN(ms) && ms > 0 && ms <= 250) {
+            return nativeSetInterval.call(this, callback, 1200);
         }
-    }
-}, 99999);
+        return nativeSetInterval.apply(this, arguments);
+    };
+})(window);
+JS;
 
-add_action('wp_enqueue_scripts', function () {
-    if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
-        return;
+    if (wp_script_is('paymob-pixel-checkout', 'enqueued')) {
+        wp_add_inline_script('paymob-pixel-checkout', $before_inline, 'before');
+    } else {
+        wp_register_script('styliiiish-paymob-checkout-guard-before', false, [], '2.1.0', false);
+        wp_enqueue_script('styliiiish-paymob-checkout-guard-before');
+        wp_add_inline_script('styliiiish-paymob-checkout-guard-before', $before_inline, 'after');
     }
 
     wp_register_script('styliiiish-paymob-checkout-guard', false, ['jquery'], '2.0.0', true);
