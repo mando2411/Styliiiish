@@ -315,7 +315,7 @@
         .ads-products .product-media {
             position: relative;
             aspect-ratio: 6 / 5;
-            max-height: 500px;
+            max-height: 320px;
             overflow: hidden;
         }
         .ads-products .thumb {
@@ -528,7 +528,7 @@
             .card-actions { grid-template-columns: 1fr; }
             .bottom-cta .btn-light { width: 100%; }
             .ads-sticky-cta { display: flex; }
-            .ads-products .product-media { max-height: 230px; }
+            .ads-products .product-media { max-height: 260px; }
         }
 
         @media (max-width: 390px) {
