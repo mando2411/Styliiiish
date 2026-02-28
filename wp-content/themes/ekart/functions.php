@@ -22,9 +22,86 @@ add_action( 'after_setup_theme', 'ekart_theme_setup' );
  */
 
 function ekart_theme_css() {
-	wp_enqueue_style( 'ekart-parent-theme-style', get_template_directory_uri() . '/style.css' );
+	$child_style_path = get_stylesheet_directory() . '/style.css';
+	$child_style_ver  = file_exists( $child_style_path ) ? (string) filemtime( $child_style_path ) : null;
+	wp_enqueue_style( 'ekart-style', get_stylesheet_uri(), [ 'shopire-style' ], $child_style_ver );
+
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		$account_style_rel  = '/assets/css/account-ui.css';
+		$account_script_rel = '/assets/js/account-ajax.js';
+		$account_style_path = get_stylesheet_directory() . $account_style_rel;
+		$account_script_path = get_stylesheet_directory() . $account_script_rel;
+
+		if ( file_exists( $account_style_path ) ) {
+			wp_enqueue_style(
+				'ekart-account-ui',
+				get_stylesheet_directory_uri() . $account_style_rel,
+				[ 'ekart-style', 'shopire-woocommerce' ],
+				(string) filemtime( $account_style_path )
+			);
+		}
+
+		if ( file_exists( $account_script_path ) ) {
+			wp_enqueue_script(
+				'ekart-account-ajax',
+				get_stylesheet_directory_uri() . $account_script_rel,
+				[],
+				(string) filemtime( $account_script_path ),
+				true
+			);
+		}
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ekart_theme_css', 99);
+
+function ekart_customize_my_account_menu_items( $items ) {
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$is_english   = preg_match( '#^/ar(?:/|$)#i', $request_path ) !== 1;
+
+	$labels = $is_english
+		? [
+			'dashboard'       => 'Dashboard',
+			'orders'          => 'Orders',
+			'edit-address'    => 'Addresses',
+			'edit-account'    => 'Account Details',
+			'saved-cards'     => 'Saved Cards',
+			'customer-logout' => 'Logout',
+		]
+		: [
+			'dashboard'       => 'لوحة التحكم',
+			'orders'          => 'الطلبات',
+			'edit-address'    => 'العنوان',
+			'edit-account'    => 'تفاصيل الحساب',
+			'saved-cards'     => 'البطاقات المحفوظة',
+			'customer-logout' => 'تسجيل الخروج',
+		];
+
+	foreach ( $labels as $endpoint => $label ) {
+		if ( isset( $items[ $endpoint ] ) ) {
+			$items[ $endpoint ] = $label;
+		}
+	}
+
+	$desired_order = [ 'dashboard', 'orders', 'edit-address', 'edit-account', 'saved-cards', 'customer-logout' ];
+	$ordered_items = [];
+
+	foreach ( $desired_order as $endpoint ) {
+		if ( isset( $items[ $endpoint ] ) ) {
+			$ordered_items[ $endpoint ] = $items[ $endpoint ];
+		}
+	}
+
+	foreach ( $items as $endpoint => $label ) {
+		if ( ! isset( $ordered_items[ $endpoint ] ) ) {
+			$ordered_items[ $endpoint ] = $label;
+		}
+	}
+
+	return $ordered_items;
+}
+add_filter( 'woocommerce_account_menu_items', 'ekart_customize_my_account_menu_items', 20 );
 
 require get_stylesheet_directory() . '/theme-functions/controls/class-customize.php';
 
