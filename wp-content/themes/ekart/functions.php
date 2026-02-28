@@ -174,3 +174,40 @@ function ekart_rewrite_legacy_assets_host_for_account_pages() {
 	);
 }
 add_action( 'template_redirect', 'ekart_rewrite_legacy_assets_host_for_account_pages', 2 );
+
+function ekart_output_no_translation_guard_script() {
+	if ( is_admin() ) {
+		return;
+	}
+	?>
+	<script id="ekart-no-translation-guard">
+	(function(){
+		var markerSelector='[data-no-translation]';
+		var markNode=function(node){
+			if(!node||node.nodeType!==1){return;}
+			node.setAttribute('translate','no');
+			node.classList.add('notranslate','trp-no-translate');
+		};
+		var markTree=function(root){
+			if(!root||root.nodeType!==1){return;}
+			if(root.matches&&root.matches(markerSelector)){markNode(root);}
+			if(root.querySelectorAll){
+				root.querySelectorAll(markerSelector).forEach(markNode);
+			}
+		};
+		markTree(document.documentElement||document.body);
+		if(!window.MutationObserver){return;}
+		var observer=new MutationObserver(function(mutations){
+			mutations.forEach(function(mutation){
+				if(!mutation.addedNodes||!mutation.addedNodes.length){return;}
+				mutation.addedNodes.forEach(function(added){
+					markTree(added);
+				});
+			});
+		});
+		observer.observe(document.documentElement,{childList:true,subtree:true});
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_footer', 'ekart_output_no_translation_guard_script', 99 );
