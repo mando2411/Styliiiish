@@ -220,7 +220,7 @@ JS;
     const LOADER_ID = 'paymob-loading-indicator';
     const NOTICE_ID = 'styliiiish-paymob-guard-notice';
     const AJAX_TIMEOUT_MS = 20000;
-    const MIN_UPDATE_INTERVAL_MS = 4000;
+    const MIN_UPDATE_INTERVAL_MS = 2500;
     const DUPLICATE_WINDOW_MS = 1800;
     let lastUpdateCallAt = 0;
     let lastUpdateSignature = null;
@@ -357,19 +357,20 @@ JS;
                 return;
             }
 
-            if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
-                try {
-                    activeUpdateXhr.abort('styliiiish_prevent_overlap');
-                } catch (error) {
-                }
-            }
-
             if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                 options.beforeSend = function () {
                     return false;
                 };
                 return;
             }
+
+            if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
+                options.beforeSend = function () {
+                    return false;
+                };
+                return;
+            }
+
             lastUpdateCallAt = now;
             lastUpdateSignature = signature;
             lastUpdateSignatureAt = now;
