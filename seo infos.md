@@ -65,6 +65,37 @@
 - English feed: `https://styliiiish.com/merchant-feed-en.xml`
 - Feed fields include: `id`, `title`, `description`, `link`, `image_link`, `availability`, `price`, `condition`, `brand`.
 
+## معلومات عن المصدر (للشفافية مع Google)
+
+- المصدر الرسمي: `styliiiish.com`
+- هذه النتيجة مصدرها موقع إلكتروني فهرسه محرّك بحث Google.
+- مزيد من المعلومات حول هذه الصفحة:
+  - الصفحة لها Canonical واضح و`hreflang` عربي/إنجليزي.
+  - الصفحة تدعم Structured Data مناسب لنوعها (WebPage / Product / ItemList / Breadcrumb).
+  - اللغة الأساسية في النتائج العربية: العربية (`ar`).
+  - الموقع يستهدف ويخدم أكثر من منطقة، منها: مصر وسويسرا (`areaServed: EG, CH`).
+
+## بحثك وهذه النتيجة
+
+- يتطابق الموقع الإلكتروني `styliiiish.com` مع عبارة بحث واحدة أو أكثر من العبارات التي أدخلتها.
+- هذه النتيجة باللغة العربية (عند صفحة عربية) أو الإنجليزية (عند صفحة إنجليزية).
+- يبدو أن هذه النتيجة ذات صلة بعمليات البحث في مناطق متعددة، بما فيها سويسرا.
+
+## طريقة عمل Google (توضيح مهم)
+
+- هذه نتيجة بحث وليست إعلانًا.
+- يتم الدفع مقابل الإعلانات فقط، وتظهر دائمًا بعلامة مثل: "إعلان" أو "دعائية".
+
+## صفحات السوشيال الرسمية للموقع
+
+- Facebook: `https://www.facebook.com/Styliiish.Egypt/`
+- Instagram: `https://www.instagram.com/styliiiish.egypt/`
+- TikTok: `https://www.tiktok.com/@styliiish_?_r=1&_t=ZS-94HEUy9a0RE`
+- Google Business Profile: `https://g.page/styliish`
+- WhatsApp Business: `https://wa.me/201050874255`
+
+> تم ربط هذه الحسابات أيضًا داخل Schema (`sameAs`) لتكون الإشارة واضحة قدر الإمكان لمحركات البحث.
+
 ## Execution Checklist (Search Console + Rich Results)
 
 1. Submit/verify sitemaps:

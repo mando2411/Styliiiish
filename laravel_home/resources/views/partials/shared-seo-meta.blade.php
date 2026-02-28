@@ -61,13 +61,17 @@
     $seoSameAs = [
         'https://www.facebook.com/Styliiish.Egypt/',
         'https://www.instagram.com/styliiiish.egypt/',
+        'https://www.tiktok.com/@styliiish_?_r=1&_t=ZS-94HEUy9a0RE',
         'https://g.page/styliish',
+        'https://wa.me/201050874255',
     ];
 @endphp
 <meta name="keywords" content="{{ $seoKeywordsValue }}">
 <meta name="author" content="Styliiiish">
 <meta name="publisher" content="Styliiiish">
 <meta name="application-name" content="Styliiiish">
+<meta property="og:site_name" content="Styliiiish">
+<meta name="apple-mobile-web-app-title" content="Styliiiish">
 <meta name="theme-color" content="#d51522">
 <link rel="preconnect" href="https://styliiiish.com" crossorigin>
 <link rel="dns-prefetch" href="//styliiiish.com">
@@ -80,6 +84,13 @@
     'logo' => $seoImageValue,
     'description' => $seoOrganizationDescription,
     'sameAs' => $seoSameAs,
+    'contactPoint' => [[
+        '@type' => 'ContactPoint',
+        'telephone' => '+20 105 087 4255',
+        'contactType' => 'customer support',
+        'availableLanguage' => ['ar', 'en'],
+        'areaServed' => ['EG', 'CH'],
+    ]],
     'areaServed' => [
         ['@type' => 'Country', 'name' => 'Egypt'],
         ['@type' => 'Country', 'name' => 'Switzerland'],
@@ -91,6 +102,7 @@
     '@context' => 'https://schema.org',
     '@type' => 'WebSite',
     'name' => $seoOrganizationName,
+    'alternateName' => ['styliiiish.com', 'ستايلش'],
     'url' => $seoBaseUrl,
     'inLanguage' => [$seoLanguageCode, $isEnglishLocale ? 'ar' : 'en'],
     'potentialAction' => [
@@ -113,6 +125,7 @@
     'description' => $seoDescriptionValue,
     'url' => $seoUrlValue,
     'inLanguage' => $seoLanguageCode,
+    'isAccessibleForFree' => true,
     'isPartOf' => [
         '@type' => 'WebSite',
         'name' => $seoOrganizationName,

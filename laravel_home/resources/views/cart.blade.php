@@ -155,7 +155,7 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="{{ $ogLocale }}">
     <meta property="og:locale:alternate" content="{{ $ogAltLocale }}">
-    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
+    <meta property="og:site_name" content="Styliiiish">
     <meta property="og:title" content="{{ $t('meta_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
     <meta property="og:url" content="{{ $seoUrl }}">
