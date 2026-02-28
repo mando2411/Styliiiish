@@ -312,13 +312,19 @@
             border-color: rgba(213,21,34,.35);
         }
 
-        .ads-products .product-media { position: relative; }
+        .ads-products .product-media {
+            position: relative;
+            aspect-ratio: 6 / 5;
+            max-height: 220px;
+            overflow: hidden;
+        }
         .ads-products .thumb {
             width: 100%;
-            aspect-ratio: 1/1;
+            height: 100%;
             object-fit: cover;
             background: #f2f2f5;
             transition: .35s ease;
+            display: block;
         }
         .ads-products .card:hover .thumb {
             transform: scale(1.03);
@@ -522,6 +528,7 @@
             .card-actions { grid-template-columns: 1fr; }
             .bottom-cta .btn-light { width: 100%; }
             .ads-sticky-cta { display: flex; }
+            .ads-products .product-media { max-height: 180px; }
         }
 
         @media (max-width: 390px) {
