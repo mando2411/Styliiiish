@@ -3084,7 +3084,17 @@ $adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionB
             ->count();
     });
 
-    return view('ads-landing', compact('products', 'total', 'currentLocale', 'localePrefix'));
+    return response()->view('ads-landing', compact('products', 'total', 'currentLocale', 'localePrefix'))
+        ->withHeaders([
+            'X-Frame-Options' => 'SAMEORIGIN',
+            'X-Content-Type-Options' => 'nosniff',
+            'Referrer-Policy' => 'strict-origin-when-cross-origin',
+            'Permissions-Policy' => 'accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'
+        ])
+        ->header('Cross-Origin-Opener-Policy', 'same-origin')
+        ->header('Cross-Origin-Resource-Policy', 'cross-origin')
+        ->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+        ->header('Content-Security-Policy', "default-src 'self' https: data: blob:; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; connect-src 'self' https:; frame-ancestors 'self'; base-uri 'self'; form-action 'self' https:; upgrade-insecure-requests");
 };
 
 Route::get('/ads', fn () => $adsHandler('ar'));

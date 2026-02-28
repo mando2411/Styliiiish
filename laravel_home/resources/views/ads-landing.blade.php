@@ -154,6 +154,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="title" content="{{ $t('meta_title') }}">
     <meta name="description" content="{{ $t('meta_desc') }}">
     <meta name="keywords" content="{{ $t('meta_keywords') }}">
@@ -162,6 +163,10 @@
     <meta name="language" content="{{ $isEnglish ? 'English' : 'Arabic' }}">
     <meta name="theme-color" content="#d51522">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="bingbot" content="index, follow">
+    <link rel="preconnect" href="https://styliiiish.com" crossorigin>
+    <link rel="dns-prefetch" href="//styliiiish.com">
     <link rel="canonical" href="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/ads">
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/ads">
@@ -174,6 +179,8 @@
     <meta property="og:description" content="{{ $t('og_desc') }}">
     <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">
     <meta property="og:image" content="{{ $wpIcon }}">
+    <meta property="og:image:width" content="512">
+    <meta property="og:image:height" content="512">
     <meta property="og:image:alt" content="{{ $t('og_image_alt') }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $t('twitter_title') }}">
@@ -527,7 +534,7 @@
             <div class="hero-wrap">
                 <div>
                     <a class="landing-brand" href="{{ $localePrefix }}" aria-label="Styliiiish Home">
-                        <img src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
+                        <img src="{{ $wpLogo }}" alt="Styliiiish" width="320" height="72" decoding="async" fetchpriority="high" onerror="this.onerror=null;this.src='/brand/logo.png';">
                     </a>
                     <span class="badge">{{ $t('badge_offer') }}</span>
                     <h1>{{ $t('hero_title') }}</h1>
@@ -594,7 +601,7 @@
 
                     <article class="card">
                         <div class="product-media">
-                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
+                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" width="600" height="800" sizes="(max-width: 640px) 48vw, (max-width: 900px) 31vw, 23vw" loading="{{ $loop->index < 2 ? 'eager' : 'lazy' }}" fetchpriority="{{ $loop->first ? 'high' : 'low' }}" decoding="async">
                             <div class="card-badges">
                                 <span class="badge-chip {{ $isMarketplace ? 'badge-marketplace' : 'badge-brand' }}">{{ $primaryBadge }}</span>
                                 @if($isSale)
