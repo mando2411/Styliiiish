@@ -8,6 +8,37 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+add_action('template_redirect', function () {
+    if (is_admin() || wp_doing_ajax()) {
+        return;
+    }
+
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    if ($request_uri === '') {
+        return;
+    }
+
+    $path = (string) parse_url($request_uri, PHP_URL_PATH);
+    $decoded_path = rawurldecode($path);
+
+    $arabic_checkout_aliases = [
+        '/ar/الدفع',
+        '/ar/الدفع/',
+        '/الدفع',
+        '/الدفع/',
+        '/ar/payment',
+        '/ar/payment/',
+    ];
+
+    foreach ($arabic_checkout_aliases as $alias) {
+        if (strcasecmp(rtrim($decoded_path, '/'), rtrim($alias, '/')) === 0) {
+            $target = home_url('/checkout/');
+            wp_safe_redirect($target, 302);
+            exit;
+        }
+    }
+}, -9999);
+
 function styliiiish_paymob_guard_is_checkout_context(): bool {
     if (is_admin()) {
         return false;
