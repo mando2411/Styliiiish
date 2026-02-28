@@ -149,6 +149,79 @@
         }
     }
     $trackingQueryString = http_build_query($trackingQuery);
+
+    $schemaProducts = collect($products ?? [])->values()->map(function ($product) use ($localePrefix, $wpBaseUrl) {
+        $price = (float) ($product->price ?? 0);
+        $regular = (float) ($product->regular_price ?? 0);
+        $normalizedPrice = $price > 0 ? $price : $regular;
+        $slug = trim((string) ($product->post_name ?? ''));
+        $image = trim((string) ($product->image ?? ''));
+
+        return [
+            'name' => trim((string) ($product->post_title ?? '')),
+            'url' => $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug),
+            'image' => $image !== '' ? $image : ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png'),
+            'price' => $normalizedPrice > 0 ? number_format($normalizedPrice, 2, '.', '') : null,
+        ];
+    })->filter(fn ($item) => ($item['name'] ?? '') !== '' && ($item['url'] ?? '') !== '')->values();
+
+    $schemaItemList = [
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'name' => $t('section_title'),
+        'url' => $wpBaseUrl . $canonicalPath,
+        'numberOfItems' => $schemaProducts->count(),
+        'itemListOrder' => 'https://schema.org/ItemListUnordered',
+        'itemListElement' => $schemaProducts->map(function ($item, $index) {
+            $product = [
+                '@type' => 'Product',
+                'name' => (string) ($item['name'] ?? ''),
+                'url' => (string) ($item['url'] ?? ''),
+                'image' => [(string) ($item['image'] ?? '')],
+            ];
+
+            if (!empty($item['price'])) {
+                $product['offers'] = [
+                    '@type' => 'Offer',
+                    'priceCurrency' => 'EGP',
+                    'price' => (string) ($item['price'] ?? '0.00'),
+                    'availability' => 'https://schema.org/InStock',
+                    'url' => (string) ($item['url'] ?? ''),
+                ];
+            }
+
+            return [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'item' => $product,
+            ];
+        })->all(),
+    ];
+
+    $schemaBreadcrumb = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => $isEnglish ? 'Home' : 'الرئيسية',
+                'item' => $wpBaseUrl . $localePrefix,
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => $isEnglish ? 'Shop' : 'المتجر',
+                'item' => $wpBaseUrl . $localePrefix . '/shop',
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 3,
+                'name' => $isEnglish ? 'Offers' : 'العروض',
+                'item' => $wpBaseUrl . $canonicalPath,
+            ],
+        ],
+    ];
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -214,6 +287,8 @@
             ],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
     </script>
+    <script type="application/ld+json">{!! json_encode($schemaItemList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($schemaBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         :root {
             --primary: #d51522;

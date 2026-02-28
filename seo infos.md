@@ -46,3 +46,36 @@
 - All pages now include shared SEO augmentation via `@include('partials.shared-seo-meta')`.
 - Existing page-specific tags (title/description/canonical/hreflang/og/twitter) remain in place; shared partial adds/standardizes missing professional meta.
 - For dynamic pages (`item/{slug}`, `blog/{slug}`), SEO values are generated per content item.
+
+## Structured Data Coverage (Implemented)
+
+- Global: `Organization` + `WebSite` + `WebPage` from shared partial.
+- Product page (`/item/{slug}`):
+  - `Product` + `Offer`
+  - `AggregateRating` (when ratings exist)
+  - `Review` (up to 5 approved reviews)
+  - `BreadcrumbList`
+- Listing pages:
+  - `/shop`: `ItemList` of products + `BreadcrumbList`
+  - `/ads`: `ItemList` of products + `BreadcrumbList`
+
+## Merchant Center Feeds (Implemented)
+
+- Arabic feed: `https://styliiiish.com/merchant-feed.xml`
+- English feed: `https://styliiiish.com/merchant-feed-en.xml`
+- Feed fields include: `id`, `title`, `description`, `link`, `image_link`, `availability`, `price`, `condition`, `brand`.
+
+## Execution Checklist (Search Console + Rich Results)
+
+1. Submit/verify sitemaps:
+  - `https://styliiiish.com/sitemap_index.xml`
+  - `https://styliiiish.com/en/sitemap_index.xml`
+2. Validate samples in Rich Results Test:
+  - Home, Shop, Ads, and 3–5 product URLs.
+3. In Search Console:
+  - URL Inspection → Request Indexing for updated templates.
+  - Monitor Enhancements: `Products`, `Breadcrumbs`, and `Merchant listings`.
+4. In Merchant Center:
+  - Add primary feed URL (`merchant-feed.xml`) and schedule daily fetch.
+  - Fix disapproved items (price mismatch, availability mismatch, image quality).
+5. Recheck Core Web Vitals + mobile usability weekly.

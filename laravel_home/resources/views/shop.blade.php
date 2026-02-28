@@ -76,6 +76,59 @@
 
     $wpLogo = 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = 'https://styliiiish.com/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
+
+    $schemaProducts = collect($schemaProducts ?? [])->values();
+    $schemaItemList = [
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'name' => $t('shop_title'),
+        'url' => $wpBaseUrl . $canonicalPath,
+        'numberOfItems' => $schemaProducts->count(),
+        'itemListOrder' => 'https://schema.org/ItemListUnordered',
+        'itemListElement' => $schemaProducts->values()->map(function ($item, $index) {
+            $product = [
+                '@type' => 'Product',
+                'name' => (string) ($item['name'] ?? ''),
+                'url' => (string) ($item['url'] ?? ''),
+                'image' => [(string) ($item['image'] ?? '')],
+            ];
+
+            if (!empty($item['price'])) {
+                $product['offers'] = [
+                    '@type' => 'Offer',
+                    'priceCurrency' => (string) ($item['currency'] ?? 'EGP'),
+                    'price' => (string) ($item['price'] ?? '0.00'),
+                    'availability' => (string) ($item['availability'] ?? 'https://schema.org/InStock'),
+                    'url' => (string) ($item['url'] ?? ''),
+                ];
+            }
+
+            return [
+                '@type' => 'ListItem',
+                'position' => $index + 1,
+                'item' => $product,
+            ];
+        })->all(),
+    ];
+
+    $schemaBreadcrumb = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => $t('shop_title') === 'Shop' ? 'Home' : 'الرئيسية',
+                'item' => $wpBaseUrl . $localePrefix,
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => $t('shop_title'),
+                'item' => $wpBaseUrl . $canonicalPath,
+            ],
+        ],
+    ];
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -102,6 +155,8 @@
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
     <title>{{ $t('page_title') }}</title>
     @include('partials.shared-seo-meta')
+    <script type="application/ld+json">{!! json_encode($schemaItemList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($schemaBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;

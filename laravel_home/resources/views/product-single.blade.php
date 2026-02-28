@@ -477,6 +477,47 @@
         ],
     ];
 
+    $schemaAverageRating = (float) ($schemaAverageRating ?? 0);
+    $schemaReviewCount = (int) ($schemaReviewCount ?? 0);
+    $schemaReviews = is_array($schemaReviews ?? null) ? $schemaReviews : [];
+
+    if ($schemaAverageRating > 0 && $schemaReviewCount > 0) {
+        $schemaProduct['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => number_format($schemaAverageRating, 2, '.', ''),
+            'reviewCount' => $schemaReviewCount,
+        ];
+    }
+
+    if (!empty($schemaReviews)) {
+        $schemaProduct['review'] = $schemaReviews;
+    }
+
+    $schemaBreadcrumb = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            [
+                '@type' => 'ListItem',
+                'position' => 1,
+                'name' => $t('home'),
+                'item' => $wpBaseUrl . $localePrefix,
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => $t('shop'),
+                'item' => $wpBaseUrl . $localePrefix . '/shop',
+            ],
+            [
+                '@type' => 'ListItem',
+                'position' => 3,
+                'name' => $seoProductName,
+                'item' => $seoUrl,
+            ],
+        ],
+    ];
+
     $seoLocale = $isEnglish ? 'en_US' : 'ar_EG';
     $seoAlternateLocale = $isEnglish ? 'ar_EG' : 'en_US';
 @endphp
@@ -523,6 +564,7 @@
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
 
     <script type="application/ld+json">{!! json_encode($schemaProduct, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($schemaBreadcrumb, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <style>
         :root {
             --wf-main-rgb: 213, 21, 34;

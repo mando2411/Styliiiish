@@ -862,12 +862,150 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
         ]);
     }
 
-    return view('shop', compact('search', 'sort', 'category', 'currentLocale', 'localePrefix'));
+    $wpBaseUrl = rtrim((string) env('WP_PUBLIC_URL', $request->getSchemeAndHttpHost()), '/');
+
+    $schemaProducts = $products
+        ->take(120)
+        ->values()
+        ->map(function ($product) use ($currentLocale, $localePrefix, $wpBaseUrl) {
+            $price = (float) ($product->price ?? 0);
+            $regular = (float) ($product->regular_price ?? 0);
+            $normalizedPrice = $price > 0 ? $price : $regular;
+            $slug = trim((string) ($product->post_name ?? ''));
+
+            return [
+                'name' => trim((string) ($product->post_title ?? '')),
+                'url' => $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug),
+                'image' => trim((string) ($product->image ?? '')) !== ''
+                    ? trim((string) ($product->image ?? ''))
+                    : ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png'),
+                'price' => $normalizedPrice > 0 ? number_format($normalizedPrice, 2, '.', '') : null,
+                'availability' => 'https://schema.org/InStock',
+                'currency' => 'EGP',
+                'locale' => $currentLocale,
+            ];
+        })
+        ->filter(fn ($item) => ($item['name'] ?? '') !== '' && ($item['url'] ?? '') !== '')
+        ->values();
+
+    return view('shop', compact('search', 'sort', 'category', 'currentLocale', 'localePrefix', 'schemaProducts'));
 };
 
 Route::get('/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/ar/shop', fn (Request $request) => $shopHandler($request, 'ar'));
 Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
+
+$merchantFeedHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
+    $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
+    $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost()), '/');
+
+    $rows = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as price', function ($join) {
+            $join->on('p.ID', '=', 'price.post_id')
+                ->where('price.meta_key', '_price');
+        })
+        ->leftJoin('wp_postmeta as regular', function ($join) {
+            $join->on('p.ID', '=', 'regular.post_id')
+                ->where('regular.meta_key', '_regular_price');
+        })
+        ->leftJoin('wp_postmeta as stock', function ($join) {
+            $join->on('p.ID', '=', 'stock.post_id')
+                ->where('stock.meta_key', '_stock_status');
+        })
+        ->leftJoin('wp_postmeta as thumb', function ($join) {
+            $join->on('p.ID', '=', 'thumb.post_id')
+                ->where('thumb.meta_key', '_thumbnail_id');
+        })
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->select(
+            'p.ID',
+            'p.post_title',
+            'p.post_name',
+            'p.post_excerpt',
+            'p.post_content',
+            'price.meta_value as price',
+            'regular.meta_value as regular_price',
+            'stock.meta_value as stock_status',
+            'img.guid as image'
+        )
+        ->orderByDesc('p.post_date')
+        ->limit(2000)
+        ->get();
+
+    $products = $localizeProductsCollectionByWpml($rows, $currentLocale, true);
+
+    $xmlEscape = function (?string $value): string {
+        return htmlspecialchars((string) ($value ?? ''), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+    };
+
+    $itemsXml = $products->map(function ($product) use ($xmlEscape, $wpBaseUrl, $localePrefix) {
+        $title = trim((string) ($product->post_title ?? ''));
+        $slug = trim((string) ($product->post_name ?? ''));
+        if ($title === '' || $slug === '') {
+            return '';
+        }
+
+        $price = (float) ($product->price ?? 0);
+        $regular = (float) ($product->regular_price ?? 0);
+        $displayPrice = $price > 0 ? $price : $regular;
+        if ($displayPrice <= 0) {
+            $displayPrice = 0;
+        }
+
+        $availability = strtolower(trim((string) ($product->stock_status ?? '')));
+        $availability = $availability === 'outofstock' ? 'out of stock' : 'in stock';
+
+        $description = trim((string) ($product->post_excerpt ?: $product->post_content));
+        $description = preg_replace('/\s+/u', ' ', trim(strip_tags($description))) ?? '';
+        if ($description === '') {
+            $description = 'Shop this product on Styliiiish with fast Egypt-wide delivery.';
+        }
+        if (mb_strlen($description) > 4900) {
+            $description = mb_substr($description, 0, 4900);
+        }
+
+        $link = $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug);
+        $image = trim((string) ($product->image ?? ''));
+        if ($image === '') {
+            $image = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png';
+        }
+
+        return '<item>'
+            . '<g:id>' . $xmlEscape((string) ((int) ($product->ID ?? 0))) . '</g:id>'
+            . '<g:title>' . $xmlEscape($title) . '</g:title>'
+            . '<g:description>' . $xmlEscape($description) . '</g:description>'
+            . '<g:link>' . $xmlEscape($link) . '</g:link>'
+            . '<g:image_link>' . $xmlEscape($image) . '</g:image_link>'
+            . '<g:availability>' . $xmlEscape($availability) . '</g:availability>'
+            . '<g:price>' . $xmlEscape(number_format($displayPrice, 2, '.', '') . ' EGP') . '</g:price>'
+            . '<g:condition>new</g:condition>'
+            . '<g:brand>Styliiiish</g:brand>'
+            . '<g:identifier_exists>no</g:identifier_exists>'
+            . '</item>';
+    })->filter(fn ($itemXml) => $itemXml !== '')->implode('');
+
+    $feedTitle = $currentLocale === 'en' ? 'Styliiiish Product Feed (EN)' : 'Styliiiish Product Feed (AR)';
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>'
+        . '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">'
+        . '<channel>'
+        . '<title>' . $xmlEscape($feedTitle) . '</title>'
+        . '<link>' . $xmlEscape($wpBaseUrl . $localePrefix . '/shop') . '</link>'
+        . '<description>' . $xmlEscape('Google Merchant Center feed for Styliiiish products') . '</description>'
+        . $itemsXml
+        . '</channel>'
+        . '</rss>';
+
+    return response($xml, 200)
+        ->header('Content-Type', 'application/xml; charset=UTF-8')
+        ->header('Cache-Control', 'public, max-age=300');
+};
+
+Route::get('/merchant-feed.xml', fn () => $merchantFeedHandler('ar'));
+Route::get('/merchant-feed-en.xml', fn () => $merchantFeedHandler('en'));
 
 $singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes, $buildProductSlugCandidates) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
@@ -1974,6 +2112,74 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         }
     }
 
+    $approvedReviewsRows = DB::table('wp_comments as c')
+        ->leftJoin('wp_commentmeta as cm', function ($join) {
+            $join->on('c.comment_ID', '=', 'cm.comment_id')
+                ->where('cm.meta_key', 'rating');
+        })
+        ->where('c.comment_post_ID', (int) $product->ID)
+        ->where('c.comment_approved', '1')
+        ->whereIn('c.comment_type', ['', 'review'])
+        ->select('c.comment_author', 'c.comment_content', 'c.comment_date_gmt', 'cm.meta_value as rating')
+        ->orderByDesc('c.comment_date_gmt')
+        ->get();
+
+    $schemaRatedRows = $approvedReviewsRows
+        ->map(function ($row) {
+            $rating = (int) ($row->rating ?? 0);
+            return [
+                'author' => trim((string) ($row->comment_author ?? '')),
+                'content' => trim((string) ($row->comment_content ?? '')),
+                'rating' => max(1, min(5, $rating)),
+                'date' => trim((string) ($row->comment_date_gmt ?? '')),
+                'valid' => $rating >= 1 && $rating <= 5,
+            ];
+        })
+        ->filter(fn ($row) => ($row['valid'] ?? false) === true)
+        ->values();
+
+    $metaAverageRating = (float) ($metaByKey['_wc_average_rating'] ?? 0);
+    $metaReviewCount = (int) ($metaByKey['_wc_review_count'] ?? 0);
+
+    $schemaReviewCount = $metaReviewCount > 0 ? $metaReviewCount : $schemaRatedRows->count();
+    $schemaAverageRating = $metaAverageRating > 0
+        ? $metaAverageRating
+        : ($schemaRatedRows->count() > 0
+            ? round($schemaRatedRows->avg(fn ($row) => (float) ($row['rating'] ?? 0)), 2)
+            : 0);
+
+    $schemaReviews = $schemaRatedRows
+        ->take(5)
+        ->map(function ($row) {
+            $datePublished = trim((string) ($row['date'] ?? ''));
+            if ($datePublished !== '') {
+                $datePublished = substr(str_replace(' ', 'T', $datePublished), 0, 19) . 'Z';
+            }
+
+            $review = [
+                '@type' => 'Review',
+                'author' => [
+                    '@type' => 'Person',
+                    'name' => ($row['author'] ?? '') !== '' ? (string) $row['author'] : 'Styliiiish Customer',
+                ],
+                'reviewBody' => (string) ($row['content'] ?? ''),
+                'reviewRating' => [
+                    '@type' => 'Rating',
+                    'ratingValue' => (int) ($row['rating'] ?? 5),
+                    'bestRating' => 5,
+                    'worstRating' => 1,
+                ],
+            ];
+
+            if ($datePublished !== '') {
+                $review['datePublished'] = $datePublished;
+            }
+
+            return $review;
+        })
+        ->values()
+        ->all();
+
     $viewData = [
         'product' => $product,
         'currentLocale' => $currentLocale,
@@ -1994,6 +2200,9 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         'relatedProducts' => $relatedProducts,
         'allProductCategories' => $allProductCategories,
         'galleryImages' => $galleryImages,
+        'schemaReviewCount' => $schemaReviewCount,
+        'schemaAverageRating' => $schemaAverageRating,
+        'schemaReviews' => $schemaReviews,
     ];
 
     return response()
