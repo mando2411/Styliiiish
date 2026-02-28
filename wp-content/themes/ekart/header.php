@@ -228,7 +228,7 @@
 						<strong>Call us anytime:</strong>
 						<a href="tel:+201050874255" dir="ltr" lang="en">+20 010 5087 4255</a>
 					</div>
-					<div class="topbar-mobile-lang">
+					<div class="topbar-mobile-lang" data-no-translation>
 						<button class="topbar-lang-toggle" id="topbarLangToggle" type="button" aria-controls="topbarLangPanel" aria-expanded="false"><?php echo esc_html($is_english ? 'EN' : 'AR'); ?></button>
 						<div class="topbar-lang-panel" id="topbarLangPanel" aria-hidden="true">
 							<a class="<?php echo !$is_english ? 'active' : ''; ?>" href="<?php echo esc_url($ar_switch_url); ?>" onclick="window.location.href='<?php echo esc_js($ar_switch_url); ?>';return false;">AR</a>
@@ -304,7 +304,7 @@
 						<input class="search-input" type="search" name="q" required placeholder="<?php echo esc_attr('Search for your dress...'); ?>" aria-label="<?php echo esc_attr('Search for your dress...'); ?>">
 						<button class="search-btn" type="submit">Search</button>
 					</form>
-					<span class="account-trigger-wrap action-account">
+					<span class="account-trigger-wrap action-account" data-no-translation>
 						<a class="icon-btn account-trigger" id="accountLoginTrigger" href="<?php echo esc_url($is_english ? 'https://styliiiish.com/my-account/' : 'https://styliiiish.com/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'); ?>" aria-label="<?php echo esc_attr('My Account'); ?>" title="<?php echo esc_attr('My Account'); ?>" aria-expanded="false" aria-controls="accountMenu">👤</a>
 						<div class="account-menu" id="accountMenu" role="dialog" aria-label="<?php echo esc_attr('My Account'); ?>" aria-hidden="true">
 							<div class="account-menu-head">
@@ -315,7 +315,7 @@
 							<a id="accountMenuLogout" href="<?php echo esc_url($build_localized_url('/my-account')); ?>"><?php echo esc_html($is_english ? 'Open account page' : 'فتح صفحة الحساب'); ?></a>
 						</div>
 					</span>
-					<span class="icon-wrap wishlist-trigger-wrap action-wishlist">
+					<span class="icon-wrap wishlist-trigger-wrap action-wishlist" data-no-translation>
 						<button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>" aria-expanded="false" aria-controls="wishlistDropdown">❤<span class="wishlist-count" id="wishlistCountBadge"><?php echo esc_html((string) $wishlist_count); ?></span></button>
 						<span class="icon-plus-one">+1</span>
 						<div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="<?php echo esc_attr('Wishlist'); ?>" aria-hidden="true">
@@ -327,7 +327,7 @@
 							</div>
 						</div>
 					</span>
-					<span class="icon-wrap cart-trigger-wrap action-cart">
+					<span class="icon-wrap cart-trigger-wrap action-cart" data-no-translation>
 						<button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>" aria-expanded="false" aria-controls="miniCart">🛒<span class="cart-count" id="cartCountBadge"><?php echo esc_html((string) ((int) ($initial_cart_payload['count'] ?? 0))); ?></span></button>
 						<span class="icon-plus-one">+1</span>
 					</span>
@@ -335,17 +335,17 @@
 				</div>
 			</div>
 		</header>
-		<div class="mini-cart" id="miniCart" aria-hidden="true">
+		<div class="mini-cart" id="miniCart" aria-hidden="true" data-no-translation>
 			<div class="mini-cart-backdrop" data-close-mini-cart></div>
 			<aside class="mini-cart-panel" role="dialog" aria-modal="true" aria-label="<?php echo esc_attr($is_english ? 'Shopping Cart' : 'سلة التسوق'); ?>">
-				<div class="mini-cart-head">
-					<h3><?php echo esc_html($is_english ? 'Shopping Cart' : 'سلة التسوق'); ?></h3>
-					<button class="mini-cart-close" type="button" data-close-mini-cart><?php echo esc_html($is_english ? 'Close' : 'إغلاق'); ?></button>
+				<div class="mini-cart-head" data-no-translation>
+					<h3 data-no-translation><?php echo esc_html($is_english ? 'Shopping Cart' : 'سلة التسوق'); ?></h3>
+					<button class="mini-cart-close" type="button" data-close-mini-cart data-no-translation><?php echo esc_html($is_english ? 'Close' : 'إغلاق'); ?></button>
 				</div>
 				<div class="mini-cart-list" id="miniCartList">
 					<p class="mini-cart-empty"><?php echo esc_html($is_english ? 'Loading cart…' : 'جاري تحميل السلة…'); ?></p>
 				</div>
-				<div class="mini-cart-foot">
+				<div class="mini-cart-foot" data-no-translation>
 					<div class="mini-cart-actions">
 						<a class="mini-cart-view" href="<?php echo esc_url($build_localized_url('/cart')); ?>"><?php echo esc_html($is_english ? 'View Cart' : 'عرض السلة'); ?></a>
 						<a class="mini-cart-checkout" href="<?php echo esc_url($build_localized_url('/checkout')); ?>"><?php echo esc_html($is_english ? 'Checkout' : 'الدفع'); ?></a>
