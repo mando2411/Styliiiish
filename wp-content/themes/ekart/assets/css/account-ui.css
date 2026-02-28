@@ -209,6 +209,41 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
     color: #fff !important;
 }
 
+.woocommerce-account .woocommerce-MyAccount-content a.button,
+.woocommerce-account .woocommerce-MyAccount-content a.button:visited,
+.woocommerce-account .woocommerce-MyAccount-content a.button:hover,
+.woocommerce-account .woocommerce-MyAccount-content a.button:focus,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button:visited,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button:hover,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button:focus,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward:visited,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward:hover,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward:focus,
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"],
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"]:visited,
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"]:hover,
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"]:focus,
+.woocommerce-account .woocommerce-MyAccount-content a[class*="btn"],
+.woocommerce-account .woocommerce-MyAccount-content a[class*="btn"]:visited,
+.woocommerce-account .woocommerce-MyAccount-content a[class*="btn"]:hover,
+.woocommerce-account .woocommerce-MyAccount-content a[class*="btn"]:focus {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
+.woocommerce-account .woocommerce-MyAccount-content a.button *,
+.woocommerce-account .woocommerce-MyAccount-content a.woocommerce-Button *,
+.woocommerce-account .woocommerce-MyAccount-content a.wc-forward *,
+.woocommerce-account .woocommerce-MyAccount-content a[style*="background"] *,
+.woocommerce-account .woocommerce-MyAccount-content a[class*="btn"] * {
+    color: #fff !important;
+    fill: #fff !important;
+    stroke: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
 .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:hover,
 .woocommerce-account .woocommerce-MyAccount-content .button:hover,
 .woocommerce-account .woocommerce-MyAccount-content button:hover,
