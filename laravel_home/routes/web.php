@@ -3064,6 +3064,15 @@ $adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionB
             'regular.meta_value as regular_price',
             'img.guid as image'
         )
+        ->selectRaw("EXISTS (
+            SELECT 1
+            FROM wp_term_relationships tr
+            INNER JOIN wp_term_taxonomy tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+            INNER JOIN wp_terms t ON t.term_id = tt.term_id
+            WHERE tr.object_id = p.ID
+              AND tt.taxonomy = 'product_cat'
+              AND t.slug = 'used-dress'
+        ) as is_marketplace")
         ->get();
 
     $products = $localizeProductsCollectionByWpml($rows, $currentLocale);

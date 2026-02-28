@@ -29,6 +29,7 @@
             'section_sub' => 'منتجات ظاهرة فورًا لتسهيل الشراء من الإعلانات بدون أي خطوات إضافية.',
             'view_all_products' => 'عرض كل المنتجات',
             'badge_brand' => 'ستايلش',
+            'badge_marketplace' => 'ماركت بليس',
             'available_label' => 'متوفر الآن',
             'delivery_label' => 'توصيل سريع',
             'trust_1' => '💯 خامات موثوقة واختيار مدروس',
@@ -76,6 +77,7 @@
             'section_sub' => 'Visible products instantly to simplify ad-driven purchases without extra steps.',
             'view_all_products' => 'View All Products',
             'badge_brand' => 'Styliiiish',
+            'badge_marketplace' => 'Marketplace',
             'available_label' => 'In Stock',
             'delivery_label' => 'Fast Delivery',
             'trust_1' => '💯 Trusted quality and curated picks',
@@ -296,6 +298,12 @@
             color: #fff;
             border: 1px solid rgba(255, 255, 255, 0.28);
             box-shadow: 0 6px 14px rgba(213, 21, 34, 0.28);
+        }
+
+        .ads-products .badge-marketplace {
+            background: rgba(23, 39, 59, 0.9);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.22);
         }
 
         .ads-products .badge-discount {
@@ -536,13 +544,15 @@
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+                        $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
+                        $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                     @endphp
 
                     <article class="card">
                         <div class="product-media">
                             <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
                             <div class="card-badges">
-                                <span class="badge-chip badge-brand">{{ $t('badge_brand') }}</span>
+                                <span class="badge-chip {{ $isMarketplace ? 'badge-marketplace' : 'badge-brand' }}">{{ $primaryBadge }}</span>
                                 @if($isSale)
                                     <span class="badge-chip badge-discount">{{ $t('sale_badge') }} {{ $discount }}%</span>
                                 @endif
