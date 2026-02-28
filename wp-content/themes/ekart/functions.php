@@ -22,6 +22,19 @@ function ekart_disable_shopire_preloader() {
 }
 add_action( 'after_setup_theme', 'ekart_disable_shopire_preloader', 20 );
 
+function ekart_disable_shopire_wow_animations() {
+	if ( is_admin() ) {
+		return;
+	}
+
+	wp_dequeue_script( 'wow-min' );
+	wp_deregister_script( 'wow-min' );
+
+	wp_dequeue_style( 'animate' );
+	wp_deregister_style( 'animate' );
+}
+add_action( 'wp_enqueue_scripts', 'ekart_disable_shopire_wow_animations', 1000 );
+
 /**
  * Load assets.
  */
