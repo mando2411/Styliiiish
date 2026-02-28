@@ -58,8 +58,8 @@ Core files for architecture understanding:
 
 ### Localization Note (Source of Truth)
 
-- Official translation plugin used in this project is: **`translatepress-multilingual`**.
-- Any frontend/backend localization logic should be compatible with TranslatePress dictionary/settings (not WPML-specific assumptions).
+- Official translation plugin used in this project is: **`translatepress-multilingual`**. / الإضافة الرسمية للترجمة المستخدمة في هذا المشروع هي: **`translatepress-multilingual`**.
+- Any frontend/backend localization logic should be compatible with TranslatePress dictionary/settings (not WPML-specific assumptions). / أي منطق للترجمة في الواجهة الأمامية أو الخلفية يجب أن يكون متوافقًا مع قاموس/إعدادات TranslatePress (وليس بافتراضات خاصة بـ WPML).
 
 ---
 
