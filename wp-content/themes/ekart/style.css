@@ -546,7 +546,44 @@ with others.
 }
 
 .woocommerce-account .woocommerce-Address-title h2 {
-    font-size: 4rem;
+    font-size: 2rem;
+    line-height: 1.35;
+    margin: 0;
+}
+
+.woocommerce-account .woocommerce-Addresses .woocommerce-Address {
+    margin-bottom: 2rem;
+}
+
+.woocommerce-account .woocommerce-Addresses .woocommerce-Address-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 0.8rem;
+}
+
+.woocommerce-account .woocommerce-Addresses .woocommerce-Address-title .edit {
+    float: none;
+    display: inline-block;
+    line-height: 1.4;
+}
+
+.woocommerce-account .woocommerce-Addresses p,
+.woocommerce-account .woocommerce-Addresses address {
+    line-height: 1.7;
+    margin: 0;
+}
+
+body.rtl.woocommerce-account .woocommerce-Addresses .woocommerce-Address-title,
+body.rtl.woocommerce-account .woocommerce-Addresses p,
+body.rtl.woocommerce-account .woocommerce-Addresses address {
+    text-align: right;
+}
+
+@media (max-width: 767px) {
+    .woocommerce-account .woocommerce-Address-title h2 {
+        font-size: 1.7rem;
+    }
 }
 
 .wp-block-button.is-style-outline a.wp-block-button__link {
