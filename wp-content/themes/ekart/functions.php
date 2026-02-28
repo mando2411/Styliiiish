@@ -72,6 +72,43 @@ function ekart_theme_css() {
 }
 add_action( 'wp_enqueue_scripts', 'ekart_theme_css', 99);
 
+function ekart_is_ar_fasatini_request() {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	return $normalized === '/ar/فساتيني';
+}
+
+function ekart_disable_trp_dom_changes_on_ar_fasatini() {
+	if ( ! ekart_is_ar_fasatini_request() ) {
+		return;
+	}
+
+	global $wp_scripts;
+
+	if ( ! ( $wp_scripts instanceof WP_Scripts ) || ! is_array( $wp_scripts->queue ) ) {
+		return;
+	}
+
+	foreach ( $wp_scripts->queue as $handle ) {
+		$src = isset( $wp_scripts->registered[ $handle ] ) ? (string) ( $wp_scripts->registered[ $handle ]->src ?? '' ) : '';
+		$is_dom_changes_script = ( strpos( $handle, 'trp-translate-dom-changes' ) !== false )
+			|| ( strpos( $src, 'trp-translate-dom-changes' ) !== false );
+
+		if ( $is_dom_changes_script ) {
+			wp_dequeue_script( $handle );
+			wp_deregister_script( $handle );
+		}
+	}
+}
+add_action( 'wp_enqueue_scripts', 'ekart_disable_trp_dom_changes_on_ar_fasatini', 1001 );
+
 function ekart_customize_my_account_menu_items( $items ) {
 	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
 	$request_path = parse_url( $request_uri, PHP_URL_PATH );
