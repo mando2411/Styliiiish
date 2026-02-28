@@ -22,10 +22,6 @@ add_action( 'after_setup_theme', 'ekart_theme_setup' );
  */
 
 function ekart_theme_css() {
-	$child_style_path = get_stylesheet_directory() . '/style.css';
-	$child_style_ver  = file_exists( $child_style_path ) ? (string) filemtime( $child_style_path ) : null;
-	wp_enqueue_style( 'ekart-style', get_stylesheet_uri(), [ 'shopire-style' ], $child_style_ver );
-
 	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
 		$account_style_rel  = '/assets/css/account-ui.css';
 		$account_script_rel = '/assets/js/account-ajax.js';
@@ -36,7 +32,7 @@ function ekart_theme_css() {
 			wp_enqueue_style(
 				'ekart-account-ui',
 				get_stylesheet_directory_uri() . $account_style_rel,
-				[ 'ekart-style', 'shopire-woocommerce' ],
+				[],
 				(string) filemtime( $account_style_path )
 			);
 		}
@@ -50,7 +46,13 @@ function ekart_theme_css() {
 				true
 			);
 		}
+
+		return;
 	}
+
+	$child_style_path = get_stylesheet_directory() . '/style.css';
+	$child_style_ver  = file_exists( $child_style_path ) ? (string) filemtime( $child_style_path ) : null;
+	wp_enqueue_style( 'ekart-style', get_stylesheet_uri(), [ 'shopire-style' ], $child_style_ver );
 }
 add_action( 'wp_enqueue_scripts', 'ekart_theme_css', 99);
 
@@ -108,40 +110,57 @@ function ekart_disable_conflicting_woo_styles_on_account() {
 		return;
 	}
 
+	$conflicting_handles = [
+		'owl-carousel-min',
+		'all-css',
+		'animate',
+		'Fancybox',
+		'shopire-core',
+		'shopire-theme',
+		'shopire-woocommerce',
+		'shopire-style',
+		'ekart-style',
+		'woocommerce-general',
+		'woocommerce-layout',
+		'woocommerce-smallscreen',
+		'woocommerce-inline',
+		'woocommerce_prettyPhoto_css',
+		'photoswipe',
+		'photoswipe-default-skin',
+		'select2',
+		'selectWoo',
+		'wc-blocks-style',
+		'wc-blocks-vendors-style',
+		'wc-blocks-packages-style',
+		'wc-block-style',
+		'woocommerce-twenty-nineteen',
+		'woocommerce-twenty-twenty',
+		'woocommerce-twenty-twentyone',
+		'woocommerce-twenty-twentytwo',
+		'woocommerce-twenty-twentythree',
+	];
+
+	foreach ( $conflicting_handles as $handle ) {
+		wp_dequeue_style( $handle );
+		wp_deregister_style( $handle );
+	}
+
 	wp_dequeue_style( 'woocommerce-general' );
 	wp_dequeue_style( 'woocommerce-layout' );
 	wp_dequeue_style( 'woocommerce-smallscreen' );
+
+	$account_style_rel  = '/assets/css/account-ui.css';
+	$account_style_path = get_stylesheet_directory() . $account_style_rel;
+	if ( file_exists( $account_style_path ) ) {
+		wp_enqueue_style(
+			'ekart-account-ui',
+			get_stylesheet_directory_uri() . $account_style_rel,
+			[],
+			(string) filemtime( $account_style_path )
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'ekart_disable_conflicting_woo_styles_on_account', 999 );
-
-function ekart_output_account_desktop_hard_override() {
-	if ( ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
-		return;
-	}
-	?>
-	<style id="ekart-account-desktop-hard-override">
-	@media (min-width: 992px) {
-		body.woocommerce-account #wf-sidebar {display:none!important;width:0!important;max-width:0!important;flex:0 0 0!important;margin:0!important;padding:0!important;}
-		body.woocommerce-account #wf-main,
-		body.woocommerce-account .woo-products #wf-main,
-		body.woocommerce-account .woo-products .wf-col-lg-8,
-		body.woocommerce-account .woo-products .wf-col-md-12,
-		body.woocommerce-account .woo-products .wf-col-12 {width:100%!important;max-width:100%!important;flex:0 0 100%!important;}
-		body.woocommerce-account .woo-products .woocommerce,
-		body.woocommerce-account .woocommerce {display:flex!important;flex-wrap:nowrap!important;gap:24px!important;align-items:flex-start!important;}
-		body.woocommerce-account .woocommerce > .woocommerce-MyAccount-navigation {flex:0 0 300px!important;max-width:300px!important;min-width:260px!important;width:300px!important;float:none!important;}
-		body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {flex:1 1 auto!important;min-width:0!important;width:auto!important;max-width:none!important;float:none!important;overflow:hidden!important;}
-		body.woocommerce-account .woocommerce .woocommerce-MyAccount-navigation,
-		body.woocommerce-account .woocommerce .woocommerce-MyAccount-content {position:relative!important;left:auto!important;right:auto!important;clear:none!important;}
-		body.woocommerce-account .woocommerce .col2-set,
-		body.woocommerce-account .woocommerce .u-columns {width:100%!important;max-width:100%!important;display:block!important;}
-		body.woocommerce-account .woocommerce .col2-set:after,
-		body.woocommerce-account .woocommerce .u-columns:after {content:""!important;display:table!important;clear:both!important;}
-	}
-	</style>
-	<?php
-}
-add_action( 'wp_head', 'ekart_output_account_desktop_hard_override', 999 );
 
 require get_stylesheet_directory() . '/theme-functions/controls/class-customize.php';
 
