@@ -81,6 +81,29 @@
 	$query_string = isset($_SERVER['QUERY_STRING']) && (string) $_SERVER['QUERY_STRING'] !== '' ? ('?' . (string) $_SERVER['QUERY_STRING']) : '';
 	$ar_switch_url = rtrim($wp_base_url, '/') . $ar_switch_path . $query_string;
 	$en_switch_url = rtrim($wp_base_url, '/') . $en_switch_path . $query_string;
+	$wishlist_count = 0;
+	$wishlist_items_payload = [];
+	if (function_exists('fable_extra_woowishlist_get_list')) {
+		$wishlist_raw_list = (array) fable_extra_woowishlist_get_list();
+		$wishlist_count = count($wishlist_raw_list);
+		foreach (array_slice($wishlist_raw_list, 0, 6) as $wishlist_product_id) {
+			$product = function_exists('wc_get_product') ? wc_get_product((int) $wishlist_product_id) : null;
+			if (!$product || !is_object($product)) {
+				continue;
+			}
+			$wishlist_items_payload[] = [
+				'name' => wp_strip_all_tags((string) $product->get_name()),
+				'url' => get_permalink((int) $product->get_id()),
+				'image' => wp_get_attachment_image_url((int) $product->get_image_id(), 'woocommerce_thumbnail') ?: (function_exists('wc_placeholder_img_src') ? wc_placeholder_img_src('woocommerce_thumbnail') : ''),
+			];
+		}
+	}
+	$initial_cart_payload = null;
+	if (function_exists('shopire_styliiiish_build_cart_payload')) {
+		$initial_cart_payload = shopire_styliiiish_build_cart_payload();
+	}
+	$cart_summary_url = admin_url('admin-ajax.php?action=styliiiish_cart_summary');
+	$request_lang = $is_english ? 'en' : 'ar';
 ?>
 
 <style>
@@ -146,6 +169,10 @@
 	.wishlist-dropdown{position:absolute;top:calc(100% + 10px);inset-inline-end:0;width:min(360px,82vw);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(23,39,59,.14);padding:10px;display:none;z-index:90}
 	.wishlist-dropdown.is-open{display:block}
 	.wishlist-dropdown-list{display:grid;gap:8px;max-height:360px;overflow:auto}
+	.wishlist-dropdown-item{display:grid;grid-template-columns:56px 1fr;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff}
+	.wishlist-dropdown-item img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:#f2f2f5}
+	.wishlist-dropdown-name{font-size:13px;font-weight:800;color:var(--secondary);margin:0 0 6px;line-height:1.35}
+	.wishlist-dropdown-link{display:inline-flex;align-items:center;justify-content:center;min-height:30px;padding:0 10px;border-radius:8px;background:var(--primary);color:#fff;font-size:12px;font-weight:700;text-decoration:none}
 	.wishlist-dropdown-empty{margin:0;font-size:13px;color:var(--muted);text-align:center;padding:12px 8px;border:1px dashed var(--line);border-radius:10px;background:#fbfcff}
 	.wishlist-dropdown-footer{display:flex;justify-content:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 	.wishlist-dropdown-all{font-size:13px;color:var(--primary);font-weight:800;text-decoration:none}
@@ -163,6 +190,12 @@
 	.mini-cart-head h3{margin:0;font-size:17px;color:var(--secondary)}
 	.mini-cart-close{border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--secondary);padding:6px 10px;cursor:pointer;font-family:inherit;font-weight:700}
 	.mini-cart-list{overflow:auto;padding:12px;display:grid;gap:10px;align-content:start}
+	.mini-cart-item{display:grid;grid-template-columns:70px 1fr auto;gap:10px;border:1px solid var(--line);border-radius:10px;padding:9px;align-items:center}
+	.mini-cart-item img{width:70px;height:92px;object-fit:cover;border-radius:9px;background:#f2f2f5}
+	.mini-cart-item h4{margin:0 0 4px;font-size:13px;line-height:1.35;color:var(--secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+	.mini-cart-meta{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+	.mini-cart-price{font-size:12px;color:var(--primary);font-weight:800;margin-top:4px}
+	.mini-cart-remove{border:1px solid rgba(var(--wf-main-rgb),.2);background:#fff;color:var(--primary);border-radius:8px;min-width:34px;min-height:34px;font-weight:800;cursor:pointer}
 	.mini-cart-empty{color:var(--muted);font-size:14px;padding:8px 0;text-align:center;border:1px dashed var(--line);border-radius:10px;background:#fbfcff}
 	.mini-cart-foot{border-top:1px solid var(--line);padding:12px;display:grid;gap:8px}
 	.mini-cart-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -283,11 +316,11 @@
 						</div>
 					</span>
 					<span class="icon-wrap wishlist-trigger-wrap action-wishlist">
-						<button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>" aria-expanded="false" aria-controls="wishlistDropdown">❤<span class="wishlist-count" id="wishlistCountBadge">0</span></button>
+						<button class="icon-btn wishlist-trigger" id="wishlistTrigger" type="button" aria-label="<?php echo esc_attr('Wishlist'); ?>" title="<?php echo esc_attr('Wishlist'); ?>" aria-expanded="false" aria-controls="wishlistDropdown">❤<span class="wishlist-count" id="wishlistCountBadge"><?php echo esc_html((string) $wishlist_count); ?></span></button>
 						<span class="icon-plus-one">+1</span>
 						<div class="wishlist-dropdown" id="wishlistDropdown" role="dialog" aria-label="<?php echo esc_attr('Wishlist'); ?>" aria-hidden="true">
 							<div class="wishlist-dropdown-list" id="wishlistDropdownList">
-								<p class="wishlist-dropdown-empty"><?php echo esc_html($is_english ? 'Your wishlist preview opens here.' : 'معاينة المفضلة تظهر هنا.'); ?></p>
+								<p class="wishlist-dropdown-empty"><?php echo esc_html($is_english ? 'Loading wishlist…' : 'جاري تحميل المفضلة…'); ?></p>
 							</div>
 							<div class="wishlist-dropdown-footer">
 								<a class="wishlist-dropdown-all" href="<?php echo esc_url($build_localized_url('/wishlist')); ?>"><?php echo esc_html($is_english ? 'View full wishlist' : 'عرض كل المفضلة'); ?></a>
@@ -295,7 +328,7 @@
 						</div>
 					</span>
 					<span class="icon-wrap cart-trigger-wrap action-cart">
-						<button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>" aria-expanded="false" aria-controls="miniCart">🛒<span class="cart-count" id="cartCountBadge">0</span></button>
+						<button class="icon-btn cart-trigger" id="miniCartTrigger" type="button" aria-label="<?php echo esc_attr('Cart'); ?>" title="<?php echo esc_attr('Cart'); ?>" aria-expanded="false" aria-controls="miniCart">🛒<span class="cart-count" id="cartCountBadge"><?php echo esc_html((string) ((int) ($initial_cart_payload['count'] ?? 0))); ?></span></button>
 						<span class="icon-plus-one">+1</span>
 					</span>
 					<a class="header-cta action-sell" href="<?php echo esc_url($my_dresses_url); ?>" target="_blank" rel="noopener">Start Selling</a>
@@ -310,7 +343,7 @@
 					<button class="mini-cart-close" type="button" data-close-mini-cart><?php echo esc_html($is_english ? 'Close' : 'إغلاق'); ?></button>
 				</div>
 				<div class="mini-cart-list" id="miniCartList">
-					<p class="mini-cart-empty"><?php echo esc_html($is_english ? 'Your cart preview opens here. Continue to cart or checkout.' : 'معاينة السلة تظهر هنا. يمكنك المتابعة إلى السلة أو الدفع.'); ?></p>
+					<p class="mini-cart-empty"><?php echo esc_html($is_english ? 'Loading cart…' : 'جاري تحميل السلة…'); ?></p>
 				</div>
 				<div class="mini-cart-foot">
 					<div class="mini-cart-actions">
@@ -322,6 +355,18 @@
 		</div>
 		<script>
 		(function(){
+			var initialWishlistItems=<?php echo wp_json_encode($wishlist_items_payload); ?>;
+			var initialWishlistCount=<?php echo (int) $wishlist_count; ?>;
+			var initialCartPayload=<?php echo wp_json_encode($initial_cart_payload ?: ['count' => 0, 'items' => []]); ?>;
+			var cartSummaryUrl=<?php echo wp_json_encode($cart_summary_url); ?>;
+			var requestLang=<?php echo wp_json_encode($request_lang); ?>;
+			var wishlistLoadingText=<?php echo wp_json_encode($is_english ? 'Loading wishlist…' : 'جاري تحميل المفضلة…'); ?>;
+			var wishlistEmptyText=<?php echo wp_json_encode($is_english ? 'Your wishlist is empty.' : 'لا توجد منتجات في المفضلة.'); ?>;
+			var goToProductText=<?php echo wp_json_encode($is_english ? 'Go to product' : 'الذهاب للمنتج'); ?>;
+			var cartEmptyText=<?php echo wp_json_encode($is_english ? 'Your cart is empty.' : 'السلة فارغة.'); ?>;
+			var qtyText=<?php echo wp_json_encode($is_english ? 'Qty' : 'الكمية'); ?>;
+			var removeText=<?php echo wp_json_encode($is_english ? 'Remove' : 'حذف'); ?>;
+			var loadingCartText=<?php echo wp_json_encode($is_english ? 'Loading cart…' : 'جاري تحميل السلة…'); ?>;
 			var navToggle=document.getElementById('headerNavToggle');
 			var nav=document.getElementById('headerMainNav');
 			var langToggle=document.getElementById('topbarLangToggle');
@@ -330,11 +375,22 @@
 			var socialPanel=document.getElementById('topbarSocialPanel');
 			var wishlistTrigger=document.getElementById('wishlistTrigger');
 			var wishlistDropdown=document.getElementById('wishlistDropdown');
+			var wishlistDropdownList=document.getElementById('wishlistDropdownList');
+			var wishlistCountBadge=document.getElementById('wishlistCountBadge');
 			var accountTrigger=document.getElementById('accountLoginTrigger');
 			var accountMenu=document.getElementById('accountMenu');
 			var cartTrigger=document.getElementById('miniCartTrigger');
+			var cartCountBadge=document.getElementById('cartCountBadge');
 			var miniCart=document.getElementById('miniCart');
+			var miniCartList=document.getElementById('miniCartList');
 			var miniCartClosers=miniCart?miniCart.querySelectorAll('[data-close-mini-cart]'):[];
+			var cartPayloadCache=initialCartPayload||null;
+			var escapeHtml=function(value){return String(value||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');};
+			var setWishlistCount=function(count){var n=Math.max(0,Number(count)||0);if(!wishlistCountBadge)return;wishlistCountBadge.textContent=String(n);wishlistCountBadge.style.display=n>0?'inline-block':'none';};
+			var setCartCount=function(count){var n=Math.max(0,Number(count)||0);if(!cartCountBadge)return;cartCountBadge.textContent=String(n);cartCountBadge.style.display=n>0?'inline-block':'none';};
+			var renderWishlist=function(items){if(!wishlistDropdownList)return;var list=Array.isArray(items)?items:[];if(list.length===0){wishlistDropdownList.innerHTML='<p class="wishlist-dropdown-empty">'+escapeHtml(wishlistEmptyText)+'</p>';return;}wishlistDropdownList.innerHTML=list.map(function(item){var image=escapeHtml(item.image||'');var name=escapeHtml(item.name||'');var url=escapeHtml(item.url||'#');return '<article class="wishlist-dropdown-item"><a href="'+url+'"><img src="'+image+'" alt="'+name+'"></a><div><h4 class="wishlist-dropdown-name">'+name+'</h4><a class="wishlist-dropdown-link" href="'+url+'">'+escapeHtml(goToProductText)+'</a></div></article>';}).join('');};
+			var renderMiniCart=function(payload){if(!miniCartList)return;var data=payload||{};var items=Array.isArray(data.items)?data.items:[];setCartCount(Number(data.count||0));if(items.length===0){miniCartList.innerHTML='<p class="mini-cart-empty">'+escapeHtml(cartEmptyText)+'</p>';return;}miniCartList.innerHTML=items.map(function(item){var name=escapeHtml(item.name||'');var url=escapeHtml(item.url||'#');var image=escapeHtml(item.image||'');var qty=Math.max(1,Number(item.qty||1));var priceHtml=String(item.line_total_html||item.price_html||'');return '<article class="mini-cart-item"><a href="'+url+'"><img src="'+image+'" alt="'+name+'"></a><div class="mini-cart-info"><h4>'+name+'</h4><div class="mini-cart-meta"><span>'+escapeHtml(qtyText)+':</span><strong>'+qty+'</strong></div><div class="mini-cart-price">'+priceHtml+'</div></div><button type="button" class="mini-cart-remove" disabled>'+escapeHtml(removeText)+'</button></article>';}).join('');};
+			var fetchCartSummary=function(){if(!cartSummaryUrl)return Promise.resolve();var sep=cartSummaryUrl.indexOf('?')>-1?'&':'?';var url=cartSummaryUrl+sep+'lang='+encodeURIComponent(requestLang||'')+'&_='+(Date.now());return fetch(url,{method:'GET',credentials:'same-origin',headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}}).then(function(res){if(!res.ok)throw new Error('cart_summary_failed');return res.json();}).then(function(json){if(!json||!json.success)return;cartPayloadCache=json.data||null;renderMiniCart(cartPayloadCache);});};
 			var closeNav=function(){if(!navToggle||!nav)return;nav.classList.remove('is-open');navToggle.setAttribute('aria-expanded','false');};
 			var closeLang=function(){if(!langToggle||!langPanel)return;langPanel.classList.remove('is-open');langPanel.setAttribute('aria-hidden','true');langToggle.setAttribute('aria-expanded','false');};
 			var closeSocial=function(){if(!socialToggle||!socialPanel)return;socialPanel.classList.remove('is-open');socialPanel.setAttribute('aria-hidden','true');socialToggle.setAttribute('aria-expanded','false');};
@@ -347,13 +403,17 @@
 			if(navToggle&&nav){navToggle.addEventListener('click',function(){var open=!nav.classList.contains('is-open');nav.classList.toggle('is-open',open);navToggle.setAttribute('aria-expanded',open?'true':'false');});}
 			if(langToggle&&langPanel){langToggle.addEventListener('click',function(e){if(e){e.preventDefault();e.stopPropagation();}var open=!langPanel.classList.contains('is-open');langPanel.classList.toggle('is-open',open);langPanel.setAttribute('aria-hidden',open?'false':'true');langToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeSocial();});document.addEventListener('click',function(e){var wrap=langToggle.closest('.topbar-mobile-lang');if(wrap&&!wrap.contains(e.target))closeLang();});}
 			if(socialToggle&&socialPanel){socialToggle.addEventListener('click',function(e){if(e){e.preventDefault();e.stopPropagation();}var open=!socialPanel.classList.contains('is-open');socialPanel.classList.toggle('is-open',open);socialPanel.setAttribute('aria-hidden',open?'false':'true');socialToggle.setAttribute('aria-expanded',open?'true':'false');if(open)closeLang();});document.addEventListener('click',function(e){var wrap=socialToggle.closest('.topbar-mobile-social');if(wrap&&!wrap.contains(e.target))closeSocial();});}
-			if(wishlistTrigger&&wishlistDropdown){wishlistTrigger.addEventListener('click',function(e){e.preventDefault();if(wishlistDropdown.classList.contains('is-open')){closeWishlist();return;}closeAccountMenu();closeMiniCart();openWishlist();});}
+			if(wishlistTrigger&&wishlistDropdown){wishlistTrigger.addEventListener('click',function(e){e.preventDefault();if(wishlistDropdown.classList.contains('is-open')){closeWishlist();return;}closeAccountMenu();closeMiniCart();openWishlist();renderWishlist(initialWishlistItems);});}
 			if(accountTrigger&&accountMenu){accountTrigger.addEventListener('click',function(e){e.preventDefault();if(accountMenu.classList.contains('is-open')){closeAccountMenu();return;}closeWishlist();closeMiniCart();openAccountMenu();});}
-			if(cartTrigger&&miniCart){cartTrigger.addEventListener('click',function(){closeWishlist();closeAccountMenu();openMiniCart();});}
+			if(cartTrigger&&miniCart){cartTrigger.addEventListener('click',function(){closeWishlist();closeAccountMenu();openMiniCart();if(miniCartList&&(!cartPayloadCache||!Array.isArray(cartPayloadCache.items))){miniCartList.innerHTML='<p class="mini-cart-empty">'+escapeHtml(loadingCartText)+'</p>';}if(cartPayloadCache){renderMiniCart(cartPayloadCache);}fetchCartSummary().catch(function(){});});}
 			if(miniCartClosers.length){miniCartClosers.forEach(function(node){node.addEventListener('click',closeMiniCart);});}
 			document.addEventListener('click',function(e){if(wishlistTrigger&&wishlistDropdown&&!wishlistTrigger.contains(e.target)&&!wishlistDropdown.contains(e.target))closeWishlist();if(accountTrigger&&accountMenu&&!accountTrigger.contains(e.target)&&!accountMenu.contains(e.target))closeAccountMenu();});
 			document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;closeMiniCart();closeWishlist();closeAccountMenu();closeLang();closeSocial();});
 			window.addEventListener('resize',function(){if(window.innerWidth>640){closeNav();closeLang();closeSocial();}if(window.innerWidth>980){closeWishlist();closeAccountMenu();closeMiniCart();}});
+			setWishlistCount(initialWishlistCount);
+			renderWishlist(initialWishlistItems);
+			if(cartPayloadCache){renderMiniCart(cartPayloadCache);}else{setCartCount(0);} 
+			fetchCartSummary().catch(function(){});
 		})();
 		</script>
 		<div class="promo">Because every woman deserves to shine • Up to 50% OFF • Delivery across Egypt in 2–10 business days</div>
