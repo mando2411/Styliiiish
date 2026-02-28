@@ -17,33 +17,79 @@ add_action('wp_enqueue_scripts', function () {
     if (!is_array($pixel_settings) || (($pixel_settings['enabled'] ?? 'no') !== 'yes')) {
         return;
     }
+    $before_inline = <<<'JS'
+(function (window) {
+    if (window.__styliiiishPaymobGuardBeforeLoaded) {
+        return;
+    }
+    window.__styliiiishPaymobGuardBeforeLoaded = true;
 
-    wp_register_script('styliiiish-paymob-checkout-guard', false, ['jquery'], '1.0.0', true);
+    const nativeSetInterval = window.setInterval;
+    window.setInterval = function (callback, delay) {
+        try {
+            const callbackText = typeof callback === 'function'
+                ? Function.prototype.toString.call(callback)
+                : String(callback || '');
+
+            const stack = String((new Error()).stack || '');
+            const fromPaymobBlock = stack.indexOf('paymob-pixel_block.js') !== -1;
+            const aggressivePolling = Number(delay) > 0
+                && Number(delay) <= 250
+                && (
+                    callbackText.indexOf('previousTotalBlock') !== -1
+                    || callbackText.indexOf('wc/store/cart') !== -1
+                    || callbackText.indexOf('cartTotals') !== -1
+                    || callbackText.indexOf('updateCheckoutData') !== -1
+                );
+
+            if (fromPaymobBlock && aggressivePolling) {
+                console.warn('[Styliiiish Paymob Guard] blocked aggressive interval', delay);
+                return 0;
+            }
+        } catch (error) {
+        }
+
+        return nativeSetInterval.apply(this, arguments);
+    };
+})(window);
+JS;
+
+    if (wp_script_is('paymob-pixel-checkout', 'enqueued')) {
+        wp_add_inline_script('paymob-pixel-checkout', $before_inline, 'before');
+    } else {
+        wp_register_script('styliiiish-paymob-checkout-guard-before', false, [], '1.1.0', false);
+        wp_enqueue_script('styliiiish-paymob-checkout-guard-before');
+        wp_add_inline_script('styliiiish-paymob-checkout-guard-before', $before_inline, 'after');
+    }
+
+    wp_register_script('styliiiish-paymob-checkout-guard', false, ['jquery'], '1.1.0', true);
     wp_enqueue_script('styliiiish-paymob-checkout-guard');
 
-    $inline_js = <<<'JS'
+    $after_inline = <<<'JS'
 (function (window, document, $) {
     if (!$ || typeof $.ajax !== 'function') {
         return;
     }
 
+    if (window.__styliiiishPaymobGuardAfterLoaded) {
+        return;
+    }
+    window.__styliiiishPaymobGuardAfterLoaded = true;
+
     const LOADER_ID = 'paymob-loading-indicator';
     const NOTICE_ID = 'styliiiish-paymob-guard-notice';
-    const LOADER_TIMEOUT_MS = 25000;
-    const PIXEL_UPDATE_MIN_INTERVAL = 1200;
-    const PIXEL_AJAX_TIMEOUT_MS = 20000;
+    const LOADER_TIMEOUT_MS = 20000;
+    const MIN_UPDATE_INTERVAL_MS = 1200;
+    let lastUpdateCall = 0;
     let loaderTimer = null;
-    let lastPixelUpdateAt = 0;
-    let lastAjaxCallAt = 0;
-    let activeUpdateXhr = null;
 
-    function getLoaderNodes() {
-        return Array.from(document.querySelectorAll('#' + LOADER_ID));
-    }
-
-    function hasRenderedPaymobWidget() {
+    function hasWidget() {
         const root = document.getElementById('paymob-elements');
         return !!(root && root.children && root.children.length > 0);
+    }
+
+    function removeLoader() {
+        document.querySelectorAll('#' + LOADER_ID).forEach((node) => node.remove());
     }
 
     function clearLoaderTimer() {
@@ -53,215 +99,143 @@ add_action('wp_enqueue_scripts', function () {
         }
     }
 
-    function removeLoader() {
-        const nodes = getLoaderNodes();
-        if (!nodes.length) {
-            return;
-        }
-        nodes.forEach((node) => node.remove());
-    }
-
-    function showErrorNotice(message) {
-        const msg = String(message || 'Payment widget timed out. Please refresh and try again.');
-        const existing = document.getElementById(NOTICE_ID);
-        if (existing) {
-            existing.textContent = msg;
-            return;
-        }
-
-        const wrappers = [
-            document.querySelector('.woocommerce-notices-wrapper'),
-            document.querySelector('.wc-block-components-notices'),
-            document.querySelector('.wc-block-checkout__actions'),
-            document.querySelector('form.checkout'),
-        ];
-
-        const wrapper = wrappers.find(Boolean);
-        if (!wrapper) {
-            console.warn('[Paymob Guard]', msg);
-            return;
-        }
-
-        const notice = document.createElement('div');
-        notice.id = NOTICE_ID;
-        notice.setAttribute('role', 'alert');
-        notice.className = 'woocommerce-error';
-        notice.style.margin = '12px 0';
-        notice.textContent = msg;
-
-        wrapper.prepend(notice);
-    }
-
     function armLoaderTimeout() {
         clearLoaderTimer();
         loaderTimer = setTimeout(function () {
-            if (!hasRenderedPaymobWidget()) {
+            if (!hasWidget()) {
                 removeLoader();
-                showErrorNotice('Unable to load Paymob checkout form. Please refresh and try again.');
+                showNotice('Unable to load payment form. Please refresh and try again.');
             }
         }, LOADER_TIMEOUT_MS);
     }
 
-    const observer = new MutationObserver(function () {
-        const hasLoader = getLoaderNodes().length > 0;
-        if (hasLoader) {
-            armLoaderTimeout();
+    function showNotice(message) {
+        const text = String(message || 'Checkout error, please retry.');
+        const existing = document.getElementById(NOTICE_ID);
+        if (existing) {
+            existing.textContent = text;
             return;
         }
-        clearLoaderTimer();
-    });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+        const host = document.querySelector('.woocommerce-notices-wrapper')
+            || document.querySelector('.wc-block-components-notices')
+            || document.querySelector('form.checkout')
+            || document.querySelector('.wc-block-checkout__actions');
 
-    $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-        const url = String(options?.url || '');
+        if (!host) {
+            return;
+        }
+
+        const node = document.createElement('div');
+        node.id = NOTICE_ID;
+        node.className = 'woocommerce-error';
+        node.setAttribute('role', 'alert');
+        node.style.margin = '12px 0';
+        node.textContent = text;
+        host.prepend(node);
+    }
+
+    $.ajaxPrefilter(function (options, originalOptions) {
+        const url = String(options?.url || originalOptions?.url || '');
         const data = String(options?.data || originalOptions?.data || '');
-        const isAdminAjax = url.includes('admin-ajax.php');
-        if (!isAdminAjax) {
+        const isPixelUpdate = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1;
+        const isOrderSession = url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=get_order_id_from_session') !== -1;
+
+        if (!(isPixelUpdate || isOrderSession)) {
             return;
         }
 
-        const isPixelUpdate = data.includes('action=update_pixel_data');
-        const isOrderSessionCall = data.includes('action=get_order_id_from_session');
+        if (options.async === false) {
+            options.async = true;
+        }
 
-        if (isPixelUpdate || isOrderSessionCall) {
-            if (options.async === false) {
-                options.async = true;
-            }
-
-            if (!options.timeout || options.timeout < PIXEL_AJAX_TIMEOUT_MS) {
-                options.timeout = PIXEL_AJAX_TIMEOUT_MS;
-            }
+        if (!options.timeout || options.timeout < LOADER_TIMEOUT_MS) {
+            options.timeout = LOADER_TIMEOUT_MS;
         }
 
         if (isPixelUpdate) {
             const now = Date.now();
-            if (activeUpdateXhr && activeUpdateXhr.readyState !== 4) {
-                try {
-                    activeUpdateXhr.abort('styliiiish_throttled');
-                } catch (error) {
-                }
-            }
-
-            activeUpdateXhr = jqXHR;
-            if ((now - lastPixelUpdateAt) < PIXEL_UPDATE_MIN_INTERVAL) {
+            if ((now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
                 options.global = false;
             }
-            lastPixelUpdateAt = now;
-        }
-    });
-
-    $(document).ajaxError(function (_event, jqXHR, settings, thrownError) {
-        const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        const isPixelUpdate = url.includes('admin-ajax.php') && data.includes('action=update_pixel_data');
-
-        if (!isPixelUpdate) {
-            return;
-        }
-
-        removeLoader();
-        const serverMessage = jqXHR?.responseJSON?.data || jqXHR?.responseJSON?.message;
-        showErrorNotice(serverMessage || thrownError || 'Checkout request failed. Please retry.');
-    });
-
-    $(document).ajaxComplete(function (_event, jqXHR, settings) {
-        const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        const isPixelUpdate = url.includes('admin-ajax.php') && data.includes('action=update_pixel_data');
-
-        if (!isPixelUpdate) {
-            return;
-        }
-
-        const failed = !!(jqXHR && jqXHR.status >= 400);
-        if (failed) {
-            removeLoader();
-            showErrorNotice('Checkout service returned an error. Please try again.');
-            return;
-        }
-
-        if (hasRenderedPaymobWidget()) {
-            removeLoader();
-            clearLoaderTimer();
-        }
-
-        if (activeUpdateXhr === jqXHR) {
-            activeUpdateXhr = null;
+            lastUpdateCall = now;
         }
     });
 
     $(document).ajaxSend(function (_event, _jqXHR, settings) {
         const url = String(settings?.url || '');
         const data = String(settings?.data || '');
-        const isPixelUpdate = url.includes('admin-ajax.php') && data.includes('action=update_pixel_data');
-        if (!isPixelUpdate) {
-            return;
+        if (url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1) {
+            armLoaderTimeout();
         }
-        armLoaderTimeout();
     });
 
-    // Safety net for old global functions from Paymob script.
-    const interval = setInterval(function () {
-        const hasShow = typeof window.showLoadingIndicator === 'function';
-        const hasHide = typeof window.hideLoadingIndicator === 'function';
+    $(document).ajaxError(function (_event, jqXHR, settings, thrownError) {
+        const url = String(settings?.url || '');
+        const data = String(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
+            return;
+        }
+        removeLoader();
+        clearLoaderTimer();
+        showNotice(jqXHR?.responseJSON?.data || thrownError || 'Payment service failed. Please retry.');
+    });
+
+    $(document).ajaxComplete(function (_event, _jqXHR, settings) {
+        const url = String(settings?.url || '');
+        const data = String(settings?.data || '');
+        if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
+            return;
+        }
+        if (hasWidget()) {
+            removeLoader();
+            clearLoaderTimer();
+        }
+    });
+
+    const patchInterval = window.setInterval(function () {
         const hasUpdateCheckoutData = typeof window.updateCheckoutData === 'function';
         const hasAjaxCall = typeof window.ajaxCall === 'function';
 
-        if (!hasShow || !hasHide) {
-            return;
-        }
-
-        const originalShow = window.showLoadingIndicator;
-        const originalHide = window.hideLoadingIndicator;
-
-        window.showLoadingIndicator = function () {
-            originalShow.apply(this, arguments);
-            armLoaderTimeout();
-        };
-
-        window.hideLoadingIndicator = function () {
-            originalHide.apply(this, arguments);
-            clearLoaderTimer();
-        };
-
-        if (hasUpdateCheckoutData && !window.__styliiiishUpdateCheckoutWrapped) {
+        if (hasUpdateCheckoutData && !window.__styliiiishWrappedUpdateCheckoutData) {
             const originalUpdateCheckoutData = window.updateCheckoutData;
             window.updateCheckoutData = function () {
                 const forceReload = !!arguments[0];
                 const now = Date.now();
-                if (!forceReload && (now - lastPixelUpdateAt) < PIXEL_UPDATE_MIN_INTERVAL) {
+                if (!forceReload && (now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
-                lastPixelUpdateAt = now;
+                lastUpdateCall = now;
                 return originalUpdateCheckoutData.apply(this, arguments);
             };
-            window.__styliiiishUpdateCheckoutWrapped = true;
+            window.__styliiiishWrappedUpdateCheckoutData = true;
         }
 
-        if (hasAjaxCall && !window.__styliiiishAjaxCallWrapped) {
+        if (hasAjaxCall && !window.__styliiiishWrappedAjaxCall) {
             const originalAjaxCall = window.ajaxCall;
             window.ajaxCall = function () {
-                const now = Date.now();
                 const forceReload = !!arguments[2];
-                if (!forceReload && (now - lastAjaxCallAt) < PIXEL_UPDATE_MIN_INTERVAL) {
+                const now = Date.now();
+                if (!forceReload && (now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
-                lastAjaxCallAt = now;
+                lastUpdateCall = now;
                 return originalAjaxCall.apply(this, arguments);
             };
-            window.__styliiiishAjaxCallWrapped = true;
+            window.__styliiiishWrappedAjaxCall = true;
         }
 
-        clearInterval(interval);
-    }, 300);
+        if ((window.__styliiiishWrappedUpdateCheckoutData || !hasUpdateCheckoutData)
+            && (window.__styliiiishWrappedAjaxCall || !hasAjaxCall)) {
+            window.clearInterval(patchInterval);
+        }
+    }, 250);
 
-    // Stop polling eventually to avoid any long-lived interval.
-    setTimeout(function () {
-        clearInterval(interval);
+    window.setTimeout(function () {
+        window.clearInterval(patchInterval);
     }, 15000);
 })(window, document, window.jQuery);
 JS;
 
-    wp_add_inline_script('styliiiish-paymob-checkout-guard', $inline_js, 'after');
+    wp_add_inline_script('styliiiish-paymob-checkout-guard', $after_inline, 'after');
 }, 999);
