@@ -9,8 +9,9 @@
 
     $translations = [
         'ar' => [
+            'meta_title' => 'سلة التسوق | أكملي طلبك بأفضل سعر وشحن سريع | Styliiiish',
             'page_title' => 'العربة | ستايلش',
-            'meta_desc' => 'صفحة العربة في ستايلش لمراجعة المنتجات، تعديل الكميات، ومتابعة الدفع بسهولة وأمان.',
+            'meta_desc' => 'راجعي منتجاتك في سلة Styliiiish وأكملي الطلب بخطوات دفع آمنة وسريعة مع شحن داخل مصر ودعم موثوق قبل وبعد الشراء.',
             'topbar' => 'المتجر الرسمي • شحن داخل مصر 2–10 أيام',
             'nav_home' => 'الرئيسية',
             'nav_shop' => 'المتجر',
@@ -68,8 +69,9 @@
             'footer_rights' => 'جميع الحقوق محفوظة',
         ],
         'en' => [
+            'meta_title' => 'Shopping Cart | Complete Your Order with Fast Egypt Delivery | Styliiiish',
             'page_title' => 'Cart | Styliiiish',
-            'meta_desc' => 'Your Styliiiish cart page to review products, adjust quantities, and proceed securely to checkout.',
+            'meta_desc' => 'Review your selected items on Styliiiish cart and complete checkout with secure steps, fast Egypt delivery, and trusted customer support.',
             'topbar' => 'Official Store • Egypt shipping in 2–10 days',
             'nav_home' => 'Home',
             'nav_shop' => 'Shop',
@@ -144,7 +146,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="robots" content="noindex, follow">
     <meta name="description" content="{{ $t('meta_desc') }}">
     <link rel="canonical" href="{{ $seoUrl }}">
     <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/cart">
@@ -154,12 +156,12 @@
     <meta property="og:locale" content="{{ $ogLocale }}">
     <meta property="og:locale:alternate" content="{{ $ogAltLocale }}">
     <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
-    <meta property="og:title" content="{{ $t('page_title') }}">
+    <meta property="og:title" content="{{ $t('meta_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
     <meta property="og:url" content="{{ $seoUrl }}">
     <meta property="og:image" content="{{ $wpIcon }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $t('page_title') }}">
+    <meta name="twitter:title" content="{{ $t('meta_title') }}">
     <meta name="twitter:description" content="{{ $t('meta_desc') }}">
     <meta name="twitter:image" content="{{ $wpIcon }}">
     <meta name="theme-color" content="#d51522">
@@ -167,7 +169,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $wpIcon }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>{{ $t('page_title') }}</title>
+    <title>{{ $t('meta_title') }}</title>
     @include('partials.shared-seo-meta')
     <style>
         :root { --wf-main-rgb: 213,21,34; --wf-main-color: rgb(var(--wf-main-rgb)); --wf-secondary-color:#17273B; --bg:#f6f7fb; --line:rgba(189,189,189,.4); --primary:var(--wf-main-color); --secondary:var(--wf-secondary-color); --danger:#dc2626; }

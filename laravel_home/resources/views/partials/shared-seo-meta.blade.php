@@ -59,17 +59,6 @@
 <meta name="publisher" content="Styliiiish">
 <meta name="application-name" content="Styliiiish">
 <meta name="theme-color" content="#d51522">
-<meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-<meta name="bingbot" content="index, follow">
-<meta property="og:locale" content="{{ $seoLocaleCode }}">
-<meta property="og:locale:alternate" content="{{ $seoAltLocaleCode }}">
-<meta property="og:image" content="{{ $seoImageValue }}">
-<meta property="og:url" content="{{ $seoUrlValue }}">
-<meta property="og:site_name" content="Styliiiish">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="{{ $seoTitleValue }}">
-<meta name="twitter:description" content="{{ $seoDescriptionValue }}">
-<meta name="twitter:image" content="{{ $seoImageValue }}">
 <link rel="preconnect" href="https://styliiiish.com" crossorigin>
 <link rel="dns-prefetch" href="//styliiiish.com">
 <script type="application/ld+json">

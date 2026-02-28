@@ -8,8 +8,9 @@
 
     $translations = [
         'ar' => [
+            'meta_title' => 'المفضلة | احفظي منتجاتك وارجعي لها في أي وقت | Styliiiish',
             'page_title' => 'المفضلة | ستايلش',
-            'meta_desc' => 'صفحة المفضلة في ستايلش لعرض المنتجات المحفوظة والعودة لها بسهولة قبل إتمام الشراء.',
+            'meta_desc' => 'تابعي منتجاتك المحفوظة في قائمة المفضلة على Styliiiish وقارنيها بسهولة قبل إتمام الشراء بأفضل عرض مناسب لك.',
             'topbar' => 'المتجر الرسمي • شحن داخل مصر 2–10 أيام',
             'nav_home' => 'الرئيسية',
             'nav_shop' => 'المتجر',
@@ -48,8 +49,9 @@
             'footer_rights' => 'جميع الحقوق محفوظة',
         ],
         'en' => [
+            'meta_title' => 'Wishlist | Save Your Favorites and Revisit Anytime | Styliiiish',
             'page_title' => 'Wishlist | Styliiiish',
-            'meta_desc' => 'Your Styliiiish wishlist page to quickly revisit your saved products before checkout.',
+            'meta_desc' => 'Keep your favorite products in your Styliiiish wishlist and revisit them quickly before completing your purchase.',
             'topbar' => 'Official Store • Egypt shipping in 2–10 days',
             'nav_home' => 'Home',
             'nav_shop' => 'Shop',
@@ -105,7 +107,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="robots" content="noindex, follow">
     <meta name="author" content="Styliiiish">
     <meta name="description" content="{{ $t('meta_desc') }}">
     <link rel="canonical" href="{{ $seoUrl }}">
@@ -116,12 +118,12 @@
     <meta property="og:locale" content="{{ $ogLocale }}">
     <meta property="og:locale:alternate" content="{{ $ogAltLocale }}">
     <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
-    <meta property="og:title" content="{{ $t('page_title') }}">
+    <meta property="og:title" content="{{ $t('meta_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
     <meta property="og:url" content="{{ $seoUrl }}">
     <meta property="og:image" content="{{ $wpIcon }}">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $t('page_title') }}">
+    <meta name="twitter:title" content="{{ $t('meta_title') }}">
     <meta name="twitter:description" content="{{ $t('meta_desc') }}">
     <meta name="twitter:image" content="{{ $wpIcon }}">
     <meta name="theme-color" content="#d51522">
@@ -129,7 +131,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ $wpIcon }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
     <link rel="apple-touch-icon" href="{{ $wpIcon }}">
-    <title>{{ $t('page_title') }}</title>
+    <title>{{ $t('meta_title') }}</title>
     @include('partials.shared-seo-meta')
     <script type="application/ld+json">
     {!! json_encode([

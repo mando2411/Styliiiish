@@ -7,9 +7,13 @@
     $wpLogo = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpIcon = $wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpAccountUrl = $isEnglish ? ($wpBaseUrl . '/my-account/') : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/');
+    $canonicalPath = $isEnglish ? '/en/my-account' : '/ar/my-account';
+    $seoUrl = $wpBaseUrl . $canonicalPath;
 
     $translations = [
         'ar' => [
+            'meta_title' => 'حسابي | إدارة الطلبات والعناوين والبيانات | Styliiiish',
+            'meta_desc' => 'ادخلي إلى حسابك في Styliiiish لإدارة الطلبات والعناوين وبيانات الحساب بسهولة. صفحة حساب خاصة بالمستخدمين المسجلين.',
             'page_title' => 'حسابي | ستايلش',
             'dashboard' => 'لوحة التحكم',
             'orders' => 'الطلبات',
@@ -62,6 +66,8 @@
             'register_disabled' => 'إنشاء الحساب غير متاح حالياً.',
         ],
         'en' => [
+            'meta_title' => 'My Account | Manage Orders, Addresses & Profile | Styliiiish',
+            'meta_desc' => 'Access your Styliiiish account to manage orders, addresses, and account details. This page is intended for logged-in users.',
             'page_title' => 'My Account | Styliiiish',
             'dashboard' => 'Dashboard',
             'orders' => 'Orders',
@@ -121,7 +127,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $t('page_title') }}</title>
+    <meta name="robots" content="noindex, follow">
+    <meta name="description" content="{{ $t('meta_desc') }}">
+    <link rel="canonical" href="{{ $seoUrl }}">
+    <link rel="alternate" hreflang="ar" href="{{ $wpBaseUrl }}/ar/my-account">
+    <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/my-account">
+    <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/my-account">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_EG' }}">
+    <meta property="og:locale:alternate" content="{{ $isEnglish ? 'ar_EG' : 'en_US' }}">
+    <meta property="og:title" content="{{ $t('meta_title') }}">
+    <meta property="og:description" content="{{ $t('meta_desc') }}">
+    <meta property="og:url" content="{{ $seoUrl }}">
+    <meta property="og:image" content="{{ $wpIcon }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $t('meta_title') }}">
+    <meta name="twitter:description" content="{{ $t('meta_desc') }}">
+    <meta name="twitter:image" content="{{ $wpIcon }}">
+    <title>{{ $t('meta_title') }}</title>
     @include('partials.shared-seo-meta')
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ $wpIcon }}">
