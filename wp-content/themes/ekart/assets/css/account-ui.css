@@ -244,6 +244,46 @@ body.woocommerce-account .woocommerce > .woocommerce-MyAccount-content {
     -webkit-text-fill-color: #fff !important;
 }
 
+body.woocommerce-account a.button,
+body.woocommerce-account a.button:visited,
+body.woocommerce-account a.button:hover,
+body.woocommerce-account a.button:focus,
+body.woocommerce-account a.woocommerce-Button,
+body.woocommerce-account a.woocommerce-Button:visited,
+body.woocommerce-account a.woocommerce-Button:hover,
+body.woocommerce-account a.woocommerce-Button:focus,
+body.woocommerce-account a.wc-forward,
+body.woocommerce-account a.wc-forward:visited,
+body.woocommerce-account a.wc-forward:hover,
+body.woocommerce-account a.wc-forward:focus,
+body.woocommerce-account a[class*="btn"],
+body.woocommerce-account a[class*="btn"]:visited,
+body.woocommerce-account a[class*="btn"]:hover,
+body.woocommerce-account a[class*="btn"]:focus,
+body.woocommerce-account a[style*="background"],
+body.woocommerce-account a[style*="background"]:visited,
+body.woocommerce-account a[style*="background"]:hover,
+body.woocommerce-account a[style*="background"]:focus,
+body.woocommerce-account a[style*="background-color"],
+body.woocommerce-account a[style*="background-color"]:visited,
+body.woocommerce-account a[style*="background-color"]:hover,
+body.woocommerce-account a[style*="background-color"]:focus {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
+body.woocommerce-account a.button *,
+body.woocommerce-account a.woocommerce-Button *,
+body.woocommerce-account a.wc-forward *,
+body.woocommerce-account a[class*="btn"] *,
+body.woocommerce-account a[style*="background"] *,
+body.woocommerce-account a[style*="background-color"] * {
+    color: #fff !important;
+    fill: #fff !important;
+    stroke: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+}
+
 .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button:hover,
 .woocommerce-account .woocommerce-MyAccount-content .button:hover,
 .woocommerce-account .woocommerce-MyAccount-content button:hover,

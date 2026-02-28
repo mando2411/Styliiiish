@@ -65,8 +65,6 @@
         a { text-decoration: none; color: inherit; }
         .container { width: min(1100px, 92%); margin: 0 auto; }
 
-        .top { background: var(--secondary); color: #fff; text-align: center; padding: 10px 12px; font-size: 13px; }
-
         .hero { padding: 10px 0 8px; }
         .hero-wrap {
             background: linear-gradient(160deg, #ffffff 0%, #fff4f5 100%);
@@ -247,9 +245,10 @@
             .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
+    @include('partials.shared-home-header-styles')
 </head>
 <body>
-    <div class="top">عروض إعلانية حصرية • خصومات قوية لفترة محدودة</div>
+    @include('partials.shared-home-header')
 
     <main class="container">
         <section class="hero">
