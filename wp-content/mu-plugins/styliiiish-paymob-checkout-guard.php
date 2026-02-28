@@ -8,6 +8,56 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function styliiiish_is_checkout_like_request(): bool {
+    if (is_admin()) {
+        return false;
+    }
+
+    if (function_exists('is_checkout') && is_checkout()) {
+        if (function_exists('is_order_received_page') && is_order_received_page()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    if ($request_uri === '') {
+        return false;
+    }
+
+    $decoded_uri = rawurldecode($request_uri);
+    $needles = ['/checkout', '/payment', '/الدفع'];
+
+    foreach ($needles as $needle) {
+        if (strpos($request_uri, $needle) !== false || strpos($decoded_uri, $needle) !== false) {
+            if (strpos($request_uri, 'order-received') !== false || strpos($decoded_uri, 'order-received') !== false) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+add_filter('trp_enable_translatepress', function ($enabled) {
+    if (!$enabled) {
+        return false;
+    }
+
+    if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
+        return $enabled;
+    }
+
+    if (styliiiish_is_checkout_like_request()) {
+        return false;
+    }
+
+    return $enabled;
+}, 9999);
+
 add_action('template_redirect', function () {
     if (is_admin() || wp_doing_ajax()) {
         return;
@@ -40,33 +90,7 @@ add_action('template_redirect', function () {
 }, -9999);
 
 function styliiiish_paymob_guard_is_checkout_context(): bool {
-    if (is_admin()) {
-        return false;
-    }
-
-    $is_checkout_page = function_exists('is_checkout') && is_checkout();
-
-    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
-    $decoded_uri = rawurldecode($request_uri);
-    $needles = ['/checkout', '/payment', '/الدفع'];
-    $is_checkout_like_url = false;
-
-    foreach ($needles as $needle) {
-        if (strpos($request_uri, $needle) !== false || strpos($decoded_uri, $needle) !== false) {
-            $is_checkout_like_url = true;
-            break;
-        }
-    }
-
-    if (!$is_checkout_page && !$is_checkout_like_url) {
-        return false;
-    }
-
-    if (function_exists('is_order_received_page') && is_order_received_page()) {
-        return false;
-    }
-
-    return true;
+    return styliiiish_is_checkout_like_request();
 }
 
 function styliiiish_paymob_guard_is_enabled(): bool {
