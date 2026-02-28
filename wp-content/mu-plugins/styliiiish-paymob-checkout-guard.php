@@ -1,128 +1,198 @@
 <?php
 /**
  * Plugin Name: Styliiiish Paymob Checkout Guard
- * Description: Non-invasive checkout guard for Paymob Pixel loading deadlocks.
+ * Description: Checkout isolation + Paymob Pixel safety guard (without editing payment plugin files).
  */
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-add_action('wp_enqueue_scripts', function () {
+function styliiiish_paymob_guard_is_checkout_context(): bool {
     if (is_admin() || !function_exists('is_checkout') || !is_checkout()) {
-        return;
+        return false;
     }
 
+    if (function_exists('is_order_received_page') && is_order_received_page()) {
+        return false;
+    }
+
+    return true;
+}
+
+function styliiiish_paymob_guard_is_enabled(): bool {
     $pixel_settings = get_option('woocommerce_paymob-pixel_settings', []);
-    if (!is_array($pixel_settings) || (($pixel_settings['enabled'] ?? 'no') !== 'yes')) {
-        return;
-    }
-    $before_inline = <<<'JS'
-(function (window) {
-    if (window.__styliiiishPaymobGuardBeforeLoaded) {
-        return;
-    }
-    window.__styliiiishPaymobGuardBeforeLoaded = true;
+    return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
+}
 
-    if (typeof window.previousTotalBlock === 'undefined') {
-        window.previousTotalBlock = null;
-    }
+function styliiiish_paymob_guard_allow_script(string $handle, string $src): bool {
+    $handle = strtolower($handle);
+    $src = strtolower($src);
 
-    try {
-        window.eval('var previousTotalBlock = window.previousTotalBlock;');
-    } catch (error) {
-    }
+    $allowed_handle_prefixes = [
+        'jquery',
+        'wc-',
+        'woocommerce',
+        'select2',
+        'selectwoo',
+        'wp-hooks',
+        'wp-i18n',
+        'wp-element',
+        'wp-components',
+        'wp-data',
+        'wp-api-fetch',
+        'wp-url',
+        'wp-polyfill',
+        'regenerator-runtime',
+        'underscore',
+        'backbone',
+        'imagesloaded',
+        'paymob',
+    ];
 
-    const nativeSetInterval = window.setInterval;
-    window.setInterval = function (callback, delay) {
-        try {
-            const callbackText = typeof callback === 'function'
-                ? Function.prototype.toString.call(callback)
-                : String(callback || '');
-
-            const stack = String((new Error()).stack || '');
-            const fromPaymobBlock = stack.indexOf('paymob-pixel_block.js') !== -1;
-            const aggressivePolling = Number(delay) > 0
-                && Number(delay) <= 250
-                && (
-                    callbackText.indexOf('previousTotalBlock') !== -1
-                    || callbackText.indexOf('wc/store/cart') !== -1
-                    || callbackText.indexOf('cartTotals') !== -1
-                    || callbackText.indexOf('updateCheckoutData') !== -1
-                );
-
-            if (fromPaymobBlock && aggressivePolling) {
-                return nativeSetInterval.call(this, callback, 1500);
-            }
-
-            if (Number(delay) > 0 && Number(delay) <= 250) {
-                return nativeSetInterval.call(this, callback, 1200);
-            }
-        } catch (error) {
+    foreach ($allowed_handle_prefixes as $prefix) {
+        if (str_starts_with($handle, $prefix)) {
+            return true;
         }
-
-        return nativeSetInterval.apply(this, arguments);
-    };
-})(window);
-JS;
-
-    if (wp_script_is('paymob-pixel-checkout', 'enqueued')) {
-        wp_add_inline_script('paymob-pixel-checkout', $before_inline, 'before');
-    } else {
-        wp_register_script('styliiiish-paymob-checkout-guard-before', false, [], '1.1.0', false);
-        wp_enqueue_script('styliiiish-paymob-checkout-guard-before');
-        wp_add_inline_script('styliiiish-paymob-checkout-guard-before', $before_inline, 'after');
     }
 
-    wp_register_script('styliiiish-paymob-checkout-guard', false, ['jquery'], '1.1.0', true);
+    $allowed_src_fragments = [
+        '/woocommerce/',
+        '/paymob-for-woocommerce/',
+        '/wc-blocks/',
+        '/wp-includes/js/',
+    ];
+
+    foreach ($allowed_src_fragments as $fragment) {
+        if ($fragment !== '' && strpos($src, $fragment) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function styliiiish_paymob_guard_allow_style(string $handle, string $src): bool {
+    $handle = strtolower($handle);
+    $src = strtolower($src);
+
+    $allowed_handle_prefixes = [
+        'woocommerce',
+        'wc-',
+        'paymob',
+        'select2',
+        'selectwoo',
+        'wp-components',
+        'dashicons',
+    ];
+
+    foreach ($allowed_handle_prefixes as $prefix) {
+        if (str_starts_with($handle, $prefix)) {
+            return true;
+        }
+    }
+
+    $allowed_src_fragments = [
+        '/woocommerce/',
+        '/paymob-for-woocommerce/',
+        '/wc-blocks/',
+        '/wp-includes/css/',
+    ];
+
+    foreach ($allowed_src_fragments as $fragment) {
+        if ($fragment !== '' && strpos($src, $fragment) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+add_action('wp_enqueue_scripts', function () {
+    if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
+        return;
+    }
+
+    // Remove unrelated head noise that may add heavy JS.
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('wp_head', 'wp_oembed_add_discovery_links');
+    remove_action('wp_head', 'wp_oembed_add_host_js');
+}, 1);
+
+add_action('wp_enqueue_scripts', function () {
+    if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
+        return;
+    }
+
+    global $wp_scripts, $wp_styles;
+
+    if ($wp_scripts instanceof WP_Scripts) {
+        foreach ((array) $wp_scripts->queue as $handle) {
+            $src = '';
+            if (isset($wp_scripts->registered[$handle])) {
+                $src = (string) $wp_scripts->registered[$handle]->src;
+            }
+
+            if (!styliiiish_paymob_guard_allow_script($handle, $src)) {
+                wp_dequeue_script($handle);
+                wp_deregister_script($handle);
+            }
+        }
+    }
+
+    if ($wp_styles instanceof WP_Styles) {
+        foreach ((array) $wp_styles->queue as $handle) {
+            $src = '';
+            if (isset($wp_styles->registered[$handle])) {
+                $src = (string) $wp_styles->registered[$handle]->src;
+            }
+
+            if (!styliiiish_paymob_guard_allow_style($handle, $src)) {
+                wp_dequeue_style($handle);
+                wp_deregister_style($handle);
+            }
+        }
+    }
+}, 99999);
+
+add_action('wp_enqueue_scripts', function () {
+    if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
+        return;
+    }
+
+    wp_register_script('styliiiish-paymob-checkout-guard', false, ['jquery'], '2.0.0', true);
     wp_enqueue_script('styliiiish-paymob-checkout-guard');
 
-    $after_inline = <<<'JS'
+    $inline_js = <<<'JS'
 (function (window, document, $) {
     if (!$ || typeof $.ajax !== 'function') {
         return;
     }
 
-    if (window.__styliiiishPaymobGuardAfterLoaded) {
+    if (window.__styliiiishCheckoutIsolatedGuard) {
         return;
     }
-    window.__styliiiishPaymobGuardAfterLoaded = true;
+    window.__styliiiishCheckoutIsolatedGuard = true;
 
     const LOADER_ID = 'paymob-loading-indicator';
     const NOTICE_ID = 'styliiiish-paymob-guard-notice';
-    const LOADER_TIMEOUT_MS = 20000;
-    const MIN_UPDATE_INTERVAL_MS = 1200;
-    let lastUpdateCall = 0;
+    const AJAX_TIMEOUT_MS = 20000;
+    const MIN_UPDATE_INTERVAL_MS = 1500;
+    let lastUpdateCallAt = 0;
     let loaderTimer = null;
 
-    function hasWidget() {
+    function hasPaymobWidget() {
         const root = document.getElementById('paymob-elements');
         return !!(root && root.children && root.children.length > 0);
     }
 
-    function removeLoader() {
+    function clearLoader() {
         document.querySelectorAll('#' + LOADER_ID).forEach((node) => node.remove());
     }
 
-    function clearLoaderTimer() {
-        if (loaderTimer) {
-            clearTimeout(loaderTimer);
-            loaderTimer = null;
-        }
-    }
-
-    function armLoaderTimeout() {
-        clearLoaderTimer();
-        loaderTimer = setTimeout(function () {
-            if (!hasWidget()) {
-                removeLoader();
-                showNotice('Unable to load payment form. Please refresh and try again.');
-            }
-        }, LOADER_TIMEOUT_MS);
-    }
-
     function showNotice(message) {
-        const text = String(message || 'Checkout error, please retry.');
+        const text = String(message || 'Checkout error. Please refresh and try again.');
         const existing = document.getElementById(NOTICE_ID);
         if (existing) {
             existing.textContent = text;
@@ -147,6 +217,18 @@ JS;
         host.prepend(node);
     }
 
+    function armLoaderTimeout() {
+        if (loaderTimer) {
+            clearTimeout(loaderTimer);
+        }
+        loaderTimer = setTimeout(function () {
+            if (!hasPaymobWidget()) {
+                clearLoader();
+                showNotice('Paymob checkout is taking too long. Please refresh and try again.');
+            }
+        }, AJAX_TIMEOUT_MS);
+    }
+
     $.ajaxPrefilter(function (options, originalOptions) {
         const url = String(options?.url || originalOptions?.url || '');
         const data = String(options?.data || originalOptions?.data || '');
@@ -161,23 +243,16 @@ JS;
             options.async = true;
         }
 
-        if (!options.timeout || options.timeout < LOADER_TIMEOUT_MS) {
-            options.timeout = LOADER_TIMEOUT_MS;
+        if (!options.timeout || options.timeout < AJAX_TIMEOUT_MS) {
+            options.timeout = AJAX_TIMEOUT_MS;
         }
 
         if (isPixelUpdate) {
             const now = Date.now();
-            if ((now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
+            if ((now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                 options.global = false;
             }
-            lastUpdateCall = now;
-        }
-    });
-
-    $(document).ajaxSend(function (_event, _jqXHR, settings) {
-        const url = String(settings?.url || '');
-        const data = String(settings?.data || '');
-        if (url.indexOf('admin-ajax.php') !== -1 && data.indexOf('action=update_pixel_data') !== -1) {
+            lastUpdateCallAt = now;
             armLoaderTimeout();
         }
     });
@@ -188,8 +263,7 @@ JS;
         if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
             return;
         }
-        removeLoader();
-        clearLoaderTimer();
+        clearLoader();
         showNotice(jqXHR?.responseJSON?.data || thrownError || 'Payment service failed. Please retry.');
     });
 
@@ -199,9 +273,14 @@ JS;
         if (url.indexOf('admin-ajax.php') === -1 || data.indexOf('action=update_pixel_data') === -1) {
             return;
         }
-        if (hasWidget()) {
-            removeLoader();
-            clearLoaderTimer();
+
+        if (loaderTimer) {
+            clearTimeout(loaderTimer);
+            loaderTimer = null;
+        }
+
+        if (hasPaymobWidget()) {
+            clearLoader();
         }
     });
 
@@ -214,10 +293,10 @@ JS;
             window.updateCheckoutData = function () {
                 const forceReload = !!arguments[0];
                 const now = Date.now();
-                if (!forceReload && (now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
+                if (!forceReload && (now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
-                lastUpdateCall = now;
+                lastUpdateCallAt = now;
                 return originalUpdateCheckoutData.apply(this, arguments);
             };
             window.__styliiiishWrappedUpdateCheckoutData = true;
@@ -228,10 +307,10 @@ JS;
             window.ajaxCall = function () {
                 const forceReload = !!arguments[2];
                 const now = Date.now();
-                if (!forceReload && (now - lastUpdateCall) < MIN_UPDATE_INTERVAL_MS) {
+                if (!forceReload && (now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
-                lastUpdateCall = now;
+                lastUpdateCallAt = now;
                 return originalAjaxCall.apply(this, arguments);
             };
             window.__styliiiishWrappedAjaxCall = true;
@@ -241,7 +320,7 @@ JS;
             && (window.__styliiiishWrappedAjaxCall || !hasAjaxCall)) {
             window.clearInterval(patchInterval);
         }
-    }, 250);
+    }, 300);
 
     window.setTimeout(function () {
         window.clearInterval(patchInterval);
@@ -249,5 +328,5 @@ JS;
 })(window, document, window.jQuery);
 JS;
 
-    wp_add_inline_script('styliiiish-paymob-checkout-guard', $after_inline, 'after');
-}, 999);
+    wp_add_inline_script('styliiiish-paymob-checkout-guard', $inline_js, 'after');
+}, 99999);
