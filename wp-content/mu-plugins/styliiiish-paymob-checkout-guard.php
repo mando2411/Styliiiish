@@ -24,6 +24,15 @@ add_action('wp_enqueue_scripts', function () {
     }
     window.__styliiiishPaymobGuardBeforeLoaded = true;
 
+    if (typeof window.previousTotalBlock === 'undefined') {
+        window.previousTotalBlock = null;
+    }
+
+    try {
+        window.eval('var previousTotalBlock = window.previousTotalBlock;');
+    } catch (error) {
+    }
+
     const nativeSetInterval = window.setInterval;
     window.setInterval = function (callback, delay) {
         try {
@@ -43,8 +52,11 @@ add_action('wp_enqueue_scripts', function () {
                 );
 
             if (fromPaymobBlock && aggressivePolling) {
-                console.warn('[Styliiiish Paymob Guard] blocked aggressive interval', delay);
-                return 0;
+                return nativeSetInterval.call(this, callback, 1500);
+            }
+
+            if (Number(delay) > 0 && Number(delay) <= 250) {
+                return nativeSetInterval.call(this, callback, 1200);
             }
         } catch (error) {
         }
