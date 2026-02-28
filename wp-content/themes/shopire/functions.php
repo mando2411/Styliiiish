@@ -426,8 +426,6 @@ add_action('template_redirect', function () {
 	}
 
 	$aliases = [
-		'ar/الدفع' => '/checkout/',
-		'الدفع' => '/checkout/',
 		'en/payment' => '/checkout/',
 		'payment' => '/checkout/',
 	];

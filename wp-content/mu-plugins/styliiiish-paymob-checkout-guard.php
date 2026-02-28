@@ -42,52 +42,41 @@ function styliiiish_is_checkout_like_request(): bool {
     return false;
 }
 
-add_filter('trp_enable_translatepress', function ($enabled) {
-    if (!$enabled) {
-        return false;
-    }
-
-    if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
-        return $enabled;
-    }
-
-    if (styliiiish_is_checkout_like_request()) {
-        return false;
-    }
-
-    return $enabled;
-}, 9999);
-
-add_action('template_redirect', function () {
-    if (is_admin() || wp_doing_ajax()) {
+add_action('wp_enqueue_scripts', function () {
+    if (!styliiiish_is_checkout_like_request()) {
         return;
     }
 
-    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
-    if ($request_uri === '') {
-        return;
-    }
+    global $wp_scripts, $wp_styles;
 
-    $path = (string) parse_url($request_uri, PHP_URL_PATH);
-    $decoded_path = rawurldecode($path);
+    if ($wp_scripts instanceof WP_Scripts && is_array($wp_scripts->queue)) {
+        foreach ($wp_scripts->queue as $handle) {
+            $src = isset($wp_scripts->registered[$handle]) ? (string) ($wp_scripts->registered[$handle]->src ?? '') : '';
+            $is_translatepress_asset = (strpos($handle, 'trp-') === 0)
+                || (strpos($handle, 'translatepress') !== false)
+                || (strpos($src, 'translatepress') !== false)
+                || (strpos($src, 'trp-') !== false);
 
-    $arabic_checkout_aliases = [
-        '/ar/الدفع',
-        '/ar/الدفع/',
-        '/الدفع',
-        '/الدفع/',
-        '/ar/payment',
-        '/ar/payment/',
-    ];
-
-    foreach ($arabic_checkout_aliases as $alias) {
-        if (strcasecmp(rtrim($decoded_path, '/'), rtrim($alias, '/')) === 0) {
-            $target = home_url('/checkout/');
-            wp_safe_redirect($target, 302);
-            exit;
+            if ($is_translatepress_asset) {
+                wp_dequeue_script($handle);
+            }
         }
     }
-}, -9999);
+
+    if ($wp_styles instanceof WP_Styles && is_array($wp_styles->queue)) {
+        foreach ($wp_styles->queue as $handle) {
+            $src = isset($wp_styles->registered[$handle]) ? (string) ($wp_styles->registered[$handle]->src ?? '') : '';
+            $is_translatepress_asset = (strpos($handle, 'trp-') === 0)
+                || (strpos($handle, 'translatepress') !== false)
+                || (strpos($src, 'translatepress') !== false)
+                || (strpos($src, 'trp-') !== false);
+
+            if ($is_translatepress_asset) {
+                wp_dequeue_style($handle);
+            }
+        }
+    }
+}, 9999);
 
 function styliiiish_paymob_guard_is_checkout_context(): bool {
     return styliiiish_is_checkout_like_request();
