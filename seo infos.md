@@ -1,0 +1,48 @@
+# SEO Infos — Laravel Pages (Styliiiish)
+
+هذا الملف يجمع روابط صفحات Laravel مع إعدادات SEO المرتبطة بها (Title / Description / Canonical / OG / Twitter).
+
+## Global SEO Stack (Applied)
+
+- Shared partial: `laravel_home/resources/views/partials/shared-seo-meta.blade.php`
+- Injected in all Laravel top-level views (21 صفحة).
+- Provides:
+  - `keywords`
+  - `author/publisher/application-name`
+  - `googlebot/bingbot`
+  - `og:locale` + `og:image` + `og:url` + `og:site_name`
+  - `twitter:card/title/description/image`
+  - `preconnect` + `dns-prefetch`
+  - `JSON-LD` (`WebPage` + `WebSite`)
+
+## URL Map + SEO Source
+
+| Page | AR URL | EN URL | Meta Title Source | Meta Description Source | Canonical Source |
+|---|---|---|---|---|---|
+| Home | https://styliiiish.com/ar | https://styliiiish.com/en | `home.blade.php` → `$t('title')` | `home.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Shop | https://styliiiish.com/ar/shop | https://styliiiish.com/en/shop | `shop.blade.php` → `$t('page_title')` | `shop.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Ads Landing | https://styliiiish.com/ar/ads | https://styliiiish.com/en/ads | `ads-landing.blade.php` → `$t('meta_title')` | `ads-landing.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Product Single (dynamic) | https://styliiiish.com/ar/item/{slug} | https://styliiiish.com/en/item/{slug} | `product-single.blade.php` → `$seoTitle` | `product-single.blade.php` → `$seoDescription` | `$seoUrl` |
+| Blog Archive | https://styliiiish.com/ar/blog | https://styliiiish.com/en/blog | `blog.blade.php` → `$t('page_title')` | `blog.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Blog Single (dynamic) | https://styliiiish.com/ar/blog/{slug} | https://styliiiish.com/en/blog/{slug} | `blog-single.blade.php` → `title + suffix` | `blog-single.blade.php` → `$metaDesc` | `$wpBaseUrl . $canonicalPath` |
+| Contact | https://styliiiish.com/ar/contact-us | https://styliiiish.com/en/contact-us | `contact.blade.php` → `$t('page_title')` | `contact.blade.php` → `$t('meta_desc')` | `https://styliiiish.com{{ $canonicalPath }}` |
+| About | https://styliiiish.com/ar/about-us | https://styliiiish.com/en/about-us | `about.blade.php` → `$t('page_title')` | `about.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Categories | https://styliiiish.com/ar/categories | https://styliiiish.com/en/categories | `categories.blade.php` → `$t('page_title')` | `categories.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Marketplace | https://styliiiish.com/ar/marketplace | https://styliiiish.com/en/marketplace | `marketplace.blade.php` → `$t('page_title')` | `marketplace.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Marketplace Policy | https://styliiiish.com/ar/marketplace-policy | https://styliiiish.com/en/marketplace-policy | `marketplace-policy.blade.php` → `$t('page_title')` | `marketplace-policy.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Privacy Policy | https://styliiiish.com/ar/privacy-policy | https://styliiiish.com/en/privacy-policy | `privacy-policy.blade.php` → `$t('page_title')` | `privacy-policy.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Terms & Conditions | https://styliiiish.com/ar/terms-conditions | https://styliiiish.com/en/terms-conditions | `terms-conditions.blade.php` → `$t('page_title')` | `terms-conditions.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Refund & Return Policy | https://styliiiish.com/ar/refund-return-policy | https://styliiiish.com/en/refund-return-policy | `refund-return-policy.blade.php` → `$t('page_title')` | `refund-return-policy.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Shipping & Delivery Policy | https://styliiiish.com/ar/shipping-delivery-policy | https://styliiiish.com/en/shipping-delivery-policy | `shipping-delivery-policy.blade.php` → `$t('page_title')` | `shipping-delivery-policy.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Cookie Policy | https://styliiiish.com/ar/cookie-policy | https://styliiiish.com/en/cookie-policy | `cookie-policy.blade.php` → `$t('page_title')` | `cookie-policy.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| FAQ | https://styliiiish.com/ar/faq | https://styliiiish.com/en/faq | `faq.blade.php` → `$t('page_title')` | `faq.blade.php` → `$t('meta_desc')` | `$wpBaseUrl . $canonicalPath` |
+| Wishlist | https://styliiiish.com/ar/wishlist | https://styliiiish.com/en/wishlist | `wishlist.blade.php` → `$t('page_title')` | `wishlist.blade.php` → `$t('meta_desc')` | `$seoUrl` |
+| Cart | https://styliiiish.com/ar/cart | https://styliiiish.com/en/cart | `cart.blade.php` → `$t('page_title')` | `cart.blade.php` → `$t('meta_desc')` | `$seoUrl` |
+| Account | https://styliiiish.com/ar/my-account | https://styliiiish.com/en/my-account | `account.blade.php` → `$t('page_title')` | from shared fallback (`meta_desc`/default) | route-driven |
+| Welcome/Landing | https://styliiiish.com/ | https://styliiiish.com/en (route-based) | `welcome.blade.php` → `$seoTitle` | `welcome.blade.php` → `$seoDescription` | route-driven |
+
+## Notes
+
+- All pages now include shared SEO augmentation via `@include('partials.shared-seo-meta')`.
+- Existing page-specific tags (title/description/canonical/hreflang/og/twitter) remain in place; shared partial adds/standardizes missing professional meta.
+- For dynamic pages (`item/{slug}`, `blog/{slug}`), SEO values are generated per content item.
