@@ -2111,6 +2111,16 @@
             align-items: stretch;
         }
 
+        .products-section .product-media {
+            height: 280px;
+            overflow: hidden;
+        }
+
+        .products-section .thumb {
+            height: 100%;
+            aspect-ratio: auto;
+        }
+
         .product-details-btn {
             margin-top: auto;
             display: inline-flex;
@@ -3020,6 +3030,10 @@
                 gap: 7px;
             }
 
+            .products-section .product-media {
+                height: 210px;
+            }
+
             .products-section .name {
                 min-height: 38px;
                 font-size: 13px;
@@ -3378,7 +3392,7 @@
         })();
     </script>
 
-    <section class="section">
+    <section class="section products-section">
         <div class="container">
             <div class="section-head">
                 <div>
