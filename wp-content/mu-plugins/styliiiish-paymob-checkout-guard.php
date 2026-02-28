@@ -87,6 +87,36 @@ function styliiiish_paymob_guard_is_enabled(): bool {
     return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
 }
 
+add_action('wp_print_styles', function () {
+    global $wp_styles;
+
+    if (!($wp_styles instanceof WP_Styles) || !is_array($wp_styles->queue)) {
+        return;
+    }
+
+    $seen_sources = [];
+    foreach ($wp_styles->queue as $handle) {
+        if (!isset($wp_styles->registered[$handle])) {
+            continue;
+        }
+
+        $src = (string) ($wp_styles->registered[$handle]->src ?? '');
+        if ($src === '') {
+            continue;
+        }
+
+        $normalized = preg_replace('/([?&])ver=[^&]+&?/', '$1', $src);
+        $normalized = rtrim((string) $normalized, '?&');
+
+        if (isset($seen_sources[$normalized])) {
+            wp_dequeue_style($handle);
+            continue;
+        }
+
+        $seen_sources[$normalized] = true;
+    }
+}, 1000);
+
 add_action('wp_enqueue_scripts', function () {
     if (!styliiiish_paymob_guard_is_checkout_context() || !styliiiish_paymob_guard_is_enabled()) {
         return;
