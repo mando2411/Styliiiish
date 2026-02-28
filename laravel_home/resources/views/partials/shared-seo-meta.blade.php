@@ -54,7 +54,7 @@
     $seoLocaleCode = $isEnglishLocale ? 'en_US' : 'ar_EG';
     $seoAltLocaleCode = $isEnglishLocale ? 'ar_EG' : 'en_US';
     $seoLanguageCode = $isEnglishLocale ? 'en' : 'ar';
-    $seoOrganizationName = 'Styliiiish';
+    $seoOrganizationName = $isEnglishLocale ? 'Styliiiish' : 'ستايلش';
     $seoOrganizationDescription = $isEnglishLocale
         ? 'Styliiiish is an online fashion platform for evening, bridal, and engagement dresses with trusted support and Egypt-wide delivery.'
         : 'ستايلش منصة أزياء إلكترونية لفساتين السهرة والزفاف والخطوبة مع دعم موثوق وتوصيل داخل مصر.';
@@ -69,9 +69,9 @@
 <meta name="keywords" content="{{ $seoKeywordsValue }}">
 <meta name="author" content="Styliiiish">
 <meta name="publisher" content="Styliiiish">
-<meta name="application-name" content="Styliiiish">
-<meta property="og:site_name" content="Styliiiish">
-<meta name="apple-mobile-web-app-title" content="Styliiiish">
+<meta name="application-name" content="{{ $seoOrganizationName }}">
+<meta property="og:site_name" content="{{ $seoOrganizationName }}">
+<meta name="apple-mobile-web-app-title" content="{{ $seoOrganizationName }}">
 <meta name="theme-color" content="#d51522">
 <link rel="preconnect" href="https://styliiiish.com" crossorigin>
 <link rel="dns-prefetch" href="//styliiiish.com">
@@ -102,7 +102,7 @@
     '@context' => 'https://schema.org',
     '@type' => 'WebSite',
     'name' => $seoOrganizationName,
-    'alternateName' => ['styliiiish.com', 'ستايلش'],
+    'alternateName' => ['styliiiish.com', $isEnglishLocale ? 'ستايلش' : 'Styliiiish'],
     'url' => $seoBaseUrl,
     'inLanguage' => [$seoLanguageCode, $isEnglishLocale ? 'ar' : 'en'],
     'potentialAction' => [

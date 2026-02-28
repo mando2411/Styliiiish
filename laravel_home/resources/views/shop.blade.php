@@ -141,7 +141,7 @@
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/shop">
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/shop">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
     <meta property="og:title" content="{{ $t('page_title') }}">
     <meta property="og:description" content="{{ $t('meta_desc') }}">
     <meta property="og:url" content="{{ $wpBaseUrl }}{{ $canonicalPath }}">

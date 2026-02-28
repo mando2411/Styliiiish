@@ -545,7 +545,7 @@
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/item/{{ rawurlencode((string) ($product->post_name ?? '')) }}">
 
     <meta property="og:type" content="product">
-    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
     <meta property="og:locale" content="{{ $seoLocale }}">
     <meta property="og:locale:alternate" content="{{ $seoAlternateLocale }}">
     <meta property="og:title" content="{{ $seoTitle }}">

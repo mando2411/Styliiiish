@@ -245,7 +245,7 @@
     <link rel="alternate" hreflang="en" href="{{ $wpBaseUrl }}/en/ads">
     <link rel="alternate" hreflang="x-default" href="{{ $wpBaseUrl }}/ar/ads">
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Styliiiish">
+    <meta property="og:site_name" content="{{ $isEnglish ? 'Styliiiish' : 'ستايلش' }}">
     <meta property="og:locale" content="{{ $isEnglish ? 'en_US' : 'ar_EG' }}">
     <meta property="og:locale:alternate" content="{{ $isEnglish ? 'ar_EG' : 'en_US' }}">
     <meta property="og:title" content="{{ $t('og_title') }}">
