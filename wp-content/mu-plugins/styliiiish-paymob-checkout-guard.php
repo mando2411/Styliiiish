@@ -46,7 +46,7 @@ add_action('wp_enqueue_scripts', function () {
     } catch (error) {
     }
 
-    // Block/slow only very aggressive short polling intervals to prevent UI freeze.
+    // Block/slow Paymob polling intervals to prevent UI freeze.
     const nativeSetInterval = window.setInterval;
     window.setInterval = function (callback, delay) {
         try {
@@ -59,16 +59,22 @@ add_action('wp_enqueue_scripts', function () {
             const fromPaymob = stack.indexOf('paymob-pixel_block.js') !== -1;
             const isAggressivePaymobPoll = fromPaymob
                 && ms > 0
-                && ms <= 250
+                && ms <= 1000
                 && (
                     cbText.indexOf('wc/store/cart') !== -1
                     || cbText.indexOf('cartTotals') !== -1
                     || cbText.indexOf('previousTotalBlock') !== -1
                     || cbText.indexOf('updateCheckoutData') !== -1
+                    || cbText.indexOf('billingAddress') !== -1
+                    || cbText.indexOf('ajaxCall(') !== -1
                 );
 
             if (isAggressivePaymobPoll) {
-                return 0;
+                return nativeSetInterval.call(this, callback, 5000);
+            }
+
+            if (fromPaymob && !Number.isNaN(ms) && ms > 0 && ms <= 1000) {
+                return nativeSetInterval.call(this, callback, 2500);
             }
 
             if (!Number.isNaN(ms) && ms > 0 && ms <= 250) {
@@ -113,6 +119,12 @@ JS;
     let lastUpdateSignatureAt = 0;
     let loaderTimer = null;
     let activeUpdateXhr = null;
+
+    function isPaymobSelected() {
+        const block = document.querySelector('input[name="radio-control-wc-payment-method-options"][value="paymob-pixel"]');
+        const classic = document.getElementById('payment_method_paymob-pixel');
+        return !!((block && block.checked) || (classic && classic.checked));
+    }
 
     function getAjaxAction(rawData) {
         if (!rawData) {
@@ -319,6 +331,9 @@ JS;
             window.ajaxCall = function () {
                 const forceReload = !!arguments[2];
                 const now = Date.now();
+                if (!isPaymobSelected()) {
+                    return;
+                }
                 if (!forceReload && (now - lastUpdateCallAt) < MIN_UPDATE_INTERVAL_MS) {
                     return;
                 }
