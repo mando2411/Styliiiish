@@ -393,16 +393,21 @@
         }
 
         .ads-products .price { color: var(--primary); font-size: 17px; font-weight: 900; }
-        .ads-products .old { color: #8b8b97; text-decoration: line-through; font-size: 14px; }
+        .ads-products .old { color: #4e5665; text-decoration: line-through; font-size: 14px; }
 
         .ads-products .sale {
             display: inline-flex;
-            background: #f2fff8;
-            color: var(--success);
+            background: #0b7a4e;
+            color: #ffffff;
             border-radius: 999px;
             padding: 5px 10px;
             font-size: 12px;
             font-weight: 700;
+        }
+
+        .ads-products .sale,
+        .ads-products .sale * {
+            color: #ffffff !important;
         }
 
         .ads-products .save {
@@ -525,6 +530,14 @@
         }
     </style>
     @include('partials.shared-home-header-styles')
+    <style>
+        .site-footer .footer-bottom a {
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1.5px;
+            font-weight: 700;
+        }
+    </style>
 </head>
 <body>
     @include('partials.shared-home-header')
