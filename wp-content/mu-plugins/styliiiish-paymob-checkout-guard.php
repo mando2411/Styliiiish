@@ -9,7 +9,25 @@ if (!defined('ABSPATH')) {
 }
 
 function styliiiish_paymob_guard_is_checkout_context(): bool {
-    if (is_admin() || !function_exists('is_checkout') || !is_checkout()) {
+    if (is_admin()) {
+        return false;
+    }
+
+    $is_checkout_page = function_exists('is_checkout') && is_checkout();
+
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    $decoded_uri = rawurldecode($request_uri);
+    $needles = ['/checkout', '/payment', '/الدفع'];
+    $is_checkout_like_url = false;
+
+    foreach ($needles as $needle) {
+        if (strpos($request_uri, $needle) !== false || strpos($decoded_uri, $needle) !== false) {
+            $is_checkout_like_url = true;
+            break;
+        }
+    }
+
+    if (!$is_checkout_page && !$is_checkout_like_url) {
         return false;
     }
 

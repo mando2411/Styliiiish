@@ -881,7 +881,7 @@ if (!function_exists('shopire_styliiiish_dequeue_checkout_theme_scripts')) {
 			return;
 		}
 
-		if (!function_exists('is_checkout') || !is_checkout()) {
+		if (!function_exists('shopire_styliiiish_is_checkout_like_request') || !shopire_styliiiish_is_checkout_like_request()) {
 			return;
 		}
 
