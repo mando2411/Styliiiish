@@ -1982,7 +1982,7 @@
 
         .thumb {
             width: 100%;
-            aspect-ratio: 3/4;
+            aspect-ratio: 4/5;
             object-fit: cover;
             background: #f2f2f5;
             transition: .35s ease;
@@ -2031,10 +2031,10 @@
         }
 
         .content {
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 7px;
         }
 
         .name {
