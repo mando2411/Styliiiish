@@ -17,6 +17,11 @@ function ekart_theme_setup(){
 }
 add_action( 'after_setup_theme', 'ekart_theme_setup' );
 
+function ekart_disable_shopire_preloader() {
+	remove_action( 'shopire_site_preloader', 'shopire_site_preloader' );
+}
+add_action( 'after_setup_theme', 'ekart_disable_shopire_preloader', 20 );
+
 /**
  * Load assets.
  */
