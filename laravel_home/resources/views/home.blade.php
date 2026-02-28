@@ -3993,6 +3993,7 @@
             let currentCartCount = 0;
             let wishlistItemsCache = [];
             let cartPayloadCache = null;
+            const analyticsCurrency = 'EGP';
 
             const updateBodyScrollLock = () => {
                 const isMiniCartOpen = !!(miniCart && miniCart.classList.contains('is-open'));
@@ -4031,6 +4032,47 @@
                     return items.reduce((total, item) => total + Math.max(0, Number(item.qty || 0)), 0);
                 }
                 return Math.max(0, Number(payload.count || 0));
+            };
+
+            const parseNumericPrice = (value) => {
+                const numeric = Number.parseFloat(String(value || '').replace(/[^\d.-]/g, ''));
+                return Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
+            };
+
+            const buildEcommerceItemsFromPayload = (payload) => {
+                const items = Array.isArray(payload?.items) ? payload.items : [];
+                return items.map((item, index) => {
+                    const unitPrice = parseNumericPrice(item?.price_html || item?.line_total_html || '');
+                    const quantity = Math.max(1, Number(item?.qty) || 1);
+
+                    return {
+                        item_id: String(item?.product_id || item?.id || item?.key || `cart_item_${index + 1}`),
+                        item_name: String(item?.name || `Product ${index + 1}`),
+                        price: unitPrice > 0 ? unitPrice : undefined,
+                        quantity,
+                    };
+                });
+            };
+
+            const trackBeginCheckout = () => {
+                if (typeof window.styliiiishTrackEvent !== 'function') {
+                    return;
+                }
+
+                const payload = cartPayloadCache || {};
+                const items = buildEcommerceItemsFromPayload(payload);
+                const value = parseNumericPrice(payload?.total_html || payload?.subtotal_html || '');
+
+                const eventPayload = {
+                    currency: analyticsCurrency,
+                    items,
+                };
+
+                if (value > 0) {
+                    eventPayload.value = value;
+                }
+
+                window.styliiiishTrackEvent('begin_checkout', eventPayload);
             };
 
             const animatePlusOne = (node) => {
@@ -4246,6 +4288,12 @@
 
             if (miniCartClosers.length > 0) {
                 miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
+            }
+
+            if (miniCartCheckout) {
+                miniCartCheckout.addEventListener('click', () => {
+                    trackBeginCheckout();
+                });
             }
 
             if (accountLoginTrigger) {

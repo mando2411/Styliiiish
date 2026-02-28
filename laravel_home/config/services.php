@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'analytics' => [
+        'ga4_measurement_id' => env('GA4_MEASUREMENT_ID'),
+        'google_ads_tag_id' => env('GOOGLE_ADS_TAG_ID'),
+    ],
+
 ];

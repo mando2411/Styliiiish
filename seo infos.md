@@ -15,6 +15,42 @@
   - `preconnect` + `dns-prefetch`
   - `JSON-LD` (`WebPage` + `WebSite`)
 
+## Analytics / Ads Tracking (Laravel + WordPress)
+
+- WordPress pages: continue to be tracked by Site Kit as-is.
+- Laravel pages: now include global `gtag` injection from shared partial:
+  - `laravel_home/resources/views/partials/shared-seo-meta.blade.php`
+- Environment configuration:
+  - `GA4_MEASUREMENT_ID=G-XXXXXXXXXX`
+  - `GOOGLE_ADS_TAG_ID=AW-XXXXXXXXX`
+- Config mapping:
+  - `laravel_home/config/services.php` → `services.analytics.ga4_measurement_id`
+  - `laravel_home/config/services.php` → `services.analytics.google_ads_tag_id`
+
+### E-commerce Events (Implemented)
+
+- `add_to_cart`:
+  - Fired on successful AJAX add-to-cart from product page.
+  - File: `laravel_home/resources/views/product-single.blade.php`
+- `begin_checkout`:
+  - Fired on checkout click from cart page CTA.
+  - File: `laravel_home/resources/views/cart.blade.php`
+  - Fired on checkout click from mini-cart (shared header).
+  - File: `laravel_home/resources/views/partials/shared-home-header-interactions.blade.php`
+  - Fired on checkout click from home-page custom mini-cart.
+  - File: `laravel_home/resources/views/home.blade.php`
+- `purchase`:
+  - Global helper is available as `window.styliiiishTrackPurchase(payload)`.
+  - Auto-deduplicates by `transaction_id` in `sessionStorage`.
+  - WordPress thank-you flow can keep using existing tracking, or call helper if purchase is rendered in Laravel.
+
+### Google Ads Conversion Import
+
+1. In GA4, mark key events as conversions (`purchase`, optionally `begin_checkout`/`add_to_cart` if needed).
+2. In Google Ads: `Tools & Settings` → `Conversions` → `New conversion action` → `Import` → `Google Analytics 4 properties`.
+3. Select the GA4 conversion event(s) and complete import.
+4. Wait for data sync (usually up to 24h) and verify status becomes recording.
+
 ## URL Map + SEO Source
 
 | Page | AR URL | EN URL | Meta Title Source | Meta Description Source | Canonical Source |

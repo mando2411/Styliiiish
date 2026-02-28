@@ -65,6 +65,10 @@
         'https://g.page/styliish',
         'https://wa.me/201050874255',
     ];
+
+    $ga4MeasurementId = trim((string) config('services.analytics.ga4_measurement_id', ''));
+    $googleAdsTagId = trim((string) config('services.analytics.google_ads_tag_id', ''));
+    $trackingTagId = $ga4MeasurementId !== '' ? $ga4MeasurementId : $googleAdsTagId;
 @endphp
 <meta name="keywords" content="{{ $seoKeywordsValue }}">
 <meta name="author" content="Styliiiish">
@@ -75,6 +79,60 @@
 <meta name="theme-color" content="#d51522">
 <link rel="preconnect" href="https://styliiiish.com" crossorigin>
 <link rel="dns-prefetch" href="//styliiiish.com">
+@if($trackingTagId !== '')
+<script async src="https://www.googletagmanager.com/gtag/js?id={{ urlencode($trackingTagId) }}"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = window.gtag || gtag;
+
+    gtag('js', new Date());
+
+    @if($ga4MeasurementId !== '')
+    gtag('config', @json($ga4MeasurementId), {
+        send_page_view: true,
+    });
+    @endif
+
+    @if($googleAdsTagId !== '')
+    gtag('config', @json($googleAdsTagId));
+    @endif
+
+    window.styliiiishTrackEvent = function(eventName, payload) {
+        if (!eventName || typeof window.gtag !== 'function') {
+            return;
+        }
+
+        const eventPayload = payload && typeof payload === 'object' ? payload : {};
+        window.gtag('event', eventName, eventPayload);
+    };
+
+    window.styliiiishTrackPurchase = function(payload) {
+        if (!payload || typeof payload !== 'object') {
+            return;
+        }
+
+        const transactionId = String(payload.transaction_id || '').trim();
+        if (!transactionId) {
+            return;
+        }
+
+        const dedupeKey = 'styliiiish_purchase_' + transactionId;
+        if (window.sessionStorage && window.sessionStorage.getItem(dedupeKey)) {
+            return;
+        }
+
+        window.styliiiishTrackEvent('purchase', payload);
+        if (window.sessionStorage) {
+            window.sessionStorage.setItem(dedupeKey, '1');
+        }
+    };
+
+    if (window.styliiiishPendingPurchasePayload && typeof window.styliiiishPendingPurchasePayload === 'object') {
+        window.styliiiishTrackPurchase(window.styliiiishPendingPurchasePayload);
+    }
+</script>
+@endif
 <script type="application/ld+json">
 {!! json_encode([
     '@context' => 'https://schema.org',

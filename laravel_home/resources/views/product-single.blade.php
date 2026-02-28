@@ -1676,6 +1676,10 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             const productSlug = @json($productSlugForRoutes);
             const productId = Number(@json((int) ($product->ID ?? 0))) || 0;
+            const productName = @json((string) ($product->post_title ?? ''));
+            const productSku = @json((string) ($product->sku ?? ''));
+            const productCategoryNames = @json(($productCategoryNames ?? collect())->values()->all());
+            const analyticsCurrency = 'EGP';
             const previewQueryString = @json($previewQueryString);
             const wishlistPageUrl = @json($wishlistPageUrl);
 
@@ -1961,6 +1965,103 @@
             const formatMoney = (amount) => {
                 const value = Number(amount) || 0;
                 return `${Math.round(value).toLocaleString()} ${currencyText}`;
+            };
+
+            const parseNumericPrice = (value) => {
+                const numeric = Number.parseFloat(String(value ?? '').replace(/[^\d.-]/g, ''));
+                return Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
+            };
+
+            const getSelectedVariantLabel = () => {
+                if (!selectorsWrap) return '';
+
+                const selected = getSelected();
+                const labels = [];
+
+                Object.entries(selected).forEach(([attributeKey, attributeValue]) => {
+                    if (!attributeValue) return;
+
+                    const optionNode = selectorsWrap.querySelector(`button[data-attribute-key="${CSS.escape(attributeKey)}"][data-option-value="${CSS.escape(attributeValue)}"]`);
+                    const optionLabelNode = optionNode ? optionNode.querySelector('span:last-child') : null;
+                    const optionLabel = (optionLabelNode ? optionLabelNode.textContent : optionNode?.textContent || '').trim();
+                    labels.push(optionLabel || attributeValue);
+                });
+
+                return labels.join(' / ');
+            };
+
+            const buildEcommerceItemsFromCartPayload = (payload) => {
+                const items = Array.isArray(payload?.items) ? payload.items : [];
+
+                return items.map((item, index) => {
+                    const unitPrice = parseNumericPrice(item?.price_html ?? item?.line_total_html ?? '');
+                    const quantity = Math.max(1, Number(item?.qty) || 1);
+
+                    return {
+                        item_id: String(item?.product_id || item?.id || item?.key || `cart_item_${index + 1}`),
+                        item_name: String(item?.name || `Product ${index + 1}`),
+                        price: unitPrice > 0 ? unitPrice : undefined,
+                        quantity,
+                    };
+                });
+            };
+
+            const trackBeginCheckoutFromCartPayload = (payload) => {
+                if (typeof window.styliiiishTrackEvent !== 'function') {
+                    return;
+                }
+
+                const items = buildEcommerceItemsFromCartPayload(payload);
+                const value = parseNumericPrice(payload?.total_html ?? payload?.subtotal_html ?? '');
+                const eventPayload = {
+                    currency: analyticsCurrency,
+                    items,
+                };
+
+                if (value > 0) {
+                    eventPayload.value = value;
+                }
+
+                window.styliiiishTrackEvent('begin_checkout', eventPayload);
+            };
+
+            const trackAddToCartEvent = (rule = null) => {
+                if (typeof window.styliiiishTrackEvent !== 'function') {
+                    return;
+                }
+
+                const selectedVariant = getSelectedVariantLabel();
+                const quantity = Math.max(1, Number(addToCartForm?.querySelector('input[name="quantity"]')?.value) || 1);
+                const unitPrice = Number(rule?.price || 0) > 0 ? Number(rule.price) : basePrice;
+
+                const ecommerceItem = {
+                    item_id: productSku || String(productId || productSlug || 'product'),
+                    item_name: String(productName || 'Product'),
+                    price: unitPrice > 0 ? unitPrice : undefined,
+                    quantity,
+                };
+
+                if (selectedVariant) {
+                    ecommerceItem.item_variant = selectedVariant;
+                }
+
+                if (Array.isArray(productCategoryNames) && productCategoryNames.length > 0) {
+                    ecommerceItem.item_category = String(productCategoryNames[0] || '');
+                    if (productCategoryNames[1]) {
+                        ecommerceItem.item_category2 = String(productCategoryNames[1]);
+                    }
+                }
+
+                const eventPayload = {
+                    currency: analyticsCurrency,
+                    items: [ecommerceItem],
+                };
+
+                if (unitPrice > 0) {
+                    eventPayload.value = unitPrice * quantity;
+                }
+
+                window.styliiiishTrackEvent('add_to_cart', eventPayload);
             };
 
             const updateDisplayedPrice = (rule = null) => {
@@ -2617,6 +2718,8 @@
                 renderMiniCart(result.data);
                 animatePlusOne();
                 helpText.textContent = addedToCartText;
+                const selectedRule = variationRules.find((rule) => String(rule.variation_id || 0) === String(variationIdInput?.value || '0')) || null;
+                trackAddToCartEvent(selectedRule);
                 openMiniCart();
             };
 
@@ -2773,6 +2876,12 @@
 
             if (miniCartClosers.length > 0) {
                 miniCartClosers.forEach((node) => node.addEventListener('click', closeMiniCart));
+            }
+
+            if (miniCartCheckout) {
+                miniCartCheckout.addEventListener('click', () => {
+                    trackBeginCheckoutFromCartPayload(cartPayloadCache || {});
+                });
             }
 
             if (miniCartList) {
