@@ -110,3 +110,15 @@
   - Add primary feed URL (`merchant-feed.xml`) and schedule daily fetch.
   - Fix disapproved items (price mismatch, availability mismatch, image quality).
 5. Recheck Core Web Vitals + mobile usability weekly.
+
+## Lighthouse Performance Fixes (Feb 2026)
+
+- Reduced oversized footer logo payload:
+  - Switched footer logo rendering to smaller generated image variant (`300x128`) with `srcset` (`1x/2x`) and safe fallback.
+- Improved home product image delivery:
+  - Home cards now request a lighter WordPress size variant first (`-768x1024`) with graceful fallback to original image.
+  - Added explicit `width/height`, `sizes`, and `decoding="async"` to stabilize rendering and reduce transfer cost.
+- Removed forced reflow source in header interactions:
+  - Replaced `offsetWidth` animation reset with `requestAnimationFrame` sequence.
+- Reduced critical request chaining on initial load:
+  - Deferred non-critical `cart summary` and `wishlist count` requests to idle/load phase instead of immediate execution.

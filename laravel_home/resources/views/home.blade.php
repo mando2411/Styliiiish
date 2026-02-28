@@ -3397,6 +3397,10 @@
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
                         $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+                        $optimizedImage = $image;
+                        if (str_contains((string) $image, '/wp-content/uploads/')) {
+                            $optimizedImage = (string) preg_replace('/\.(jpe?g|png|webp)(\?.*)?$/i', '-768x1024.$1$2', (string) $image);
+                        }
                         $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
                         $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                         $primaryBadgeClass = $isMarketplace ? 'badge-marketplace' : 'badge-brand';
@@ -3404,7 +3408,7 @@
 
                     <article class="card">
                         <div class="product-media">
-                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy">
+                            <img class="thumb" src="{{ $optimizedImage }}" alt="{{ $product->post_title }}" width="600" height="800" sizes="(max-width: 640px) 48vw, (max-width: 900px) 31vw, 23vw" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ $image }}';">
                             <div class="card-badges">
                                 <span class="badge-chip {{ $primaryBadgeClass }}">{{ $primaryBadge }}</span>
                                 @if($isSale)

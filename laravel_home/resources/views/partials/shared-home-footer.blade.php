@@ -3,7 +3,9 @@
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
     $localePrefix = $localePrefix ?? ($isEnglish ? '/en' : '/ar');
     $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
-    $wpLogo = $wpLogo ?? ($wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
+    $wpLogo = $wpLogo ?? ($wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547-300x128.png');
+    $wpLogo2x = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547-600x255.png';
+    $wpLogoOriginal = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish
         ? ($wpBaseUrl . '/my-account/')
         : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
@@ -27,7 +29,7 @@
 <footer class="site-footer">
     <div class="container footer-grid">
         <div class="footer-brand">
-            <img class="footer-brand-logo" src="{{ $wpLogo }}" alt="Styliiiish" onerror="this.onerror=null;this.src='/brand/logo.png';">
+            <img class="footer-brand-logo" src="{{ $wpLogo }}" srcset="{{ $wpLogo }} 1x, {{ $wpLogo2x }} 2x" sizes="156px" width="156" height="66" loading="lazy" decoding="async" alt="Styliiiish" onerror="this.onerror=null;this.src='{{ $wpLogoOriginal }}';">
             <h4>{{ $ft('footer_title', 'ستيليش فاشون هاوس', 'Styliiiish Fashion House') }}</h4>
             <p>{{ $ft('footer_desc', 'نعمل بشغف على تقديم أحدث تصاميم الفساتين لتناسب كل مناسبة خاصة بك.', 'We are passionate about offering the latest dress designs for every special occasion.') }}</p>
             <p class="footer-status">

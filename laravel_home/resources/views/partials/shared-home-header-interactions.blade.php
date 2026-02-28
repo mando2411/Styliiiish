@@ -279,8 +279,11 @@
         const animatePlusOne = (node) => {
             if (!node) return;
             node.classList.remove('show');
-            void node.offsetWidth;
-            node.classList.add('show');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    node.classList.add('show');
+                });
+            });
         };
 
         const parseAccountSummary = (doc) => {
@@ -608,9 +611,27 @@
             if (accountMenu?.classList.contains('is-open')) closeAccountMenu();
         });
 
-        setCartCount(0);
-        getCartSummary().catch(() => setCartCount(0));
-        setWishlistCount(0);
-        refreshWishlistCount(false).catch(() => {});
+        const runDeferredHeaderRequests = () => {
+            setCartCount(0);
+            setWishlistCount(0);
+
+            const execute = () => {
+                getCartSummary().catch(() => setCartCount(0));
+                refreshWishlistCount(false).catch(() => {});
+            };
+
+            if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(execute, { timeout: 2500 });
+                return;
+            }
+
+            setTimeout(execute, 1600);
+        };
+
+        if (document.readyState === 'complete') {
+            runDeferredHeaderRequests();
+        } else {
+            window.addEventListener('load', runDeferredHeaderRequests, { once: true });
+        }
     })();
 </script>
