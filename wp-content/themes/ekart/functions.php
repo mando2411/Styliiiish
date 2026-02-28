@@ -252,8 +252,37 @@ function ekart_rewrite_legacy_assets_host_for_account_pages() {
 }
 add_action( 'template_redirect', 'ekart_rewrite_legacy_assets_host_for_account_pages', 2 );
 
+function ekart_should_inject_no_translation_guard_script() {
+	if ( is_admin() || wp_doing_ajax() ) {
+		return false;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? rawurldecode( strtolower( rtrim( $request_path, '/' ) ) ) : '/';
+
+	$is_arabic_request = str_starts_with( $request_path, '/ar' ) || str_contains( $request_path, '/حسابي' ) || str_contains( $request_path, '/الدفع' );
+	if ( ! $is_arabic_request ) {
+		return false;
+	}
+
+	if ( function_exists( 'is_checkout' ) && is_checkout() ) {
+		return true;
+	}
+
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		return true;
+	}
+
+	return str_contains( $request_path, '/checkout' )
+		|| str_contains( $request_path, '/payment' )
+		|| str_contains( $request_path, '/my-account' )
+		|| str_contains( $request_path, '/حسابي' )
+		|| str_contains( $request_path, '/الدفع' );
+}
+
 function ekart_output_no_translation_guard_script() {
-	if ( is_admin() ) {
+	if ( ! ekart_should_inject_no_translation_guard_script() ) {
 		return;
 	}
 	?>
