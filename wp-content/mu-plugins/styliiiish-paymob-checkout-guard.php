@@ -87,6 +87,14 @@ function styliiiish_paymob_guard_is_enabled(): bool {
     return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
 }
 
+add_action('send_headers', function () {
+    if (!styliiiish_is_checkout_like_request()) {
+        return;
+    }
+
+    header('Permissions-Policy: payment=(self "https://accept.paymob.com" "https://pay.google.com")', true);
+}, 30);
+
 add_action('wp_print_styles', function () {
     global $wp_styles;
 
@@ -257,6 +265,57 @@ JS;
     let lastUpdateSignatureAt = 0;
     let loaderTimer = null;
     let activeUpdateXhr = null;
+
+    function enforceIframePaymentPermission(scope) {
+        const root = scope && scope.querySelectorAll ? scope : document;
+        const nodes = root.querySelectorAll
+            ? root.querySelectorAll('iframe[src*="accept.paymob.com"], iframe[src*="unifiedcheckout"], iframe[name*="paymob"]')
+            : [];
+
+        nodes.forEach(function (frame) {
+            const currentAllow = String(frame.getAttribute('allow') || '').trim();
+            if (currentAllow.indexOf('payment') === -1) {
+                frame.setAttribute('allow', (currentAllow ? currentAllow + '; ' : '') + 'payment *');
+            }
+        });
+    }
+
+    enforceIframePaymentPermission(document);
+
+    if (window.MutationObserver) {
+        const iframeObserver = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (!mutation.addedNodes || !mutation.addedNodes.length) {
+                    return;
+                }
+
+                mutation.addedNodes.forEach(function (node) {
+                    if (!node || node.nodeType !== 1) {
+                        return;
+                    }
+
+                    if (node.tagName === 'IFRAME') {
+                        enforceIframePaymentPermission(node.parentNode || document);
+                        return;
+                    }
+
+                    enforceIframePaymentPermission(node);
+                });
+            });
+        });
+
+        iframeObserver.observe(document.documentElement || document.body, {
+            childList: true,
+            subtree: true
+        });
+
+        window.setTimeout(function () {
+            try {
+                iframeObserver.disconnect();
+            } catch (error) {
+            }
+        }, 20000);
+    }
 
     function isPaymobSelected() {
         const block = document.querySelector('input[name="radio-control-wc-payment-method-options"][value="paymob-pixel"]');
