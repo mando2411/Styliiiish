@@ -111,6 +111,40 @@ add_action('wp_enqueue_scripts', function () {
     } catch (error) {
     }
 
+    function disableGooglePayForPaymob() {
+        try {
+            if (typeof window.pxl_object === 'object' && window.pxl_object !== null) {
+                window.pxl_object.googleenabled = 0;
+            }
+            window.googleenabled = 0;
+        } catch (error) {
+        }
+    }
+
+    disableGooglePayForPaymob();
+
+    const disableGooglePayInterval = window.setInterval(function () {
+        disableGooglePayForPaymob();
+    }, 300);
+
+    window.setTimeout(function () {
+        window.clearInterval(disableGooglePayInterval);
+    }, 15000);
+
+    const nativeAppendChild = Element.prototype.appendChild;
+    Element.prototype.appendChild = function (node) {
+        try {
+            if (node && node.tagName === 'SCRIPT') {
+                const src = String(node.src || '');
+                if (src.indexOf('pay.google.com/gp/p/js/pay.js') !== -1) {
+                    return node;
+                }
+            }
+        } catch (error) {
+        }
+        return nativeAppendChild.call(this, node);
+    };
+
     // Fix missing global used by paymob-pixel_block.js logs/comparisons.
     if (typeof window.previousTotalBlock === 'undefined') {
         window.previousTotalBlock = null;
