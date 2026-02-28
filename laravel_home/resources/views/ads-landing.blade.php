@@ -315,7 +315,7 @@
         .ads-products .product-media { position: relative; }
         .ads-products .thumb {
             width: 100%;
-            aspect-ratio: 4/5;
+            aspect-ratio: 1/1;
             object-fit: cover;
             background: #f2f2f5;
             transition: .35s ease;
