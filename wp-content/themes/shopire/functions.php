@@ -179,8 +179,8 @@ function shopire_scripts() {
 	// Shopire WooCommerce
 	wp_enqueue_style('shopire-woocommerce',get_template_directory_uri().'/assets/css/woo-styles.css');
 	
-	// Shopire Style
-	wp_enqueue_style( 'shopire-style', get_stylesheet_uri() );
+	// Shopire Style (parent theme stylesheet)
+	wp_enqueue_style( 'shopire-style', get_template_directory_uri() . '/style.css' );
 	
 	// Scripts
 	wp_enqueue_script( 'jquery' );
