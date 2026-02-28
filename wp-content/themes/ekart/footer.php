@@ -7,8 +7,8 @@
 	if ($normalized_path === '') {
 		$normalized_path = '/';
 	}
-	$is_english = (preg_match('#^/en(?:/|$)#i', $request_path) === 1) || ($normalized_path === '/my-account');
-	$locale_prefix = $is_english ? '/en' : '/ar';
+	$is_english = preg_match('#^/ar(?:/|$)#i', $request_path) !== 1;
+	$locale_prefix = $is_english ? '' : '/ar';
 	$wp_base_url = rtrim((string) get_option('home'), '/');
 	if ($wp_base_url === '') {
 		$wp_base_url = rtrim(home_url('/'), '/');
