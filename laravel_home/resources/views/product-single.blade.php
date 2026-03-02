@@ -1671,6 +1671,7 @@
             const tabLoadingText = @json($t('tab_loading'));
             const tabLoadFailedText = @json($t('tab_load_failed'));
             const leaveReviewText = @json($t('leave_review'));
+            const wishlistFallbackImage = @json($placeholderImage);
             const adminAjaxUrl = @json($wpBaseUrl . '/wp-admin/admin-ajax.php');
             const wpCheckoutUrl = @json($wpCheckoutUrl);
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -1863,13 +1864,14 @@
                 }
 
                 wishlistDropdownList.innerHTML = safeItems.map((item) => {
-                    const image = String(item.image || '').trim();
+                    const fallbackImage = String(wishlistFallbackImage || '').trim();
+                    const image = String(item.image || '').trim() || fallbackImage;
                     const name = String(item.name || '').trim();
                     const url = String(item.url || '#').trim();
 
                     return `
                         <article class="wishlist-dropdown-item">
-                            <a href="${url}"><img src="${image}" alt="${name}"></a>
+                            <a href="${url}"><img src="${image}" alt="${name}" onerror="this.onerror=null;this.src='${fallbackImage}';"></a>
                             <div>
                                 <h4 class="wishlist-dropdown-name">${name}</h4>
                                 <a class="wishlist-dropdown-link" href="${url}">${goToProductText}</a>
