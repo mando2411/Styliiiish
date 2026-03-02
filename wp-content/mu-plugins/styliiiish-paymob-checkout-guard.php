@@ -87,6 +87,76 @@ function styliiiish_paymob_guard_is_enabled(): bool {
     return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
 }
 
+add_action('template_redirect', function () {
+    if (is_admin() || (function_exists('wp_doing_ajax') && wp_doing_ajax())) {
+        return;
+    }
+
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    if ($request_uri === '') {
+        return;
+    }
+
+    $request_path = (string) parse_url($request_uri, PHP_URL_PATH);
+    $decoded_path = trim(rawurldecode($request_path), '/');
+    if ($decoded_path === '' || strpos($decoded_path, 'order-received') !== false) {
+        return;
+    }
+
+    $prefixes = [
+        'ar/الدفع',
+        'الدفع',
+        'en/payment',
+        'payment',
+    ];
+
+    $matched_prefix = null;
+    foreach ($prefixes as $prefix) {
+        if ($decoded_path === $prefix || strpos($decoded_path, $prefix . '/') === 0) {
+            $matched_prefix = $prefix;
+            break;
+        }
+    }
+
+    if ($matched_prefix === null) {
+        return;
+    }
+
+    $tail = ltrim((string) substr($decoded_path, strlen($matched_prefix)), '/');
+    if ($tail === '') {
+        return;
+    }
+
+    $parts = array_values(array_filter(explode('/', $tail), static function ($part) {
+        return $part !== '';
+    }));
+
+    if (empty($parts)) {
+        return;
+    }
+
+    $endpoint_aliases = [
+        'تم-استلام-الطلب' => 'order-received',
+        'تم-استلام-طلبك' => 'order-received',
+        'thank-you' => 'order-received',
+    ];
+
+    $first_part = rawurldecode((string) $parts[0]);
+    if (!isset($endpoint_aliases[$first_part])) {
+        return;
+    }
+
+    $parts[0] = $endpoint_aliases[$first_part];
+    $target = home_url('/checkout/' . implode('/', $parts) . '/');
+
+    if (!empty($_GET) && is_array($_GET)) {
+        $target = add_query_arg(wp_unslash($_GET), $target);
+    }
+
+    wp_safe_redirect($target, 302);
+    exit;
+}, 0);
+
 add_action('send_headers', function () {
     if (!styliiiish_is_checkout_like_request()) {
         return;
