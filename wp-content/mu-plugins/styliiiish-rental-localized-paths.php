@@ -17,11 +17,11 @@ if (!function_exists('styliiiish_rental_localized_locale')) {
             return null;
         }
 
-        if ($path === 'ar/dress-rental-in-cairo') {
+        if (in_array($path, ['ar/dress-rental-in-cairo', 'ar/تأجير-فساتين-في-القاهرة'], true)) {
             return 'ar';
         }
 
-        if ($path === 'en/dress-rental-in-cairo') {
+        if (in_array($path, ['en/dress-rental-in-cairo', 'dress-rental-in-cairo'], true)) {
             return 'en';
         }
 

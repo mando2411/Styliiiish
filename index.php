@@ -17,8 +17,28 @@ if (in_array($path, ['/ar/حسابي/customer-logout', '/ara/حسابي/customer
     exit;
 }
 
+// Always serve favicon from known files before any framework routing.
+if ($path === '/favicon.ico') {
+    $favicon_candidates = [
+        __DIR__ . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png',
+        __DIR__ . '/laravel_home/public/favicon.ico',
+        __DIR__ . '/laravel_home/public/brand/icons.png',
+    ];
+
+    foreach ($favicon_candidates as $candidate) {
+        if (is_file($candidate)) {
+            $ext = strtolower(pathinfo($candidate, PATHINFO_EXTENSION));
+            $mime = $ext === 'ico' ? 'image/x-icon' : ($ext === 'png' ? 'image/png' : 'application/octet-stream');
+            header('Content-Type: ' . $mime);
+            header('Cache-Control: public, max-age=604800');
+            readfile($candidate);
+            exit;
+        }
+    }
+}
+
 // Keep rental landing bilingual under WordPress + TranslatePress context.
-if (in_array($path, ['/ar/dress-rental-in-cairo', '/ar/dress-rental-in-cairo/'], true)) {
+if (in_array($path, ['/ar/dress-rental-in-cairo', '/ar/dress-rental-in-cairo/', '/ar/تأجير-فساتين-في-القاهرة', '/ar/تأجير-فساتين-في-القاهرة/'], true)) {
     setcookie('trp_language', 'ar', [
         'expires' => time() + (30 * 24 * 60 * 60),
         'path' => '/',
@@ -180,6 +200,8 @@ $wordpress_exact_routes = [
     '/dress-rental-in-cairo/',
     '/ar/dress-rental-in-cairo',
     '/ar/dress-rental-in-cairo/',
+    '/ar/تأجير-فساتين-في-القاهرة',
+    '/ar/تأجير-فساتين-في-القاهرة/',
     '/en/dress-rental-in-cairo',
     '/en/dress-rental-in-cairo/',
     '/ar/الدفع',
@@ -213,6 +235,7 @@ $wordpress_exact_routes = [
 $wordpress_prefix_routes = [
     '/dress-rental-in-cairo/',
     '/ar/dress-rental-in-cairo/',
+    '/ar/تأجير-فساتين-في-القاهرة/',
     '/en/dress-rental-in-cairo/',
     '/ar/wp-json/',
     '/en/wp-json/',
