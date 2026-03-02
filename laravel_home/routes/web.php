@@ -4825,6 +4825,12 @@ Route::get('/en/my-account/', fn (Request $request) => $accountHandler($request,
 Route::get('/my-account', fn (Request $request) => $accountHandler($request, 'en'));
 Route::get('/my-account/', fn (Request $request) => $accountHandler($request, 'en'));
 
+Route::get('/ar/dress-rental-in-cairo', function (Request $request) {
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    return redirect()->away($wpBaseUrl . '/dress-rental-in-cairo/', 302)
+        ->cookie('trp_language', 'ar', 60 * 24 * 30, '/');
+});
+
 $checkoutRedirectHandler = function (Request $request, ?string $endpoint = null, ?string $orderId = null) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     $requestPath = trim((string) $request->path(), '/');

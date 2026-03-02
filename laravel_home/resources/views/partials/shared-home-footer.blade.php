@@ -52,6 +52,7 @@
                 <li><a href="{{ $localePrefix }}/shop">{{ $ft('nav_shop', 'المتجر', 'Shop') }}</a></li>
                 <li><a href="{{ $localePrefix }}/marketplace">{{ $ft('nav_marketplace', 'الماركت بليس', 'Marketplace') }}</a></li>
                 <li><a href="{{ $localePrefix }}/categories">{{ $ft('categories', 'الأقسام', 'Categories') }}</a></li>
+                <li><a href="{{ $isEnglish ? ($wpBaseUrl . '/dress-rental-in-cairo/') : ($wpBaseUrl . '/ar/dress-rental-in-cairo/') }}">{{ $ft('nav_rental', 'قسم الإيجار', 'Rental Section') }}</a></li>
                 <li><a href="https://styliiiish.com/my-dresses/" target="_blank" rel="noopener">{{ $ft('nav_sell', 'بيعي فستانك', 'Sell Your Dress') }}</a></li>
                 <li><a href="{{ $wpLocalizedAccountUrl }}" target="_blank" rel="noopener">{{ $ft('account', 'حسابي', 'My Account') }}</a></li>
             </ul>
