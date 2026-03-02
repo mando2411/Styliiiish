@@ -81,6 +81,7 @@
 <link rel="preconnect" href="https://styliiiish.com" crossorigin>
 <link rel="dns-prefetch" href="//styliiiish.com">
 @if($gtmContainerId !== '')
+<!-- Google Tag Manager -->
 <script>
     (function(w,d,s,l,i){
         w[l]=w[l]||[];
@@ -89,10 +90,11 @@
             j=d.createElement(s),
             dl=l!=='dataLayer'?'&l='+l:'';
         j.async=true;
-        j.src='https://www.googletagmanager.com/gtm.js?id='+encodeURIComponent(i)+dl;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
         f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer',@json($gtmContainerId));
 </script>
+<!-- End Google Tag Manager -->
 @endif
 @if($trackingTagId !== '')
 <script async src="https://www.googletagmanager.com/gtag/js?id={{ urlencode($trackingTagId) }}"></script>
