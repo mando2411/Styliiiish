@@ -149,6 +149,23 @@ add_action('template_redirect', function () {
     $parts[0] = $endpoint_aliases[$first_part];
     $target = home_url('/checkout/' . implode('/', $parts) . '/');
 
+    $preferredLocale = null;
+    if (strpos($matched_prefix, 'en/') === 0 || $matched_prefix === 'en/payment') {
+        $preferredLocale = 'en';
+    } else {
+        $preferredLocale = 'ar';
+    }
+
+    if (!headers_sent()) {
+        setcookie('trp_language', $preferredLocale, [
+            'expires' => time() + (30 * DAY_IN_SECONDS),
+            'path' => '/',
+            'secure' => is_ssl(),
+            'httponly' => false,
+            'samesite' => 'Lax',
+        ]);
+    }
+
     if (!empty($_GET) && is_array($_GET)) {
         $target = add_query_arg(wp_unslash($_GET), $target);
     }

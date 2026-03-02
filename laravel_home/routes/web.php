@@ -4827,6 +4827,7 @@ Route::get('/my-account/', fn (Request $request) => $accountHandler($request, 'e
 
 $checkoutRedirectHandler = function (Request $request, ?string $endpoint = null, ?string $orderId = null) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $requestPath = trim((string) $request->path(), '/');
 
     $endpointMap = [
         'تم-استلام-الطلب' => 'order-received',
@@ -4851,7 +4852,19 @@ $checkoutRedirectHandler = function (Request $request, ?string $endpoint = null,
         $targetUrl .= '?' . http_build_query($queryParams);
     }
 
-    return redirect()->away($targetUrl, 302);
+    $preferredLocale = null;
+    if (str_starts_with($requestPath, 'ar/') || $requestPath === 'الدفع' || str_starts_with($requestPath, 'الدفع/')) {
+        $preferredLocale = 'ar';
+    } elseif (str_starts_with($requestPath, 'en/')) {
+        $preferredLocale = 'en';
+    }
+
+    $response = redirect()->away($targetUrl, 302);
+    if ($preferredLocale !== null) {
+        return $response->cookie('trp_language', $preferredLocale, 60 * 24 * 30, '/');
+    }
+
+    return $response;
 };
 
 Route::get('/الدفع', fn (Request $request) => $checkoutRedirectHandler($request));
