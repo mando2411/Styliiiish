@@ -540,7 +540,10 @@
 
         .bottom-cta strong { font-size: 20px; }
         .bottom-cta p { margin: 4px 0 0; color: #d7e0ed; font-size: 14px; }
-        .bottom-cta .btn-light { min-width: 180px; }
+        .bottom-cta .btn-light {
+            min-width: 180px;
+            color: var(--secondary);
+        }
 
         .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
         .benefit-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
