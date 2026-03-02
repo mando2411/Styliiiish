@@ -17,6 +17,27 @@ if (in_array($path, ['/ar/حسابي/customer-logout', '/ara/حسابي/customer
     exit;
 }
 
+// Keep rental landing bilingual under WordPress + TranslatePress context.
+if (in_array($path, ['/ar/dress-rental-in-cairo', '/ar/dress-rental-in-cairo/'], true)) {
+    setcookie('trp_language', 'ar', [
+        'expires' => time() + (30 * 24 * 60 * 60),
+        'path' => '/',
+        'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ]);
+}
+
+if (in_array($path, ['/dress-rental-in-cairo', '/dress-rental-in-cairo/'], true)) {
+    setcookie('trp_language', 'en', [
+        'expires' => time() + (30 * 24 * 60 * 60),
+        'path' => '/',
+        'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+        'httponly' => false,
+        'samesite' => 'Lax',
+    ]);
+}
+
 // Fix localized static asset URLs like /ar/wp-content/... -> /wp-content/...
 if (preg_match('#^/(ar|en|ara)/wp-content/(.+)$#u', $request_uri, $matches)) {
     $normalized_asset_path = '/wp-content/' . $matches[2];
@@ -155,6 +176,12 @@ $laravel_prefix_routes = [
 
 // Routes that must stay on WordPress (e.g. translated plugin endpoints)
 $wordpress_exact_routes = [
+    '/dress-rental-in-cairo',
+    '/dress-rental-in-cairo/',
+    '/ar/dress-rental-in-cairo',
+    '/ar/dress-rental-in-cairo/',
+    '/en/dress-rental-in-cairo',
+    '/en/dress-rental-in-cairo/',
     '/ar/الدفع',
     '/ar/الدفع/',
     '/ara/الدفع',
@@ -184,6 +211,9 @@ $wordpress_exact_routes = [
 ];
 
 $wordpress_prefix_routes = [
+    '/dress-rental-in-cairo/',
+    '/ar/dress-rental-in-cairo/',
+    '/en/dress-rental-in-cairo/',
     '/ar/wp-json/',
     '/en/wp-json/',
     '/ara/wp-json/',
