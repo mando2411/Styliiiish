@@ -2858,7 +2858,110 @@ $wishlistBridgeCall = function (Request $request, array $payload): array {
     }
 };
 
-$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall) {
+$wishlistFallbackCookieName = 'styliiiish_wishlist_ids';
+$wishlistFallbackCookieMinutes = 60 * 24 * 180;
+
+$readWishlistFallbackIds = function (Request $request) use ($wishlistFallbackCookieName): array {
+    $raw = trim((string) $request->cookie($wishlistFallbackCookieName, ''));
+    if ($raw === '') {
+        return [];
+    }
+
+    $parts = preg_split('/[\s,]+/u', $raw) ?: [];
+
+    return collect($parts)
+        ->map(fn ($value) => (int) $value)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values()
+        ->all();
+};
+
+$attachWishlistFallbackCookie = function ($response, array $ids) use ($wishlistFallbackCookieName, $wishlistFallbackCookieMinutes) {
+    $normalized = collect($ids)
+        ->map(fn ($value) => (int) $value)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values()
+        ->all();
+
+    if (empty($normalized)) {
+        $response->withCookie(cookie()->forget($wishlistFallbackCookieName, '/'));
+        return $response;
+    }
+
+    $response->withCookie(cookie()->make(
+        $wishlistFallbackCookieName,
+        implode(',', $normalized),
+        $wishlistFallbackCookieMinutes,
+        '/',
+        null,
+        null,
+        false,
+        false,
+        'Lax'
+    ));
+
+    return $response;
+};
+
+$buildWishlistFallbackItems = function (array $ids, string $locale, int $limit = 8) use ($normalizeBrandByLocale): array {
+    $normalizedIds = collect($ids)
+        ->map(fn ($value) => (int) $value)
+        ->filter(fn ($id) => $id > 0)
+        ->unique()
+        ->values();
+
+    if ($normalizedIds->isEmpty()) {
+        return [];
+    }
+
+    $slicedIds = $normalizedIds->reverse()->take(max(1, min(20, $limit)))->values();
+
+    try {
+        $postsById = DB::table('wp_posts')
+            ->whereIn('ID', $slicedIds->all())
+            ->where('post_type', 'product')
+            ->where('post_status', 'publish')
+            ->select('ID', 'post_title', 'post_name')
+            ->get()
+            ->keyBy('ID');
+    } catch (\Throwable $exception) {
+        logger()->warning('Wishlist fallback items query failed', [
+            'locale' => $locale,
+            'error' => $exception->getMessage(),
+        ]);
+
+        return [];
+    }
+
+    $localePrefix = '/' . (in_array($locale, ['ar', 'en'], true) ? $locale : 'ar');
+    $placeholderImage = 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+
+    return $slicedIds->map(function ($id) use ($postsById, $localePrefix, $normalizeBrandByLocale, $locale, $placeholderImage) {
+        $post = $postsById->get((int) $id);
+        if (!$post) {
+            return null;
+        }
+
+        $slug = trim((string) ($post->post_name ?? ''));
+        if ($slug === '') {
+            return null;
+        }
+
+        $name = trim((string) ($post->post_title ?? ''));
+        $resolvedName = $normalizeBrandByLocale($name, $locale);
+
+        return [
+            'id' => (int) ($post->ID ?? 0),
+            'name' => $resolvedName,
+            'image' => $placeholderImage,
+            'url' => $localePrefix . '/item/' . rawurlencode($slug),
+        ];
+    })->filter(fn ($item) => is_array($item))->values()->all();
+};
+
+$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
@@ -2872,13 +2975,22 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
     ]);
 
     if (!$bridge['ok']) {
-        return response()->json([
-            'success' => false,
-            'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
+        $fallbackIds = $readWishlistFallbackIds($request);
+        $productId = (int) ($product->ID ?? 0);
+
+        if ($productId > 0 && !in_array($productId, $fallbackIds, true)) {
+            $fallbackIds[] = $productId;
+        }
+
+        $response = response()->json([
+            'success' => true,
+            'count' => count($fallbackIds),
             'message' => $currentLocale === 'en'
-                ? 'Wishlist service is temporarily unavailable.'
-                : 'خدمة المفضلة غير متاحة حالياً.',
+                ? 'Product added to wishlist.'
+                : 'تمت إضافة المنتج إلى المفضلة.',
         ]);
+
+        return $attachWishlistFallbackCookie($response, $fallbackIds);
     }
 
     $count = max(0, (int) ($bridge['json']['count'] ?? 0));
@@ -2897,7 +3009,7 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
     return $response;
 };
 
-$wishlistRemoveHandler = function (Request $request, int $id, string $locale = 'ar') use ($wishlistBridgeCall) {
+$wishlistRemoveHandler = function (Request $request, int $id, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $productId = max(0, (int) $id);
 
@@ -2914,13 +3026,18 @@ $wishlistRemoveHandler = function (Request $request, int $id, string $locale = '
     ]);
 
     if (!$bridge['ok']) {
-        return response()->json([
-            'success' => false,
-            'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
-            'message' => $currentLocale === 'en'
-                ? 'Unable to remove wishlist item.'
-                : 'تعذر حذف المنتج من المفضلة.',
+        $fallbackIds = collect($readWishlistFallbackIds($request))
+            ->filter(fn ($fallbackId) => (int) $fallbackId !== $productId)
+            ->values()
+            ->all();
+
+        $response = response()->json([
+            'success' => true,
+            'count' => count($fallbackIds),
+            'message' => $currentLocale === 'en' ? 'Item removed from wishlist.' : 'تم حذف المنتج من المفضلة.',
         ]);
+
+        return $attachWishlistFallbackCookie($response, $fallbackIds);
     }
 
     $response = response()->json([
@@ -2936,16 +3053,18 @@ $wishlistRemoveHandler = function (Request $request, int $id, string $locale = '
     return $response;
 };
 
-$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall) {
+$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'count',
     ]);
 
     if (!$bridge['ok']) {
+        $fallbackIds = $readWishlistFallbackIds($request);
+
         return response()->json([
             'success' => true,
-            'count' => 0,
+            'count' => count($fallbackIds),
             'message' => $currentLocale === 'en'
                 ? 'Wishlist count service is temporarily unavailable.'
                 : 'خدمة عداد المفضلة غير متاحة حالياً.',
@@ -2964,7 +3083,7 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
     return $response;
 };
 
-$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $resolveTranslatePressLanguageCodes) {
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $resolveTranslatePressLanguageCodes, $readWishlistFallbackIds, $buildWishlistFallbackItems) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'list',
@@ -2973,10 +3092,13 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
     ]);
 
     if (!$bridge['ok']) {
+        $fallbackIds = $readWishlistFallbackIds($request);
+        $fallbackItems = $buildWishlistFallbackItems($fallbackIds, $currentLocale, 8);
+
         return response()->json([
             'success' => true,
-            'count' => 0,
-            'items' => [],
+            'count' => count($fallbackIds),
+            'items' => $fallbackItems,
             'message' => $currentLocale === 'en'
                 ? 'Wishlist items service is temporarily unavailable.'
                 : 'خدمة عناصر المفضلة غير متاحة حالياً.',
