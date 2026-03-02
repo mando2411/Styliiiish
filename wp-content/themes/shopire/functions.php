@@ -418,25 +418,43 @@ add_action('template_redirect', function () {
 	}
 
 	$request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
-	$path = trim((string) parse_url($request_uri, PHP_URL_PATH), '/');
-	$decoded_path = trim(urldecode($path), '/');
+	$request_path = (string) parse_url($request_uri, PHP_URL_PATH);
+	$path = trim($request_path, '/');
+	$decoded_path = trim(rawurldecode($path), '/');
 
 	if ($decoded_path === '') {
 		return;
 	}
 
 	$aliases = [
-		'en/payment' => '/checkout/',
-		'payment' => '/checkout/',
+		'en/payment' => 'checkout',
+		'payment' => 'checkout',
+		'ar/الدفع' => 'checkout',
+		'الدفع' => 'checkout',
 	];
 
-	$target_path = $aliases[$decoded_path] ?? null;
+	$target_path = null;
+	foreach ($aliases as $source_prefix => $target_prefix) {
+		if ($decoded_path !== $source_prefix && strpos($decoded_path, $source_prefix . '/') !== 0) {
+			continue;
+		}
+
+		$tail = ltrim((string) substr($decoded_path, strlen($source_prefix)), '/');
+		$rebuilt_path = trim($target_prefix . ($tail !== '' ? '/' . $tail : ''), '/');
+		$target_path = '/' . $rebuilt_path . '/';
+		break;
+	}
+
 	if (!$target_path) {
 		return;
 	}
 
-	$current_path = '/' . ltrim((string) parse_url($request_uri, PHP_URL_PATH), '/');
+	$current_path = '/' . ltrim($request_path, '/');
 	$target_url = home_url($target_path);
+	if (!empty($_GET) && is_array($_GET)) {
+		$target_url = add_query_arg(wp_unslash($_GET), $target_url);
+	}
+
 	$target_only_path = (string) parse_url($target_url, PHP_URL_PATH);
 	if (untrailingslashit(rawurldecode($current_path)) === untrailingslashit(rawurldecode($target_only_path))) {
 		return;
