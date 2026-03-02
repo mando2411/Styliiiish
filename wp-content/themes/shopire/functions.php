@@ -440,6 +440,26 @@ add_action('template_redirect', function () {
 		}
 
 		$tail = ltrim((string) substr($decoded_path, strlen($source_prefix)), '/');
+		if ($tail !== '') {
+			$tail_parts = array_values(array_filter(explode('/', $tail), static function ($part) {
+				return $part !== '';
+			}));
+
+			if (!empty($tail_parts)) {
+				$endpoint_aliases = [
+					'تم-استلام-الطلب' => 'order-received',
+					'تم-استلام-طلبك' => 'order-received',
+					'order-received' => 'order-received',
+				];
+
+				$first_part = rawurldecode((string) $tail_parts[0]);
+				if (isset($endpoint_aliases[$first_part])) {
+					$tail_parts[0] = $endpoint_aliases[$first_part];
+					$tail = implode('/', $tail_parts);
+				}
+			}
+		}
+
 		$rebuilt_path = trim($target_prefix . ($tail !== '' ? '/' . $tail : ''), '/');
 		$target_path = '/' . $rebuilt_path . '/';
 		break;
