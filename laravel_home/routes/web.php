@@ -845,7 +845,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
                 'is_marketplace' => (int) ($product->is_marketplace ?? 0) === 1,
                 'discount' => $discount,
                 'saving' => $saving,
-                'image' => $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png',
+                'image' => $product->image ?: 'https://styliiiish.com/wp-content/plugins/woocommerce/assets/images/placeholder.png',
             ];
         })->values();
 
@@ -878,7 +878,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
                 'url' => $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug),
                 'image' => trim((string) ($product->image ?? '')) !== ''
                     ? trim((string) ($product->image ?? ''))
-                    : ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png'),
+                    : ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png'),
                 'price' => $normalizedPrice > 0 ? number_format($normalizedPrice, 2, '.', '') : null,
                 'availability' => 'https://schema.org/InStock',
                 'currency' => 'EGP',
@@ -970,7 +970,7 @@ $merchantFeedHandler = function (string $locale = 'ar') use ($localizeProductsCo
         $link = $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug);
         $image = trim((string) ($product->image ?? ''));
         if ($image === '') {
-            $image = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png';
+            $image = $wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png';
         }
 
         return '<item>'
@@ -2936,7 +2936,7 @@ $buildWishlistFallbackItems = function (array $ids, string $locale, int $limit =
     }
 
     $localePrefix = '/' . (in_array($locale, ['ar', 'en'], true) ? $locale : 'ar');
-    $placeholderImage = 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.png';
+    $placeholderImage = 'https://styliiiish.com/wp-content/plugins/woocommerce/assets/images/placeholder.png';
 
     return $slicedIds->map(function ($id) use ($postsById, $localePrefix, $normalizeBrandByLocale, $locale, $placeholderImage) {
         $post = $postsById->get((int) $id);

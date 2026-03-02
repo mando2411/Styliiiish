@@ -627,7 +627,7 @@
                             }
                         }
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
-                        $image = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.png');
+                        $image = $post->image ?: ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png');
                     @endphp
 
                     <article class="post-card">
