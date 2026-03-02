@@ -200,6 +200,10 @@ if ($action === 'list') {
             $image = (string) wc_placeholder_img_src('woocommerce_thumbnail');
         }
 
+        if ($image === '' || strpos($image, '/wp-content/plugins/woocommerce/assets/images/placeholder') !== false) {
+            $image = rtrim((string) home_url(), '/') . '/wp-content/uploads/woocommerce-placeholder.webp';
+        }
+
         if ($name === '' || $url === '') {
             continue;
         }

@@ -160,7 +160,7 @@
         return [
             'name' => trim((string) ($product->post_title ?? '')),
             'url' => $wpBaseUrl . $localePrefix . '/item/' . rawurlencode($slug),
-            'image' => $image !== '' ? $image : ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png'),
+            'image' => $image !== '' ? $image : ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp'),
             'price' => $normalizedPrice > 0 ? number_format($normalizedPrice, 2, '.', '') : null,
         ];
     })->filter(fn ($item) => ($item['name'] ?? '') !== '' && ($item['url'] ?? '') !== '')->values();
@@ -694,7 +694,7 @@
                         $isSale = $regular > 0 && $price > 0 && $regular > $price;
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
-                        $image = $product->image ?: 'https://styliiiish.com/wp-content/plugins/woocommerce/assets/images/placeholder.png';
+                        $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.webp';
                         $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
                         $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                     @endphp

@@ -269,11 +269,11 @@
                         $discount = $isSale ? (int) round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
                         $productLink = $localePrefix . '/item/' . rawurlencode((string) $product->post_name);
-                        $image = $product->image ?: ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png');
+                        $image = $product->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
                     @endphp
                     <article class="card" style="animation-delay: {{ (($loop->index % 8) * 0.04) }}s;">
                         <div class="media">
-                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/plugins/woocommerce/assets/images/placeholder.png';">
+                            <img class="thumb" src="{{ $image }}" alt="{{ $product->post_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/uploads/woocommerce-placeholder.webp';">
                             @if($isSale)
                                 <span class="discount">{{ str_replace(':percent', (string) $discount, $t('discount_label')) }}</span>
                             @endif

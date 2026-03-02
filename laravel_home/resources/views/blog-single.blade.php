@@ -40,7 +40,7 @@
         : $t('meta_desc_fallback');
 
     $canonicalPath = $localePrefix . '/blog/' . rawurlencode(rawurldecode((string) ($post->post_name ?? '')));
-    $articleImage = $post->image ?: ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png');
+    $articleImage = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
 
     $contentHtml = (string) ($post->post_content ?? '');
     if (trim($contentHtml) === '') {
@@ -233,7 +233,7 @@
 
 <main class="container article-wrap">
     <article class="article-card">
-        <img class="article-cover" src="{{ $articleImage }}" alt="{{ $title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/plugins/woocommerce/assets/images/placeholder.png';">
+        <img class="article-cover" src="{{ $articleImage }}" alt="{{ $title }}" loading="eager" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/uploads/woocommerce-placeholder.webp';">
         <div class="article-body">
             <h1 class="article-title">{{ $title }}</h1>
             <span class="article-meta">{{ $t('published_on') }} {{ \Carbon\Carbon::parse((string) ($post->post_date ?? now()))->format('Y-m-d') }}</span>
@@ -256,11 +256,11 @@
                     @php
                         $relatedSlug = rawurlencode(rawurldecode((string) ($related->post_name ?? '')));
                         $relatedUrl = $localePrefix . '/blog/' . $relatedSlug;
-                        $relatedImage = $related->image ?: ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png');
+                        $relatedImage = $related->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
                     @endphp
                     <article class="related-card">
                         <a href="{{ $relatedUrl }}">
-                            <img src="{{ $relatedImage }}" alt="{{ $related->post_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/plugins/woocommerce/assets/images/placeholder.png';">
+                            <img src="{{ $relatedImage }}" alt="{{ $related->post_title }}" loading="lazy" onerror="this.onerror=null;this.src='{{ $wpBaseUrl }}/wp-content/uploads/woocommerce-placeholder.webp';">
                         </a>
                         <div class="inner">
                             <h4><a href="{{ $relatedUrl }}">{{ $related->post_title }}</a></h4>

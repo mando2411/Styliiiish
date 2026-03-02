@@ -3410,7 +3410,7 @@
                         $isSale = $regular > 0 && $price > 0 && $regular > $price;
                         $discount = $isSale ? round((($regular - $price) / $regular) * 100) : 0;
                         $saving = $isSale ? ($regular - $price) : 0;
-                        $image = $product->image ?: 'https://styliiiish.com/wp-content/plugins/woocommerce/assets/images/placeholder.png';
+                        $image = $product->image ?: 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.webp';
                         $isMarketplace = (int) ($product->is_marketplace ?? 0) === 1;
                         $primaryBadge = $isMarketplace ? $t('badge_marketplace') : $t('badge_brand');
                         $primaryBadgeClass = $isMarketplace ? 'badge-marketplace' : 'badge-brand';

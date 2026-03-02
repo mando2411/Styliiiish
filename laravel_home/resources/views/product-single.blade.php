@@ -1550,7 +1550,7 @@
                     @foreach($relatedProducts as $related)
                         @php
                             $relatedPrice = (float) ($related->price ?? 0);
-                            $relatedImage = $related->image ?: ($wpBaseUrl . '/wp-content/plugins/woocommerce/assets/images/placeholder.png');
+                            $relatedImage = $related->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
                         @endphp
                         <article class="r-card">
                             <img class="r-thumb" src="{{ $relatedImage }}" alt="{{ $related->post_title }}" loading="lazy">
