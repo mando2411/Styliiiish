@@ -2874,10 +2874,11 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
     if (!$bridge['ok']) {
         return response()->json([
             'success' => false,
+            'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
             'message' => $currentLocale === 'en'
                 ? 'Wishlist service is temporarily unavailable.'
                 : 'خدمة المفضلة غير متاحة حالياً.',
-        ], 500);
+        ]);
     }
 
     $count = max(0, (int) ($bridge['json']['count'] ?? 0));
@@ -2915,10 +2916,11 @@ $wishlistRemoveHandler = function (Request $request, int $id, string $locale = '
     if (!$bridge['ok']) {
         return response()->json([
             'success' => false,
+            'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
             'message' => $currentLocale === 'en'
                 ? 'Unable to remove wishlist item.'
                 : 'تعذر حذف المنتج من المفضلة.',
-        ], 500);
+        ]);
     }
 
     $response = response()->json([
