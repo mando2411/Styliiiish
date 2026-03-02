@@ -154,6 +154,8 @@
         const qtyShortText = @json($translate('qty_short'));
         const accountLoadingText = @json($translate('account_loading'));
         const accountLoggedInText = @json($translate('account_logged_in'));
+        const wishlistImageFallback = @json($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
+        const wishlistImageUltimateFallback = '/brand/logo.png';
 
         const wishlistTrigger = document.getElementById('wishlistTrigger');
         const wishlistBadge = document.getElementById('wishlistCountBadge');
@@ -436,10 +438,11 @@
                 return;
             }
             wishlistDropdownList.innerHTML = safeItems.map((item) => {
-                const image = escapeHtml(item.image || '');
+                const safeFallback = escapeHtml(wishlistImageFallback || wishlistImageUltimateFallback);
+                const image = escapeHtml(item.image || wishlistImageFallback || wishlistImageUltimateFallback);
                 const name = escapeHtml(item.name || '');
                 const url = escapeHtml(item.url || '#');
-                return `<article class="wishlist-dropdown-item"><a href="${url}"><img src="${image}" alt="${name}"></a><div><h4 class="wishlist-dropdown-name">${name}</h4><a class="wishlist-dropdown-link" href="${url}">${escapeHtml(goToProductText)}</a></div></article>`;
+                return `<article class="wishlist-dropdown-item"><a href="${url}"><img src="${image}" alt="${name}" onerror="this.onerror=null;this.src='${safeFallback}';"></a><div><h4 class="wishlist-dropdown-name">${name}</h4><a class="wishlist-dropdown-link" href="${url}">${escapeHtml(goToProductText)}</a></div></article>`;
             }).join('');
         };
 

@@ -2905,7 +2905,7 @@ $attachWishlistFallbackCookie = function ($response, array $ids) use ($wishlistF
     return $response;
 };
 
-$buildWishlistFallbackItems = function (array $ids, string $locale, int $limit = 8) use ($normalizeBrandByLocale): array {
+$buildWishlistFallbackItems = function (array $ids, string $locale, int $limit = 8) use ($normalizeBrandByLocale, $resolveTranslatePressLanguageCodes): array {
     $normalizedIds = collect($ids)
         ->map(fn ($value) => (int) $value)
         ->filter(fn ($id) => $id > 0)
@@ -2938,7 +2938,7 @@ $buildWishlistFallbackItems = function (array $ids, string $locale, int $limit =
     $localePrefix = '/' . (in_array($locale, ['ar', 'en'], true) ? $locale : 'ar');
     $placeholderImage = 'https://styliiiish.com/wp-content/uploads/woocommerce-placeholder.webp';
 
-    return $slicedIds->map(function ($id) use ($postsById, $localePrefix, $normalizeBrandByLocale, $locale, $placeholderImage) {
+    $items = $slicedIds->map(function ($id) use ($postsById, $localePrefix, $normalizeBrandByLocale, $locale, $placeholderImage) {
         $post = $postsById->get((int) $id);
         if (!$post) {
             return null;
@@ -2958,7 +2958,98 @@ $buildWishlistFallbackItems = function (array $ids, string $locale, int $limit =
             'image' => $placeholderImage,
             'url' => $localePrefix . '/item/' . rawurlencode($slug),
         ];
-    })->filter(fn ($item) => is_array($item))->values()->all();
+    })->filter(fn ($item) => is_array($item))->values();
+
+    if ($locale === 'ar' && $items->isNotEmpty()) {
+        try {
+            $languageCodes = $resolveTranslatePressLanguageCodes('ar');
+            $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
+            $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
+
+            if ($defaultLanguage !== '' && $targetLanguage !== '') {
+                $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+
+                if (Schema::hasTable($dictionaryTable)) {
+                    $normalizeNameVariant = function (string $value): string {
+                        $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $decoded = str_replace(["\u{00A0}", "\r", "\n", "\t"], ' ', $decoded);
+                        $decoded = preg_replace('/\s+/u', ' ', $decoded);
+                        return trim((string) $decoded);
+                    };
+
+                    $nameVariants = [];
+                    foreach ($items as $item) {
+                        $name = trim((string) ($item['name'] ?? ''));
+                        if ($name === '') {
+                            continue;
+                        }
+
+                        $nameVariants[] = $name;
+                        $normalized = $normalizeNameVariant($name);
+                        if ($normalized !== '' && $normalized !== $name) {
+                            $nameVariants[] = $normalized;
+                        }
+                    }
+
+                    $nameVariants = array_values(array_unique(array_filter($nameVariants, fn ($value) => is_string($value) && trim($value) !== '')));
+
+                    if (!empty($nameVariants)) {
+                        $dictionaryRows = DB::table($dictionaryTable)
+                            ->whereIn('original', $nameVariants)
+                            ->whereNotNull('translated')
+                            ->where('translated', '!=', '')
+                            ->select('original', 'translated')
+                            ->get();
+
+                        if ($dictionaryRows->isNotEmpty()) {
+                            $translationMap = [];
+
+                            foreach ($dictionaryRows as $dictionaryRow) {
+                                $original = trim((string) ($dictionaryRow->original ?? ''));
+                                $translated = trim((string) ($dictionaryRow->translated ?? ''));
+
+                                if ($original === '' || $translated === '') {
+                                    continue;
+                                }
+
+                                if (!array_key_exists($original, $translationMap)) {
+                                    $translationMap[$original] = $translated;
+                                }
+
+                                $normalizedOriginal = $normalizeNameVariant($original);
+                                if ($normalizedOriginal !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
+                                    $translationMap[$normalizedOriginal] = $translated;
+                                }
+                            }
+
+                            $items = $items->map(function ($item) use ($translationMap, $normalizeNameVariant, $normalizeBrandByLocale) {
+                                $currentName = trim((string) ($item['name'] ?? ''));
+                                if ($currentName === '') {
+                                    return $item;
+                                }
+
+                                $normalizedName = $normalizeNameVariant($currentName);
+                                $translatedName = $translationMap[$currentName] ?? $translationMap[$normalizedName] ?? null;
+
+                                if (is_string($translatedName) && trim($translatedName) !== '') {
+                                    $item['name'] = $normalizeBrandByLocale(trim($translatedName), 'ar');
+                                }
+
+                                return $item;
+                            })->values();
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $exception) {
+            logger()->warning('Wishlist fallback TranslatePress translation failed', [
+                'locale' => $locale,
+                'error' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    return $items->values()->all();
 };
 
 $wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie) {
