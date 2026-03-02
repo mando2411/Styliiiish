@@ -41,6 +41,11 @@
             'trust_1' => '💯 خامات موثوقة واختيار مدروس',
             'trust_2' => '🚚 توصيل سريع لكل المحافظات',
             'trust_3' => '📦 دعم قبل وبعد الطلب',
+            'legal_title' => 'سياسات واضحة قبل الشراء',
+            'legal_privacy' => 'الخصوصية',
+            'legal_terms' => 'الشروط',
+            'legal_refund' => 'الاسترجاع',
+            'legal_shipping' => 'الشحن',
             'sale_badge' => 'خصم',
             'view_product' => 'تفاصيل الفستان',
             'contact_for_price' => 'تواصل لمعرفة السعر',
@@ -95,6 +100,11 @@
             'trust_1' => '💯 Trusted quality and curated picks',
             'trust_2' => '🚚 Fast delivery across all governorates',
             'trust_3' => '📦 Support before and after order',
+            'legal_title' => 'Clear policies before checkout',
+            'legal_privacy' => 'Privacy',
+            'legal_terms' => 'Terms',
+            'legal_refund' => 'Returns',
+            'legal_shipping' => 'Shipping',
             'sale_badge' => 'OFF',
             'view_product' => 'Dress Details',
             'contact_for_price' => 'Contact for price',
@@ -129,6 +139,10 @@
     $wpLocalizedMyDressesUrl = $isEnglish
         ? ($wpBaseUrl . '/my-dresses/')
         : ($wpBaseUrl . '/ar/%d9%81%d8%b3%d8%a7%d8%aa%d9%8a%d9%86%d9%8a/');
+    $privacyPolicyUrl = $localePrefix . '/privacy-policy';
+    $termsPolicyUrl = $localePrefix . '/terms-conditions';
+    $refundPolicyUrl = $localePrefix . '/refund-return-policy';
+    $shippingPolicyUrl = $localePrefix . '/shipping-delivery-policy';
 
     $trackingKeys = [
         'gclid',
@@ -339,6 +353,10 @@
 
         .trust-row { margin: 12px 0 0; padding: 0; list-style: none; display: flex; gap: 8px; flex-wrap: wrap; }
         .trust-row li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700; }
+
+        .legal-row { margin: 10px 0 0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .legal-row .label { font-size: 12px; font-weight: 800; color: #d7e0ed; }
+        .legal-row a { font-size: 12px; color: #fff; border-bottom: 1px solid rgba(255,255,255,.65); }
 
         .actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .btn { min-height: 38px; padding: 0 14px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
@@ -753,6 +771,13 @@
                 <div>
                     <strong>{{ $t('bottom_cta_title') }}</strong>
                     <p>{{ $t('bottom_cta_sub') }}</p>
+                    <div class="legal-row" aria-label="Policy quick links">
+                        <span class="label">{{ $t('legal_title') }}:</span>
+                        <a href="{{ $privacyPolicyUrl }}" data-track-link="1">{{ $t('legal_privacy') }}</a>
+                        <a href="{{ $termsPolicyUrl }}" data-track-link="1">{{ $t('legal_terms') }}</a>
+                        <a href="{{ $refundPolicyUrl }}" data-track-link="1">{{ $t('legal_refund') }}</a>
+                        <a href="{{ $shippingPolicyUrl }}" data-track-link="1">{{ $t('legal_shipping') }}</a>
+                    </div>
                 </div>
                 <a class="btn btn-light" href="{{ $localePrefix }}/shop" data-track-link="1">{{ $t('go_full_shop') }}</a>
             </div>
@@ -811,6 +836,53 @@
         })();
     </script>
     @endif
+
+    <script>
+        (() => {
+            const emitEvent = (eventName, payload = {}) => {
+                const safePayload = {
+                    page_type: 'ads_landing',
+                    locale: @json($currentLocale),
+                    ...payload,
+                };
+
+                if (typeof window.styliiiishTrackEvent === 'function') {
+                    window.styliiiishTrackEvent(eventName, safePayload);
+                }
+
+                if (typeof window.gtag === 'function') {
+                    window.gtag('event', eventName, safePayload);
+                }
+
+                if (Array.isArray(window.dataLayer)) {
+                    window.dataLayer.push({ event: eventName, ...safePayload });
+                }
+            };
+
+            const classifyLink = (href) => {
+                const lower = (href || '').toLowerCase();
+                if (lower.startsWith('tel:')) return { eventName: 'generate_lead', click_type: 'call' };
+                if (lower.includes('wa.me')) return { eventName: 'generate_lead', click_type: 'whatsapp' };
+                if (lower.includes('/shop')) return { eventName: 'view_item_list', click_type: 'shop' };
+                if (lower.includes('/item/')) return { eventName: 'select_item', click_type: 'product' };
+                return { eventName: 'ads_landing_click', click_type: 'other' };
+            };
+
+            document.querySelectorAll('a[data-track-link="1"]').forEach((link) => {
+                link.addEventListener('click', () => {
+                    const href = link.getAttribute('href') || '';
+                    const text = (link.textContent || '').trim();
+                    const { eventName, click_type: clickType } = classifyLink(href);
+
+                    emitEvent(eventName, {
+                        click_type: clickType,
+                        link_text: text,
+                        destination: href,
+                    });
+                }, { passive: true });
+            });
+        })();
+    </script>
 
     @include('partials.shared-home-footer')
 </body>
