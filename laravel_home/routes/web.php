@@ -2972,11 +2972,13 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
 
     if (!$bridge['ok']) {
         return response()->json([
-            'success' => false,
+            'success' => true,
+            'count' => 0,
+            'items' => [],
             'message' => $currentLocale === 'en'
-                ? 'Unable to load wishlist items.'
-                : 'تعذر تحميل عناصر المفضلة.',
-        ], 500);
+                ? 'Wishlist items service is temporarily unavailable.'
+                : 'خدمة عناصر المفضلة غير متاحة حالياً.',
+        ]);
     }
 
     $rawItems = collect($bridge['json']['items'] ?? [])->filter(fn ($item) => is_array($item))->values();
@@ -2992,41 +2994,48 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
     $localizedIdBySourceId = [];
     $localizedPostsById = collect();
 
-    if ($sourceProductIds->isNotEmpty() && Schema::hasTable('wp_icl_translations')) {
-        $translationRows = DB::table('wp_icl_translations as base')
-            ->join('wp_icl_translations as localized', function ($join) {
-                $join->on('base.trid', '=', 'localized.trid')
-                    ->where('localized.element_type', 'post_product');
-            })
-            ->where('base.element_type', 'post_product')
-            ->whereIn('base.element_id', $sourceProductIds->all())
-            ->where('localized.language_code', 'like', $wpmlCode . '%')
-            ->select('base.element_id as source_id', 'localized.element_id as localized_id')
-            ->get();
+    try {
+        if ($sourceProductIds->isNotEmpty() && Schema::hasTable('wp_icl_translations')) {
+            $translationRows = DB::table('wp_icl_translations as base')
+                ->join('wp_icl_translations as localized', function ($join) {
+                    $join->on('base.trid', '=', 'localized.trid')
+                        ->where('localized.element_type', 'post_product');
+                })
+                ->where('base.element_type', 'post_product')
+                ->whereIn('base.element_id', $sourceProductIds->all())
+                ->where('localized.language_code', 'like', $wpmlCode . '%')
+                ->select('base.element_id as source_id', 'localized.element_id as localized_id')
+                ->get();
 
-        foreach ($translationRows as $translationRow) {
-            $sourceId = (int) ($translationRow->source_id ?? 0);
-            $localizedId = (int) ($translationRow->localized_id ?? 0);
-            if ($sourceId > 0 && $localizedId > 0 && !array_key_exists($sourceId, $localizedIdBySourceId)) {
-                $localizedIdBySourceId[$sourceId] = $localizedId;
+            foreach ($translationRows as $translationRow) {
+                $sourceId = (int) ($translationRow->source_id ?? 0);
+                $localizedId = (int) ($translationRow->localized_id ?? 0);
+                if ($sourceId > 0 && $localizedId > 0 && !array_key_exists($sourceId, $localizedIdBySourceId)) {
+                    $localizedIdBySourceId[$sourceId] = $localizedId;
+                }
+            }
+
+            $localizedPostIds = collect($sourceProductIds)
+                ->map(fn ($sourceId) => (int) ($localizedIdBySourceId[(int) $sourceId] ?? (int) $sourceId))
+                ->filter(fn ($id) => $id > 0)
+                ->unique()
+                ->values();
+
+            if ($localizedPostIds->isNotEmpty()) {
+                $localizedPostsById = DB::table('wp_posts')
+                    ->whereIn('ID', $localizedPostIds->all())
+                    ->where('post_type', 'product')
+                    ->where('post_status', 'publish')
+                    ->select('ID', 'post_title', 'post_name')
+                    ->get()
+                    ->keyBy('ID');
             }
         }
-
-        $localizedPostIds = collect($sourceProductIds)
-            ->map(fn ($sourceId) => (int) ($localizedIdBySourceId[(int) $sourceId] ?? (int) $sourceId))
-            ->filter(fn ($id) => $id > 0)
-            ->unique()
-            ->values();
-
-        if ($localizedPostIds->isNotEmpty()) {
-            $localizedPostsById = DB::table('wp_posts')
-                ->whereIn('ID', $localizedPostIds->all())
-                ->where('post_type', 'product')
-                ->where('post_status', 'publish')
-                ->select('ID', 'post_title', 'post_name')
-                ->get()
-                ->keyBy('ID');
-        }
+    } catch (\Throwable $exception) {
+        logger()->warning('Wishlist localization fallback enabled', [
+            'locale' => $currentLocale,
+            'error' => $exception->getMessage(),
+        ]);
     }
 
     $items = $rawItems->map(function (array $item) use ($localePrefix, $localizedIdBySourceId, $localizedPostsById, $normalizeBrandByLocale, $currentLocale) {
@@ -3057,86 +3066,93 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
     })->filter(fn ($item) => $item['id'] > 0 && $item['name'] !== '' && $item['url'] !== '')->values();
 
     if ($currentLocale === 'ar' && $items->isNotEmpty()) {
-        $languageCodes = $resolveTranslatePressLanguageCodes('ar');
-        $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
-        $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
+        try {
+            $languageCodes = $resolveTranslatePressLanguageCodes('ar');
+            $defaultLanguage = strtolower((string) ($languageCodes['default'] ?? ''));
+            $targetLanguage = strtolower((string) ($languageCodes['target'] ?? ''));
 
-        if ($defaultLanguage !== '' && $targetLanguage !== '') {
-            $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
+            if ($defaultLanguage !== '' && $targetLanguage !== '') {
+                $dictionaryTable = 'wp_trp_dictionary_' . $defaultLanguage . '_' . $targetLanguage;
 
-            if (Schema::hasTable($dictionaryTable)) {
-                $nameVariants = [];
+                if (Schema::hasTable($dictionaryTable)) {
+                    $nameVariants = [];
 
-                $normalizeNameVariant = function (string $value): string {
-                    $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-                    $decoded = str_replace(["\u{00A0}", "\r", "\n", "\t"], ' ', $decoded);
-                    $decoded = preg_replace('/\s+/u', ' ', $decoded);
-                    return trim((string) $decoded);
-                };
+                    $normalizeNameVariant = function (string $value): string {
+                        $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $decoded = str_replace(["\u{00A0}", "\r", "\n", "\t"], ' ', $decoded);
+                        $decoded = preg_replace('/\s+/u', ' ', $decoded);
+                        return trim((string) $decoded);
+                    };
 
-                foreach ($items as $item) {
-                    $name = trim((string) ($item['name'] ?? ''));
-                    if ($name === '') {
-                        continue;
-                    }
-
-                    $nameVariants[] = $name;
-
-                    $normalized = $normalizeNameVariant($name);
-                    if ($normalized !== '' && $normalized !== $name) {
-                        $nameVariants[] = $normalized;
-                    }
-                }
-
-                $nameVariants = array_values(array_unique(array_filter($nameVariants, fn ($value) => is_string($value) && trim($value) !== '')));
-
-                if (!empty($nameVariants)) {
-                    $dictionaryRows = DB::table($dictionaryTable)
-                        ->whereIn('original', $nameVariants)
-                        ->whereNotNull('translated')
-                        ->where('translated', '!=', '')
-                        ->select('original', 'translated')
-                        ->get();
-
-                    if ($dictionaryRows->isNotEmpty()) {
-                        $translationMap = [];
-
-                        foreach ($dictionaryRows as $dictionaryRow) {
-                            $original = trim((string) ($dictionaryRow->original ?? ''));
-                            $translated = trim((string) ($dictionaryRow->translated ?? ''));
-
-                            if ($original === '' || $translated === '') {
-                                continue;
-                            }
-
-                            if (!array_key_exists($original, $translationMap)) {
-                                $translationMap[$original] = $translated;
-                            }
-
-                            $normalizedOriginal = $normalizeNameVariant($original);
-                            if ($normalizedOriginal !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
-                                $translationMap[$normalizedOriginal] = $translated;
-                            }
+                    foreach ($items as $item) {
+                        $name = trim((string) ($item['name'] ?? ''));
+                        if ($name === '') {
+                            continue;
                         }
 
-                        $items = $items->map(function ($item) use ($translationMap, $normalizeNameVariant, $normalizeBrandByLocale) {
-                            $currentName = trim((string) ($item['name'] ?? ''));
-                            if ($currentName === '') {
+                        $nameVariants[] = $name;
+
+                        $normalized = $normalizeNameVariant($name);
+                        if ($normalized !== '' && $normalized !== $name) {
+                            $nameVariants[] = $normalized;
+                        }
+                    }
+
+                    $nameVariants = array_values(array_unique(array_filter($nameVariants, fn ($value) => is_string($value) && trim($value) !== '')));
+
+                    if (!empty($nameVariants)) {
+                        $dictionaryRows = DB::table($dictionaryTable)
+                            ->whereIn('original', $nameVariants)
+                            ->whereNotNull('translated')
+                            ->where('translated', '!=', '')
+                            ->select('original', 'translated')
+                            ->get();
+
+                        if ($dictionaryRows->isNotEmpty()) {
+                            $translationMap = [];
+
+                            foreach ($dictionaryRows as $dictionaryRow) {
+                                $original = trim((string) ($dictionaryRow->original ?? ''));
+                                $translated = trim((string) ($dictionaryRow->translated ?? ''));
+
+                                if ($original === '' || $translated === '') {
+                                    continue;
+                                }
+
+                                if (!array_key_exists($original, $translationMap)) {
+                                    $translationMap[$original] = $translated;
+                                }
+
+                                $normalizedOriginal = $normalizeNameVariant($original);
+                                if ($normalizedOriginal !== '' && !array_key_exists($normalizedOriginal, $translationMap)) {
+                                    $translationMap[$normalizedOriginal] = $translated;
+                                }
+                            }
+
+                            $items = $items->map(function ($item) use ($translationMap, $normalizeNameVariant, $normalizeBrandByLocale) {
+                                $currentName = trim((string) ($item['name'] ?? ''));
+                                if ($currentName === '') {
+                                    return $item;
+                                }
+
+                                $normalizedName = $normalizeNameVariant($currentName);
+                                $translatedName = $translationMap[$currentName] ?? $translationMap[$normalizedName] ?? null;
+
+                                if (is_string($translatedName) && trim($translatedName) !== '') {
+                                    $item['name'] = $normalizeBrandByLocale(trim($translatedName), 'ar');
+                                }
+
                                 return $item;
-                            }
-
-                            $normalizedName = $normalizeNameVariant($currentName);
-                            $translatedName = $translationMap[$currentName] ?? $translationMap[$normalizedName] ?? null;
-
-                            if (is_string($translatedName) && trim($translatedName) !== '') {
-                                $item['name'] = $normalizeBrandByLocale(trim($translatedName), 'ar');
-                            }
-
-                            return $item;
-                        })->values();
+                            })->values();
+                        }
                     }
                 }
             }
+        } catch (\Throwable $exception) {
+            logger()->warning('Wishlist TranslatePress fallback enabled', [
+                'locale' => $currentLocale,
+                'error' => $exception->getMessage(),
+            ]);
         }
     }
 
