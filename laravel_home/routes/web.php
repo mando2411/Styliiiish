@@ -4825,6 +4825,44 @@ Route::get('/en/my-account/', fn (Request $request) => $accountHandler($request,
 Route::get('/my-account', fn (Request $request) => $accountHandler($request, 'en'));
 Route::get('/my-account/', fn (Request $request) => $accountHandler($request, 'en'));
 
+$checkoutRedirectHandler = function (Request $request, ?string $endpoint = null, ?string $orderId = null) {
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+
+    $endpointMap = [
+        'تم-استلام-الطلب' => 'order-received',
+        'تم-استلام-طلبك' => 'order-received',
+        'order-received' => 'order-received',
+        'thank-you' => 'order-received',
+    ];
+
+    $normalizedEndpoint = trim((string) $endpoint);
+    if ($normalizedEndpoint !== '' && isset($endpointMap[$normalizedEndpoint])) {
+        $targetPath = '/checkout/' . $endpointMap[$normalizedEndpoint] . '/';
+        if ($orderId !== null && $orderId !== '') {
+            $targetPath .= rawurlencode((string) $orderId) . '/';
+        }
+    } else {
+        $targetPath = '/checkout/';
+    }
+
+    $targetUrl = $wpBaseUrl . $targetPath;
+    $queryParams = $request->query();
+    if (is_array($queryParams) && !empty($queryParams)) {
+        $targetUrl .= '?' . http_build_query($queryParams);
+    }
+
+    return redirect()->away($targetUrl, 302);
+};
+
+Route::get('/الدفع', fn (Request $request) => $checkoutRedirectHandler($request));
+Route::get('/ar/الدفع', fn (Request $request) => $checkoutRedirectHandler($request));
+Route::get('/payment', fn (Request $request) => $checkoutRedirectHandler($request));
+Route::get('/en/payment', fn (Request $request) => $checkoutRedirectHandler($request));
+Route::get('/الدفع/{endpoint}/{orderId?}', fn (Request $request, string $endpoint, ?string $orderId = null) => $checkoutRedirectHandler($request, $endpoint, $orderId));
+Route::get('/ar/الدفع/{endpoint}/{orderId?}', fn (Request $request, string $endpoint, ?string $orderId = null) => $checkoutRedirectHandler($request, $endpoint, $orderId));
+Route::get('/payment/{endpoint}/{orderId?}', fn (Request $request, string $endpoint, ?string $orderId = null) => $checkoutRedirectHandler($request, $endpoint, $orderId));
+Route::get('/en/payment/{endpoint}/{orderId?}', fn (Request $request, string $endpoint, ?string $orderId = null) => $checkoutRedirectHandler($request, $endpoint, $orderId));
+
 Route::get('/favicon.ico', function (Request $request) {
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
