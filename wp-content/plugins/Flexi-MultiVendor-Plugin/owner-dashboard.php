@@ -389,7 +389,9 @@ add_action('wp_enqueue_scripts', function () {
         && is_account_page()
     ) {
         $should_load_assets = (
-            is_wc_endpoint_url('vendor_orders')
+            is_wc_endpoint_url('vendor-dashboard')
+            || is_wc_endpoint_url('vendor_dashboard')
+            || is_wc_endpoint_url('vendor_orders')
             || is_wc_endpoint_url('vendor-orders')
             || is_wc_endpoint_url('store-profile')
             || is_wc_endpoint_url('store_profile')

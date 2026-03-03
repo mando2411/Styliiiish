@@ -106,6 +106,57 @@ function ekart_theme_css() {
 }
 add_action( 'wp_enqueue_scripts', 'ekart_theme_css', 99);
 
+function ekart_is_flexi_vendor_endpoint_request() {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	if ( ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
+		return false;
+	}
+
+	if ( function_exists( 'is_wc_endpoint_url' ) ) {
+		if (
+			is_wc_endpoint_url( 'vendor-dashboard' )
+			|| is_wc_endpoint_url( 'vendor_dashboard' )
+			|| is_wc_endpoint_url( 'vendor-orders' )
+			|| is_wc_endpoint_url( 'vendor_orders' )
+			|| is_wc_endpoint_url( 'store-profile' )
+			|| is_wc_endpoint_url( 'store_profile' )
+		) {
+			return true;
+		}
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	if ( $normalized === '' ) {
+		$normalized = '/';
+	}
+
+	$needles = [
+		'/my-account/vendor-dashboard',
+		'/en/my-account/vendor-dashboard',
+		'/my-account/vendor_orders',
+		'/en/my-account/vendor_orders',
+		'/my-account/vendor-orders',
+		'/en/my-account/vendor-orders',
+		'/my-account/store-profile',
+		'/en/my-account/store-profile',
+	];
+
+	foreach ( $needles as $needle ) {
+		if ( $normalized === $needle || strpos( $normalized, $needle . '/' ) === 0 ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function ekart_force_flexi_account_styles() {
 	if ( ! ekart_is_account_like_request() ) {
 		return;
@@ -206,6 +257,53 @@ function ekart_prioritize_flexi_account_styles() {
 	$wp_styles->queue = array_merge( $other_queue, $plugin_queue );
 }
 add_action( 'wp_print_styles', 'ekart_prioritize_flexi_account_styles', 10050 );
+
+function ekart_prioritize_flexi_vendor_endpoint_styles() {
+	if ( ! ekart_is_flexi_vendor_endpoint_request() ) {
+		return;
+	}
+
+	global $wp_styles;
+	if ( ! ( $wp_styles instanceof WP_Styles ) || ! is_array( $wp_styles->queue ) ) {
+		return;
+	}
+
+	$plugin_queue = [];
+	$other_queue  = [];
+	$plugin_path_needle = '/wp-content/plugins/flexi-multivendor-plugin/';
+
+	foreach ( $wp_styles->queue as $handle ) {
+		if ( ! isset( $wp_styles->registered[ $handle ] ) ) {
+			$other_queue[] = $handle;
+			continue;
+		}
+
+		$src = (string) ( $wp_styles->registered[ $handle ]->src ?? '' );
+		$src = strtolower( $src );
+
+		$is_plugin_style = strpos( $src, $plugin_path_needle ) !== false
+			|| strpos( $handle, 'wf-flexi-css-' ) === 0
+			|| in_array(
+				$handle,
+				[
+					'sty-owner-css',
+					'sty-owner-mobile-css',
+					'wf-vendor-orders',
+					'select2-css',
+				],
+				true
+			);
+
+		if ( $is_plugin_style ) {
+			$plugin_queue[] = $handle;
+		} else {
+			$other_queue[] = $handle;
+		}
+	}
+
+	$wp_styles->queue = array_merge( $other_queue, $plugin_queue );
+}
+add_action( 'wp_print_styles', 'ekart_prioritize_flexi_vendor_endpoint_styles', 10060 );
 
 function ekart_is_ar_fasatini_request() {
 	if ( is_admin() ) {
