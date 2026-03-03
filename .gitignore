@@ -8,7 +8,7 @@ wp-content/upgrade/
 wp-content/upgrade-temp-backup/
 wp-content/uploads/flutter_firebase/*.json
 wp-content/uploads/wc-logs/
-wp-content/plugins/
+#wp-content/plugins/
 wp-content/languages/
 
 # Secrets
