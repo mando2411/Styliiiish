@@ -693,11 +693,13 @@ function sty_get_gallery_cb() {
 add_action('wp_footer', 'sty_gallery_script');
 function sty_gallery_script() {
     ?>
-    <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
+    <script>
 		
 		
 		 
-
+		
+jQuery(function($){
+	
 	
 	
 	
@@ -820,9 +822,7 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
 	
 	
 	
-	const wfRenderVendorListErrorLocal = (message) => {
-		$(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
-	};
+	jQuery(function($){
 
     // Auto-load Pending on page open
     function loadPending() {
@@ -833,7 +833,7 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
         }, function(resp) {
 
             if (!resp || !resp.success) {
-                wfRenderVendorListErrorLocal('فشل تحميل الفساتين المعلّقة.');
+                $(".sty-vendor-list").html('<div class="sty-no-items">Failed to load pending dresses.</div>');
                 return;
             }
 
@@ -844,6 +844,8 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
 
     // Run on page load
     loadPending();
+
+});
 	
 	
 	
