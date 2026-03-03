@@ -68,9 +68,9 @@ add_action('pre_get_posts', function ($q) {
     $dashboard_ids = wf_od_get_dashboard_ids();   // owner-dashboard access
 
     if (in_array($user_id, $manager_ids) || in_array($user_id, $dashboard_ids)) {
-        $template_id = 29323;  // OWNER TEMPLATE
+        $template_id = 1905;  // OWNER TEMPLATE
     } else {
-        $template_id = 29321;  // USER TEMPLATE
+        $template_id = 1954;  // USER TEMPLATE
     }
 
     // Permission check
@@ -1865,6 +1865,17 @@ function sty_add_product(){
     $sale  = floatval($_POST['sale_price'] ?? 0);
     $cat   = intval($_POST['cats'] ?? 0);
 
+    $user_id = get_current_user_id();
+    $user_type = function_exists('wf_od_get_user_type') ? wf_od_get_user_type($user_id) : '';
+    $is_admin_creator = in_array($user_type, ['manager', 'dashboard'], true) || current_user_can('manage_woocommerce');
+    $requested_status = sanitize_key($_POST['admin_status'] ?? '');
+
+    if ($is_admin_creator) {
+        $target_status = in_array($requested_status, ['draft', 'publish'], true) ? $requested_status : 'draft';
+    } else {
+        $target_status = 'pending';
+    }
+
     // صلاحيات
     if($pid && !current_user_can('edit_post',$pid)){
         wp_send_json_error(['msg'=>'No permission']);
@@ -1878,7 +1889,7 @@ function sty_add_product(){
             'ID'           => $pid,
             'post_title'   => $title,
             'post_content' => $desc,
-            'post_status'  => 'pending'
+            'post_status'  => $target_status
         ]);
 
         $id = $pid;
@@ -1889,8 +1900,8 @@ function sty_add_product(){
             'post_type'    => 'product',
             'post_title'   => $title,
             'post_content' => $desc,
-            'post_status'  => 'pending',
-            'post_author'  => get_current_user_id()
+            'post_status'  => $target_status,
+            'post_author'  => $user_id
         ]);
 
     }
@@ -1963,7 +1974,8 @@ if(!empty($_POST['attrs']) && is_array($_POST['attrs'])){
     
     wp_send_json_success([
        'id'    => $id,
-       'image' => $img
+         'image' => $img,
+         'status' => get_post_status($id)
     ]);
 
 }
@@ -1999,9 +2011,26 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
         wp_send_json_error('Not found');
     }
 
-    // السعر
+    // السعر (Woo actual price with fallback)
     $price = get_post_meta($pid,'_regular_price',true);
-    $sale = get_post_meta($pid,'_sale_price',true);
+    $sale  = get_post_meta($pid,'_sale_price',true);
+
+    $product_for_price = wc_get_product($pid);
+    if ($product_for_price) {
+        $regular_price = (string) $product_for_price->get_regular_price();
+        $sale_price    = (string) $product_for_price->get_sale_price();
+        $current_price = (string) $product_for_price->get_price();
+
+        $price = $regular_price !== '' ? $regular_price : $current_price;
+
+        if ($sale_price !== '') {
+            $sale = $sale_price;
+        } elseif ($regular_price !== '' && $current_price !== '' && floatval($current_price) < floatval($regular_price)) {
+            $sale = $current_price;
+        } else {
+            $sale = '';
+        }
+    }
 
 
     // الكاتيجوري
@@ -2012,6 +2041,21 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
         $img = $thumb_id
             ? wp_get_attachment_image_url($thumb_id,'medium')
             : '';
+
+    $gallery_raw = get_post_meta($pid, '_product_image_gallery', true);
+    $gallery_ids = !empty($gallery_raw) ? array_filter(array_map('intval', explode(',', $gallery_raw))) : [];
+    $gallery_urls = [];
+
+    foreach ($gallery_ids as $gallery_id) {
+        if ($gallery_id === (int) $thumb_id) {
+            continue;
+        }
+
+        $gallery_url = wp_get_attachment_image_url($gallery_id, 'thumbnail');
+        if ($gallery_url) {
+            $gallery_urls[] = $gallery_url;
+        }
+    }
 
         /* ========== GET ATTRIBUTES (FROM PRODUCT) ========== */
 
@@ -2060,8 +2104,10 @@ if($product){
         'desc'  => $post->post_content,
         'price' => $price,
         'sale'  => $sale,
+        'status' => get_post_status($pid),
         'cats'  => $cats,
         'attrs' => $attrs,
+        'gallery' => $gallery_urls,
         'image' => $img // ✅ الصورة
     
     ]);
