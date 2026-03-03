@@ -282,12 +282,71 @@ add_action('woocommerce_account_moderate-site_endpoint', function() {
     echo do_shortcode('[owner_dashboard]');
 });
 
+function wf_is_moderate_site_request() {
+    if ( is_admin() ) {
+        return false;
+    }
+
+    return get_query_var( 'moderate-site', false ) !== false;
+}
+
+add_action( 'wp_print_styles', function () {
+    if ( ! wf_is_moderate_site_request() ) {
+        return;
+    }
+
+    global $wp_styles;
+    if ( ! ( $wp_styles instanceof WP_Styles ) || ! is_array( $wp_styles->queue ) ) {
+        return;
+    }
+
+    $plugin_path_needle = '/wp-content/plugins/flexi-multivendor-plugin/';
+    $allowed_handles = [
+        'admin-bar',
+        'dashicons',
+    ];
+
+    foreach ( $wp_styles->queue as $handle ) {
+        if ( in_array( $handle, $allowed_handles, true ) ) {
+            continue;
+        }
+
+        if ( ! isset( $wp_styles->registered[ $handle ] ) ) {
+            wp_dequeue_style( $handle );
+            wp_deregister_style( $handle );
+            continue;
+        }
+
+        $src = (string) ( $wp_styles->registered[ $handle ]->src ?? '' );
+        $src = strtolower( $src );
+
+        $is_plugin_style = strpos( $src, $plugin_path_needle ) !== false
+            || strpos( $handle, 'wf-flexi-css-' ) === 0
+            || in_array(
+                $handle,
+                [
+                    'sty-owner-css',
+                    'sty-owner-mobile-css',
+                    'wf-add-modal',
+                    'styliiiish-myaccount-css',
+                    'wf-vendor-orders',
+                ],
+                true
+            );
+
+        if ( ! $is_plugin_style ) {
+            wp_dequeue_style( $handle );
+            wp_deregister_style( $handle );
+        }
+    }
+}, 10080 );
+
 add_action('template_redirect', function () {
     if ( is_admin() || ( function_exists('wp_doing_ajax') && wp_doing_ajax() ) ) {
         return;
     }
 
-    if ( get_query_var( 'moderate-site', false ) === false ) {
+    if ( ! wf_is_moderate_site_request() ) {
         return;
     }
 
@@ -305,7 +364,7 @@ add_action('template_redirect', function () {
     status_header( 200 );
     get_header();
 
-    echo '<main class="wf-moderate-site-standalone">';
+    echo '<main class="wf-moderate-site-standalone taj-vendor-dashboard">';
     echo do_shortcode('[owner_dashboard]');
     echo '</main>';
 
