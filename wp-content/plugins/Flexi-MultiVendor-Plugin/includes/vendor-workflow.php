@@ -341,6 +341,19 @@ add_action( 'wp_print_styles', function () {
     }
 }, 10080 );
 
+add_action( 'wp_head', function () {
+    if ( ! wf_is_moderate_site_request() ) {
+        return;
+    }
+
+    echo '<style id="wf-moderate-site-layout">'
+        . '.wf-moderate-site-standalone{padding:24px 16px 40px;}'
+        . '.wf-moderate-site-shell{max-width:1240px;margin:0 auto;}'
+        . '.wf-moderate-site-content{background:#fff;border:1px solid #e9edf3;border-radius:16px;padding:20px;box-sizing:border-box;overflow:hidden;}'
+        . '@media (max-width:992px){.wf-moderate-site-standalone{padding:16px 10px 28px;}.wf-moderate-site-content{padding:14px;border-radius:12px;}}'
+        . '</style>';
+}, 99 );
+
 add_action('template_redirect', function () {
     if ( is_admin() || ( function_exists('wp_doing_ajax') && wp_doing_ajax() ) ) {
         return;
@@ -364,8 +377,12 @@ add_action('template_redirect', function () {
     status_header( 200 );
     get_header();
 
-    echo '<main class="wf-moderate-site-standalone taj-vendor-dashboard">';
+    echo '<main class="wf-moderate-site-standalone">';
+    echo '<div class="wf-moderate-site-shell">';
+    echo '<section class="wf-moderate-site-content taj-vendor-dashboard">';
     echo do_shortcode('[owner_dashboard]');
+    echo '</section>';
+    echo '</div>';
     echo '</main>';
 
     get_footer();
