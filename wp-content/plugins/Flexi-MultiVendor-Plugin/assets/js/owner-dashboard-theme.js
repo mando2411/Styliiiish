@@ -57,6 +57,25 @@ window.showSection = window.showSection || function(section) {
     }
 };
 
+// Robust card navigation binding (works even if inline onclick/script is stripped).
+$(document).on('click', '.owner-card[data-owner-section]', function(e){
+    e.preventDefault();
+    var section = this.getAttribute('data-owner-section');
+    if (section) {
+        window.showSection(section);
+    }
+});
+
+$(document).on('keydown', '.owner-card[data-owner-section]', function(e){
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        var section = this.getAttribute('data-owner-section');
+        if (section) {
+            window.showSection(section);
+        }
+    }
+});
+
 
 
 

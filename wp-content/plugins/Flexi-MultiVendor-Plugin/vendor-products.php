@@ -78,9 +78,9 @@ function styliiiish_vendor_moderate_cb() {
         wp_send_json_error(['message' => 'Bad nonce']);
     }
 
-    // ????????? ????????
+    // Role check: manager/dashboard or Woo admin
     $user_type = wf_od_get_user_type(get_current_user_id());
-    if ( ! in_array($user_type, ['manager','dashboard']) ) {
+    if ( ! in_array($user_type, ['manager','dashboard'], true) && ! current_user_can('manage_woocommerce') ) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -191,7 +191,7 @@ function sty_filter_vendor_products_cb() {
     }
 
     $user_type = wf_od_get_user_type(get_current_user_id());
-    if (!in_array($user_type, ['manager', 'dashboard'])) {
+    if (!in_array($user_type, ['manager', 'dashboard'], true) && !current_user_can('manage_woocommerce')) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -327,6 +327,13 @@ function styliiiish_render_vendor_products() {
 
     <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
 jQuery(function($){
+
+        if (!window.ajax_object || !window.ajax_object.ajax_url || !window.ajax_object.nonce) {
+            window.ajax_object = {
+                ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
+                nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
+            };
+        }
 
     function wfRenderVendorListLoading() {
         var $list = $(".sty-vendor-list");
@@ -692,6 +699,13 @@ function sty_gallery_script() {
 		 
 		
 jQuery(function($){
+
+        if (!window.ajax_object || !window.ajax_object.ajax_url || !window.ajax_object.nonce) {
+            window.ajax_object = {
+                ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
+                nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
+            };
+        }
 	
 	
 	

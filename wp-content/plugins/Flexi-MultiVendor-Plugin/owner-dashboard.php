@@ -729,24 +729,24 @@ function styliiiish_owner_dashboard_shortcode(){
         </h2>
 
         <!-- CARDS -->
-        <div class="owner-card" onclick="showSection('products')">
+        <div class="owner-card" data-owner-section="products" role="button" tabindex="0">
             <h3>🛍 Manage Products <span>→</span></h3>
         </div>
 
         <?php if ($is_manager): ?>
-            <div class="owner-card" onclick="showSection('vendor_products')">
+            <div class="owner-card" data-owner-section="vendor_products" role="button" tabindex="0">
                 <h3>👗 Customer Dresses Added <span>→</span></h3>
             </div>
 
-            <div class="owner-card" onclick="showSection('orders')">
+            <div class="owner-card" data-owner-section="orders" role="button" tabindex="0">
                 <h3>📦 Orders <span>→</span></h3>
             </div>
 
-            <div class="owner-card" onclick="showSection('stats')">
+            <div class="owner-card" data-owner-section="stats" role="button" tabindex="0">
                 <h3>📊 Statistics <span>→</span></h3>
             </div>
 
-            <div class="owner-card" onclick="showSection('email')">
+            <div class="owner-card" data-owner-section="email" role="button" tabindex="0">
                 <h3>✉️ Send Email <span>→</span></h3>
             </div>
         <?php endif; ?>
@@ -782,11 +782,37 @@ function styliiiish_owner_dashboard_shortcode(){
     </div>
 
     <script>
-        function showSection(section) {
-            document.querySelectorAll('.owner-section').forEach(sec => sec.style.display = 'none');
-            document.getElementById("section-" + section).style.display = 'block';
-            window.scrollTo({top: 300, behavior: 'smooth'});
-        }
+        (function(){
+            window.showSection = function(section) {
+                document.querySelectorAll('.owner-section').forEach(function(sec){ sec.style.display = 'none'; });
+                var target = document.getElementById('section-' + section);
+                if (!target) return;
+                target.style.display = 'block';
+                if (window.scrollTo) {
+                    window.scrollTo({top: 300, behavior: 'smooth'});
+                }
+            };
+
+            var bindCard = function(card){
+                if (!card || card.dataset.wfBound === '1') return;
+                card.dataset.wfBound = '1';
+
+                card.addEventListener('click', function(){
+                    var section = card.getAttribute('data-owner-section');
+                    if (section) window.showSection(section);
+                });
+
+                card.addEventListener('keydown', function(e){
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        var section = card.getAttribute('data-owner-section');
+                        if (section) window.showSection(section);
+                    }
+                });
+            };
+
+            document.querySelectorAll('.owner-card[data-owner-section]').forEach(bindCard);
+        })();
     </script>
 
     <?php
