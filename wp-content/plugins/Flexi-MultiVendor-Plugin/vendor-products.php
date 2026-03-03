@@ -301,7 +301,7 @@ function styliiiish_render_vendor_products() {
 
 		
 						<div class="sty-vendor-filters">
-							<button class="vp-filter-btn" data-status="pending">Pending</button>
+                            <button class="vp-filter-btn active" data-status="pending">Pending</button>
 							<button class="vp-filter-btn" data-status="publish">Active</button>
 							<button class="vp-filter-btn" data-status="incomplete">Incomplete</button>
 							<button class="vp-filter-btn" data-status="deactivated">Deactivated</button>
@@ -313,7 +313,13 @@ function styliiiish_render_vendor_products() {
 
 	
 	
-    <div class="sty-loading">Loading dresses...</div>
+    <?php if ( $q && $q->have_posts() ) : ?>
+        <?php foreach ( $q->posts as $post ) : ?>
+            <?php echo sty_render_vendor_single_card( $post->ID ); ?>
+        <?php endforeach; ?>
+    <?php else : ?>
+        <div class="sty-no-items" translate="no">No dresses found.</div>
+    <?php endif; ?>
 </div>
 
 
