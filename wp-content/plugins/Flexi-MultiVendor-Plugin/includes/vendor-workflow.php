@@ -290,6 +290,113 @@ function wf_is_moderate_site_request() {
     return get_query_var( 'moderate-site', false ) !== false;
 }
 
+function wf_mark_arabic_elements_notranslate( $html ) {
+    if ( ! is_string( $html ) || $html === '' ) {
+        return $html;
+    }
+
+    if ( ! class_exists( 'DOMDocument' ) ) {
+        return $html;
+    }
+
+    $has_arabic = static function ( $text ) {
+        if ( ! is_string( $text ) ) {
+            return false;
+        }
+
+        $text = trim( $text );
+        if ( $text === '' ) {
+            return false;
+        }
+
+        return preg_match( '/[\x{0600}-\x{06FF}\x{0750}-\x{077F}\x{08A0}-\x{08FF}]/u', $text ) === 1;
+    };
+
+    $internal_errors = libxml_use_internal_errors( true );
+
+    $dom = new DOMDocument();
+    $loaded = $dom->loadHTML(
+        '<?xml encoding="utf-8" ?><div id="wf-moderate-root">' . $html . '</div>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+
+    if ( ! $loaded ) {
+        libxml_clear_errors();
+        libxml_use_internal_errors( $internal_errors );
+        return $html;
+    }
+
+    $xpath = new DOMXPath( $dom );
+    $nodes = $xpath->query( '//*[@id="wf-moderate-root"]//*' );
+
+    if ( $nodes instanceof DOMNodeList ) {
+        foreach ( $nodes as $node ) {
+            if ( ! ( $node instanceof DOMElement ) ) {
+                continue;
+            }
+
+            $tag = strtolower( $node->tagName );
+            if ( in_array( $tag, [ 'script', 'style', 'noscript', 'textarea', 'input', 'option', 'select' ], true ) ) {
+                continue;
+            }
+
+            $mark = false;
+
+            if ( $node->childElementCount === 0 && $has_arabic( $node->textContent ) ) {
+                $mark = true;
+            }
+
+            if ( ! $mark ) {
+                foreach ( [ 'title', 'aria-label', 'placeholder', 'value' ] as $attr ) {
+                    if ( ! $node->hasAttribute( $attr ) ) {
+                        continue;
+                    }
+
+                    if ( $has_arabic( $node->getAttribute( $attr ) ) ) {
+                        $mark = true;
+                        break;
+                    }
+                }
+            }
+
+            if ( $mark ) {
+                $node->setAttribute( 'translate', 'no' );
+
+                $existing_class = trim( (string) $node->getAttribute( 'class' ) );
+                $classes = $existing_class === '' ? [] : preg_split( '/\s+/', $existing_class );
+                if ( ! is_array( $classes ) ) {
+                    $classes = [];
+                }
+
+                foreach ( [ 'notranslate', 'trp-no-translate' ] as $class_name ) {
+                    if ( ! in_array( $class_name, $classes, true ) ) {
+                        $classes[] = $class_name;
+                    }
+                }
+
+                $node->setAttribute( 'class', trim( implode( ' ', $classes ) ) );
+            }
+        }
+    }
+
+    $root = $dom->getElementById( 'wf-moderate-root' );
+    if ( ! ( $root instanceof DOMElement ) ) {
+        libxml_clear_errors();
+        libxml_use_internal_errors( $internal_errors );
+        return $html;
+    }
+
+    $result = '';
+    foreach ( $root->childNodes as $child ) {
+        $result .= $dom->saveHTML( $child );
+    }
+
+    libxml_clear_errors();
+    libxml_use_internal_errors( $internal_errors );
+
+    return $result !== '' ? $result : $html;
+}
+
 add_action( 'wp_print_styles', function () {
     if ( ! wf_is_moderate_site_request() ) {
         return;
@@ -424,10 +531,13 @@ add_action('template_redirect', function () {
     status_header( 200 );
     get_header();
 
-    echo '<main class="wf-moderate-site-standalone">';
+    $content_html = do_shortcode('[owner_dashboard]');
+    $content_html = wf_mark_arabic_elements_notranslate( $content_html );
+
+    echo '<main class="wf-moderate-site-standalone" translate="no">';
     echo '<div class="wf-moderate-site-shell">';
     echo '<section class="wf-moderate-site-content taj-vendor-dashboard">';
-    echo do_shortcode('[owner_dashboard]');
+    echo $content_html;
     echo '</section>';
     echo '</div>';
     echo '</main>';
