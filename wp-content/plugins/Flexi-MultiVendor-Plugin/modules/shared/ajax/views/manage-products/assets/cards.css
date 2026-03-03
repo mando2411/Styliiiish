@@ -256,6 +256,39 @@ html[dir="ltr"] .sty-cards-grid{ direction: ltr; }
 .btn-deactivate-user{ color: #b91c1c; }
 .btn-activate-user{ color: #15803d; }
 
+/* Fix: ekart account-ui has broad `a[class*="btn"] { color:#fff !important; }`
+   which makes these action links white-on-white. */
+body.woocommerce-account .sty-cards-grid .card-footer .card-btn,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn:visited,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn:hover,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn:focus {
+  background: #fff !important;
+  color: var(--sty-text) !important;
+  -webkit-text-fill-color: var(--sty-text) !important;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn *,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn:hover *,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .card-btn:focus * {
+  color: inherit !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .btn-deactivate-user,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .btn-deactivate-user:visited {
+  color: #b91c1c !important;
+  -webkit-text-fill-color: #b91c1c !important;
+}
+
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .btn-edit-product,
+body.woocommerce-account .woocommerce-MyAccount-content .sty-cards-grid .card-footer .btn-edit-product:visited {
+  color: #1f2937 !important;
+  -webkit-text-fill-color: #1f2937 !important;
+}
+
 
 /* --------------------------
    Empty State
