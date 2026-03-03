@@ -23,21 +23,12 @@ echo '<link rel="stylesheet" href="' . esc_url( plugins_url( 'assets/cards.css',
 
 <?php
 $id     = $p->get_id();
-$price  = (string) $p->get_regular_price();
-$sale   = (string) $p->get_sale_price();
-$current_price = (string) $p->get_price();
-
-if ($price === '' && $current_price !== '') {
-    $price = $current_price;
-}
-
-if ($sale === '' && $price !== '' && $current_price !== '' && floatval($current_price) < floatval($price)) {
-    $sale = $current_price;
-}
+$price  = $p->get_regular_price();
+$sale   = $p->get_sale_price();
 
 // compute discount percent when applicable
 $discount_percent = '';
-if($sale !== '' && $price !== '' && floatval($sale) < floatval($price)){
+if($sale && $price && floatval($sale) < floatval($price)){
     $discount_percent = round(100 - (floatval($sale) / floatval($price) * 100));
 }
 $img    = $p->get_image('medium');
@@ -64,7 +55,7 @@ $is_deactivated =
 $created_ts = get_post_time('U', true, $id);
 ?>
 
-<div class="sty-card <?= $is_deactivated?'is-deactivated':'' ?>" data-id="<?= esc_attr($id) ?>" data-created="<?= esc_attr($created_ts) ?>" data-price="<?= esc_attr($current_price !== '' ? $current_price : $price) ?>">
+<div class="sty-card <?= $is_deactivated?'is-deactivated':'' ?>" data-id="<?= esc_attr($id) ?>" data-created="<?= esc_attr($created_ts) ?>" data-price="<?= esc_attr($price) ?>">
 
     <!-- Image -->
    <div class="card-thumb">
@@ -104,7 +95,7 @@ $created_ts = get_post_time('U', true, $id);
         <div class="card-meta">
 
             <span class="card-price-wrap">
-            <?php if($sale !== '' && $price !== '' && floatval($sale) < floatval($price)): ?>
+            <?php if($sale && $price && floatval($sale) < floatval($price)): ?>
 
                 <span class="card-price card-price-sale">
                     <?= esc_html( $sale ) . ' ' . esc_html__( 'EGP', 'website-flexi' ) ?>
@@ -121,7 +112,7 @@ $created_ts = get_post_time('U', true, $id);
             <?php else: ?>
 
                 <span class="card-price">
-                    <?= $price !== '' ? esc_html($price) . ' ' . esc_html__( 'EGP', 'website-flexi' ) : esc_html__( '—', 'website-flexi' ) ?>
+                    <?= $price ? esc_html($price) . ' ' . esc_html__( 'EGP', 'website-flexi' ) : esc_html__( '—', 'website-flexi' ) ?>
                 </span>
 
             <?php endif; ?>
