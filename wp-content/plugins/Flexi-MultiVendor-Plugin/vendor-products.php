@@ -459,59 +459,7 @@ $(document).on('click', '.sty-reject', function(e){
     });
 });
 
-    // =========================
-    // Filters: Pending / Active / Incomplete / Deactivated
-    // =========================
-    const wfRenderVendorListError = (message) => {
-        $(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
-    };
-
-$(document).on("click", ".vp-filter-btn", function (e) {
-    e.preventDefault();
-
-    let status = $(this).data("status");
-
-    // Active state
-    $(".vp-filter-btn").removeClass("active");
-    $(this).addClass("active");
-
-    // Show skeleton loader
-    let skeleton = `
-        <div class="sty-skeleton-wrap">
-            ${Array(6).fill(`
-                <div class="sty-skeleton-card">
-					<div class="sk-thumb"></div>
-					<div class="sk-body">
-						<div class="sk-line title"></div>
-						<div class="sk-line"></div>
-						<div class="sk-line small"></div>
-					</div>
-				</div>
-            `).join('')}
-        </div>
-    `;
-
-    $(".sty-vendor-list").html(skeleton);
-
-    // AJAX request
-    $.post(ajax_object.ajax_url, {
-        action: "sty_filter_vendor_products",
-        nonce: ajax_object.nonce,
-        status: status
-    }, function (resp) {
-
-        if (!resp || !resp.success) {
-            wfRenderVendorListError('فشل تحميل الفساتين.');
-            return;
-        }
-
-        $(".sty-vendor-list").html(resp.data.html);
-
-    }, 'json');
-});
-
-						  
-						  
+ 
 						  
 						  
 						  
