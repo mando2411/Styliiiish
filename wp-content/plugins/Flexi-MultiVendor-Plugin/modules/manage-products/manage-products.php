@@ -165,6 +165,7 @@ $note = get_option('wf_vendor_add_note','');
             </div>
         <?php endif; ?>
     </div>
+    </div>
     <!--
     
     <div id="styliiiish-manage-products-content"

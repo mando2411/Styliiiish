@@ -52,14 +52,6 @@ window.showSection = window.showSection || function(section) {
         var el = document.getElementById('section-' + section);
         if (el) {
             el.style.display = 'block';
-
-            var parent = el.parentElement;
-            while (parent) {
-                if (parent.classList && parent.classList.contains('owner-section')) {
-                    parent.style.display = 'block';
-                }
-                parent = parent.parentElement;
-            }
         }
         if (window.scrollTo) window.scrollTo({ top: 300, behavior: 'smooth' });
     } catch(e) {

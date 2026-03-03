@@ -789,14 +789,6 @@ function styliiiish_owner_dashboard_shortcode(){
                 if (!target) return;
                 target.style.display = 'block';
 
-                var parent = target.parentElement;
-                while (parent) {
-                    if (parent.classList && parent.classList.contains('owner-section')) {
-                        parent.style.display = 'block';
-                    }
-                    parent = parent.parentElement;
-                }
-
                 if (window.scrollTo) {
                     window.scrollTo({top: 300, behavior: 'smooth'});
                 }
