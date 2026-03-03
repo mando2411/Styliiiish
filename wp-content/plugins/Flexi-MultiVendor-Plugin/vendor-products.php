@@ -321,6 +321,35 @@ function styliiiish_render_vendor_products() {
 
     <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
 jQuery(function($){
+
+    if (typeof window.wfBuildVendorSkeleton !== 'function') {
+        window.wfBuildVendorSkeleton = function(count){
+            var total = parseInt(count, 10) || 6;
+            var html = '';
+            for (var index = 0; index < total; index++) {
+                html += '<div class="sty-vendor-card skel" aria-hidden="true">'
+                      + '<div class="sty-vendor-head">'
+                      + '<div class="sk sk-check"></div>'
+                      + '<div class="sk sk-img"></div>'
+                      + '<div class="sty-vendor-meta">'
+                      + '<div class="sk sk-line sk-w-90"></div>'
+                      + '<div class="sk sk-line sk-w-60"></div>'
+                      + '</div></div>'
+                      + '<div class="sty-vendor-body">'
+                      + '<div class="sk sk-line"></div>'
+                      + '<div class="sk sk-line sk-w-80"></div>'
+                      + '</div></div>';
+            }
+            return html;
+        };
+    }
+
+    if (typeof window.wfRenderVendorListError !== 'function') {
+        window.wfRenderVendorListError = function(message){
+            var safeMessage = message || 'حدث خطأ أثناء تحميل البيانات.';
+            $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + safeMessage + '</div>');
+        };
+    }
 	
 	
 	$(document).ready(function(){

@@ -240,21 +240,6 @@ add_filter( 'wp_handle_upload_prefilter', function( $file ) {
 });
 
 
-add_action('wp_enqueue_scripts', function () {
-    if (is_page('owner-dashboard') || is_page('my-account')) {
-        wp_enqueue_script(
-            'lottie-player',
-            'https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js',
-            array(),
-            null,
-            true
-        );
-    }
-});
-
-
-
-
 add_action('init', function () {
     $role = get_role('customer');
     if ($role && !$role->has_cap('upload_files')) {
