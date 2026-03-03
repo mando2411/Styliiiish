@@ -1641,6 +1641,62 @@ add_filter('woocommerce_product_variation_get_price', 'wf_apply_vendor_markup', 
 add_filter('woocommerce_product_variation_get_regular_price', 'wf_apply_vendor_markup', 20, 2);
 add_filter('woocommerce_product_variation_get_sale_price', 'wf_apply_vendor_markup', 20, 2);
 
+function wf_is_commission_vendor_user( $user_id ) {
+    $user_id = intval( $user_id );
+    if ( $user_id <= 0 ) {
+        return false;
+    }
+
+    $user = get_userdata( $user_id );
+    if ( ! $user ) {
+        return false;
+    }
+
+    $roles = (array) $user->roles;
+
+    return (
+        in_array( 'taj_vendor', $roles, true )
+        || in_array( 'taj_vendor_pending', $roles, true )
+        || in_array( 'taj_vendor_suspended', $roles, true )
+    );
+}
+
+function wf_calculate_markup_price( $price, $type, $value ) {
+    if ( $price === '' || $price === null ) {
+        return $price;
+    }
+
+    $numeric_price = floatval( $price );
+
+    if ( $type === 'percent' ) {
+        return $numeric_price + ( ( $numeric_price * $value ) / 100 );
+    }
+
+    if ( $type === 'fixed' ) {
+        return $numeric_price + $value;
+    }
+
+    return $price;
+}
+
+function wf_flush_commission_price_cache() {
+    if ( function_exists( 'wc_delete_product_transients' ) ) {
+        wc_delete_product_transients();
+    }
+
+    if ( class_exists( 'WC_Cache_Helper' ) ) {
+        WC_Cache_Helper::get_transient_version( 'product', true );
+    }
+}
+
+add_action( 'update_option_wf_commission_type', function () {
+    wf_flush_commission_price_cache();
+}, 10, 0 );
+
+add_action( 'update_option_wf_commission_value', function () {
+    wf_flush_commission_price_cache();
+}, 10, 0 );
+
 function wf_apply_vendor_markup( $price, $product ) {
 
     if ( is_admin() && ! defined('DOING_AJAX') ) {
@@ -1649,8 +1705,8 @@ function wf_apply_vendor_markup( $price, $product ) {
 
     $vendor_id = get_post_field( 'post_author', $product->get_id() );
 
-    // Only for vendors
-    if ( ! user_can( $vendor_id, 'taj_vendor' ) ) {
+    // Only for vendor accounts (active / pending / suspended)
+    if ( ! wf_is_commission_vendor_user( $vendor_id ) ) {
         return $price;
     }
 
@@ -1661,21 +1717,7 @@ function wf_apply_vendor_markup( $price, $product ) {
         return $price;
     }
 
-    // Percentage
-    if ( $type === 'percent' ) {
-
-        $markup = ( $price * $value ) / 100;
-        return $price + $markup;
-
-    }
-
-    // Fixed
-    if ( $type === 'fixed' ) {
-
-        return $price + $value;
-    }
-
-    return $price;
+    return wf_calculate_markup_price( $price, $type, $value );
 }
 
 
