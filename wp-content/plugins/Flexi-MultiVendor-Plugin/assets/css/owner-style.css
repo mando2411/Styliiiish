@@ -638,6 +638,9 @@ td[data-label="Price"] .inline-edit:focus{
 /* Dropdowns */
 #styliiiish-filter-cat,
 #styliiiish-filter-status,
+#styliiiish-filter-status-user,
+#styliiiish-sort,
+#styliiiish-per-row,
 #styliiiish-bulk-action {
     padding: 7px 12px;
     font-size: 14px;
@@ -648,6 +651,9 @@ td[data-label="Price"] .inline-edit:focus{
 }
 #styliiiish-filter-cat:focus,
 #styliiiish-filter-status:focus,
+#styliiiish-filter-status-user:focus,
+#styliiiish-sort:focus,
+#styliiiish-per-row:focus,
 #styliiiish-bulk-action:focus {
     border-color:#0073aa;
     box-shadow: 0 0 0 2px rgba(0,115,170,0.12);
@@ -665,12 +671,26 @@ td[data-label="Price"] .inline-edit:focus{
     display:flex;
     align-items:center;
     gap:10px;
+    flex-wrap: wrap;
 }
         
 .styliiiish-bulk-group {
     display:flex;
     align-items:center;
     gap:10px;
+    flex-wrap: wrap;
+}
+
+.styliiiish-filters-group label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #5f6b7a;
+    margin-left: 0 !important;
+}
+
+#styliiiish-sort,
+#styliiiish-per-row {
+    min-width: 120px;
 }
         
 /* صياغة select status */
@@ -1526,11 +1546,68 @@ body.attr-modal-open {
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+    margin: 2px 0 8px;
+}
+
+#styliiiish-add-product {
+    height: 42px;
+    padding: 0 18px !important;
+    border-radius: 10px !important;
+    border: 1px solid #0073aa !important;
+    background: #0073aa !important;
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: .2px;
+    box-shadow: 0 6px 16px rgba(0, 115, 170, 0.22);
+    transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+
+#styliiiish-add-product:hover {
+    background: #005f8d !important;
+    box-shadow: 0 8px 18px rgba(0, 95, 141, 0.28);
+    transform: translateY(-1px);
+}
+
+#styliiiish-add-product:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 115, 170, 0.2), 0 8px 18px rgba(0, 95, 141, 0.25);
 }
 
 .styliiiish-add-note {
     font-size: 13px;
     opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+    .styliiiish-toolbar {
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .styliiiish-filters-group,
+    .styliiiish-bulk-group {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    #styliiiish-search,
+    #styliiiish-filter-cat,
+    #styliiiish-filter-status,
+    #styliiiish-filter-status-user,
+    #styliiiish-sort,
+    #styliiiish-per-row,
+    #styliiiish-bulk-action,
+    #styliiiish-bulk-apply,
+    #styliiiish-add-product {
+        width: 100% !important;
+        min-width: 0;
+    }
+
+    .styliiiish-filters-group label {
+        margin: 4px 0 -2px !important;
+    }
 }
 
 /* ============================
