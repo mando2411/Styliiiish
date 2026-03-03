@@ -12,6 +12,11 @@ jQuery(function($){
 
 
 
+var wfModal = window.wfModal || {
+   ajax: (window.ajax_object && ajax_object.ajax_url) ? ajax_object.ajax_url : '',
+   nonce: (window.ajax_object && ajax_object.nonce) ? ajax_object.nonce : ''
+};
+
 console.log(wfModal);
 
 

@@ -1031,6 +1031,15 @@ $(document).on("click", "#editCatsModal", function (e) {
    /**************************** // Function Of Add New product *******************************************/
            jQuery(document).on('click', '#styliiiish-add-product', function (e) {
                 e.preventDefault();
+
+                var addProductNonce = (window.wfModal && wfModal.nonce)
+                    ? wfModal.nonce
+                    : ((window.ajax_object && ajax_object.nonce) ? ajax_object.nonce : '');
+
+                if (!addProductNonce) {
+                    Swal.fire("Error", "Security token missing. Please refresh the page.", "error");
+                    return;
+                }
             
                 Swal.fire({
                     title: "Create new product?",
@@ -1046,7 +1055,7 @@ $(document).on("click", "#editCatsModal", function (e) {
                     jQuery.post(ajax_object.ajax_url, {
             
                         action: 'styliiiish_add_new_product',
-                        nonce: wfModal.nonce
+                        nonce: addProductNonce
             
                     }, function (response) {
             

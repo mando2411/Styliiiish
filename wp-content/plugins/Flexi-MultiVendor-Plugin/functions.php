@@ -83,7 +83,11 @@ add_shortcode('styliiiish_user_manage_products', 'styliiiish_user_manage_product
 
 add_action('wp_enqueue_scripts', function () {
 
-    if ( ! function_exists('is_account_page') || ! is_account_page() ) {
+    $is_account_context = function_exists('is_account_page') && is_account_page();
+    $is_vendor_dashboard_endpoint = get_query_var('vendor-dashboard', false) !== false;
+    $is_moderate_site_endpoint = get_query_var('moderate-site', false) !== false;
+
+    if ( ! $is_account_context && ! $is_vendor_dashboard_endpoint && ! $is_moderate_site_endpoint ) {
         return;
     }
 
