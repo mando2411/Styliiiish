@@ -2004,9 +2004,19 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
         wp_send_json_error('Not found');
     }
 
-    // السعر
+    // السعر (Woo actual price with fallback)
     $price = get_post_meta($pid,'_regular_price',true);
-    $sale = get_post_meta($pid,'_sale_price',true);
+    $sale  = get_post_meta($pid,'_sale_price',true);
+
+    $product_for_price = wc_get_product($pid);
+    if ($product_for_price) {
+        $regular_price = (string) $product_for_price->get_regular_price();
+        $sale_price    = (string) $product_for_price->get_sale_price();
+        $current_price = (string) $product_for_price->get_price();
+
+        $price = $regular_price !== '' ? $regular_price : $current_price;
+        $sale  = $sale_price;
+    }
 
 
     // الكاتيجوري
