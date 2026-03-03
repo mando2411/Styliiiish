@@ -52,8 +52,7 @@ $(document).on("click", ".styliiiish-upload-btn", function (e) {
 
     currentImageProd = pid;
 
-    console.log("FINAL PRODUCT ID:", currentImageProd);
-    console.log("CTX:", currentImageContext);
+
 
     if (!currentImageProd) {
         Swal.fire(
@@ -142,8 +141,7 @@ $(document).on('submit','#addProductForm',function(e){
  form.append('nonce', wfModal.nonce); // مهم
  form.append('product_id', window.currentProductId);
 
- console.log('SAVE NONCE:', wfModal.nonce);
- console.log('SAVE PID:', window.currentProductId);
+
 
  $.ajax({
 
@@ -156,7 +154,6 @@ $(document).on('submit','#addProductForm',function(e){
 
    success:function(res){
 
-     console.log('SAVE RESPONSE:',res);
 
      if(res.success){
 
@@ -192,8 +189,6 @@ $(document).on('submit','#addProductForm',function(e){
 
    error:function(xhr){
 
-     console.log('STATUS:',xhr.status);
-     console.log('RESPONSE:',xhr.responseText);
 
    }
 
@@ -373,7 +368,6 @@ $(document).on('change','#fCats',function(){
 
  },function(res){
 
-   console.log(res); // ← مهم جدًا للتجربة
 
    if(res.success){
 
@@ -502,7 +496,6 @@ $(document).on('click','.btn-edit-product',function(e){
 
    if(!pid) return;
 
-   console.log('Edit product:', pid);
 
    $.post(wfModal.ajax,{
 
