@@ -465,16 +465,16 @@ $(document).on('click', '.sty-reject', function(e){
     const wfRenderVendorListError = (message) => {
         $(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
     };
-
+/*
 $(document).on("click", ".vp-filter-btn", function (e) {
     e.preventDefault();
 
-    /*let status = $(this).data("status");
+    let status = $(this).data("status");
 
     // Active state
     $(".vp-filter-btn").removeClass("active");
     $(this).addClass("active");
-*/
+
     // Show skeleton loader
     let skeleton = `
         <div class="sty-skeleton-wrap">
@@ -509,7 +509,7 @@ $(document).on("click", ".vp-filter-btn", function (e) {
 
     }, 'json');
 });
-
+*/
 						  
 						  
 						  
