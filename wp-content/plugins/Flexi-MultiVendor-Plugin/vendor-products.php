@@ -322,8 +322,21 @@ function styliiiish_render_vendor_products() {
     <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
 jQuery(function($){
 
- 
-});
+    function wfRenderVendorListLoading() {
+        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">Loading...</div>');
+    }
+
+    function wfRenderVendorListError(message) {
+        var safeMessage = message || 'حدث خطأ أثناء تحميل البيانات.';
+        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + safeMessage + '</div>');
+    }
+
+
+	var pendingBtn = $(".vp-filter-btn[data-status='pending']");
+
+	if (pendingBtn.length) {
+		pendingBtn.trigger("click");
+	}
 
 	
 	
