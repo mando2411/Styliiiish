@@ -469,12 +469,12 @@ $(document).on('click', '.sty-reject', function(e){
 $(document).on("click", ".vp-filter-btn", function (e) {
     e.preventDefault();
 
-    let status = $(this).data("status");
+    /*let status = $(this).data("status");
 
     // Active state
     $(".vp-filter-btn").removeClass("active");
     $(this).addClass("active");
-
+*/
     // Show skeleton loader
     let skeleton = `
         <div class="sty-skeleton-wrap">
