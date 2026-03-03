@@ -25,8 +25,6 @@
         <span id="noImg">No Image</span>
     </div>
 
-    <div class="preview-gallery" id="previewGallery"></div>
-
     <div class="preview-title" id="prevTitle">
         Product Name
     </div>
@@ -113,21 +111,6 @@ Leave sale empty if no discount
 <label>Description</label>
 <textarea name="desc" id="fDesc"></textarea>
 </div>
-
-<?php
-$wf_user_type_modal = function_exists('wf_od_get_user_type') ? wf_od_get_user_type(get_current_user_id()) : '';
-$wf_is_admin_modal = current_user_can('manage_woocommerce') || in_array($wf_user_type_modal, ['manager', 'dashboard'], true);
-?>
-
-<?php if ($wf_is_admin_modal): ?>
-<div class="wf-field">
-<label>Status</label>
-<select name="admin_status" id="fAdminStatus">
-  <option value="draft">Draft</option>
-  <option value="publish">Active</option>
-</select>
-</div>
-<?php endif; ?>
 
 
 
