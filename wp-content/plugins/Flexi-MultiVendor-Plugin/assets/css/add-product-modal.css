@@ -131,6 +131,34 @@
    object-fit:cover;
 }
 
+.preview-gallery{
+   margin-top:10px;
+   display:grid;
+   grid-template-columns:repeat(auto-fill,minmax(52px,1fr));
+   gap:8px;
+}
+
+.preview-gallery .preview-thumb{
+   width:100%;
+   aspect-ratio:1/1;
+   object-fit:cover;
+   border-radius:8px;
+   border:2px solid transparent;
+   cursor:pointer;
+   transition:.15s ease;
+   background:#f1f5f9;
+}
+
+.preview-gallery .preview-thumb:hover{
+   transform:translateY(-1px);
+   border-color:#c7d2fe;
+}
+
+.preview-gallery .preview-thumb.is-active{
+   border-color:#4f46e5;
+   box-shadow:0 0 0 2px rgba(79,70,229,.12);
+}
+
 
 /* Title */
 

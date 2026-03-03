@@ -2042,6 +2042,21 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
             ? wp_get_attachment_image_url($thumb_id,'medium')
             : '';
 
+    $gallery_raw = get_post_meta($pid, '_product_image_gallery', true);
+    $gallery_ids = !empty($gallery_raw) ? array_filter(array_map('intval', explode(',', $gallery_raw))) : [];
+    $gallery_urls = [];
+
+    foreach ($gallery_ids as $gallery_id) {
+        if ($gallery_id === (int) $thumb_id) {
+            continue;
+        }
+
+        $gallery_url = wp_get_attachment_image_url($gallery_id, 'thumbnail');
+        if ($gallery_url) {
+            $gallery_urls[] = $gallery_url;
+        }
+    }
+
         /* ========== GET ATTRIBUTES (FROM PRODUCT) ========== */
 
 $attrs = [];
@@ -2092,6 +2107,7 @@ if($product){
         'status' => get_post_status($pid),
         'cats'  => $cats,
         'attrs' => $attrs,
+        'gallery' => $gallery_urls,
         'image' => $img // ✅ الصورة
     
     ]);

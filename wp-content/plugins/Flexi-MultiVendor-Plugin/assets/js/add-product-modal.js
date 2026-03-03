@@ -23,6 +23,60 @@ if(window.wfAddModalLoaded){return;}
 window.currentProductId = 0;
 let pendingAttrs = null;
 
+function renderPreviewGallery(images, mainImage) {
+
+   var list = Array.isArray(images) ? images.filter(Boolean) : [];
+   var main = mainImage || '';
+
+   if (main) {
+      list = list.filter(function(url){ return url !== main; });
+      list.unshift(main);
+   }
+
+   var $gallery = $('#previewGallery');
+   $gallery.empty();
+
+   if (!list.length) {
+      return;
+   }
+
+   list.forEach(function(url, index){
+      var $thumb = $('<img>')
+         .addClass('preview-thumb')
+         .attr('src', url)
+         .attr('alt', 'Product image ' + (index + 1));
+
+      if (index === 0) {
+         $thumb.addClass('is-active');
+      }
+
+      $thumb.on('click', function(){
+         $('#previewGallery .preview-thumb').removeClass('is-active');
+         $(this).addClass('is-active');
+
+         $('#previewImg').attr('src', url).show();
+         $('#noImg').hide();
+      });
+
+      $gallery.append($thumb);
+   });
+}
+
+function syncPreviewGalleryFromImagesHtml(html, mainImage) {
+   var urls = [];
+   if (html) {
+      var $tmp = $('<div>').html(html);
+      $tmp.find('.styliiiish-img-item img').each(function(){
+         var src = $(this).attr('src');
+         if (src) {
+            urls.push(src);
+         }
+      });
+   }
+
+   renderPreviewGallery(urls, mainImage || $('#previewImg').attr('src') || '');
+}
+
 
 
 
@@ -69,6 +123,7 @@ $(document).on("click", ".styliiiish-upload-btn", function (e) {
         function (response) {
 
             $("#styliiiish-images-list").html(response.data.html);
+         syncPreviewGalleryFromImagesHtml(response.data.html, response.data.main_url || $('#previewImg').attr('src') || '');
 
             $("#styliiiishImageModal").css("display", "flex");
         }
@@ -314,6 +369,7 @@ function resetBuilder(){
 
    $('#prevCats').html('');
    $('#prevAttrs').html('');
+   $('#previewGallery').empty();
 
    $('#prevRegular')
      .removeClass('discount')
@@ -526,11 +582,13 @@ $(document).on('click','.btn-edit-product',function(e){
              .show();
         
            $("#noImg").hide();
+           renderPreviewGallery(p.gallery || [], p.image);
         
         }else{
         
            $("#previewImg").hide();
            $("#noImg").show();
+           renderPreviewGallery(p.gallery || [], '');
         }
 
 

@@ -25,6 +25,8 @@
         <span id="noImg">No Image</span>
     </div>
 
+    <div class="preview-gallery" id="previewGallery"></div>
+
     <div class="preview-title" id="prevTitle">
         Product Name
     </div>
