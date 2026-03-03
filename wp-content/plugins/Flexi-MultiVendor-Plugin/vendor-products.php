@@ -332,13 +332,7 @@ jQuery(function($){
     };
 	
 	
-	$(document).ready(function(){
 
-    let pendingBtn = $(".vp-filter-btn[data-status='pending']");
-
-    if (pendingBtn.length) {
-        pendingBtn.trigger("click");
-    }
 
 });
 
