@@ -111,6 +111,16 @@ function fable_extra_quick_view_callback() {
 
 if ( ! function_exists( 'fable_extra_quick_view' ) ) :
 function fable_extra_quick_view() {
+     if ( is_admin() ) {
+         return;
+     }
+
+     // Do not inject quick-view overlay into account/dashboard endpoints
+     // (e.g. /my-account/moderate-site/) where it appears as broken footer HTML.
+     if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+         return;
+     }
+
      if ( class_exists( 'woocommerce' ) ) {
          $args = array(
              'post_type' => 'product'
