@@ -87,6 +87,27 @@ function styliiiish_paymob_guard_is_enabled(): bool {
     return is_array($pixel_settings) && (($pixel_settings['enabled'] ?? 'no') === 'yes');
 }
 
+function styliiiish_paymob_guard_is_protected_plugin_style(string $handle, string $src = ''): bool {
+    $protected_handles = [
+        'sty-owner-css',
+        'sty-owner-mobile-css',
+        'wf-add-modal',
+        'styliiiish-myaccount-css',
+        'wf-vendor-orders',
+    ];
+
+    if (in_array($handle, $protected_handles, true)) {
+        return true;
+    }
+
+    $src = strtolower($src);
+    if ($src === '') {
+        return false;
+    }
+
+    return strpos($src, '/wp-content/plugins/flexi-multivendor-plugin/') !== false;
+}
+
 add_action('template_redirect', function () {
     if (is_admin() || (function_exists('wp_doing_ajax') && wp_doing_ajax())) {
         return;
@@ -297,6 +318,11 @@ add_action('wp_print_styles', function () {
         }
 
         $src = (string) ($wp_styles->registered[$handle]->src ?? '');
+
+        if (styliiiish_paymob_guard_is_protected_plugin_style($handle, $src)) {
+            continue;
+        }
+
         if ($src === '') {
             continue;
         }
