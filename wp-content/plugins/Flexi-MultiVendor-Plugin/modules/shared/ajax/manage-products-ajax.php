@@ -1865,6 +1865,11 @@ function sty_add_product(){
     $sale  = floatval($_POST['sale_price'] ?? 0);
     $cat   = intval($_POST['cats'] ?? 0);
 
+    $user_id = get_current_user_id();
+    $user_type = function_exists('wf_od_get_user_type') ? wf_od_get_user_type($user_id) : '';
+    $is_admin_creator = in_array($user_type, ['manager', 'dashboard'], true) || current_user_can('manage_woocommerce');
+    $target_status = $is_admin_creator ? 'draft' : 'pending';
+
     // صلاحيات
     if($pid && !current_user_can('edit_post',$pid)){
         wp_send_json_error(['msg'=>'No permission']);
@@ -1878,7 +1883,7 @@ function sty_add_product(){
             'ID'           => $pid,
             'post_title'   => $title,
             'post_content' => $desc,
-            'post_status'  => 'pending'
+            'post_status'  => $target_status
         ]);
 
         $id = $pid;
@@ -1889,8 +1894,8 @@ function sty_add_product(){
             'post_type'    => 'product',
             'post_title'   => $title,
             'post_content' => $desc,
-            'post_status'  => 'pending',
-            'post_author'  => get_current_user_id()
+            'post_status'  => $target_status,
+            'post_author'  => $user_id
         ]);
 
     }
