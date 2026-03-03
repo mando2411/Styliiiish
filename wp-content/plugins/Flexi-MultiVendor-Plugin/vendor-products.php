@@ -78,9 +78,9 @@ function styliiiish_vendor_moderate_cb() {
         wp_send_json_error(['message' => 'Bad nonce']);
     }
 
-    // Role check: manager/dashboard or Woo admin
+    // ????????? ????????
     $user_type = wf_od_get_user_type(get_current_user_id());
-    if ( ! in_array($user_type, ['manager','dashboard'], true) && ! current_user_can('manage_woocommerce') ) {
+    if ( ! in_array($user_type, ['manager','dashboard']) ) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -191,7 +191,7 @@ function sty_filter_vendor_products_cb() {
     }
 
     $user_type = wf_od_get_user_type(get_current_user_id());
-    if (!in_array($user_type, ['manager', 'dashboard'], true) && !current_user_can('manage_woocommerce')) {
+    if (!in_array($user_type, ['manager', 'dashboard'])) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -301,7 +301,7 @@ function styliiiish_render_vendor_products() {
 
 		
 						<div class="sty-vendor-filters">
-                            <button class="vp-filter-btn active" data-status="pending">Pending</button>
+							<button class="vp-filter-btn" data-status="pending">Pending</button>
 							<button class="vp-filter-btn" data-status="publish">Active</button>
 							<button class="vp-filter-btn" data-status="incomplete">Incomplete</button>
 							<button class="vp-filter-btn" data-status="deactivated">Deactivated</button>
@@ -313,53 +313,25 @@ function styliiiish_render_vendor_products() {
 
 	
 	
-    <?php if ( $q && $q->have_posts() ) : ?>
-        <?php foreach ( $q->posts as $post ) : ?>
-            <?php echo sty_render_vendor_single_card( $post->ID ); ?>
-        <?php endforeach; ?>
-    <?php else : ?>
-        <div class="sty-no-items" translate="no">No dresses found.</div>
-    <?php endif; ?>
+    <div class="sty-loading">Loading dresses...</div>
 </div>
 
 
     </div>
 
-    <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
+   <script>
 jQuery(function($){
+	
+	
+	$(document).ready(function(){
 
-        if (!window.ajax_object || !window.ajax_object.ajax_url || !window.ajax_object.nonce) {
-            window.ajax_object = {
-                ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
-                nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
-            };
-        }
+    let pendingBtn = $(".vp-filter-btn[data-status='pending']");
 
-    function wfRenderVendorListLoading() {
-        var $list = $(".sty-vendor-list");
-        var $item = $("<div>")
-            .addClass("sty-no-items")
-            .attr("translate", "no")
-            .text("Loading...");
-        $list.empty().append($item);
+    if (pendingBtn.length) {
+        pendingBtn.trigger("click");
     }
 
-    function wfRenderVendorListError(message) {
-        var safeMessage = message || "حدث خطأ أثناء تحميل البيانات.";
-        var $list = $(".sty-vendor-list");
-        var $item = $("<div>")
-            .addClass("sty-no-items")
-            .attr("translate", "no")
-            .text(safeMessage);
-        $list.empty().append($item);
-    }
-
-
-	var pendingBtn = $('.vp-filter-btn').filter('[data-status="pending"]');
-
-	if (pendingBtn.length) {
-		pendingBtn.trigger("click");
-	}
+});
 
 	
 	
@@ -490,30 +462,49 @@ $(document).on('click', '.sty-reject', function(e){
     // =========================
     // Filters: Pending / Active / Incomplete / Deactivated
     // =========================
-  
-    $(document).on("click", ".vp-filter-btn", function (e) {
-        e.preventDefault();
+$(document).on("click", ".vp-filter-btn", function (e) {
+    e.preventDefault();
 
-        var status = $(this).data("status");
+    let status = $(this).data("status");
 
-        $(".vp-filter-btn").removeClass("active");
-        $(this).addClass("active");
+    // Active state
+    $(".vp-filter-btn").removeClass("active");
+    $(this).addClass("active");
 
-        wfRenderVendorListLoading();
+    // Show skeleton loader
+    let skeleton = `
+        <div class="sty-skeleton-wrap">
+            ${Array(6).fill(`
+                <div class="sty-skeleton-card">
+					<div class="sk-thumb"></div>
+					<div class="sk-body">
+						<div class="sk-line title"></div>
+						<div class="sk-line"></div>
+						<div class="sk-line small"></div>
+					</div>
+				</div>
+            `).join('')}
+        </div>
+    `;
 
-        $.post(ajax_object.ajax_url, {
-            action: "sty_filter_vendor_products",
-            nonce: ajax_object.nonce,
-            status: status
-        }, function (resp) {
-            if (!resp || !resp.success) {
-                wfRenderVendorListError('فشل تحميل الفساتين.');
-                return;
-            }
+    $(".sty-vendor-list").html(skeleton);
 
-            $(".sty-vendor-list").html(resp.data.html);
-        }, 'json');
-    });
+    // AJAX request
+    $.post(ajax_object.ajax_url, {
+        action: "sty_filter_vendor_products",
+        nonce: ajax_object.nonce,
+        status: status
+    }, function (resp) {
+
+        if (!resp || !resp.success) {
+            $(".sty-vendor-list").html('<div class="sty-no-items">Failed to load dresses.</div>');
+            return;
+        }
+
+        $(".sty-vendor-list").html(resp.data.html);
+
+    }, 'json');
+});
 
 						  
 						  
@@ -523,7 +514,17 @@ $(document).on('click', '.sty-reject', function(e){
 						  
 
 						
-				  
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						  
 						  
 						  
 						  
@@ -558,27 +559,7 @@ function sty_render_vendor_single_card($product_id){
 
     // === Data ===
     $name       = $p->get_name();
-
-    $raw_desc   = (string) $p->get_description();
-    $js_markers = [
-        '$(document).on("click"',
-        '$(document).on(\'click\'',
-        '$.post(',
-        'ajax_object.',
-        'sty_filter_vendor_products',
-        'wfRenderVendorListError',
-    ];
-
-    foreach ( $js_markers as $marker ) {
-        $pos = strpos( $raw_desc, $marker );
-        if ( $pos !== false ) {
-            $raw_desc = substr( $raw_desc, 0, $pos );
-            break;
-        }
-    }
-
-    $raw_desc = wp_strip_all_tags( $raw_desc );
-    $desc     = wp_trim_words( $raw_desc, 20, '...' );
+    $desc       = wp_trim_words( $p->get_description(), 20, '...' );
     $price      = $p->get_regular_price();
     $price      = $price ? wc_price($price) : '�';
     $date_obj = $p->get_date_created();
@@ -598,7 +579,7 @@ function sty_render_vendor_single_card($product_id){
 
     ob_start(); ?>
 
-    <div class="sty-vendor-card notranslate trp-no-translate" data-id="<?php echo $product_id; ?>" translate="no" data-no-translation="1">
+    <div class="sty-vendor-card" data-id="<?php echo $product_id; ?>">
 
         <div class="sty-vendor-card-left">
             <div class="sty-vendor-checkbox">
@@ -612,15 +593,15 @@ function sty_render_vendor_single_card($product_id){
 
         <div class="sty-vendor-card-body">
 
-            <div class="sty-vendor-title" translate="no">
+            <div class="sty-vendor-title">
                 <?php echo esc_html($name); ?>
             </div>
 
-            <div class="sty-vendor-desc" translate="no">
+            <div class="sty-vendor-desc">
                 <strong>Description: </strong> <?php echo esc_html($desc); ?>
             </div>
 
-            <div class="sty-vendor-cond" translate="no">
+            <div class="sty-vendor-cond">
                 <strong>Condition: </strong> <?php echo esc_html($condition); ?>
             </div>
 
