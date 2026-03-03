@@ -25,7 +25,7 @@ function styliiiish_render_manage_products( $mode = 'owner' ){
     // - user mode: أي يوزر مسجل دخول، هنتحكم في الفلترة من AJAX بعدين
     if ($mode === 'owner') {
         if (!current_user_can('manage_woocommerce')) {
-            echo esc_html__('No permission', 'styliiiish');
+            echo esc_html__('No permission', 'website-flexi');
             return;
         }
     } else {
