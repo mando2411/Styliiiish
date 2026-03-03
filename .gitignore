@@ -10,6 +10,8 @@ wp-content/uploads/flutter_firebase/*.json
 wp-content/uploads/wc-logs/
 #wp-content/plugins/
 wp-content/languages/
+wp-content/mu-plugins/hostinger-auto-updates.php
+wp-content/themes/twentytwentyfive/
 
 # Secrets
 wp-config.php
