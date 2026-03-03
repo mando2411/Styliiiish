@@ -462,28 +462,7 @@ $(document).on('click', '.sty-reject', function(e){
     // =========================
     // Filters: Pending / Active / Incomplete / Deactivated
     // =========================
-    function wfRenderVendorListError(message) {
-        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + message + '</div>');
-    }
 
-    function wfBuildVendorSkeleton(count) {
-        var card = ''
-            + '<div class="sty-skeleton-card">'
-            + '  <div class="sk-thumb"></div>'
-            + '  <div class="sk-body">'
-            + '    <div class="sk-line title"></div>'
-            + '    <div class="sk-line"></div>'
-            + '    <div class="sk-line small"></div>'
-            + '  </div>'
-            + '</div>';
-
-        var cardsHtml = '';
-        for (var index = 0; index < count; index++) {
-            cardsHtml += card;
-        }
-
-        return '<div class="sty-skeleton-wrap">' + cardsHtml + '</div>';
-    }
 
     $(document).on("click", ".vp-filter-btn", function (e) {
         e.preventDefault();
