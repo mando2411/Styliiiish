@@ -16,7 +16,17 @@
 <?php wp_body_open(); ?>
 
 	<div id="page" class="site">
+		<a class="skip-link screen-reader-text" href="#content"><?php esc_html_e( 'Skip to content', 'shopire' ); ?></a>
 	
+	<?php 
+		// Theme Header
+		do_action('shopire_site_main_header'); 
+		
+		// Theme Breadcrumb
+		if ( !is_page_template( 'page-templates/frontpage.php' )) {
+				get_template_part('/template-parts/site','breadcrumb');
+		}
+	?>
 	
 	<div id="content" class="site-content">
 	
