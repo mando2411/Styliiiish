@@ -459,7 +459,33 @@ $(document).on('click', '.sty-reject', function(e){
     });
 });
 
-    // Filters logic moved to footer script to avoid inline block corruption by translation layers.
+    // =========================
+    // Filters: Pending / Active / Incomplete / Deactivated
+    // =========================
+  
+    $(document).on("click", ".vp-filter-btn", function (e) {
+        e.preventDefault();
+
+        var status = $(this).data("status");
+
+        $(".vp-filter-btn").removeClass("active");
+        $(this).addClass("active");
+
+        $(".sty-vendor-list").html(wfBuildVendorSkeleton(6));
+
+        $.post(ajax_object.ajax_url, {
+            action: "sty_filter_vendor_products",
+            nonce: ajax_object.nonce,
+            status: status
+        }, function (resp) {
+            if (!resp || !resp.success) {
+                wfRenderVendorListError('فشل تحميل الفساتين.');
+                return;
+            }
+
+            $(".sty-vendor-list").html(resp.data.html);
+        }, 'json');
+    });
 
 						  
 						  
@@ -771,49 +797,6 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
 	const wfRenderVendorListErrorLocal = (message) => {
 		$(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
 	};
-
-    function wfBuildVendorSkeletonLocal(count) {
-        var card = ''
-            + '<div class="sty-skeleton-card">'
-            + '  <div class="sk-thumb"></div>'
-            + '  <div class="sk-body">'
-            + '    <div class="sk-line title"></div>'
-            + '    <div class="sk-line"></div>'
-            + '    <div class="sk-line small"></div>'
-            + '  </div>'
-            + '</div>';
-
-        var cardsHtml = '';
-        for (var index = 0; index < count; index++) {
-            cardsHtml += card;
-        }
-
-        return '<div class="sty-skeleton-wrap">' + cardsHtml + '</div>';
-    }
-
-    $(document).on("click", ".vp-filter-btn", function (e) {
-        e.preventDefault();
-
-        var status = $(this).data("status");
-
-        $(".vp-filter-btn").removeClass("active");
-        $(this).addClass("active");
-
-        $(".sty-vendor-list").html(wfBuildVendorSkeletonLocal(6));
-
-        $.post(ajax_object.ajax_url, {
-            action: "sty_filter_vendor_products",
-            nonce: ajax_object.nonce,
-            status: status
-        }, function (resp) {
-            if (!resp || !resp.success) {
-                wfRenderVendorListErrorLocal('فشل تحميل الفساتين.');
-                return;
-            }
-
-            $(".sty-vendor-list").html(resp.data.html);
-        }, 'json');
-    });
 
     // Auto-load Pending on page open
     function loadPending() {
