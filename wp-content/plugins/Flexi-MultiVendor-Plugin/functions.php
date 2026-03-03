@@ -1636,6 +1636,10 @@ function wf_add_support_tab($items){
 
 add_filter('woocommerce_product_get_price', 'wf_apply_vendor_markup', 20, 2);
 add_filter('woocommerce_product_get_regular_price', 'wf_apply_vendor_markup', 20, 2);
+add_filter('woocommerce_product_get_sale_price', 'wf_apply_vendor_markup', 20, 2);
+add_filter('woocommerce_product_variation_get_price', 'wf_apply_vendor_markup', 20, 2);
+add_filter('woocommerce_product_variation_get_regular_price', 'wf_apply_vendor_markup', 20, 2);
+add_filter('woocommerce_product_variation_get_sale_price', 'wf_apply_vendor_markup', 20, 2);
 
 function wf_apply_vendor_markup( $price, $product ) {
 
