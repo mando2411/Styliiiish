@@ -729,24 +729,24 @@ function styliiiish_owner_dashboard_shortcode(){
         </h2>
 
         <!-- CARDS -->
-        <div class="owner-card" data-owner-section="products" role="button" tabindex="0">
+        <div class="owner-card" onclick="showSection('products')">
             <h3>🛍 Manage Products <span>→</span></h3>
         </div>
 
         <?php if ($is_manager): ?>
-            <div class="owner-card" data-owner-section="vendor_products" role="button" tabindex="0">
+            <div class="owner-card" onclick="showSection('vendor_products')">
                 <h3>👗 Customer Dresses Added <span>→</span></h3>
             </div>
 
-            <div class="owner-card" data-owner-section="orders" role="button" tabindex="0">
+            <div class="owner-card" onclick="showSection('orders')">
                 <h3>📦 Orders <span>→</span></h3>
             </div>
 
-            <div class="owner-card" data-owner-section="stats" role="button" tabindex="0">
+            <div class="owner-card" onclick="showSection('stats')">
                 <h3>📊 Statistics <span>→</span></h3>
             </div>
 
-            <div class="owner-card" data-owner-section="email" role="button" tabindex="0">
+            <div class="owner-card" onclick="showSection('email')">
                 <h3>✉️ Send Email <span>→</span></h3>
             </div>
         <?php endif; ?>
@@ -782,111 +782,17 @@ function styliiiish_owner_dashboard_shortcode(){
     </div>
 
     <script>
-        (function(){
-            window.showSection = function(section) {
-                document.querySelectorAll('.owner-section').forEach(function(sec){ sec.style.display = 'none'; });
-                var target = document.getElementById('section-' + section);
-                if (!target) return;
-                target.style.display = 'block';
-                if (window.scrollTo) {
-                    window.scrollTo({top: 300, behavior: 'smooth'});
-                }
-            };
-
-            var bindCard = function(card){
-                if (!card || card.dataset.wfBound === '1') return;
-                card.dataset.wfBound = '1';
-
-                card.addEventListener('click', function(){
-                    var section = card.getAttribute('data-owner-section');
-                    if (section) window.showSection(section);
-                });
-
-                card.addEventListener('keydown', function(e){
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        var section = card.getAttribute('data-owner-section');
-                        if (section) window.showSection(section);
-                    }
-                });
-            };
-
-            document.querySelectorAll('.owner-card[data-owner-section]').forEach(bindCard);
-        })();
+        function showSection(section) {
+            document.querySelectorAll('.owner-section').forEach(sec => sec.style.display = 'none');
+            document.getElementById("section-" + section).style.display = 'block';
+            window.scrollTo({top: 300, behavior: 'smooth'});
+        }
     </script>
 
     <?php
     return ob_get_clean();
         }
         add_shortcode('owner_dashboard', 'styliiiish_owner_dashboard_shortcode');
-
-function wf_plugin_notranslate_shortcode_tags() {
-    return [
-        'owner_dashboard',
-        'styliiiish_user_manage_products',
-        'user_products_dashboard',
-        'websiteflexi_vendor_orders',
-    ];
-}
-
-add_filter('do_shortcode_tag', function ($output, $tag) {
-    if (!in_array($tag, wf_plugin_notranslate_shortcode_tags(), true)) {
-        return $output;
-    }
-
-    return '<div class="wf-plugin-notranslate notranslate trp-no-translate" translate="no" data-no-translation="1">' . $output . '</div>';
-}, 10, 2);
-
-add_filter('trp_no_translate_selectors', function ($selectors) {
-    if (!is_array($selectors)) {
-        $selectors = [];
-    }
-
-    $selectors = array_merge($selectors, [
-        '.wf-plugin-notranslate',
-        '.owner-dashboard-container',
-        '.owner-section',
-        '.sty-vendor-review-wrapper',
-        '.sty-vendor-list',
-        '.sty-vendor-card',
-        '.sty-vendor-card-body',
-        '.sty-vendor-actions',
-        '.sty-vendor-meta',
-        '.sty-vendor-source',
-        '.taj-vendor-dashboard',
-    ]);
-
-    return array_values(array_unique($selectors));
-});
-
-add_action('wp_footer', function () {
-    ?>
-    <script id="wf-plugin-notranslate-guard">
-    (function(){
-        var selectors = [
-            '.wf-plugin-notranslate',
-            '.owner-dashboard-container',
-            '.owner-section',
-            '.sty-vendor-review-wrapper',
-            '.sty-vendor-list',
-            '.sty-vendor-card',
-            '.sty-vendor-card-body',
-            '.taj-vendor-dashboard'
-        ];
-
-        var mark = function(node){
-            if(!node || node.nodeType !== 1){ return; }
-            node.setAttribute('translate','no');
-            node.classList.add('notranslate','trp-no-translate');
-        };
-
-        selectors.forEach(function(selector){
-            document.querySelectorAll(selector).forEach(mark);
-        });
-    })();
-    </script>
-    <?php
-}, 999);
         
 
         
