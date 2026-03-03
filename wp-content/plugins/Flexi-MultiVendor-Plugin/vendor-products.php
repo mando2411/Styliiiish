@@ -323,16 +323,26 @@ function styliiiish_render_vendor_products() {
 jQuery(function($){
 
     function wfRenderVendorListLoading() {
-        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">Loading...</div>');
+        var $list = $(".sty-vendor-list");
+        var $item = $("<div>")
+            .addClass("sty-no-items")
+            .attr("translate", "no")
+            .text("Loading...");
+        $list.empty().append($item);
     }
 
     function wfRenderVendorListError(message) {
-        var safeMessage = message || 'حدث خطأ أثناء تحميل البيانات.';
-        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + safeMessage + '</div>');
+        var safeMessage = message || "حدث خطأ أثناء تحميل البيانات.";
+        var $list = $(".sty-vendor-list");
+        var $item = $("<div>")
+            .addClass("sty-no-items")
+            .attr("translate", "no")
+            .text(safeMessage);
+        $list.empty().append($item);
     }
 
 
-	var pendingBtn = $(".vp-filter-btn[data-status='pending']");
+	var pendingBtn = $('.vp-filter-btn').filter('[data-status="pending"]');
 
 	if (pendingBtn.length) {
 		pendingBtn.trigger("click");
