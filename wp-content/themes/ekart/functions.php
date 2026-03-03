@@ -85,33 +85,43 @@ function ekart_force_flexi_account_styles() {
 	wp_enqueue_style( 'woocommerce-smallscreen' );
 	wp_enqueue_style( 'woocommerce-general' );
 
-	wp_enqueue_style(
-		'sty-owner-css',
-		WF_OWNER_DASHBOARD_URL . 'assets/css/owner-style.css',
-		[],
-		null
-	);
+	if ( ! defined( 'WF_OWNER_DASHBOARD_PATH' ) || ! is_dir( WF_OWNER_DASHBOARD_PATH ) ) {
+		return;
+	}
 
-	wp_enqueue_style(
-		'sty-owner-mobile-css',
-		WF_OWNER_DASHBOARD_URL . 'assets/css/mobile.css',
-		[ 'sty-owner-css' ],
-		null
-	);
+	$base_path = rtrim( (string) WF_OWNER_DASHBOARD_PATH, '/\\' );
+	$base_url  = rtrim( (string) WF_OWNER_DASHBOARD_URL, '/' );
 
-	wp_enqueue_style(
-		'wf-add-modal',
-		WF_OWNER_DASHBOARD_URL . 'assets/css/add-product-modal.css',
-		[ 'sty-owner-css' ],
-		null
-	);
+	try {
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator( $base_path, FilesystemIterator::SKIP_DOTS )
+		);
 
-	wp_enqueue_style(
-		'styliiiish-myaccount-css',
-		WF_OWNER_DASHBOARD_URL . 'assets/css/myaccount-style.css',
-		[ 'sty-owner-css' ],
-		null
-	);
+		foreach ( $iterator as $file_info ) {
+			if ( ! $file_info instanceof SplFileInfo || ! $file_info->isFile() ) {
+				continue;
+			}
+
+			if ( strtolower( $file_info->getExtension() ) !== 'css' ) {
+				continue;
+			}
+
+			$absolute_path = str_replace( '\\', '/', $file_info->getPathname() );
+			$relative_path = ltrim( str_replace( '\\', '/', substr( $absolute_path, strlen( $base_path ) ) ), '/' );
+
+			if ( $relative_path === '' ) {
+				continue;
+			}
+
+			$handle = 'wf-flexi-css-' . md5( $relative_path );
+			$src    = $base_url . '/' . $relative_path;
+			$ver    = (string) $file_info->getMTime();
+
+			wp_enqueue_style( $handle, $src, [], $ver );
+		}
+	} catch ( Exception $e ) {
+		return;
+	}
 }
 add_action( 'wp_print_styles', 'ekart_force_flexi_account_styles', 10001 );
 
