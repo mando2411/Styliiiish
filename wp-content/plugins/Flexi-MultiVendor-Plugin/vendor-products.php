@@ -332,24 +332,20 @@ jQuery(function($){
     };
 	
 	
+	$(document).ready(function(){
 
+    let pendingBtn = $(".vp-filter-btn[data-status='pending']");
+
+    if (pendingBtn.length) {
+        pendingBtn.trigger("click");
+    }
 
 });
 
 	
 	
 
-    // Helper: send moderation request
-function sendModeration(productID, moderation, reason) {
-    return $.post(ajax_object.ajax_url, {
-        action: 'styliiiish_vendor_moderate',
-        nonce: ajax_object.nonce,
-        product_id: productID,
-        moderation: moderation,
-        reason: reason   // ????? ??? ???? || ''
-    }, null, 'json');
-}
-
+  
 
 
     // Approve single (card button)
