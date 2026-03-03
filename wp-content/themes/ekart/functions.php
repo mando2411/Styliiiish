@@ -39,12 +39,46 @@ add_action( 'wp_enqueue_scripts', 'ekart_disable_shopire_wow_animations', 1000 )
  * Load assets.
  */
 
+function ekart_is_account_like_request() {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+		return true;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	if ( $normalized === '' ) {
+		$normalized = '/';
+	}
+
+	$account_prefixes = [
+		'/my-account',
+		'/en/my-account',
+		'/ar/حسابي',
+		'/حسابي',
+	];
+
+	foreach ( $account_prefixes as $prefix ) {
+		if ( $normalized === $prefix || strpos( $normalized, $prefix . '/' ) === 0 ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function ekart_theme_css() {
 	$child_style_path = get_stylesheet_directory() . '/style.css';
 	$child_style_ver  = file_exists( $child_style_path ) ? (string) filemtime( $child_style_path ) : null;
 	wp_enqueue_style( 'ekart-style', get_stylesheet_uri(), [ 'shopire-style' ], $child_style_ver );
 
-	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+	if ( ekart_is_account_like_request() ) {
 		$account_style_rel  = '/assets/css/account-ui.css';
 		$account_script_rel = '/assets/js/account-ajax.js';
 		$account_style_path = get_stylesheet_directory() . $account_style_rel;
@@ -73,7 +107,7 @@ function ekart_theme_css() {
 add_action( 'wp_enqueue_scripts', 'ekart_theme_css', 99);
 
 function ekart_force_flexi_account_styles() {
-	if ( is_admin() || ! function_exists( 'is_account_page' ) || ! is_account_page() ) {
+	if ( ! ekart_is_account_like_request() ) {
 		return;
 	}
 
