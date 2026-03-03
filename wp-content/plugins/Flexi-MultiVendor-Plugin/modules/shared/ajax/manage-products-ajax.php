@@ -68,9 +68,9 @@ add_action('pre_get_posts', function ($q) {
     $dashboard_ids = wf_od_get_dashboard_ids();   // owner-dashboard access
 
     if (in_array($user_id, $manager_ids) || in_array($user_id, $dashboard_ids)) {
-        $template_id = 29323;  // OWNER TEMPLATE
+        $template_id = 1905;  // OWNER TEMPLATE
     } else {
-        $template_id = 29321;  // USER TEMPLATE
+        $template_id = 1954;  // USER TEMPLATE
     }
 
     // Permission check
