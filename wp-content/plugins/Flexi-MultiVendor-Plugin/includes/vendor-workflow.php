@@ -455,10 +455,11 @@ add_action( 'wp_head', function () {
 
     echo '<style id="wf-moderate-site-layout">'
         . '.wf-moderate-site-standalone{padding:0;margin:0;}'
-        . '.wf-moderate-site-shell{max-width:none;width:100%;margin:0;padding:0;}'
+        . '.wf-moderate-site-shell{width:100%;margin:0;padding:0;}'
         . '.wf-moderate-site-content{background:transparent;border:0;border-radius:0;padding:0;box-sizing:border-box;overflow:visible;}'
-        . '.wf-moderate-site-content .owner-dashboard-container{background:transparent;border-radius:0;padding:0;}'
-        . 'body.woocommerce-account .site,body.woocommerce-account .site-content,body.woocommerce-account #content,body.woocommerce-account #primary{margin:0!important;padding:0!important;}'
+        . '.wf-moderate-site-content .owner-dashboard-container{max-width:1280px;margin:0 auto;background:transparent;border-radius:0;padding:16px;}'
+        . '@media (max-width:992px){.wf-moderate-site-content .owner-dashboard-container{padding:12px;}}'
+        . 'body.woocommerce-account .site-content,body.woocommerce-account #content,body.woocommerce-account #primary{margin:0!important;padding:0!important;}'
         . '</style>';
 }, 99 );
 
