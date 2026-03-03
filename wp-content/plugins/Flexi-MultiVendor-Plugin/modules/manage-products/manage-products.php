@@ -279,6 +279,7 @@ $note = get_option('wf_vendor_add_note','');
 
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 
 
     <?php
