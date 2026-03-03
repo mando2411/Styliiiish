@@ -12,6 +12,7 @@ jQuery(function($){
 
 
 
+console.log(wfModal);
 
 
 
@@ -19,63 +20,9 @@ jQuery(function($){
 
 
 if(window.wfAddModalLoaded){return;}
-    
+window.wfAddModalLoaded = true;
 window.currentProductId = 0;
 let pendingAttrs = null;
-
-function renderPreviewGallery(images, mainImage) {
-
-   var list = Array.isArray(images) ? images.filter(Boolean) : [];
-   var main = mainImage || '';
-
-   if (main) {
-      list = list.filter(function(url){ return url !== main; });
-      list.unshift(main);
-   }
-
-   var $gallery = $('#previewGallery');
-   $gallery.empty();
-
-   if (!list.length) {
-      return;
-   }
-
-   list.forEach(function(url, index){
-      var $thumb = $('<img>')
-         .addClass('preview-thumb')
-         .attr('src', url)
-         .attr('alt', 'Product image ' + (index + 1));
-
-      if (index === 0) {
-         $thumb.addClass('is-active');
-      }
-
-      $thumb.on('click', function(){
-         $('#previewGallery .preview-thumb').removeClass('is-active');
-         $(this).addClass('is-active');
-
-         $('#previewImg').attr('src', url).show();
-         $('#noImg').hide();
-      });
-
-      $gallery.append($thumb);
-   });
-}
-
-function syncPreviewGalleryFromImagesHtml(html, mainImage) {
-   var urls = [];
-   if (html) {
-      var $tmp = $('<div>').html(html);
-      $tmp.find('.styliiiish-img-item img').each(function(){
-         var src = $(this).attr('src');
-         if (src) {
-            urls.push(src);
-         }
-      });
-   }
-
-   renderPreviewGallery(urls, mainImage || $('#previewImg').attr('src') || '');
-}
 
 
 
@@ -106,7 +53,8 @@ $(document).on("click", ".styliiiish-upload-btn", function (e) {
 
     currentImageProd = pid;
 
-
+    console.log("FINAL PRODUCT ID:", currentImageProd);
+    console.log("CTX:", currentImageContext);
 
     if (!currentImageProd) {
         Swal.fire(
@@ -123,7 +71,6 @@ $(document).on("click", ".styliiiish-upload-btn", function (e) {
         function (response) {
 
             $("#styliiiish-images-list").html(response.data.html);
-         syncPreviewGalleryFromImagesHtml(response.data.html, response.data.main_url || $('#previewImg').attr('src') || '');
 
             $("#styliiiishImageModal").css("display", "flex");
         }
@@ -196,7 +143,8 @@ $(document).on('submit','#addProductForm',function(e){
  form.append('nonce', wfModal.nonce); // مهم
  form.append('product_id', window.currentProductId);
 
-
+ console.log('SAVE NONCE:', wfModal.nonce);
+ console.log('SAVE PID:', window.currentProductId);
 
  $.ajax({
 
@@ -209,6 +157,7 @@ $(document).on('submit','#addProductForm',function(e){
 
    success:function(res){
 
+     console.log('SAVE RESPONSE:',res);
 
      if(res.success){
 
@@ -244,6 +193,8 @@ $(document).on('submit','#addProductForm',function(e){
 
    error:function(xhr){
 
+     console.log('STATUS:',xhr.status);
+     console.log('RESPONSE:',xhr.responseText);
 
    }
 
@@ -369,7 +320,6 @@ function resetBuilder(){
 
    $('#prevCats').html('');
    $('#prevAttrs').html('');
-   $('#previewGallery').empty();
 
    $('#prevRegular')
      .removeClass('discount')
@@ -424,6 +374,7 @@ $(document).on('change','#fCats',function(){
 
  },function(res){
 
+   console.log(res); // ← مهم جدًا للتجربة
 
    if(res.success){
 
@@ -552,6 +503,7 @@ $(document).on('click','.btn-edit-product',function(e){
 
    if(!pid) return;
 
+   console.log('Edit product:', pid);
 
    $.post(wfModal.ajax,{
 
@@ -582,13 +534,11 @@ $(document).on('click','.btn-edit-product',function(e){
              .show();
         
            $("#noImg").hide();
-           renderPreviewGallery(p.gallery || [], p.image);
         
         }else{
         
            $("#previewImg").hide();
            $("#noImg").show();
-           renderPreviewGallery(p.gallery || [], '');
         }
 
 
@@ -604,11 +554,6 @@ $(document).on('click','.btn-edit-product',function(e){
       $('#fDesc').val(p.desc);
       $('#fRegularPrice').val(p.price);
         $('#fSalePrice').val(p.sale || '');
-
-            if ($('#fAdminStatus').length) {
-                var editStatus = (p.status === 'publish') ? 'publish' : 'draft';
-                $('#fAdminStatus').val(editStatus);
-            }
         
         $('#fRegularPrice').trigger('input').blur();
 
