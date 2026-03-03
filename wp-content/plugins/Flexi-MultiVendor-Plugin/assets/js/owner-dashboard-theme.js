@@ -50,7 +50,17 @@ window.showSection = window.showSection || function(section) {
             secs.forEach(function(s){ s.style.display = 'none'; });
         }
         var el = document.getElementById('section-' + section);
-        if (el) el.style.display = 'block';
+        if (el) {
+            el.style.display = 'block';
+
+            var parent = el.parentElement;
+            while (parent) {
+                if (parent.classList && parent.classList.contains('owner-section')) {
+                    parent.style.display = 'block';
+                }
+                parent = parent.parentElement;
+            }
+        }
         if (window.scrollTo) window.scrollTo({ top: 300, behavior: 'smooth' });
     } catch(e) {
         console.warn('showSection failed', e);
@@ -75,6 +85,21 @@ $(document).on('keydown', '.owner-card[data-owner-section]', function(e){
         }
     }
 });
+
+setTimeout(function(){
+    try {
+        var sections = document.querySelectorAll('.owner-section');
+        if (!sections || !sections.length) return;
+
+        var hasVisible = Array.prototype.some.call(sections, function(sec){
+            return sec.style.display && sec.style.display !== 'none';
+        });
+
+        if (!hasVisible) {
+            window.showSection('products');
+        }
+    } catch(e) {}
+}, 50);
 
 
 

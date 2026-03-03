@@ -788,6 +788,15 @@ function styliiiish_owner_dashboard_shortcode(){
                 var target = document.getElementById('section-' + section);
                 if (!target) return;
                 target.style.display = 'block';
+
+                var parent = target.parentElement;
+                while (parent) {
+                    if (parent.classList && parent.classList.contains('owner-section')) {
+                        parent.style.display = 'block';
+                    }
+                    parent = parent.parentElement;
+                }
+
                 if (window.scrollTo) {
                     window.scrollTo({top: 300, behavior: 'smooth'});
                 }
@@ -812,6 +821,14 @@ function styliiiish_owner_dashboard_shortcode(){
             };
 
             document.querySelectorAll('.owner-card[data-owner-section]').forEach(bindCard);
+
+            var anyVisible = Array.prototype.some.call(
+                document.querySelectorAll('.owner-section'),
+                function(sec){ return sec.style.display && sec.style.display !== 'none'; }
+            );
+            if (!anyVisible) {
+                window.showSection('products');
+            }
         })();
     </script>
 
