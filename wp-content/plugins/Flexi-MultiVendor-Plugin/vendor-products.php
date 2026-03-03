@@ -80,8 +80,7 @@ function styliiiish_vendor_moderate_cb() {
 
     // ????????? ????????
     $user_type = wf_od_get_user_type(get_current_user_id());
-    $can_moderate = current_user_can('manage_woocommerce') || in_array($user_type, ['manager','dashboard'], true);
-    if ( ! $can_moderate ) {
+    if ( ! in_array($user_type, ['manager','dashboard']) ) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -192,8 +191,7 @@ function sty_filter_vendor_products_cb() {
     }
 
     $user_type = wf_od_get_user_type(get_current_user_id());
-    $can_moderate = current_user_can('manage_woocommerce') || in_array($user_type, ['manager', 'dashboard'], true);
-    if (!$can_moderate) {
+    if (!in_array($user_type, ['manager', 'dashboard'])) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
