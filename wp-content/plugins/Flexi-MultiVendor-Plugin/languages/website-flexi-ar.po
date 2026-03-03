@@ -1,1200 +1,810 @@
 msgid ""
-msgstr ""
-"Project-Id-Version: WebsiteFlexi Owner Dashboard & Marketplace\n"
-"POT-Creation-Date: 2026-01-17 16:10+0200\n"
-"PO-Revision-Date: 2026-01-17 16:31+0200\n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: ar\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
-"X-Generator: Poedit 2.2\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
-"X-Poedit-WPHeader: owner-dashboard.php\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
+msgstr "Project-Id-Version: WebsiteFlexi Owner Dashboard & Marketplace\\\\nPOT-Creation-Date: 2026-01-17 16:10+0200\\\\nPO-Revision-Date: 2026-01-17 16:31+0200\\\\nLast-Translator: \\\\nLanguage-Team: \\\\nLanguage: ar\\\\nMIME-Version: 1.0\\\\nContent-Type: text/plain; charset=UTF-8\\\\nContent-Transfer-Encoding: 8bit\\\\nPlural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\\\\nX-Generator: Poedit 2.2\\\\nX-Poedit-Basepath: ..\\\\nX-Poedit-Flags-xgettext: --add-comments=translators:\\\\nX-Poedit-WPHeader: owner-dashboard.php\\\\nX-Poedit-SourceCharset: UTF-8\\\\nX-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\\\\nX-Poedit-SearchPath-0: .\\\\nX-Poedit-SearchPathExcluded-0: *.js\\\\n"
 
-#: admin/system-settings-view.php:8
 msgid "WebsiteFlexi Owner Dashboard & Marketplace – Settings"
-msgstr ""
+msgstr "لوحة تحكم مالك موقع الويب والسوق - الإعدادات"
 
-#: admin/system-settings-view.php:16
 msgid "Marketplace settings saved successfully."
-msgstr ""
+msgstr "تم حفظ إعدادات السوق بنجاح."
 
-#: admin/system-settings-view.php:19
 msgid "Add Product Mode saved successfully."
-msgstr ""
+msgstr "تم حفظ وضع إضافة المنتج بنجاح."
 
-#: admin/system-settings-view.php:22
 msgid "Manager added successfully."
-msgstr ""
+msgstr "تمت إضافة المدير بنجاح."
 
-#: admin/system-settings-view.php:25
 msgid "Manager removed successfully."
-msgstr ""
+msgstr "تمت إزالة المدير بنجاح."
 
-#: admin/system-settings-view.php:28
 msgid "Dashboard user added successfully."
-msgstr ""
+msgstr "تمت إضافة مستخدم لوحة المعلومات بنجاح."
 
-#: admin/system-settings-view.php:31
 msgid "Dashboard user removed successfully."
-msgstr ""
+msgstr "تمت إزالة مستخدم لوحة المعلومات بنجاح."
 
-#: admin/system-settings-view.php:34
 msgid "Settings saved."
-msgstr ""
+msgstr "تم حفظ الإعدادات."
 
-#: admin/system-settings-view.php:45
 msgid "Marketplace"
-msgstr ""
+msgstr "السوق"
 
-#: admin/system-settings-view.php:50
-#, fuzzy
-#| msgid "My Products"
 msgid "Add Product"
 msgstr "منتجاتي"
 
-#: admin/system-settings-view.php:55
 msgid "Managers"
-msgstr ""
+msgstr "المديرين"
 
-#: admin/system-settings-view.php:60
 msgid "Dashboard Access"
-msgstr ""
+msgstr "الوصول إلى لوحة القيادة"
 
-#: admin/system-settings-view.php:66 owner-dashboard.php:171
 msgid "Vendors"
-msgstr ""
+msgstr "الباعة"
 
-#: admin/system-settings-view.php:71 templates/vendor-page.php:114
 msgid "Reviews"
-msgstr ""
+msgstr "التعليقات"
 
-#: admin/system-settings-view.php:76
 msgid "Reports"
-msgstr ""
+msgstr "التقارير"
 
-#: admin/system-settings-view.php:81
 msgid "Vendor Orders"
-msgstr ""
+msgstr "أوامر البائعين"
 
-#: admin/system-settings-view.php:113
 msgid "Enable Customer Marketplace"
-msgstr ""
+msgstr "تمكين سوق العملاء"
 
-#: admin/system-settings-view.php:120
-msgid ""
-"Allow customers to sell & manage their own dresses (Sell Your Dress system)."
-msgstr ""
+msgid "Allow customers to sell & manage their own dresses (Sell Your Dress system)."
+msgstr "السماح للعملاء ببيع وإدارة فساتينهم الخاصة (نظام بيع فستانك)."
 
-#: admin/system-settings-view.php:123
-msgid ""
-"When enabled, logged-in customers will see custom marketplace features (Sell "
-"Your Dress / Manage Products) based on your implementation."
-msgstr ""
+msgid "When enabled, logged-in customers will see custom marketplace features (Sell Your Dress / Manage Products) based on your implementation."
+msgstr "عند التمكين، سيرى العملاء الذين قاموا بتسجيل الدخول ميزات السوق المخصصة (بيع ملابسك / إدارة المنتجات) بناءً على التنفيذ الخاص بك."
 
-#: admin/system-settings-view.php:129
 msgid "My Account Welcome Banner"
-msgstr ""
+msgstr "شعار الترحيب الخاص بحسابي"
 
-#: admin/system-settings-view.php:137
 msgid "Enable welcome banner in My Account page"
-msgstr ""
+msgstr "تمكين شعار الترحيب في صفحة حسابي"
 
-#: admin/system-settings-view.php:146
 msgid "Save Marketplace Settings"
-msgstr ""
+msgstr "حفظ إعدادات السوق"
 
-#: admin/system-settings-view.php:180
 msgid "Add Product Mode"
-msgstr ""
+msgstr "إضافة وضع المنتج"
 
-#: admin/system-settings-view.php:186
 msgid "AJAX – Duplicate Template (Recommended)"
-msgstr ""
+msgstr "AJAX – قالب مكرر (مستحسن)"
 
-#: admin/system-settings-view.php:189
 msgid "OLD Method – admin_post (Legacy)"
-msgstr ""
+msgstr "الطريقة القديمة – admin_post (قديم)"
 
-#: admin/system-settings-view.php:193
 msgid "Choose how a new product is created inside the Owner Dashboard."
-msgstr ""
+msgstr "اختر كيفية إنشاء منتج جديد داخل لوحة تحكم المالك."
 
-#: admin/system-settings-view.php:201
 msgid "Save Add Product Settings"
-msgstr ""
+msgstr "حفظ إضافة إعدادات المنتج"
 
-#: admin/system-settings-view.php:229
 msgid "Current Managers"
-msgstr ""
+msgstr "المديرين الحاليين"
 
-#: admin/system-settings-view.php:234 admin/system-settings-view.php:314
 msgid "User"
-msgstr ""
+msgstr "مستخدم"
 
-#: admin/system-settings-view.php:235 admin/system-settings-view.php:315
 msgid "Role"
-msgstr ""
+msgstr "دور"
 
-#: admin/system-settings-view.php:236 admin/system-settings-view.php:316
 msgid "ID"
-msgstr ""
+msgstr "بطاقة تعريف"
 
-#: admin/system-settings-view.php:237 admin/system-settings-view.php:317
-#: admin/system-settings-view.php:1461
 msgid "Action"
-msgstr ""
+msgstr "فعل"
 
-#: admin/system-settings-view.php:242
 msgid "No managers added."
-msgstr ""
+msgstr "لم تتم إضافة أي مديرين."
 
-#: admin/system-settings-view.php:255
 msgid "Remove this manager?"
-msgstr ""
+msgstr "هل تريد إزالة هذا المدير؟"
 
-#: admin/system-settings-view.php:257 admin/system-settings-view.php:338
-#: includes/vendor-profile-editor.php:210
-#: includes/vendor-profile-editor.php:241 includes/vendor-workflow.php:362
-#: includes/vendor-workflow.php:386 includes/vendor-workflow.php:428
-#: includes/vendor-workflow.php:452 includes/vendor-workflow.php:476
 msgid "Remove"
-msgstr ""
+msgstr "يزيل"
 
-#: admin/system-settings-view.php:266 admin/system-settings-view.php:286
 msgid "Add Manager"
-msgstr ""
+msgstr "إضافة مدير"
 
-#: admin/system-settings-view.php:273 admin/system-settings-view.php:354
 msgid "Email"
-msgstr ""
+msgstr "بريد إلكتروني"
 
-#: admin/system-settings-view.php:277 admin/system-settings-view.php:358
 msgid "Password"
-msgstr ""
+msgstr "كلمة المرور"
 
-#: admin/system-settings-view.php:279 admin/system-settings-view.php:360
 msgid "Auto-generate if empty"
-msgstr ""
+msgstr "الإنشاء التلقائي إذا كان فارغًا"
 
-#: admin/system-settings-view.php:309
 msgid "Owner Dashboard Access"
-msgstr ""
+msgstr "الوصول إلى لوحة تحكم المالك"
 
-#: admin/system-settings-view.php:323
 msgid "No dashboard users yet."
-msgstr ""
+msgstr "لا يوجد مستخدمون للوحة التحكم حتى الآن."
 
-#: admin/system-settings-view.php:336
 msgid "Remove this user?"
-msgstr ""
+msgstr "هل ترغب في إزالة هذا المستخدم؟"
 
-#: admin/system-settings-view.php:347 admin/system-settings-view.php:367
 msgid "Add Dashboard User"
-msgstr ""
+msgstr "إضافة مستخدم لوحة المعلومات"
 
-#: admin/system-settings-view.php:420
 msgid "All Vendors"
-msgstr ""
+msgstr "جميع البائعين"
 
-#: admin/system-settings-view.php:425
 msgid "Pending Vendors"
-msgstr ""
+msgstr "البائعين في انتظار"
 
-#: admin/system-settings-view.php:430
 msgid "Approved Vendors"
-msgstr ""
+msgstr "البائعين المعتمدين"
 
-#: admin/system-settings-view.php:437
 msgid "Suspended Vendors"
-msgstr ""
+msgstr "الباعة الموقوفون"
 
-#: admin/system-settings-view.php:446
 msgid "Vendor Details"
-msgstr ""
+msgstr "تفاصيل البائع"
 
-#: admin/system-settings-view.php:447
 msgid "Documents"
-msgstr ""
+msgstr "وثائق"
 
-#: admin/system-settings-view.php:448
 msgid "Status"
-msgstr ""
+msgstr "حالة"
 
-#: admin/system-settings-view.php:449
 msgid "Admin Notes"
-msgstr ""
+msgstr "ملاحظات المشرف"
 
-#: admin/system-settings-view.php:450
 msgid "Actions"
-msgstr ""
+msgstr "الإجراءات"
 
-#: admin/system-settings-view.php:451 admin/system-settings-view.php:774
-#: admin/system-settings-view.php:1206 functions.php:512
-#: templates/vendor-page.php:69
 msgid "Verified"
-msgstr ""
+msgstr "تم التحقق منه"
 
-#: admin/system-settings-view.php:452 includes/vendor-workflow.php:89
 msgid "Wallet"
 msgstr "محفظة"
 
-#: admin/system-settings-view.php:453
 msgid "Orders"
-msgstr ""
+msgstr "طلبات"
 
-#: admin/system-settings-view.php:454
 msgid "Reports&amp;Reviews"
-msgstr ""
+msgstr "التقارير والمراجعات"
 
-#: admin/system-settings-view.php:464
 msgid "No vendors found."
-msgstr ""
+msgstr "لم يتم العثور على البائعين."
 
-#: admin/system-settings-view.php:625 admin/system-settings-view.php:804
 msgid "Unnamed Store"
-msgstr ""
+msgstr "متجر بدون اسم"
 
-#: admin/system-settings-view.php:640 admin/system-settings-view.php:822
 msgid "ID Front"
-msgstr ""
+msgstr "واجهة الهوية"
 
-#: admin/system-settings-view.php:641 admin/system-settings-view.php:826
 msgid "ID Back"
-msgstr ""
+msgstr "معرف العودة"
 
-#: admin/system-settings-view.php:642 admin/system-settings-view.php:830
 msgid "Utility Bill"
-msgstr ""
+msgstr "فاتورة المرافق"
 
-#: admin/system-settings-view.php:643 admin/system-settings-view.php:834
 msgid "No documents uploaded"
-msgstr ""
+msgstr "لم يتم تحميل أي مستندات"
 
-#: admin/system-settings-view.php:646 admin/system-settings-view.php:854
 msgid "Pending Review"
-msgstr ""
+msgstr "في انتظار المراجعة"
 
-#: admin/system-settings-view.php:673 admin/system-settings-view.php:907
-#, fuzzy
-#| msgid "Your Store"
 msgid "View Store"
 msgstr "متجرى"
 
-#: admin/system-settings-view.php:684 admin/system-settings-view.php:922
 msgid "Approval note"
-msgstr ""
+msgstr "مذكرة الموافقة"
 
-#: admin/system-settings-view.php:687 admin/system-settings-view.php:925
 msgid "Confirm Approval"
-msgstr ""
+msgstr "تأكيد الموافقة"
 
-#: admin/system-settings-view.php:693 admin/system-settings-view.php:931
 msgid "Approve"
-msgstr ""
+msgstr "يعتمد"
 
-#: admin/system-settings-view.php:707 admin/system-settings-view.php:947
 msgid "Reason for rejection"
-msgstr ""
+msgstr "سبب الرفض"
 
-#: admin/system-settings-view.php:714 admin/system-settings-view.php:954
 msgid "Confirm Rejection"
-msgstr ""
+msgstr "تأكيد الرفض"
 
-#: admin/system-settings-view.php:721 admin/system-settings-view.php:961
 msgid "Reject"
-msgstr ""
+msgstr "يرفض"
 
-#: admin/system-settings-view.php:740 admin/system-settings-view.php:979
-#: admin/system-settings-view.php:1074 admin/system-settings-view.php:1163
 msgid "Reason for converting vendor to customer"
-msgstr ""
+msgstr "سبب تحويل البائع إلى عميل"
 
-#: admin/system-settings-view.php:746 admin/system-settings-view.php:985
-#: admin/system-settings-view.php:1080 admin/system-settings-view.php:1169
 msgid "Confirm Convert to Customer"
-msgstr ""
+msgstr "تأكيد التحويل إلى العميل"
 
-#: admin/system-settings-view.php:752 admin/system-settings-view.php:991
-#: admin/system-settings-view.php:1086 admin/system-settings-view.php:1175
 msgid "Convert to Customer"
-msgstr ""
+msgstr "تحويل إلى العميل"
 
-#: admin/system-settings-view.php:842 admin/system-settings-view.php:852
 msgid "Approved"
-msgstr ""
+msgstr "موافقة"
 
-#: admin/system-settings-view.php:846 admin/system-settings-view.php:856
-#: functions.php:450 functions.php:1342
-#, fuzzy
-#| msgid "Store Suspended"
 msgid "Suspended"
 msgstr "تم تعليق المتجر"
 
-#: admin/system-settings-view.php:1016
 msgid "Reason for suspension"
-msgstr ""
+msgstr "سبب الإيقاف"
 
-#: admin/system-settings-view.php:1022
 msgid "Confirm Suspension"
-msgstr ""
+msgstr "تأكيد التعليق"
 
-#: admin/system-settings-view.php:1028
-#, fuzzy
-#| msgid "Store Suspended"
 msgid "Suspend"
 msgstr "تم تعليق المتجر"
 
-#: admin/system-settings-view.php:1045
 msgid "Reason for setting vendor to pending"
-msgstr ""
+msgstr "سبب تعيين البائع إلى معلق"
 
-#: admin/system-settings-view.php:1051 admin/system-settings-view.php:1141
 msgid "Confirm Set to Pending"
-msgstr ""
+msgstr "قم بتأكيد التعيين على \\"معلق\\"."
 
-#: admin/system-settings-view.php:1057 admin/system-settings-view.php:1147
 msgid "Set to Pending"
-msgstr ""
+msgstr "اضبط على معلق"
 
-#: admin/system-settings-view.php:1106
 msgid "Reason for re-activation"
-msgstr ""
+msgstr "سبب إعادة التنشيط"
 
-#: admin/system-settings-view.php:1112
 msgid "Confirm Re-Activation"
-msgstr ""
+msgstr "تأكيد إعادة التنشيط"
 
-#: admin/system-settings-view.php:1118
 msgid "Re-Activate"
-msgstr ""
+msgstr "إعادة التنشيط"
 
-#: admin/system-settings-view.php:1135
 msgid "Reason for setting pending"
-msgstr ""
+msgstr "سبب الضبط معلق"
 
-#: admin/system-settings-view.php:1415
 msgid "Vendor Reviews"
-msgstr ""
+msgstr "مراجعات البائعين"
 
-#: admin/system-settings-view.php:1446
 msgid "No vendor reviews found."
-msgstr ""
+msgstr "لم يتم العثور على مراجعات البائعين."
 
-#: admin/system-settings-view.php:1456
 msgid "Reviewer"
-msgstr ""
+msgstr "المراجع"
 
-#: admin/system-settings-view.php:1457 admin/system-settings-view.php:1636
-#: owner-dashboard.php:158 owner-dashboard.php:172
 msgid "Vendor"
-msgstr ""
+msgstr "بائع"
 
-#: admin/system-settings-view.php:1458 templates/vendor-page.php:853
 msgid "Rating"
-msgstr ""
+msgstr "تصنيف"
 
-#: admin/system-settings-view.php:1459 admin/system-settings-view.php:1630
 msgid "Review"
-msgstr ""
+msgstr "مراجعة"
 
-#: admin/system-settings-view.php:1460
 msgid "Date"
-msgstr ""
+msgstr "تاريخ"
 
-#: admin/system-settings-view.php:1505
 msgid "Delete this review?"
-msgstr ""
+msgstr "هل تريد حذف هذه المراجعة؟"
 
-#: admin/system-settings-view.php:1507 templates/vendor-page.php:424
 msgid "Delete"
-msgstr ""
+msgstr "يمسح"
 
-#: admin/system-settings-view.php:1579
 msgid "No reports found."
-msgstr ""
+msgstr "لم يتم العثور على تقارير."
 
-#: admin/system-settings-view.php:1642
 msgid "Item not found"
-msgstr ""
+msgstr "لم يتم العثور على العنصر"
 
-#. Plugin Name of the plugin/theme
-#: admin/system-settings.php:13
 msgid "WebsiteFlexi Owner Dashboard & Marketplace"
 msgstr "لوحة تحكم وسوق ويبسايت فليكسى لأصحاب المواقع"
 
-#: admin/system-settings.php:14
 msgid "WebsiteFlexi System Settings"
-msgstr ""
+msgstr "إعدادات نظام الموقع الإلكتروني"
 
-#: admin/system-settings.php:29 includes/vendor-profile-editor.php:76
 msgid "You do not have permission to access this page."
-msgstr ""
+msgstr "ليس لديك إذن للوصول إلى هذه الصفحة."
 
-#: admin/system-settings.php:86 admin/system-settings.php:157
 msgid "Email is required."
-msgstr ""
+msgstr "البريد الإلكتروني مطلوب."
 
-#: admin/system-settings.php:101 admin/system-settings.php:172
 msgid "Error creating user:"
-msgstr ""
+msgstr "خطأ في إنشاء المستخدم:"
 
-#: admin/system-settings.php:340
 msgid "Admin note is required."
-msgstr ""
+msgstr "ملاحظة المشرف مطلوبة."
 
-#: functions.php:283
 msgid "Welcome back, Boss! 🔧✨"
-msgstr ""
+msgstr "مرحبًا بعودتك يا رئيس! "
 
-#: functions.php:286
-msgid ""
-"Here’s your quick access to manage your website smoothly and keep everything "
-"running perfectly."
-msgstr ""
+msgid "Here’s your quick access to manage your website smoothly and keep everything running perfectly."
+msgstr "إليك وصولك السريع لإدارة موقع الويب الخاص بك بسلاسة والحفاظ على تشغيل كل شيء بشكل مثالي."
 
-#: functions.php:290
 msgid "🔧 Manage Your Website"
-msgstr ""
+msgstr "🔧 إدارة موقع الويب الخاص بك"
 
-#: functions.php:297
 msgid "Hey lovely! 💖"
-msgstr ""
+msgstr "يا جميل! "
 
-#: functions.php:300
-msgid ""
-"Ready to earn money now? You can list your products in just a few smooth "
-"steps. We’re here to make it easy for you! ✨"
-msgstr ""
+msgid "Ready to earn money now? You can list your products in just a few smooth steps. We’re here to make it easy for you! ✨"
+msgstr "هل أنت مستعد لكسب المال الآن؟ "
 
-#: functions.php:304
 msgid "Add Your Products Now"
-msgstr ""
+msgstr "أضف منتجاتك الآن"
 
-#: functions.php:447
 msgid "Pending Approval"
-msgstr ""
+msgstr "في انتظار الموافقة"
 
-#: functions.php:453
 msgid "Active"
-msgstr ""
+msgstr "نشيط"
 
-#: functions.php:525
-#, php-format
 msgid "Rating: %s / 5 (%d reviews)"
-msgstr ""
+msgstr "التقييم: %s / 5 (%d مراجعة)"
 
-#: functions.php:531
 msgid "Order Success Rate"
-msgstr ""
+msgstr "معدل نجاح الطلب"
 
-#: functions.php:739 functions.php:837
 msgid "Login required"
-msgstr ""
+msgstr "تسجيل الدخول مطلوب"
 
-#: functions.php:746 functions.php:832
 msgid "Security check failed"
-msgstr ""
+msgstr "فشل فحص الأمان"
 
-#: functions.php:755 functions.php:846
 msgid "Invalid data"
-msgstr ""
+msgstr "بيانات غير صالحة"
 
-#: functions.php:779 templates/vendor-page.php:215
 msgid "You can only review vendors after a completed (final) order."
-msgstr ""
+msgstr "لا يمكنك مراجعة الموردين إلا بعد اكتمال الطلب (النهائي)."
 
-#: functions.php:796 templates/vendor-page.php:228
 msgid "You already reviewed this vendor."
-msgstr ""
+msgstr "لقد قمت بالفعل بمراجعة هذا البائع."
 
-#: functions.php:810
 msgid "Failed to save review"
-msgstr ""
+msgstr "فشل حفظ المراجعة"
 
-#: functions.php:816
 msgid "Review submitted"
-msgstr ""
+msgstr "تم إرسال المراجعة"
 
-#: functions.php:853
 msgid "Unauthorized"
-msgstr ""
+msgstr "غير مصرح به"
 
-#: functions.php:868
 msgid "Reply already exists"
-msgstr ""
+msgstr "الرد موجود بالفعل"
 
-#: functions.php:874
 msgid "Review not found"
-msgstr ""
+msgstr "لم يتم العثور على المراجعة"
 
-#: functions.php:892
 msgid "Failed to save reply"
-msgstr ""
+msgstr "فشل حفظ الرد"
 
-#: functions.php:900
 msgid "Reply added successfully"
-msgstr ""
+msgstr "تمت إضافة الرد بنجاح"
 
-#: functions.php:1246
-msgid ""
-"This product has been temporarily disabled by Aswaq Taj because the store is "
-"still under review."
-msgstr ""
+msgid "This product has been temporarily disabled by Aswaq Taj because the store is still under review."
+msgstr "لقد تم تعطيل هذا المنتج مؤقتاً من قبل أسواق تاج لأن المتجر لا يزال قيد المراجعة."
 
-#: functions.php:1250
-msgid ""
-"This product is unavailable because the store has been suspended by Aswaq "
-"Taj."
-msgstr ""
+msgid "This product is unavailable because the store has been suspended by Aswaq Taj."
+msgstr "هذا المنتج غير متوفر بسبب إيقاف المتجر من قبل أسواق تاج."
 
-#: functions.php:1338
 msgid "This store is still pending"
-msgstr ""
+msgstr "هذا المتجر لا يزال معلقا"
 
-#: functions.php:1339
 msgid "Pending"
-msgstr ""
+msgstr "قيد الانتظار"
 
-#: functions.php:1341
-#, fuzzy
-#| msgid "Store Suspended"
 msgid "This store is suspended"
 msgstr "تم تعليق المتجر"
 
-#: includes/vendor-profile-editor.php:52 includes/vendor-profile-editor.php:59
-#: includes/vendor-profile-editor.php:169
-#, fuzzy
-#| msgid "Store Name"
 msgid "Store Profile"
 msgstr "اسم المتجر"
 
-#: includes/vendor-profile-editor.php:71
 msgid "Please log in."
-msgstr ""
+msgstr "الرجاء تسجيل الدخول."
 
-#: includes/vendor-profile-editor.php:86
 msgid "Security check failed."
-msgstr ""
+msgstr "فشل فحص الأمان."
 
-#: includes/vendor-profile-editor.php:131
 msgid "Store profile updated successfully."
-msgstr ""
+msgstr "تم تحديث ملف تعريف المتجر بنجاح."
 
-#: includes/vendor-profile-editor.php:173
-msgid ""
-"Update your store information, logo, and cover. These details will appear on "
-"your public vendor page."
-msgstr ""
+msgid "Update your store information, logo, and cover. These details will appear on your public vendor page."
+msgstr "قم بتحديث معلومات متجرك وشعاره وغلافه. "
 
-#: includes/vendor-profile-editor.php:188
-#, fuzzy
-#| msgid "Store Name"
 msgid "Store Cover"
 msgstr "اسم المتجر"
 
-#: includes/vendor-profile-editor.php:189
 msgid "Recommended: wide image (e.g. 1200×400)."
-msgstr ""
+msgstr "موصى به: صورة واسعة (على سبيل المثال 1200×400)."
 
-#: includes/vendor-profile-editor.php:195
 msgid "No cover selected"
-msgstr ""
+msgstr "لم يتم تحديد أي غلاف"
 
-#: includes/vendor-profile-editor.php:206
 msgid "Choose Cover"
-msgstr ""
+msgstr "اختر الغلاف"
 
-#: includes/vendor-profile-editor.php:218
-#, fuzzy
-#| msgid "Store Name"
 msgid "Store Logo"
 msgstr "اسم المتجر"
 
-#: includes/vendor-profile-editor.php:219
 msgid "Recommended: square image (e.g. 400×400)."
-msgstr ""
+msgstr "موصى به: صورة مربعة (على سبيل المثال، 400×400)."
 
-#: includes/vendor-profile-editor.php:227
 msgid "No logo"
-msgstr ""
+msgstr "لا شعار"
 
-#: includes/vendor-profile-editor.php:237
 msgid "Choose Logo"
-msgstr ""
+msgstr "اختر الشعار"
 
-#: includes/vendor-profile-editor.php:247 includes/vendor-workflow.php:283
 msgid "Store Name"
 msgstr "اسم المتجر"
 
-#: includes/vendor-profile-editor.php:254 includes/vendor-workflow.php:288
 msgid "Store Description"
-msgstr ""
+msgstr "وصف المتجر"
 
-#: includes/vendor-profile-editor.php:260 includes/vendor-workflow.php:298
 msgid "WhatsApp Number"
 msgstr "رقم واتساب"
 
-#: includes/vendor-profile-editor.php:264
 msgid "Example: 201155555555"
-msgstr ""
+msgstr "مثال: 201155555555"
 
-#: includes/vendor-profile-editor.php:266
 msgid "Use international format without + sign."
-msgstr ""
+msgstr "استخدم التنسيق الدولي بدون علامة +."
 
-#: includes/vendor-profile-editor.php:272
 msgid "Phone Number"
-msgstr ""
+msgstr "رقم التليفون"
 
-#: includes/vendor-profile-editor.php:280
 msgid "Example: 01123456789"
-msgstr ""
+msgstr "مثال: 01123456789"
 
-#: includes/vendor-profile-editor.php:285
 msgid "Address"
-msgstr ""
+msgstr "عنوان"
 
-#: includes/vendor-profile-editor.php:293
 msgid "Save Changes"
-msgstr ""
+msgstr "حفظ التغييرات"
 
-#: includes/vendor-workflow.php:86 includes/vendor-workflow.php:88
-#, fuzzy
-#| msgid "Store Name"
 msgid "Store Orders"
 msgstr "اسم المتجر"
 
-#: includes/vendor-workflow.php:87
 msgid "My Products"
 msgstr "منتجاتي"
 
-#: includes/vendor-workflow.php:90
 msgid "Withdraw Earnings"
 msgstr "سحب الأرباح"
 
-#: includes/vendor-workflow.php:91
 msgid "Application Under Review"
 msgstr "الطلب قيد المراجعة"
 
-#: includes/vendor-workflow.php:92
 msgid "Store Suspended"
 msgstr "تم تعليق المتجر"
 
-#: includes/vendor-workflow.php:93
 msgid "Register as Vendor"
 msgstr "سجل كتاجر"
 
-#: includes/vendor-workflow.php:94
 msgid "Moderate Your Site"
-msgstr ""
+msgstr "قم بتعديل موقعك"
 
-#: includes/vendor-workflow.php:208
 msgid "Your vendor application is under review. You will be contacted soon."
 msgstr "طلب انضمامك كتاجر قيد المراجعة. سيتم التواصل معك قريباً."
 
-#: includes/vendor-workflow.php:212
 msgid "Your store has been temporarily suspended. Please contact support."
 msgstr "تم تعليق متجرك مؤقتًا. يرجى الاتصال بالدعم."
 
-#: includes/vendor-workflow.php:255
 msgid "You cannot apply again."
 msgstr "لا يمكنك التقديم مرة أخرى."
 
-#: includes/vendor-workflow.php:260
 msgid "Register as a Vendor"
 msgstr "سجل كتاجر"
 
-#: includes/vendor-workflow.php:261
-#, fuzzy
-#| msgid ""
-#| "Please fill in the following details carefully. Your application will be "
-#| "reviewed before approval."
-msgid ""
-"Fill in the details below. Your application will be reviewed before approval."
-msgstr ""
-"يرجى تعبئة البيانات التالية بعناية. سيتم مراجعة طلبك قبل الموافقة عليه."
+msgid "Fill in the details below. Your application will be reviewed before approval."
+msgstr "يرجى تعبئة البيانات التالية بعناية. سيتم مراجعة طلبك قبل الموافقة عليه."
 
-#: includes/vendor-workflow.php:277
 msgid "Basic Information"
 msgstr "معلومات أساسية"
 
-#: includes/vendor-workflow.php:278
 msgid "Store details shown to customers after approval."
-msgstr ""
+msgstr "تفاصيل المتجر تظهر للعملاء بعد الموافقة عليها."
 
-#: includes/vendor-workflow.php:293
 msgid "Phone Number (Call)"
 msgstr "رقم هاتف"
 
-#: includes/vendor-workflow.php:303
 msgid "Current Working Address"
-msgstr ""
+msgstr "عنوان العمل الحالي"
 
-#: includes/vendor-workflow.php:314
 msgid "Business Type"
 msgstr "نوع النشاط"
 
-#: includes/vendor-workflow.php:315
 msgid "This helps us verify your business and set pickup details."
-msgstr ""
+msgstr "يساعدنا هذا في التحقق من نشاطك التجاري وتعيين تفاصيل الاستلام."
 
-#: includes/vendor-workflow.php:320 includes/vendor-workflow.php:322
 msgid "Select Business Type"
 msgstr "اختر نوع النشاط"
 
-#: includes/vendor-workflow.php:323
 msgid "Work From Home"
-msgstr ""
+msgstr "العمل من المنزل"
 
-#: includes/vendor-workflow.php:324
 msgid "I Have a Shop"
-msgstr ""
+msgstr "لدي متجر"
 
-#: includes/vendor-workflow.php:325
 msgid "I Have a Company"
-msgstr ""
+msgstr "لدي شركة"
 
-#: includes/vendor-workflow.php:326
 msgid "I Have an Office"
-msgstr ""
+msgstr "لدي مكتب"
 
-#: includes/vendor-workflow.php:333
-msgid ""
-"This working address will be used as the pickup location for shipping orders."
-msgstr ""
+msgid "This working address will be used as the pickup location for shipping orders."
+msgstr "سيتم استخدام عنوان العمل هذا كموقع لاستلام طلبات الشحن."
 
-#: includes/vendor-workflow.php:340
 msgid "Business Documents"
 msgstr "وثائق الأعمال"
 
-#: includes/vendor-workflow.php:341
 msgid "Optional for home businesses. Required for shops/companies/offices."
-msgstr ""
+msgstr "اختياري للأعمال المنزلية. "
 
-#: includes/vendor-workflow.php:347
 msgid "Commercial Register"
 msgstr "السجل التجاري"
 
-#: includes/vendor-workflow.php:353 includes/vendor-workflow.php:377
-#: includes/vendor-workflow.php:419 includes/vendor-workflow.php:443
-#: includes/vendor-workflow.php:467
 msgid "Choose File"
-msgstr ""
+msgstr "اختر ملف"
 
-#: includes/vendor-workflow.php:357 includes/vendor-workflow.php:358
-#: includes/vendor-workflow.php:381 includes/vendor-workflow.php:382
-#: includes/vendor-workflow.php:423 includes/vendor-workflow.php:424
-#: includes/vendor-workflow.php:447 includes/vendor-workflow.php:448
-#: includes/vendor-workflow.php:471 includes/vendor-workflow.php:472
 msgid "No file chosen"
-msgstr ""
+msgstr "لم يتم اختيار أي ملف"
 
-#: includes/vendor-workflow.php:371
 msgid "Tax Card"
 msgstr "بطاقة ضريبية"
 
-#: includes/vendor-workflow.php:394
 msgid "Business Address"
 msgstr "عنوان العمل"
 
-#: includes/vendor-workflow.php:406
 msgid "Identity Verification"
 msgstr "التحقق من الهوية"
 
-#: includes/vendor-workflow.php:407
 msgid "Upload clear images. Make sure all details are readable."
-msgstr ""
+msgstr "تحميل صور واضحة. "
 
-#: includes/vendor-workflow.php:413
 msgid "ID Card (Front)"
 msgstr "بطاقة الهوية (الوجه الأمامي)"
 
-#: includes/vendor-workflow.php:437
 msgid "ID Card (Back)"
 msgstr "بطاقة الهوية (الظهر)"
 
-#: includes/vendor-workflow.php:461
 msgid "Latest Electricity or Gas Bill"
 msgstr "آخر فاتورة كهرباء أو غاز"
 
-#: includes/vendor-workflow.php:487
 msgid "Submit Vendor Application"
 msgstr "تقديم طلب التاجر"
 
-#: includes/vendor-workflow.php:490
-msgid ""
-"By submitting, you confirm the information is correct. We may contact you "
-"for verification."
-msgstr ""
+msgid "By submitting, you confirm the information is correct. We may contact you for verification."
+msgstr "من خلال الإرسال، فإنك تؤكد صحة المعلومات. "
 
-#: owner-dashboard.php:170
 msgid "Home"
 msgstr "الصفحة الرئيسية"
 
-#: templates/vendor-page.php:11
 msgid "Vendor not found"
-msgstr ""
+msgstr "لم يتم العثور على البائع"
 
-#: templates/vendor-page.php:87
 msgid "No ratings yet"
-msgstr ""
+msgstr "لا يوجد تقييمات حتى الآن"
 
-#: templates/vendor-page.php:95 templates/vendor-page.php:113
-#: templates/vendor-page.php:828
-#, fuzzy
-#| msgid "My Products"
 msgid "Products"
 msgstr "منتجاتي"
 
-#: templates/vendor-page.php:103
 msgid "WhatsApp"
-msgstr ""
+msgstr "واتساب"
 
-#: templates/vendor-page.php:115
 msgid "Statistics"
-msgstr ""
+msgstr "إحصائيات"
 
-#: templates/vendor-page.php:116 templates/vendor-page.php:391
 msgid "Report"
-msgstr ""
+msgstr "تقرير"
 
-#: templates/vendor-page.php:146
 msgid "Previous"
-msgstr ""
+msgstr "سابق"
 
-#: templates/vendor-page.php:147
 msgid "Next"
-msgstr ""
+msgstr "التالي"
 
-#: templates/vendor-page.php:150
 msgid "No products yet."
-msgstr ""
+msgstr "لا توجد منتجات حتى الآن."
 
-#: templates/vendor-page.php:223
 msgid "Please log in to leave a review."
-msgstr ""
+msgstr "الرجاء تسجيل الدخول لترك التعليق."
 
-#: templates/vendor-page.php:234
 msgid "Leave a Review"
-msgstr ""
+msgstr "ترك التعليق"
 
-#: templates/vendor-page.php:244
 msgid "Write your review…"
-msgstr ""
+msgstr "أكتب رأيك…"
 
-#: templates/vendor-page.php:251
 msgid "Submit Review"
-msgstr ""
+msgstr "إرسال المراجعة"
 
-#: templates/vendor-page.php:382
 msgid "Reported"
-msgstr ""
+msgstr "ذكرت"
 
-#: templates/vendor-page.php:411
-#, fuzzy
-#| msgid "Store Name"
 msgid "Store Reply"
 msgstr "اسم المتجر"
 
-#: templates/vendor-page.php:420
 msgid "Edit"
-msgstr ""
+msgstr "يحرر"
 
-#: templates/vendor-page.php:442
 msgid "Reply"
-msgstr ""
+msgstr "رد"
 
-#: templates/vendor-page.php:455
 msgid "No reviews yet."
-msgstr ""
+msgstr "لا توجد تعليقات حتى الآن."
 
-#: templates/vendor-page.php:682
 msgid "Report Review"
-msgstr ""
+msgstr "مراجعة التقرير"
 
-#: templates/vendor-page.php:691
 msgid "Reason"
-msgstr ""
+msgstr "سبب"
 
-#: templates/vendor-page.php:693
 msgid "Spam"
-msgstr ""
+msgstr "رسائل إلكترونية مزعجة"
 
-#: templates/vendor-page.php:694
 msgid "Abuse"
 msgstr "إساءة"
 
-#: templates/vendor-page.php:695
 msgid "Fake review"
 msgstr "مراجعة مزيفة"
 
-#: templates/vendor-page.php:700
 msgid "Comment (optional)"
 msgstr "تعليق (اختياري)"
 
-#: templates/vendor-page.php:706
 msgid "Submit Report"
 msgstr "إرسال البلاغ"
 
-#: templates/vendor-page.php:710
 msgid "Cancel"
 msgstr "الغاء"
 
-#: templates/vendor-page.php:826
 msgid "Total number of products published by this vendor."
 msgstr "إجمالي عدد المنتجات التي نشرها هذا التاجر."
 
-#: templates/vendor-page.php:831
 msgid "Total orders placed for this vendor's products."
 msgstr "إجمالي الطلبات المقدمة لمنتجات هذا التاجر."
 
-#: templates/vendor-page.php:833
 msgid "Total Orders"
 msgstr "إجمالي الطلبات"
 
-#: templates/vendor-page.php:836
 msgid "Orders that were successfully completed without issues."
 msgstr "تم إنجاز الطلبات بنجاح ودون أي مشاكل."
 
-#: templates/vendor-page.php:838
 msgid "Completed Orders"
 msgstr "الطلبات المكتملة"
 
-#: templates/vendor-page.php:841
 msgid "Orders that were refunded or returned by customers."
 msgstr "الطلبات التي تم استرداد ثمنها أو إرجاعها من قبل العملاء."
 
-#: templates/vendor-page.php:843
 msgid "Refunded Orders"
 msgstr "الطلبات المسترجعة"
 
-#: templates/vendor-page.php:846
 msgid "Percentage of successful orders compared to total orders."
 msgstr "نسبة الطلبات الناجحة مقارنة بإجمالي الطلبات."
 
-#: templates/vendor-page.php:848
 msgid "Success Rate"
 msgstr "معدل النجاح"
 
-#: templates/vendor-page.php:851
 msgid "Average rating given by customers who reviewed this vendor."
 msgstr "متوسط ​​التقييم الذي قدمه العملاء الذين قاموا بتقييم هذا البائع."
 
-#: templates/vendor-page.php:872
 msgid "How to read these numbers"
 msgstr "كيفية قراءة هذه الأرقام"
 
-#: templates/vendor-page.php:876
-msgid ""
-"These indicators help you understand the vendor’s activity and reliability. "
-"Use them together (not one number alone) to form a fair impression."
-msgstr ""
-"تساعدك هذه المؤشرات على فهم نشاط التاجر وموثوقيته. استخدمها مجتمعة (وليس "
-"رقماً واحداً فقط) لتكوين انطباع عادل."
+msgid "These indicators help you understand the vendor’s activity and reliability. Use them together (not one number alone) to form a fair impression."
+msgstr "تساعدك هذه المؤشرات على فهم نشاط التاجر وموثوقيته. استخدمها مجتمعة (وليس رقماً واحداً فقط) لتكوين انطباع عادل."
 
-#: templates/vendor-page.php:881
 msgid "Products:"
 msgstr "منتجات"
 
-#: templates/vendor-page.php:882
-msgid ""
-"A higher number usually means the vendor is active. New vendors may have "
-"fewer products — this is normal."
-msgstr ""
-"يشير الرقم الأعلى عادةً إلى أن التاجر نشط. قد يمتلك البائعون الجدد عددًا أقل "
-"من المنتجات، وهذا أمر طبيعي."
+msgid "A higher number usually means the vendor is active. New vendors may have fewer products — this is normal."
+msgstr "يشير الرقم الأعلى عادةً إلى أن التاجر نشط. قد يمتلك البائعون الجدد عددًا أقل من المنتجات، وهذا أمر طبيعي."
 
-#: templates/vendor-page.php:886
 msgid "Total Orders:"
 msgstr "إجمالي الطلبات:"
 
-#: templates/vendor-page.php:887
-msgid ""
-"Shows overall demand and experience. If it is low, the vendor may be new — "
-"rely more on rating and success rate."
-msgstr ""
-"يُظهر هذا المؤشر مستوى الطلب والخبرة بشكل عام. إذا كان منخفضًا، فقد يكون "
-"البائع جديدًا - لذا اعتمد أكثر على التقييم ونسبة النجاح."
+msgid "Shows overall demand and experience. If it is low, the vendor may be new — rely more on rating and success rate."
+msgstr "يُظهر هذا المؤشر مستوى الطلب والخبرة بشكل عام. إذا كان منخفضًا، فقد يكون البائع جديدًا - لذا اعتمد أكثر على التقييم ونسبة النجاح."
 
-#: templates/vendor-page.php:891
 msgid "Completed Orders:"
 msgstr "الطلبات المكتملة:"
 
-#: templates/vendor-page.php:892
-msgid ""
-"The more completed orders, the more proven the vendor’s ability to deliver "
-"successfully."
-msgstr ""
-"كلما زاد عدد الطلبات المكتملة، كلما ثبتت قدرة البائع على التسليم بنجاح."
+msgid "The more completed orders, the more proven the vendor’s ability to deliver successfully."
+msgstr "كلما زاد عدد الطلبات المكتملة، كلما ثبتت قدرة البائع على التسليم بنجاح."
 
-#: templates/vendor-page.php:896
 msgid "Refunded Orders:"
 msgstr "الطلبات المسترجعة:"
 
-#: templates/vendor-page.php:897
-msgid ""
-"Refunds can happen for many reasons. A high number compared to completed "
-"orders may indicate repeated issues."
-msgstr ""
-"قد تحدث عمليات استرداد الأموال لأسباب عديدة. وقد يشير ارتفاع عدد عمليات "
-"الاسترداد مقارنةً بالطلبات المكتملة إلى تكرار المشكلات."
+msgid "Refunds can happen for many reasons. A high number compared to completed orders may indicate repeated issues."
+msgstr "قد تحدث عمليات استرداد الأموال لأسباب عديدة. وقد يشير ارتفاع عدد عمليات الاسترداد مقارنةً بالطلبات المكتملة إلى تكرار المشكلات."
 
-#: templates/vendor-page.php:901
 msgid "Success Rate:"
 msgstr "معدل النجاح:"
 
-#: templates/vendor-page.php:902
-msgid ""
-"This is one of the most important indicators. Higher success rate generally "
-"means higher reliability."
-msgstr ""
-"يُعد هذا أحد أهم المؤشرات. فارتفاع معدل النجاح يعني عموماً ارتفاع مستوى "
-"الموثوقية."
+msgid "This is one of the most important indicators. Higher success rate generally means higher reliability."
+msgstr "يُعد هذا أحد أهم المؤشرات. فارتفاع معدل النجاح يعني عموماً ارتفاع مستوى الموثوقية."
 
-#: templates/vendor-page.php:906
 msgid "Rating:"
 msgstr "تقييم:"
 
-#: templates/vendor-page.php:907
-msgid ""
-"Average rating from customers. Read reviews when available to understand the "
-"reasons behind ratings."
+msgid "Average rating from customers. Read reviews when available to understand the reasons behind ratings."
 msgstr "متوسط ​​تقييم العملاء. اقرأ التقييمات عند توفرها لفهم أسباب التقييمات."
 
-#: templates/vendor-page.php:912
 msgid "Tip:"
 msgstr "نصيحة:"
 
-#: templates/vendor-page.php:913
-msgid ""
-"If the vendor is new (few orders/products), don’t judge too quickly. Check "
-"the rating, review details, and communication quality before deciding."
-msgstr ""
-"إذا كان التاجر جديداً (لديه طلبات/منتجات قليلة)، فلا تتسرع في الحكم عليه. "
-"تحقق من التقييم، وتفاصيل المراجعات، وجودة التواصل قبل اتخاذ القرار."
+msgid "If the vendor is new (few orders/products), don’t judge too quickly. Check the rating, review details, and communication quality before deciding."
+msgstr "إذا كان التاجر جديداً (لديه طلبات/منتجات قليلة)، فلا تتسرع في الحكم عليه. تحقق من التقييم، وتفاصيل المراجعات، وجودة التواصل قبل اتخاذ القرار."
 
-#: templates/vendor-page.php:959
 msgid "You cannot report your own store."
 msgstr "لا يمكنك الإبلاغ عن متجرك الخاص."
 
-#: templates/vendor-page.php:966
 msgid "Please log in to report this vendor."
 msgstr "يرجى تسجيل الدخول للإبلاغ عن هذا التاجر."
 
-#: templates/vendor-page.php:989
 msgid "You must have at least one order from this vendor to submit a report."
 msgstr "يجب أن يكون لديك طلب واحد على الأقل من هذا التاجر لتقديم بلاغ."
 
-#: templates/vendor-page.php:1010
 msgid "Report this vendor"
 msgstr "أبلغ عن هذا التاجر"
 
-#: templates/vendor-page.php:1021 templates/vendor-page.php:1193
 msgid "You have already reported this vendor."
 msgstr "لقد أبلغت عن هذا التاجر بالفعل."
 
-#: templates/vendor-page.php:1029
-msgid ""
-"Select all reasons that apply. Your report helps us keep the marketplace "
-"safe."
+msgid "Select all reasons that apply. Your report helps us keep the marketplace safe."
 msgstr "اختر جميع الأسباب التي تنطبق. يساعدنا تقريرك في الحفاظ على أمان السوق."
 
-#: templates/vendor-page.php:1035
 msgid "Unprofessional communication"
 msgstr "التواصل غير المهني"
 
-#: templates/vendor-page.php:1036
 msgid "Late delivery"
 msgstr "تأخر في التسليم"
 
-#: templates/vendor-page.php:1037
 msgid "Product not as described"
 msgstr "المنتج غير مطابق للوصف"
 
-#: templates/vendor-page.php:1038
 msgid "Repeated order issues"
 msgstr "مشاكل متكررة في الطلبات"
 
-#: templates/vendor-page.php:1039
 msgid "Refund problems"
 msgstr "مشاكل استرداد الأموال"
 
-#: templates/vendor-page.php:1040
 msgid "Fake or misleading information"
 msgstr "معلومات مزيفة أو مضللة"
 
-#: templates/vendor-page.php:1041
 msgid "Other"
 msgstr "آخر"
 
-#: templates/vendor-page.php:1055
 msgid "Additional details (optional)"
 msgstr "تفاصيل إضافية (اختياري)"
 
-#: templates/vendor-page.php:1063
 msgid "Submit Vendor Report"
 msgstr "تقديم بلاغ عن التاجر."
 
-#: templates/vendor-page.php:1170
 msgid "Please select at least one reason."
 msgstr "يرجى اختيار سبب واحد على الأقل."
 
-#: templates/vendor-page.php:1188
 msgid "Vendor reported successfully."
 msgstr "تم الإبلاغ عن التاجر بنجاح."
 
-#: vendor-orders.php:409
 msgid "Order Progress"
 msgstr "حالة الطلب"
 
-#: vendor-orders.php:417
 msgid "Processing"
 msgstr "يعالج"
 
-#: vendor-orders.php:424
 msgid "Received"
 msgstr "استلمت"
 
-#: vendor-orders.php:431
 msgid "Ready"
 msgstr "مستعد"
 
-#: vendor-orders.php:438
 msgid "Shipped"
 msgstr "شركة الشحن"
 
-#: vendor-orders.php:445
 msgid "Out for delivery"
 msgstr "في الطريق  للتسليم"
 
-#: vendor-orders.php:452
 msgid "Completed"
 msgstr "مكتمل"
 
-#: vendor-orders.php:459
 msgid "Close"
 msgstr "غلق"
 
-#. Description of the plugin/theme
-msgid ""
-"WebsiteFlexi Dashboard & Marketplace — Owner control, managers, dashboard "
-"access and customer dress marketplace."
-msgstr ""
-"لوحة تحكم وسوق ويبسايت فليكسى - تحكم المالك، والمديرين، والوصول إلى لوحة "
-"التحكم، وسوق منتجات العملاء."
+msgid "WebsiteFlexi Dashboard & Marketplace — Owner control, managers, dashboard access and customer dress marketplace."
+msgstr "لوحة تحكم وسوق ويبسايت فليكسى - تحكم المالك، والمديرين، والوصول إلى لوحة التحكم، وسوق منتجات العملاء."
 
-#. Author of the plugin/theme
 msgid "WebsiteFlexi"
 msgstr "ويبسايت فليكسى"
+
