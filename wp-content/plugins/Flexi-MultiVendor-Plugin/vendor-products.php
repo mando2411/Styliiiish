@@ -462,6 +462,10 @@ $(document).on('click', '.sty-reject', function(e){
     // =========================
     // Filters: Pending / Active / Incomplete / Deactivated
     // =========================
+    const wfRenderVendorListError = (message) => {
+        $(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
+    };
+
 $(document).on("click", ".vp-filter-btn", function (e) {
     e.preventDefault();
 
@@ -497,7 +501,7 @@ $(document).on("click", ".vp-filter-btn", function (e) {
     }, function (resp) {
 
         if (!resp || !resp.success) {
-            $(".sty-vendor-list").html('<div class="sty-no-items">Failed to load dresses.</div>');
+            wfRenderVendorListError('فشل تحميل الفساتين.');
             return;
         }
 
@@ -814,7 +818,7 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
         }, function(resp) {
 
             if (!resp || !resp.success) {
-                $(".sty-vendor-list").html('<div class="sty-no-items">Failed to load pending dresses.</div>');
+                wfRenderVendorListError('فشل تحميل الفساتين المعلّقة.');
                 return;
             }
 
