@@ -690,22 +690,6 @@ function sty_get_gallery_cb() {
 
 
 
-add_action('wp_footer', 'sty_gallery_script');
-function sty_gallery_script() {
-    ?>
-    <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
-		
-		
-		 
-		
-jQuery(function($){
-
-        if (!window.ajax_object || !window.ajax_object.ajax_url || !window.ajax_object.nonce) {
-            window.ajax_object = {
-                ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
-                nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
-            };
-        }
 	
 	
 	
