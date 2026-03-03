@@ -23,8 +23,19 @@ echo '<link rel="stylesheet" href="' . esc_url( plugins_url( 'assets/cards.css',
 
 <?php
 $id     = $p->get_id();
-$price  = $p->get_regular_price();
-$sale   = $p->get_sale_price();
+
+$regular_price = (string) $p->get_regular_price();
+$sale_price    = (string) $p->get_sale_price();
+$current_price = (string) $p->get_price();
+
+$price = $regular_price !== '' ? $regular_price : $current_price;
+$sale  = '';
+
+if ($sale_price !== '') {
+    $sale = $sale_price;
+} elseif ($regular_price !== '' && $current_price !== '' && floatval($current_price) < floatval($regular_price)) {
+    $sale = $current_price;
+}
 
 // compute discount percent when applicable
 $discount_percent = '';
@@ -53,9 +64,11 @@ $is_deactivated =
 
 // created timestamp for client-side sorting
 $created_ts = get_post_time('U', true, $id);
+
+$data_price = $sale !== '' ? $sale : $price;
 ?>
 
-<div class="sty-card <?= $is_deactivated?'is-deactivated':'' ?>" data-id="<?= esc_attr($id) ?>" data-created="<?= esc_attr($created_ts) ?>" data-price="<?= esc_attr($price) ?>">
+<div class="sty-card <?= $is_deactivated?'is-deactivated':'' ?>" data-id="<?= esc_attr($id) ?>" data-created="<?= esc_attr($created_ts) ?>" data-price="<?= esc_attr($data_price) ?>">
 
     <!-- Image -->
    <div class="card-thumb">
@@ -98,11 +111,11 @@ $created_ts = get_post_time('U', true, $id);
             <?php if($sale && $price && floatval($sale) < floatval($price)): ?>
 
                 <span class="card-price card-price-sale">
-                    <?= esc_html( $sale ) . ' ' . esc_html__( 'EGP', 'website-flexi' ) ?>
+                    <?= wp_kses_post( wc_price( (float) $sale ) ) ?>
                 </span>
 
                 <span class="card-price card-price-regular">
-                    <?= esc_html( $price ) . ' ' . esc_html__( 'EGP', 'website-flexi' ) ?>
+                    <?= wp_kses_post( wc_price( (float) $price ) ) ?>
                 </span>
 
                 <span class="card-discount-badge">
@@ -112,7 +125,7 @@ $created_ts = get_post_time('U', true, $id);
             <?php else: ?>
 
                 <span class="card-price">
-                    <?= $price ? esc_html($price) . ' ' . esc_html__( 'EGP', 'website-flexi' ) : esc_html__( '—', 'website-flexi' ) ?>
+                    <?= $price !== '' ? wp_kses_post( wc_price( (float) $price ) ) : esc_html__( '—', 'website-flexi' ) ?>
                 </span>
 
             <?php endif; ?>
