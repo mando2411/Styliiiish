@@ -31,6 +31,10 @@ if ($price === '' && $current_price !== '') {
     $price = $current_price;
 }
 
+if ($sale === '' && $price !== '' && $current_price !== '' && floatval($current_price) < floatval($price)) {
+    $sale = $current_price;
+}
+
 // compute discount percent when applicable
 $discount_percent = '';
 if($sale !== '' && $price !== '' && floatval($sale) < floatval($price)){

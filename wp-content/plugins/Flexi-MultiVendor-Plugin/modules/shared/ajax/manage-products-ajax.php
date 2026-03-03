@@ -2015,7 +2015,14 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
         $current_price = (string) $product_for_price->get_price();
 
         $price = $regular_price !== '' ? $regular_price : $current_price;
-        $sale  = $sale_price;
+
+        if ($sale_price !== '') {
+            $sale = $sale_price;
+        } elseif ($regular_price !== '' && $current_price !== '' && floatval($current_price) < floatval($regular_price)) {
+            $sale = $current_price;
+        } else {
+            $sale = '';
+        }
     }
 
 
