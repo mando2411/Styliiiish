@@ -20,7 +20,7 @@ console.log(wfModal);
 
 
 if(window.wfAddModalLoaded){return;}
-window.wfAddModalLoaded = true;
+    
 window.currentProductId = 0;
 let pendingAttrs = null;
 
