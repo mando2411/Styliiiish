@@ -68,7 +68,6 @@ window.lastScrollY = 0;
 
 window.lockScroll = function(){
 
-   console.log("LOCK →", window.openModalCount);
 
    if(window.openModalCount === 0){
 
@@ -83,7 +82,6 @@ window.lockScroll = function(){
 
 window.unlockScroll = function(){
 
-   console.log("UNLOCK →", window.openModalCount);
 
    if(window.openModalCount <= 0) return; // حماية
 
@@ -1067,7 +1065,6 @@ $(document).on("click", "#editCatsModal", function (e) {
                             
                             let pid = response.data.new_id;   // ✅ خد الـ ID من السيرفر
                             
-                            console.log('New product:', pid);
                             
                             // خزّن الـ ID
                             window.currentProductId = pid;
@@ -2045,7 +2042,6 @@ $(document).on('click', '.btn-activate-user', function (e) {
 function changeProductStatus(productID, newStatus) {
 
 
-    console.log("Changing status for:", productID, "→", newStatus);
     $.post(ajax_object.ajax_url, {
         action: "styliiiish_update_status",
         nonce: ajax_object.nonce,
