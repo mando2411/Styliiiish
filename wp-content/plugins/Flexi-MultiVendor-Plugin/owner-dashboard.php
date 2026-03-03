@@ -705,7 +705,7 @@ Logic في الشورت كود	🟡 قابل للتحسين
 **************************************/
 function styliiiish_owner_dashboard_shortcode(){
     if (!is_user_logged_in()) {
-        return '<p>Please log in to access this page.</p>';
+        return '<p>' . esc_html__('Please log in to access this page.', 'website-flexi') . '</p>';
     }
 
     $user = wp_get_current_user();
@@ -716,7 +716,7 @@ function styliiiish_owner_dashboard_shortcode(){
     $is_manager = (in_array($user_id, wf_od_get_manager_ids()) || $is_admin);
 
     if (!$is_manager && !in_array($user_id, $allowed_dashboard)) {
-        return '<p>You do not have permission to access this page.</p>';
+        return '<p>' . esc_html__('You do not have permission to access this page.', 'website-flexi') . '</p>';
     }
 
     ob_start();
@@ -725,56 +725,56 @@ function styliiiish_owner_dashboard_shortcode(){
     <div class="owner-dashboard-container" id="sty-page-wrapper">
 
         <h2 style="margin-bottom:20px;">
-            🛍 Styliiiish Owner Dashboard
+            🛍 <?php echo esc_html__('Styliiiish Owner Dashboard', 'website-flexi'); ?>
         </h2>
 
         <!-- CARDS -->
         <div class="owner-card" data-owner-section="products" role="button" tabindex="0">
-            <h3>🛍 Manage Products <span>→</span></h3>
+            <h3>🛍 <?php echo esc_html__('Manage Products', 'website-flexi'); ?> <span>→</span></h3>
         </div>
 
         <?php if ($is_manager): ?>
             <div class="owner-card" data-owner-section="vendor_products" role="button" tabindex="0">
-                <h3>👗 Customer Dresses Added <span>→</span></h3>
+                <h3>👗 <?php echo esc_html__('Customer Dresses Added', 'website-flexi'); ?> <span>→</span></h3>
             </div>
 
             <div class="owner-card" data-owner-section="orders" role="button" tabindex="0">
-                <h3>📦 Orders <span>→</span></h3>
+                <h3>📦 <?php echo esc_html__('Orders', 'website-flexi'); ?> <span>→</span></h3>
             </div>
 
             <div class="owner-card" data-owner-section="stats" role="button" tabindex="0">
-                <h3>📊 Statistics <span>→</span></h3>
+                <h3>📊 <?php echo esc_html__('Statistics', 'website-flexi'); ?> <span>→</span></h3>
             </div>
 
             <div class="owner-card" data-owner-section="email" role="button" tabindex="0">
-                <h3>✉️ Send Email <span>→</span></h3>
+                <h3>✉️ <?php echo esc_html__('Send Email', 'website-flexi'); ?> <span>→</span></h3>
             </div>
         <?php endif; ?>
 
         <!-- SECTIONS -->
         <div id="section-products" class="owner-section" style="display:none;">
-            <h3>🛍 Manage Products</h3>
+            <h3>🛍 <?php echo esc_html__('Manage Products', 'website-flexi'); ?></h3>
             <?php styliiiish_render_manage_products($is_manager); ?>
         </div>
 
         <?php if ($is_manager): ?>
             <div id="section-vendor_products" class="owner-section" style="display:none;">
-                <h3>👗 Customer Dresses Added</h3>
+                <h3>👗 <?php echo esc_html__('Customer Dresses Added', 'website-flexi'); ?></h3>
                 <?php styliiiish_render_vendor_products(); ?>
             </div>
 
             <div id="section-orders" class="owner-section" style="display:none;">
-                <h3>📦 Orders</h3>
+                <h3>📦 <?php echo esc_html__('Orders', 'website-flexi'); ?></h3>
                 <?php styliiiish_render_orders(); ?>
             </div>
 
             <div id="section-stats" class="owner-section" style="display:none;">
-                <h3>📊 Statistics</h3>
+                <h3>📊 <?php echo esc_html__('Statistics', 'website-flexi'); ?></h3>
                 <?php styliiiish_render_stats(); ?>
             </div>
 
             <div id="section-email" class="owner-section" style="display:none;">
-                <h3>✉️ Send Email</h3>
+                <h3>✉️ <?php echo esc_html__('Send Email', 'website-flexi'); ?></h3>
                 <?php styliiiish_render_email_sender(); ?>
             </div>
         <?php endif; ?>
