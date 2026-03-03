@@ -459,7 +459,58 @@ $(document).on('click', '.sty-reject', function(e){
     });
 });
 
- 
+    // =========================
+    // Filters: Pending / Active / Incomplete / Deactivated
+    // =========================
+    function wfRenderVendorListError(message) {
+        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + message + '</div>');
+    }
+
+    function wfBuildVendorSkeleton(count) {
+        var card = ''
+            + '<div class="sty-skeleton-card">'
+            + '  <div class="sk-thumb"></div>'
+            + '  <div class="sk-body">'
+            + '    <div class="sk-line title"></div>'
+            + '    <div class="sk-line"></div>'
+            + '    <div class="sk-line small"></div>'
+            + '  </div>'
+            + '</div>';
+
+        var cardsHtml = '';
+        for (var index = 0; index < count; index++) {
+            cardsHtml += card;
+        }
+
+        return '<div class="sty-skeleton-wrap">' + cardsHtml + '</div>';
+    }
+
+    $(document).on("click", ".vp-filter-btn", function (e) {
+        e.preventDefault();
+
+        var status = $(this).data("status");
+
+        $(".vp-filter-btn").removeClass("active");
+        $(this).addClass("active");
+
+        $(".sty-vendor-list").html(wfBuildVendorSkeleton(6));
+
+        $.post(ajax_object.ajax_url, {
+            action: "sty_filter_vendor_products",
+            nonce: ajax_object.nonce,
+            status: status
+        }, function (resp) {
+            if (!resp || !resp.success) {
+                wfRenderVendorListError('فشل تحميل الفساتين.');
+                return;
+            }
+
+            $(".sty-vendor-list").html(resp.data.html);
+        }, 'json');
+    });
+
+						  
+						  
 						  
 						  
 						  
