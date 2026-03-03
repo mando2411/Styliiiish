@@ -793,6 +793,74 @@ function styliiiish_owner_dashboard_shortcode(){
     return ob_get_clean();
         }
         add_shortcode('owner_dashboard', 'styliiiish_owner_dashboard_shortcode');
+
+function wf_plugin_notranslate_shortcode_tags() {
+    return [
+        'owner_dashboard',
+        'styliiiish_user_manage_products',
+        'user_products_dashboard',
+        'websiteflexi_vendor_orders',
+    ];
+}
+
+add_filter('do_shortcode_tag', function ($output, $tag) {
+    if (!in_array($tag, wf_plugin_notranslate_shortcode_tags(), true)) {
+        return $output;
+    }
+
+    return '<div class="wf-plugin-notranslate notranslate trp-no-translate" translate="no" data-no-translation="1">' . $output . '</div>';
+}, 10, 2);
+
+add_filter('trp_no_translate_selectors', function ($selectors) {
+    if (!is_array($selectors)) {
+        $selectors = [];
+    }
+
+    $selectors = array_merge($selectors, [
+        '.wf-plugin-notranslate',
+        '.owner-dashboard-container',
+        '.owner-section',
+        '.sty-vendor-review-wrapper',
+        '.sty-vendor-list',
+        '.sty-vendor-card',
+        '.sty-vendor-card-body',
+        '.sty-vendor-actions',
+        '.sty-vendor-meta',
+        '.sty-vendor-source',
+        '.taj-vendor-dashboard',
+    ]);
+
+    return array_values(array_unique($selectors));
+});
+
+add_action('wp_footer', function () {
+    ?>
+    <script id="wf-plugin-notranslate-guard">
+    (function(){
+        var selectors = [
+            '.wf-plugin-notranslate',
+            '.owner-dashboard-container',
+            '.owner-section',
+            '.sty-vendor-review-wrapper',
+            '.sty-vendor-list',
+            '.sty-vendor-card',
+            '.sty-vendor-card-body',
+            '.taj-vendor-dashboard'
+        ];
+
+        var mark = function(node){
+            if(!node || node.nodeType !== 1){ return; }
+            node.setAttribute('translate','no');
+            node.classList.add('notranslate','trp-no-translate');
+        };
+
+        selectors.forEach(function(selector){
+            document.querySelectorAll(selector).forEach(mark);
+        });
+    })();
+    </script>
+    <?php
+}, 999);
         
 
         
