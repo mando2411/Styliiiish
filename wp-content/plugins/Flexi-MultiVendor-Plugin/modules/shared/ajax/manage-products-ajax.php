@@ -1868,7 +1868,13 @@ function sty_add_product(){
     $user_id = get_current_user_id();
     $user_type = function_exists('wf_od_get_user_type') ? wf_od_get_user_type($user_id) : '';
     $is_admin_creator = in_array($user_type, ['manager', 'dashboard'], true) || current_user_can('manage_woocommerce');
-    $target_status = $is_admin_creator ? 'draft' : 'pending';
+    $requested_status = sanitize_key($_POST['admin_status'] ?? '');
+
+    if ($is_admin_creator) {
+        $target_status = in_array($requested_status, ['draft', 'publish'], true) ? $requested_status : 'draft';
+    } else {
+        $target_status = 'pending';
+    }
 
     // صلاحيات
     if($pid && !current_user_can('edit_post',$pid)){
@@ -1968,7 +1974,8 @@ if(!empty($_POST['attrs']) && is_array($_POST['attrs'])){
     
     wp_send_json_success([
        'id'    => $id,
-       'image' => $img
+         'image' => $img,
+         'status' => get_post_status($id)
     ]);
 
 }
@@ -2082,6 +2089,7 @@ if($product){
         'desc'  => $post->post_content,
         'price' => $price,
         'sale'  => $sale,
+        'status' => get_post_status($pid),
         'cats'  => $cats,
         'attrs' => $attrs,
         'image' => $img // ✅ الصورة

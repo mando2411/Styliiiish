@@ -546,6 +546,11 @@ $(document).on('click','.btn-edit-product',function(e){
       $('#fDesc').val(p.desc);
       $('#fRegularPrice').val(p.price);
         $('#fSalePrice').val(p.sale || '');
+
+            if ($('#fAdminStatus').length) {
+                var editStatus = (p.status === 'publish') ? 'publish' : 'draft';
+                $('#fAdminStatus').val(editStatus);
+            }
         
         $('#fRegularPrice').trigger('input').blur();
 
