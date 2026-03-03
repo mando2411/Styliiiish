@@ -73,12 +73,40 @@ function ekart_is_account_like_request() {
 	return false;
 }
 
+function ekart_is_moderate_site_account_request() {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$request_path = parse_url( $request_uri, PHP_URL_PATH );
+	$request_path = is_string( $request_path ) ? $request_path : '/';
+	$normalized   = rawurldecode( strtolower( rtrim( $request_path, '/' ) ) );
+
+	if ( $normalized === '' ) {
+		$normalized = '/';
+	}
+
+	$targets = [
+		'/my-account/moderate-site',
+		'/en/my-account/moderate-site',
+		'/ar/حسابي/موقع-متوسط',
+		'/حسابي/موقع-متوسط',
+	];
+
+	return in_array( $normalized, $targets, true );
+}
+
 function ekart_theme_css() {
 	$child_style_path = get_stylesheet_directory() . '/style.css';
 	$child_style_ver  = file_exists( $child_style_path ) ? (string) filemtime( $child_style_path ) : null;
 	wp_enqueue_style( 'ekart-style', get_stylesheet_uri(), [ 'shopire-style' ], $child_style_ver );
 
 	if ( ekart_is_account_like_request() ) {
+		if ( ekart_is_moderate_site_account_request() ) {
+			return;
+		}
+
 		$account_style_rel  = '/assets/css/account-ui.css';
 		$account_script_rel = '/assets/js/account-ajax.js';
 		$account_style_path = get_stylesheet_directory() . $account_style_rel;
@@ -115,9 +143,11 @@ function ekart_force_flexi_account_styles() {
 		return;
 	}
 
-	wp_enqueue_style( 'woocommerce-layout' );
-	wp_enqueue_style( 'woocommerce-smallscreen' );
-	wp_enqueue_style( 'woocommerce-general' );
+	if ( ! ekart_is_moderate_site_account_request() ) {
+		wp_enqueue_style( 'woocommerce-layout' );
+		wp_enqueue_style( 'woocommerce-smallscreen' );
+		wp_enqueue_style( 'woocommerce-general' );
+	}
 
 	if ( ! defined( 'WF_OWNER_DASHBOARD_PATH' ) || ! is_dir( WF_OWNER_DASHBOARD_PATH ) ) {
 		return;
@@ -158,6 +188,48 @@ function ekart_force_flexi_account_styles() {
 	}
 }
 add_action( 'wp_print_styles', 'ekart_force_flexi_account_styles', 10001 );
+
+function ekart_moderate_site_plugin_css_only() {
+	if ( ! ekart_is_moderate_site_account_request() ) {
+		return;
+	}
+
+	global $wp_styles;
+	if ( ! ( $wp_styles instanceof WP_Styles ) || ! is_array( $wp_styles->queue ) ) {
+		return;
+	}
+
+	$plugin_path_needle = '/wp-content/plugins/flexi-multivendor-plugin/';
+
+	foreach ( $wp_styles->queue as $handle ) {
+		if ( ! isset( $wp_styles->registered[ $handle ] ) ) {
+			continue;
+		}
+
+		$src = (string) ( $wp_styles->registered[ $handle ]->src ?? '' );
+		$src = strtolower( $src );
+
+		$is_plugin_style = strpos( $src, $plugin_path_needle ) !== false
+			|| strpos( $handle, 'wf-flexi-css-' ) === 0
+			|| in_array(
+				$handle,
+				[
+					'sty-owner-css',
+					'sty-owner-mobile-css',
+					'wf-add-modal',
+					'styliiiish-myaccount-css',
+					'wf-vendor-orders',
+				],
+				true
+			);
+
+		if ( ! $is_plugin_style ) {
+			wp_dequeue_style( $handle );
+			wp_deregister_style( $handle );
+		}
+	}
+}
+add_action( 'wp_print_styles', 'ekart_moderate_site_plugin_css_only', 10050 );
 
 function ekart_is_ar_fasatini_request() {
 	if ( is_admin() ) {
