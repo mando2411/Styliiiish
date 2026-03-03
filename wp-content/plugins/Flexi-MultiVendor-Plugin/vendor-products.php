@@ -322,30 +322,23 @@ function styliiiish_render_vendor_products() {
     <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
 jQuery(function($){
 
-    const wfRenderVendorListLoading = () => {
-        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">Loading...</div>');
-    };
-
-    const wfRenderVendorListError = (message) => {
-        const safeMessage = message || 'حدث خطأ أثناء تحميل البيانات.';
-        $(".sty-vendor-list").html('<div class="sty-no-items" translate="no">' + safeMessage + '</div>');
-    };
-	
-	
-	$(document).ready(function(){
-
-    let pendingBtn = $(".vp-filter-btn[data-status='pending']");
-
-    if (pendingBtn.length) {
-        pendingBtn.trigger("click");
-    }
-
+ 
 });
 
 	
 	
 
-  
+    // Helper: send moderation request
+function sendModeration(productID, moderation, reason) {
+    return $.post(ajax_object.ajax_url, {
+        action: 'styliiiish_vendor_moderate',
+        nonce: ajax_object.nonce,
+        product_id: productID,
+        moderation: moderation,
+        reason: reason   // ????? ??? ???? || ''
+    }, null, 'json');
+}
+
 
 
     // Approve single (card button)
