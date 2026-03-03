@@ -690,6 +690,18 @@ function sty_get_gallery_cb() {
 
 
 
+add_action('wp_footer', 'sty_gallery_script');
+function sty_gallery_script() {
+    ?>
+    <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
+		
+		
+		 
+		
+jQuery(function($){
+
+      
+        }
 	
 	
 	
