@@ -697,12 +697,7 @@ function sty_gallery_script() {
 		
 		
 		 
-		
-jQuery(function($){
 
-      
-        }
-	
 	
 	
 	
