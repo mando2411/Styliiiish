@@ -380,8 +380,23 @@ function wf_install_support_system(){
    Load Assets ONLY on owner-dashboard page
 =========================================== */
 add_action('wp_enqueue_scripts', function () {
+    $should_load_assets = is_page('owner-dashboard');
 
-    if (!is_page('owner-dashboard')) return;
+    if (
+        ! $should_load_assets
+        && function_exists('is_account_page')
+        && function_exists('is_wc_endpoint_url')
+        && is_account_page()
+    ) {
+        $should_load_assets = (
+            is_wc_endpoint_url('vendor_orders')
+            || is_wc_endpoint_url('vendor-orders')
+            || is_wc_endpoint_url('store-profile')
+            || is_wc_endpoint_url('store_profile')
+        );
+    }
+
+    if (! $should_load_assets) return;
     
     
 
