@@ -83,6 +83,14 @@ add_shortcode('styliiiish_user_manage_products', 'styliiiish_user_manage_product
 
 add_action('wp_enqueue_scripts', function () {
 
+    if ( ! function_exists('is_account_page') || ! is_account_page() ) {
+        return;
+    }
+
+    wp_enqueue_style( 'woocommerce-layout' );
+    wp_enqueue_style( 'woocommerce-smallscreen' );
+    wp_enqueue_style( 'woocommerce-general' );
+
     /* =========================
        CSS
     ========================= */
@@ -114,13 +122,6 @@ add_action('wp_enqueue_scripts', function () {
         'select2-css',
         'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css'
     );
-
-
-    // JS الخاص بالدashboard/modals نخليه فقط داخل صفحة الحساب
-    if ( ! function_exists('is_account_page') || ! is_account_page() ) {
-        return;
-    }
-
 
 
     /* =========================
