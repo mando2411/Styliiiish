@@ -324,6 +324,11 @@ function styliiiish_render_vendor_products() {
     <script translate="no" class="notranslate trp-no-translate" data-no-translation="1">
 jQuery(function($){
 
+    window.ajax_object = window.ajax_object || {
+        ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
+        nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
+    };
+
     function wfRenderVendorListLoading() {
         var $list = $(".sty-vendor-list");
         var $item = $("<div>")
@@ -688,6 +693,11 @@ function sty_gallery_script() {
 		 
 		
 jQuery(function($){
+
+window.ajax_object = window.ajax_object || {
+    ajax_url: "<?php echo esc_js(admin_url('admin-ajax.php')); ?>",
+    nonce: "<?php echo esc_js(wp_create_nonce('ajax_nonce')); ?>"
+};
 	
 	
 	
