@@ -354,6 +354,53 @@ add_action( 'wp_head', function () {
         . '</style>';
 }, 99 );
 
+add_action( 'wp_footer', function () {
+    if ( ! wf_is_moderate_site_request() ) {
+        return;
+    }
+
+    echo '<script id="wf-moderate-site-ar-notranslate">'
+        . '(function(){'
+        . 'var root=document.querySelector(".wf-moderate-site-content");'
+        . 'if(!root){return;}'
+        . 'var arabicPattern=/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;'
+        . 'var skipTags={SCRIPT:1,STYLE:1,NOSCRIPT:1,IFRAME:1,TEXTAREA:1,INPUT:1,OPTION:1,SELECT:1};'
+        . 'var mark=function(el){if(!el||!el.tagName){return;}el.setAttribute("translate","no");el.classList.add("notranslate","trp-no-translate");};'
+        . 'var walk=function(node){'
+        . 'if(!node||node.nodeType!==1){return;}'
+        . 'if(skipTags[node.tagName]){return;}'
+        . 'if(node.children.length===0){'
+        . 'var text=String(node.textContent||"").trim();'
+        . 'if(text!==""&&arabicPattern.test(text)){mark(node);}'
+        . '}'
+        . 'var attrs=["title","aria-label","placeholder","value"];'
+        . 'for(var i=0;i<attrs.length;i++){'
+        . 'var key=attrs[i];'
+        . 'if(!node.hasAttribute(key)){continue;}'
+        . 'var val=String(node.getAttribute(key)||"").trim();'
+        . 'if(val!==""&&arabicPattern.test(val)){mark(node);break;}'
+        . '}'
+        . 'var children=node.children;'
+        . 'for(var j=0;j<children.length;j++){walk(children[j]);}'
+        . '};'
+        . 'walk(root);'
+        . 'if(window.MutationObserver){'
+        . 'var observer=new MutationObserver(function(mutations){'
+        . 'for(var m=0;m<mutations.length;m++){'
+        . 'var added=mutations[m].addedNodes||[];'
+        . 'for(var k=0;k<added.length;k++){'
+        . 'var n=added[k];'
+        . 'if(n&&n.nodeType===1){walk(n);}'
+        . '}'
+        . '}'
+        . '});'
+        . 'observer.observe(root,{childList:true,subtree:true});'
+        . 'setTimeout(function(){try{observer.disconnect();}catch(e){}},20000);'
+        . '}'
+        . '})();'
+        . '</script>';
+}, 99 );
+
 add_action('template_redirect', function () {
     if ( is_admin() || ( function_exists('wp_doing_ajax') && wp_doing_ajax() ) ) {
         return;
