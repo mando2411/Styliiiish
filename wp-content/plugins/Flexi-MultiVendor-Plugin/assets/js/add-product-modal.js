@@ -12,7 +12,6 @@ jQuery(function($){
 
 
 
-console.log(wfModal);
 
 
 
