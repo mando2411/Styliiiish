@@ -282,6 +282,37 @@ add_action('woocommerce_account_moderate-site_endpoint', function() {
     echo do_shortcode('[owner_dashboard]');
 });
 
+add_action('template_redirect', function () {
+    if ( is_admin() || ( function_exists('wp_doing_ajax') && wp_doing_ajax() ) ) {
+        return;
+    }
+
+    if ( get_query_var( 'moderate-site', false ) === false ) {
+        return;
+    }
+
+    if ( ! is_user_logged_in() ) {
+        wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
+        exit;
+    }
+
+    $user = wp_get_current_user();
+    if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+        wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
+        exit;
+    }
+
+    status_header( 200 );
+    get_header();
+
+    echo '<main class="wf-moderate-site-standalone">';
+    echo do_shortcode('[owner_dashboard]');
+    echo '</main>';
+
+    get_footer();
+    exit;
+}, 2);
+
 
 
 add_action( 'woocommerce_account_register-vendor_endpoint', function () {
