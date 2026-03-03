@@ -46,22 +46,6 @@
    overflow: hidden;
 }
 
-/* Keep Add/Edit Product modal large even if generic modal styles load later */
-#addProductModal.wf-ui-modal{
-   overflow-y: auto;
-}
-
-#addProductModal .wf-ui-modal-box{
-   width: 95%;
-   max-width: 1200px;
-   height: 90vh;
-   max-height: 95vh;
-   margin: 3vh auto;
-   padding: 0;
-   display: flex;
-   flex-direction: column;
-}
-
 /* Mobile */
 
 @media(max-width:900px){
@@ -73,14 +57,6 @@
     .wf-ui-modal-box{
         height:auto;
     }
-
-   #addProductModal .wf-ui-modal-box{
-      width: 96%;
-      max-width: 96%;
-      margin: 2vh auto;
-      height: auto;
-      max-height: none;
-   }
 }
 
 /* Layout */
