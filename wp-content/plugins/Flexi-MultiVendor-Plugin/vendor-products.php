@@ -518,22 +518,12 @@ $(document).on("click", ".vp-filter-btn", function (e) {
 						  
 
 						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						
-						  
+				  
 						  
 						  
 						  
 
-				  
+});					  
 </script>
 
     <?php
@@ -827,7 +817,9 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
 	
 	
 	
-	jQuery(function($){
+	const wfRenderVendorListErrorLocal = (message) => {
+		$(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
+	};
 
     // Auto-load Pending on page open
     function loadPending() {
@@ -838,7 +830,7 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
         }, function(resp) {
 
             if (!resp || !resp.success) {
-                wfRenderVendorListError('فشل تحميل الفساتين المعلّقة.');
+                wfRenderVendorListErrorLocal('فشل تحميل الفساتين المعلّقة.');
                 return;
             }
 
@@ -849,8 +841,6 @@ $(document).on("click", ".sty-fullscreen-close, .sty-fullscreen-view", function(
 
     // Run on page load
     loadPending();
-
-});
 	
 	
 	
