@@ -1,0 +1,3 @@
+[submodule "wp-content/plugins/Flexi-MultiVendor-Plugin"]
+	path = wp-content/plugins/Flexi-MultiVendor-Plugin
+	url = https://github.com/mando2411/Flexi-MultiVendor-Plugin.git
