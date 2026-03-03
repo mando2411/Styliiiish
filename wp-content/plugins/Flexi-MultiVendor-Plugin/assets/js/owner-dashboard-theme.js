@@ -78,6 +78,12 @@ $(document).on('keydown', '.owner-card[data-owner-section]', function(e){
     }
 });
 
+// Mobile default: show 1 card per row initially.
+if (window.matchMedia && window.matchMedia('(max-width: 768px)').matches) {
+    currentFilters.per_row = 1;
+    $('#styliiiish-per-row').val('1');
+}
+
 setTimeout(function(){
     try {
         var sections = document.querySelectorAll('.owner-section');
