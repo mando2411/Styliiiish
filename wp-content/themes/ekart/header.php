@@ -51,11 +51,15 @@
 	$is_account_edit_address_path = in_array($normalized_path, ['/my-account/edit-address', '/en/my-account/edit-address', '/ar/حسابي/تعديل-العنوان'], true);
 	$is_account_edit_account_path = in_array($normalized_path, ['/my-account/edit-account', '/en/my-account/edit-account', '/ar/حسابي/تعديل-الحساب'], true);
 	$is_account_saved_cards_path = in_array($normalized_path, ['/my-account/saved-cards', '/en/my-account/saved-cards', '/ar/حسابي/البطاقة-المحفوظة'], true);
+	$is_account_moderate_site_path = in_array($normalized_path, ['/my-account/moderate-site', '/en/my-account/moderate-site', '/ar/حسابي/موقع-متوسط'], true);
 	$is_my_dresses_path = in_array($normalized_path, ['/my-dresses', '/ar/فساتيني'], true);
 	$is_owner_dashboard_path = in_array($normalized_path, ['/owner-dashboard', '/ar/لوحة-معلومات-المالك'], true);
 	if ($is_account_path) {
 		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/';
 		$en_switch_path = '/my-account/';
+	} elseif ($is_account_moderate_site_path) {
+		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d9%85%d9%88%d9%82%d8%b9-%d9%85%d8%aa%d9%88%d8%b3%d8%b7/';
+		$en_switch_path = '/my-account/moderate-site/';
 	} elseif ($is_account_orders_path) {
 		$ar_switch_path = '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/%d8%b7%d9%84%d8%a8%d8%a7%d8%aa/';
 		$en_switch_path = '/my-account/orders/';
