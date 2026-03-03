@@ -465,7 +465,7 @@ $(document).on('click', '.sty-reject', function(e){
     const wfRenderVendorListError = (message) => {
         $(".sty-vendor-list").html(`<div class="sty-no-items" translate="no">${message}</div>`);
     };
-/*
+
 $(document).on("click", ".vp-filter-btn", function (e) {
     e.preventDefault();
 
@@ -509,7 +509,7 @@ $(document).on("click", ".vp-filter-btn", function (e) {
 
     }, 'json');
 });
-*/
+
 						  
 						  
 						  
@@ -533,7 +533,7 @@ $(document).on("click", ".vp-filter-btn", function (e) {
 						  
 						  
 
-});					  
+				  
 </script>
 
     <?php
