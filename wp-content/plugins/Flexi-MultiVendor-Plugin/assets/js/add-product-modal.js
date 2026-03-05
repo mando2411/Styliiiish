@@ -390,7 +390,14 @@ function resetBuilder(){
 
 $(document).on('change','#fCats',function(){
 
- let cat = $(this).val();
+ let cats = $(this).val() || [];
+
+ if(!Array.isArray(cats)){
+    cats = cats ? [cats] : [];
+ }
+
+ // Attribute map is category-based, so use first selected category as the driver.
+ let cat = cats.length ? cats[0] : '';
 
  /* ---------- PREVIEW ---------- */
 

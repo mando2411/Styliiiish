@@ -141,7 +141,7 @@ $wf_is_admin_modal = current_user_can('manage_woocommerce') || wf_od_is_user_plu
 
 <div class="wf-field">
 <label>Categories</label>
-<select name="cats" id="fCats" >
+<select name="cats[]" id="fCats" multiple>
 
 <?php
 

@@ -1944,7 +1944,13 @@ function sty_add_product(){
     $desc  = wp_kses_post($_POST['desc'] ?? '');
     $price = floatval($_POST['regular_price'] ?? 0);
     $sale  = floatval($_POST['sale_price'] ?? 0);
-    $cat   = intval($_POST['cats'] ?? 0);
+    $raw_cats = $_POST['cats'] ?? [];
+
+    if (!is_array($raw_cats)) {
+        $raw_cats = [$raw_cats];
+    }
+
+    $cats = array_values(array_unique(array_filter(array_map('intval', wp_unslash($raw_cats)))));
 
     $user_id = get_current_user_id();
     $user_type = function_exists('wf_od_get_user_type') ? wf_od_get_user_type($user_id) : '';
@@ -2008,8 +2014,20 @@ function sty_add_product(){
 
     /* ========== CATEGORY ========== */
 
-    if($cat){
-        wp_set_object_terms($id,[$cat],'product_cat');
+    if (!empty($cats)) {
+        if (!$is_admin_creator) {
+            $allowed = get_option('wf_allowed_vendor_categories', []);
+            if (is_array($allowed) && !empty($allowed)) {
+                $allowed = array_map('intval', $allowed);
+                $cats = array_values(array_intersect($cats, $allowed));
+            } else {
+                $cats = [];
+            }
+        }
+
+        if (!empty($cats)) {
+            wp_set_object_terms($id, $cats, 'product_cat');
+        }
     }
 
     /* ========== ATTRIBUTES ========== */
