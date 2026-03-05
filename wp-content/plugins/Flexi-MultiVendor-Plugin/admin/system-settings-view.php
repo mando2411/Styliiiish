@@ -177,9 +177,6 @@ if ( ! defined('ABSPATH') ) {
         $admin_email_options_list = isset($admin_email_options) && is_array($admin_email_options) ? $admin_email_options : array();
         ?>
 
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
         <form method="post" style="margin-top:20px;max-width:920px;">
             <?php wp_nonce_field('wf_save_admin_emails'); ?>
 
@@ -190,16 +187,18 @@ if ( ! defined('ABSPATH') ) {
                     <?php esc_html_e('Users with these emails are treated as admins inside this plugin.', 'website-flexi'); ?>
                 </p>
 
-                <label for="wf-admin-emails-select" style="display:block;font-weight:600;margin-bottom:8px;">
-                    <?php esc_html_e('Select Admin Emails', 'website-flexi'); ?>
+                <label for="wf-admin-email-search" style="display:block;font-weight:600;margin-bottom:8px;">
+                    <?php esc_html_e('Search & Select Admin Emails', 'website-flexi'); ?>
                 </label>
 
-                <select
-                    id="wf-admin-emails-select"
-                    name="wf_admin_emails[]"
-                    multiple="multiple"
-                    style="width:100%;max-width:800px;">
+                <input
+                    type="search"
+                    id="wf-admin-email-search"
+                    class="regular-text"
+                    style="width:100%;max-width:800px;"
+                    placeholder="<?php echo esc_attr__('Search by name or email...', 'website-flexi'); ?>">
 
+                <div id="wf-admin-email-picker" class="wf-admin-email-picker" style="margin-top:10px;max-width:800px;">
                     <?php foreach ( $admin_email_options_list as $opt ): ?>
                         <?php
                         $email = strtolower(trim((string) ($opt['email'] ?? '')));
@@ -207,15 +206,29 @@ if ( ! defined('ABSPATH') ) {
                         if ( $email === '' ) {
                             continue;
                         }
+                        $search_text = strtolower($label . ' ' . $email);
                         ?>
-                        <option value="<?php echo esc_attr($email); ?>" <?php selected(in_array($email, $saved_admin_emails, true)); ?>>
-                            <?php echo esc_html($label); ?>
-                        </option>
+                        <label class="wf-admin-email-item" data-search="<?php echo esc_attr($search_text); ?>">
+                            <input
+                                type="checkbox"
+                                name="wf_admin_emails[]"
+                                value="<?php echo esc_attr($email); ?>"
+                                <?php checked(in_array($email, $saved_admin_emails, true)); ?>>
+                            <span><?php echo esc_html($label); ?></span>
+                        </label>
                     <?php endforeach; ?>
-                </select>
+                    <p id="wf-admin-email-empty-filter" class="description" style="display:none;margin:8px 0 0 0;">
+                        <?php esc_html_e('No emails match your search.', 'website-flexi'); ?>
+                    </p>
+                    <?php if ( empty($admin_email_options_list) ): ?>
+                        <p class="description" style="margin:8px 0 0 0;">
+                            <?php esc_html_e('No site user emails available yet.', 'website-flexi'); ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
 
                 <p class="description">
-                    <?php esc_html_e('Search by name or email, then select multiple emails.', 'website-flexi'); ?>
+                    <?php esc_html_e('Select one or more emails from existing site users.', 'website-flexi'); ?>
                 </p>
 
                 <div class="wf-selected-admins-wrap" style="margin-top:14px;max-width:800px;">
@@ -234,6 +247,25 @@ if ( ! defined('ABSPATH') ) {
         </form>
 
         <style>
+            .wf-admin-email-picker {
+                border: 1px solid #dcdcde;
+                border-radius: 8px;
+                background: #fff;
+                max-height: 260px;
+                overflow: auto;
+                padding: 8px;
+            }
+            .wf-admin-email-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                border-radius: 6px;
+                padding: 8px;
+                margin: 2px 0;
+            }
+            .wf-admin-email-item:hover {
+                background: #f6f7f7;
+            }
             .wf-selected-admins-wrap li {
                 background: #f0f4ff;
                 border: 1px solid #d8e2ff;
@@ -248,60 +280,88 @@ if ( ! defined('ABSPATH') ) {
                 border-color: #e5e7ef;
                 color: #6b7280;
             }
-            .select2-container--default .select2-selection--multiple {
-                border: 1px solid #ccd0d4;
-                border-radius: 6px;
-                min-height: 42px;
-            }
-            .select2-container--default .select2-search--inline .select2-search__field {
-                margin-top: 8px;
-            }
         </style>
 
         <script>
-            (function($){
-                function renderSelectedEmails($select) {
-                    var $list = $('#wf-selected-admin-emails');
-                    if (!$list.length) {
+            (function(){
+                function renderSelectedEmails() {
+                    var list = document.getElementById('wf-selected-admin-emails');
+                    if (!list) {
                         return;
                     }
 
-                    var values = $select.val() || [];
+                    var checked = document.querySelectorAll('#wf-admin-email-picker input[name="wf_admin_emails[]"]:checked');
                     var html = '';
 
-                    if (!values.length) {
+                    if (!checked.length) {
                         html = '<li class="wf-empty"><?php echo esc_js(__('No admin emails selected yet.', 'website-flexi')); ?></li>';
-                        $list.html(html);
+                        list.innerHTML = html;
                         return;
                     }
 
-                    values.forEach(function(email){
-                        html += '<li>' + $('<div/>').text(email).html() + '</li>';
+                    checked.forEach(function(input){
+                        var email = input.value || '';
+                        var safeEmail = email
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;');
+                        html += '<li>' + safeEmail + '</li>';
                     });
 
-                    $list.html(html);
+                    list.innerHTML = html;
                 }
 
-                $(function(){
-                    var $select = $('#wf-admin-emails-select');
-                    if (!$select.length) {
+                function applySearchFilter() {
+                    var search = document.getElementById('wf-admin-email-search');
+                    var picker = document.getElementById('wf-admin-email-picker');
+                    var empty = document.getElementById('wf-admin-email-empty-filter');
+
+                    if (!search || !picker) {
                         return;
                     }
 
-                    if ($.fn && $.fn.select2) {
-                        $select.select2({
-                            width: '100%',
-                            closeOnSelect: false,
-                            placeholder: '<?php echo esc_js(__('Search email or name...', 'website-flexi')); ?>'
-                        });
+                    var query = (search.value || '').toLowerCase().trim();
+                    var items = picker.querySelectorAll('.wf-admin-email-item');
+                    var visibleCount = 0;
+
+                    items.forEach(function(item){
+                        var haystack = (item.getAttribute('data-search') || '').toLowerCase();
+                        var visible = !query || haystack.indexOf(query) !== -1;
+                        item.style.display = visible ? 'flex' : 'none';
+                        if (visible) {
+                            visibleCount += 1;
+                        }
+                    });
+
+                    if (empty) {
+                        empty.style.display = visibleCount ? 'none' : 'block';
+                    }
+                }
+
+                document.addEventListener('DOMContentLoaded', function(){
+                    var search = document.getElementById('wf-admin-email-search');
+                    var picker = document.getElementById('wf-admin-email-picker');
+
+                    if (!picker) {
+                        return;
                     }
 
-                    renderSelectedEmails($select);
-                    $select.on('change', function(){
-                        renderSelectedEmails($select);
+                    if (search) {
+                        search.addEventListener('input', applySearchFilter);
+                    }
+
+                    picker.addEventListener('change', function(e){
+                        if (e.target && e.target.name === 'wf_admin_emails[]') {
+                            renderSelectedEmails();
+                        }
                     });
+
+                    applySearchFilter();
+                    renderSelectedEmails();
                 });
-            })(jQuery);
+            })();
         </script>
 
     <?php endif; ?>
