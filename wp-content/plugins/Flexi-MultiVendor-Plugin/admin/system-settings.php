@@ -434,13 +434,34 @@ function websiteflexi_render_system_settings_page() {
     // =========================
     if ( isset($_POST['wf_save_admin_emails_btn']) && check_admin_referer('wf_save_admin_emails') ) {
 
-        $raw = isset($_POST['wf_admin_emails']) ? wp_unslash($_POST['wf_admin_emails']) : '';
-        $parts = preg_split('/[\r\n,;]+/', (string) $raw);
+        $selected = isset($_POST['wf_admin_emails']) ? (array) wp_unslash($_POST['wf_admin_emails']) : array();
 
-        $emails = array();
-        foreach ( (array) $parts as $email ) {
+        $selected_emails = array();
+        foreach ( $selected as $email ) {
             $email = strtolower(trim(sanitize_email($email)));
             if ( $email !== '' ) {
+                $selected_emails[] = $email;
+            }
+        }
+        $selected_emails = array_values(array_unique($selected_emails));
+
+        // Restrict saved values to existing site user emails only.
+        $site_users = get_users(array(
+            'fields' => array('user_email'),
+            'number' => -1,
+        ));
+
+        $site_email_map = array();
+        foreach ( $site_users as $u ) {
+            $email = strtolower(trim(sanitize_email($u->user_email ?? '')));
+            if ( $email !== '' ) {
+                $site_email_map[$email] = true;
+            }
+        }
+
+        $emails = array();
+        foreach ( $selected_emails as $email ) {
+            if ( isset($site_email_map[$email]) ) {
                 $emails[] = $email;
             }
         }
@@ -469,6 +490,40 @@ function websiteflexi_render_system_settings_page() {
     $manager_ids    = wf_od_get_manager_ids();
     $dashboard_ids  = wf_od_get_dashboard_ids();
     $admin_emails   = wf_od_get_admin_emails();
+
+    $admin_email_options = array();
+    $users_for_admins = get_users(array(
+        'fields'  => array('ID', 'display_name', 'user_email', 'user_login'),
+        'orderby' => 'display_name',
+        'order'   => 'ASC',
+        'number'  => -1,
+    ));
+
+    $seen_admin_emails = array();
+    foreach ( $users_for_admins as $u ) {
+        $email = strtolower(trim(sanitize_email($u->user_email ?? '')));
+        if ( $email === '' || isset($seen_admin_emails[$email]) ) {
+            continue;
+        }
+
+        $display_name = trim((string) ($u->display_name ?? ''));
+        $login_name = trim((string) ($u->user_login ?? ''));
+
+        if ( $display_name !== '' ) {
+            $label = $display_name . ' - ' . $email;
+        } elseif ( $login_name !== '' ) {
+            $label = $login_name . ' - ' . $email;
+        } else {
+            $label = $email;
+        }
+
+        $admin_email_options[] = array(
+            'email' => $email,
+            'label' => $label,
+        );
+
+        $seen_admin_emails[$email] = true;
+    }
 
     $manager_users   = wf_od_get_users_from_ids($manager_ids);
     $dashboard_users = wf_od_get_users_from_ids($dashboard_ids);

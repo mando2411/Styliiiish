@@ -174,7 +174,11 @@ if ( ! defined('ABSPATH') ) {
 
         <?php
         $saved_admin_emails = isset($admin_emails) && is_array($admin_emails) ? $admin_emails : array();
+        $admin_email_options_list = isset($admin_email_options) && is_array($admin_email_options) ? $admin_email_options : array();
         ?>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
         <form method="post" style="margin-top:20px;max-width:920px;">
             <?php wp_nonce_field('wf_save_admin_emails'); ?>
@@ -186,15 +190,40 @@ if ( ! defined('ABSPATH') ) {
                     <?php esc_html_e('Users with these emails are treated as admins inside this plugin.', 'website-flexi'); ?>
                 </p>
 
-                <textarea
-                    name="wf_admin_emails"
-                    rows="10"
-                    style="width:100%;max-width:800px;"
-                    placeholder="admin1@example.com&#10;admin2@example.com"><?php echo esc_textarea(implode("\n", $saved_admin_emails)); ?></textarea>
+                <label for="wf-admin-emails-select" style="display:block;font-weight:600;margin-bottom:8px;">
+                    <?php esc_html_e('Select Admin Emails', 'website-flexi'); ?>
+                </label>
+
+                <select
+                    id="wf-admin-emails-select"
+                    name="wf_admin_emails[]"
+                    multiple="multiple"
+                    style="width:100%;max-width:800px;">
+
+                    <?php foreach ( $admin_email_options_list as $opt ): ?>
+                        <?php
+                        $email = strtolower(trim((string) ($opt['email'] ?? '')));
+                        $label = (string) ($opt['label'] ?? $email);
+                        if ( $email === '' ) {
+                            continue;
+                        }
+                        ?>
+                        <option value="<?php echo esc_attr($email); ?>" <?php selected(in_array($email, $saved_admin_emails, true)); ?>>
+                            <?php echo esc_html($label); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
                 <p class="description">
-                    <?php esc_html_e('Add one email per line. You can also separate emails by comma.', 'website-flexi'); ?>
+                    <?php esc_html_e('Search by name or email, then select multiple emails.', 'website-flexi'); ?>
                 </p>
+
+                <div class="wf-selected-admins-wrap" style="margin-top:14px;max-width:800px;">
+                    <h4 style="margin:0 0 8px 0;">
+                        <?php esc_html_e('Selected Admin Emails', 'website-flexi'); ?>
+                    </h4>
+                    <ul id="wf-selected-admin-emails" style="margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px;"></ul>
+                </div>
             </div>
 
             <p class="submit">
@@ -203,6 +232,77 @@ if ( ! defined('ABSPATH') ) {
                 </button>
             </p>
         </form>
+
+        <style>
+            .wf-selected-admins-wrap li {
+                background: #f0f4ff;
+                border: 1px solid #d8e2ff;
+                border-radius: 16px;
+                color: #1f3b7a;
+                font-size: 12px;
+                line-height: 1;
+                padding: 8px 10px;
+            }
+            .wf-selected-admins-wrap li.wf-empty {
+                background: #f8f9fb;
+                border-color: #e5e7ef;
+                color: #6b7280;
+            }
+            .select2-container--default .select2-selection--multiple {
+                border: 1px solid #ccd0d4;
+                border-radius: 6px;
+                min-height: 42px;
+            }
+            .select2-container--default .select2-search--inline .select2-search__field {
+                margin-top: 8px;
+            }
+        </style>
+
+        <script>
+            (function($){
+                function renderSelectedEmails($select) {
+                    var $list = $('#wf-selected-admin-emails');
+                    if (!$list.length) {
+                        return;
+                    }
+
+                    var values = $select.val() || [];
+                    var html = '';
+
+                    if (!values.length) {
+                        html = '<li class="wf-empty"><?php echo esc_js(__('No admin emails selected yet.', 'website-flexi')); ?></li>';
+                        $list.html(html);
+                        return;
+                    }
+
+                    values.forEach(function(email){
+                        html += '<li>' + $('<div/>').text(email).html() + '</li>';
+                    });
+
+                    $list.html(html);
+                }
+
+                $(function(){
+                    var $select = $('#wf-admin-emails-select');
+                    if (!$select.length) {
+                        return;
+                    }
+
+                    if ($.fn && $.fn.select2) {
+                        $select.select2({
+                            width: '100%',
+                            closeOnSelect: false,
+                            placeholder: '<?php echo esc_js(__('Search email or name...', 'website-flexi')); ?>'
+                        });
+                    }
+
+                    renderSelectedEmails($select);
+                    $select.on('change', function(){
+                        renderSelectedEmails($select);
+                    });
+                });
+            })(jQuery);
+        </script>
 
     <?php endif; ?>
 
