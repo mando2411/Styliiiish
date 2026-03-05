@@ -3864,19 +3864,30 @@
                 if (!doc) return null;
                 const scripts = Array.from(doc.querySelectorAll('script'));
 
+                const decodeGoogleInlineValue = (value) => String(value || '')
+                    .replace(/\\\//g, '/')
+                    .replace(/\\u0026/gi, '&')
+                    .trim();
+
+                const isValidGoogleClientId = (clientId) => /^\d+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(String(clientId || '').trim());
+
                 for (const scriptTag of scripts) {
                     const text = String(scriptTag.textContent || '');
                     if (!text.includes('googlesitekit_auth') || !text.includes('google.accounts.id.initialize')) {
                         continue;
                     }
 
-                    const endpointMatch = text.match(/fetch\('([^']*action=googlesitekit_auth[^']*)'/);
-                    const clientMatch = text.match(/client_id:'([^']+)'/);
+                    const endpointMatch = text.match(/fetch\(\s*(['"])([^'"]*action=googlesitekit_auth[^'"]*)\1/);
+                    const clientMatch = text.match(/client_id\s*:\s*(['"])([^'"]+)\1/);
                     if (!endpointMatch || !clientMatch) continue;
 
+                    const endpoint = decodeGoogleInlineValue(endpointMatch[2]);
+                    const clientId = decodeGoogleInlineValue(clientMatch[2]);
+                    if (!endpoint || !isValidGoogleClientId(clientId)) continue;
+
                     return {
-                        endpoint: endpointMatch[1],
-                        clientId: clientMatch[1],
+                        endpoint,
+                        clientId,
                     };
                 }
 
@@ -3912,14 +3923,25 @@
 
             const initGoogleButton = async () => {
                 if (!authGoogleButton || !siteKitGoogleConfig) return;
+                if (!/^\d+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(String(siteKitGoogleConfig.clientId || '').trim())) {
+                    if (authGoogleFallback) authGoogleFallback.style.display = 'inline-flex';
+                    return;
+                }
 
                 await loadGoogleIdentityScript();
                 if (!(window.google && window.google.accounts && window.google.accounts.id)) return;
 
                 const endpointUrl = String(siteKitGoogleConfig.endpoint || '');
-                const absoluteEndpoint = endpointUrl.startsWith('http')
-                    ? endpointUrl
-                    : new URL(endpointUrl, wpMyAccountUrl).toString();
+                if (!endpointUrl) return;
+
+                let absoluteEndpoint = '';
+                try {
+                    absoluteEndpoint = endpointUrl.startsWith('http')
+                        ? endpointUrl
+                        : new URL(endpointUrl, wpMyAccountUrl).toString();
+                } catch (error) {
+                    return;
+                }
 
                 const handleGoogleCredentialResponse = async (response) => {
                     response.integration = 'woocommerce';

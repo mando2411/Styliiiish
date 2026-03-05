@@ -551,6 +551,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerDisabledText = @json($t('register_disabled'));
     let accountData = null;
     let authContext = { loginNonce: '', registerNonce: '', canRegister: true, googleConfig: null, isLoggedIn: false };
+    let accountGoogleInitialized = false;
+
+    const decodeGoogleInlineValue = (value) => String(value || '')
+        .replace(/\\\//g, '/')
+        .replace(/\\u0026/gi, '&')
+        .trim();
+
+    const isValidGoogleClientId = (clientId) => {
+        const value = String(clientId || '').trim();
+        return /^\d+-[a-z0-9-]+\.apps\.googleusercontent\.com$/i.test(value);
+    };
 
     const showMsg = (id, text) => {
         const el = document.getElementById(id);
@@ -598,10 +609,15 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const scriptTag of scripts) {
             const text = String(scriptTag.textContent || '');
             if (!text.includes('googlesitekit_auth') || !text.includes('google.accounts.id.initialize')) continue;
-            const endpointMatch = text.match(/fetch\('([^']*action=googlesitekit_auth[^']*)'/);
-            const clientMatch = text.match(/client_id:'([^']+)'/);
+            const endpointMatch = text.match(/fetch\(\s*(['"])([^'"]*action=googlesitekit_auth[^'"]*)\1/);
+            const clientMatch = text.match(/client_id\s*:\s*(['"])([^'"]+)\1/);
             if (!endpointMatch || !clientMatch) continue;
-            return { endpoint: endpointMatch[1], clientId: clientMatch[1] };
+
+            const endpoint = decodeGoogleInlineValue(endpointMatch[2]);
+            const clientId = decodeGoogleInlineValue(clientMatch[2]);
+            if (!endpoint || !isValidGoogleClientId(clientId)) continue;
+
+            return { endpoint, clientId };
         }
         return null;
     };
@@ -665,12 +681,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const googleButton = document.getElementById('accountGoogleButton');
         const googleFallback = document.getElementById('accountGoogleFallback');
         if (!googleButton || !authContext.googleConfig) return;
+        if (!isValidGoogleClientId(authContext.googleConfig.clientId)) {
+            if (googleFallback) googleFallback.style.display = 'inline-flex';
+            return;
+        }
 
         await loadGoogleIdentityScript();
         if (!window.google?.accounts?.id) return;
 
         const endpointUrl = String(authContext.googleConfig.endpoint || '');
-        const absoluteEndpoint = endpointUrl.startsWith('http') ? endpointUrl : new URL(endpointUrl, wpAccountUrl).toString();
+        if (!endpointUrl) return;
+
+        let absoluteEndpoint = '';
+        try {
+            absoluteEndpoint = endpointUrl.startsWith('http') ? endpointUrl : new URL(endpointUrl, wpAccountUrl).toString();
+        } catch (error) {
+            return;
+        }
 
         const handleGoogleCredentialResponse = async (response) => {
             response.integration = 'woocommerce';
@@ -691,7 +718,10 @@ document.addEventListener('DOMContentLoaded', () => {
             location.assign(redirectTarget);
         };
 
-        window.google.accounts.id.initialize({ client_id: authContext.googleConfig.clientId, callback: handleGoogleCredentialResponse, library_name: 'Site-Kit' });
+        if (!accountGoogleInitialized) {
+            window.google.accounts.id.initialize({ client_id: authContext.googleConfig.clientId, callback: handleGoogleCredentialResponse, library_name: 'Site-Kit' });
+            accountGoogleInitialized = true;
+        }
         googleButton.innerHTML = '';
         window.google.accounts.id.renderButton(googleButton, {
             shape: googleButton.getAttribute('data-googlesitekit-siwg-shape') || 'pill',
