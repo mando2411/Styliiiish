@@ -452,6 +452,8 @@ function buildAttrs(data){
 
       data.forEach(function(attr){
 
+         const isSizeAttr = attr.taxonomy === 'pa_size';
+
          html += `
          <div class="attr-group">
 
@@ -462,16 +464,40 @@ function buildAttrs(data){
             <div class="attr-list">
          `;
 
-         attr.options.forEach(function(opt){
-
+         if (isSizeAttr) {
             html += `
             <label class="attr-item">
-               <input type="radio"
-                      name="attrs[${attr.taxonomy}]"
-                      value="${opt.value}">
-               <span>${opt.label}</span>
+               <input type="checkbox"
+                      class="size-all-toggle"
+                      name="attrs[${attr.taxonomy}][]"
+                      value="__all__">
+               <span>All sizes</span>
             </label>
             `;
+         }
+
+         attr.options.forEach(function(opt){
+
+            if (isSizeAttr) {
+               html += `
+               <label class="attr-item">
+                  <input type="checkbox"
+                         class="size-item-toggle"
+                         name="attrs[${attr.taxonomy}][]"
+                         value="${opt.value}">
+                  <span>${opt.label}</span>
+               </label>
+               `;
+            } else {
+               html += `
+               <label class="attr-item">
+                  <input type="radio"
+                         name="attrs[${attr.taxonomy}]"
+                         value="${opt.value}">
+                  <span>${opt.label}</span>
+               </label>
+               `;
+            }
 
          });
 
@@ -492,9 +518,25 @@ function buildAttrs(data){
 
          for(let tax in pendingAttrs){
 
-            $(`input[name="attrs[${tax}]"][value="${pendingAttrs[tax]}"]`)
-              .prop("checked", true)
-              .trigger("change");
+            const pendingVal = pendingAttrs[tax];
+
+            if (tax === 'pa_size') {
+               if (Array.isArray(pendingVal)) {
+                  pendingVal.forEach(function (sizeVal) {
+                     $(`input[name="attrs[${tax}][]"][value="${sizeVal}"]`)
+                       .prop('checked', true)
+                       .trigger('change');
+                  });
+               } else if (pendingVal) {
+                  $(`input[name="attrs[${tax}][]"][value="${pendingVal}"]`)
+                    .prop('checked', true)
+                    .trigger('change');
+               }
+            } else {
+               $(`input[name="attrs[${tax}]"][value="${pendingVal}"]`)
+                 .prop('checked', true)
+                 .trigger('change');
+            }
          }
 
          pendingAttrs = null;
@@ -502,6 +544,22 @@ function buildAttrs(data){
       });
    }
 }
+
+$(document).on('change', '.attr-box .size-all-toggle', function(){
+   let $group = $(this).closest('.attr-group');
+
+   if($(this).is(':checked')){
+      $group.find('.size-item-toggle').prop('checked', false);
+   }
+});
+
+$(document).on('change', '.attr-box .size-item-toggle', function(){
+   let $group = $(this).closest('.attr-group');
+
+   if($(this).is(':checked')){
+      $group.find('.size-all-toggle').prop('checked', false);
+   }
+});
 
 
 
@@ -516,14 +574,15 @@ $(document).on('change','.attr-box input',function(){
 
  $('.attr-group').each(function(){
 
-   let checked = $(this).find('input:checked');
+    let checked = $(this).find('input:checked');
 
-   if(checked.length){
+    if(checked.length){
 
-     html += '<span class="preview-attr">'+checked.parent().text().trim()+'</span>';
+       checked.each(function(){
+            html += '<span class="preview-attr">'+$(this).parent().text().trim()+'</span>';
+       });
 
-
-   }
+    }
 
  });
 

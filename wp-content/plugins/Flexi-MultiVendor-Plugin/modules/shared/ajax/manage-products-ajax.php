@@ -287,6 +287,38 @@ add_action('wp_ajax_styliiiish_get_attributes', function () {
 
         }
 
+        $selected_values = array_values(array_unique(array_filter(array_map('sanitize_title', (array) $selected))));
+        $is_all_sizes = false;
+
+        if ($is_edit_mode && $taxonomy === 'pa_size') {
+            $all_sizes_flag = get_post_meta($pid, '_styliiiish_all_sizes_enabled', true) === 'yes';
+            $all_size_slugs = get_terms([
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => false,
+                'fields'     => 'slugs',
+            ]);
+
+            if (!is_wp_error($all_size_slugs)) {
+                $all_size_slugs = array_values(array_unique(array_filter(array_map('sanitize_title', (array) $all_size_slugs))));
+
+                $selected_cmp = $selected_values;
+                sort($selected_cmp);
+
+                $all_cmp = $all_size_slugs;
+                sort($all_cmp);
+
+                if ($all_sizes_flag || (!empty($all_cmp) && $selected_cmp === $all_cmp)) {
+                    $is_all_sizes = true;
+                }
+            } elseif ($all_sizes_flag) {
+                $is_all_sizes = true;
+            }
+        }
+
+        if ($is_all_sizes) {
+            $selected_values = ['__all__'];
+        }
+
 
         $data[] = [
 
@@ -296,7 +328,11 @@ add_action('wp_ajax_styliiiish_get_attributes', function () {
 
             'options'  => $options,
 
-            'selected' => $selected[0] ?? '',
+            'selected' => $selected_values[0] ?? '',
+
+            'selected_values' => $selected_values,
+
+            'all_sizes' => $is_all_sizes,
 
         ];
     }
@@ -327,9 +363,7 @@ add_action('wp_ajax_styliiiish_save_attributes', function () {
         $existing_attrs = [];
     }
 
-    foreach ($items as $taxonomy => $slug) {
-
-        if (empty($slug)) continue;
+    foreach ($items as $taxonomy => $raw_value) {
 
         /* =====================================================
            1) VALIDATION — حماية من أي taxonomy أو slug مزيف
@@ -345,26 +379,73 @@ add_action('wp_ajax_styliiiish_save_attributes', function () {
             continue;
         }
 
-        // لازم يكون الـ term موجود فعلاً داخل الـ taxonomy
-        $term_obj = get_term_by('slug', $slug, $taxonomy);
-        if (!$term_obj) {
+        $slugs = [];
+
+        if (is_array($raw_value)) {
+            foreach ($raw_value as $single_val) {
+                $single_slug = sanitize_text_field(wp_unslash((string) $single_val));
+                if ($single_slug !== '') {
+                    $slugs[] = $single_slug;
+                }
+            }
+        } else {
+            $single_slug = sanitize_text_field(wp_unslash((string) $raw_value));
+            if ($single_slug !== '') {
+                $slugs[] = $single_slug;
+            }
+        }
+
+        $slugs = array_values(array_unique($slugs));
+
+        if ($taxonomy === 'pa_size') {
+            if (in_array('__all__', $slugs, true)) {
+                $all_size_slugs = get_terms([
+                    'taxonomy'   => 'pa_size',
+                    'hide_empty' => false,
+                    'fields'     => 'slugs',
+                ]);
+
+                if (is_wp_error($all_size_slugs)) {
+                    $slugs = [];
+                } else {
+                    $slugs = array_values(array_unique(array_filter(array_map('sanitize_title', (array) $all_size_slugs))));
+                    update_post_meta($pid, '_styliiiish_all_sizes_enabled', 'yes');
+                }
+            } else {
+                update_post_meta($pid, '_styliiiish_all_sizes_enabled', 'no');
+            }
+        }
+
+        if (empty($slugs)) {
+            continue;
+        }
+
+        $valid_slugs = [];
+
+        foreach ($slugs as $slug) {
+            $term_obj = get_term_by('slug', $slug, $taxonomy);
+            if ($term_obj && !is_wp_error($term_obj)) {
+                $valid_slugs[] = $term_obj->slug;
+            }
+        }
+
+        $valid_slugs = array_values(array_unique($valid_slugs));
+
+        if (empty($valid_slugs)) {
             continue;
         }
 
         /* =====================================================
            2) بعد التأكد — احفظ الـ term
         ======================================================*/
-        wp_set_object_terms($pid, [$slug], $taxonomy);
-
-        // مثال: pa_color → color
-        $attr_name = str_replace('pa_', '', $taxonomy);
+        wp_set_object_terms($pid, $valid_slugs, $taxonomy);
 
         // لو مش موجود: نضيفه
         if (!isset($existing_attrs[$taxonomy])) {
 
             $existing_attrs[$taxonomy] = [
                 'name'         => $taxonomy,
-                'value'        => $slug,
+                'value'        => '',
                 'is_visible'   => 1,
                 'is_variation' => 0,
                 'is_taxonomy'  => 1
@@ -372,7 +453,7 @@ add_action('wp_ajax_styliiiish_save_attributes', function () {
 
         } else {
             // موجود مسبقًا → حدّث القيمة
-            $existing_attrs[$taxonomy]['value'] = $slug;
+            $existing_attrs[$taxonomy]['value'] = '';
         }
         
         
@@ -1941,13 +2022,74 @@ if(!empty($_POST['attrs']) && is_array($_POST['attrs'])){
       $product_attributes = [];
    }
 
-   foreach($_POST['attrs'] as $tax => $val){
+    foreach($_POST['attrs'] as $tax => $val){
 
-      $tax = wc_sanitize_taxonomy_name($tax);
-      $val = sanitize_text_field($val);
+        $tax = wc_sanitize_taxonomy_name(wp_unslash((string)$tax));
 
-      // اربط الـ term
-      wp_set_object_terms($id, $val, $tax, false);
+        if (strpos($tax, 'pa_') !== 0 || !taxonomy_exists($tax)) {
+            continue;
+        }
+
+        $vals = [];
+
+        if (is_array($val)) {
+            foreach ($val as $single_val) {
+                $single_slug = sanitize_text_field(wp_unslash((string)$single_val));
+                if ($single_slug !== '') {
+                    $vals[] = $single_slug;
+                }
+            }
+        } else {
+            $single_slug = sanitize_text_field(wp_unslash((string)$val));
+            if ($single_slug !== '') {
+                $vals[] = $single_slug;
+            }
+        }
+
+        $vals = array_values(array_unique($vals));
+
+        if ($tax === 'pa_size') {
+            if (in_array('__all__', $vals, true)) {
+                $all_sizes = get_terms([
+                    'taxonomy'   => 'pa_size',
+                    'hide_empty' => false,
+                    'fields'     => 'slugs',
+                ]);
+
+                if (!is_wp_error($all_sizes)) {
+                    $vals = array_values(array_unique(array_filter(array_map('sanitize_title', (array)$all_sizes))));
+                    update_post_meta($id, '_styliiiish_all_sizes_enabled', 'yes');
+                } else {
+                    $vals = [];
+                }
+            } else {
+                update_post_meta($id, '_styliiiish_all_sizes_enabled', 'no');
+            }
+        }
+
+        if (empty($vals)) {
+            continue;
+        }
+
+        $valid_terms = get_terms([
+            'taxonomy'   => $tax,
+            'hide_empty' => false,
+            'slug'       => $vals,
+            'fields'     => 'slugs',
+        ]);
+
+        if (is_wp_error($valid_terms) || empty($valid_terms)) {
+            continue;
+        }
+
+        $valid_terms = array_values(array_unique(array_filter(array_map('sanitize_title', (array)$valid_terms))));
+
+        if (empty($valid_terms)) {
+            continue;
+        }
+
+        // اربط الـ terms
+        wp_set_object_terms($id, $valid_terms, $tax, false);
 
       // خزّن Attribute بشكل صحيح
       $product_attributes[$tax] = [
@@ -2077,7 +2219,43 @@ if($product){
          $terms = wp_get_post_terms($pid, $tax, ['fields'=>'slugs']);
 
          if($terms){
-            $attrs[$tax] = $terms[0];
+                $clean_terms = array_values(array_unique(array_filter(array_map('sanitize_title', (array)$terms))));
+
+                if($tax === 'pa_size'){
+                    $all_sizes_flag = get_post_meta($pid, '_styliiiish_all_sizes_enabled', true) === 'yes';
+
+                    $all_size_terms = get_terms([
+                        'taxonomy'   => 'pa_size',
+                        'hide_empty' => false,
+                        'fields'     => 'slugs',
+                    ]);
+
+                    $has_all_sizes = false;
+
+                    if (!is_wp_error($all_size_terms)) {
+                        $all_clean = array_values(array_unique(array_filter(array_map('sanitize_title', (array)$all_size_terms))));
+
+                        $terms_cmp = $clean_terms;
+                        sort($terms_cmp);
+
+                        $all_cmp = $all_clean;
+                        sort($all_cmp);
+
+                        if ($all_sizes_flag || (!empty($all_cmp) && $terms_cmp === $all_cmp)) {
+                            $has_all_sizes = true;
+                        }
+                    } elseif ($all_sizes_flag) {
+                        $has_all_sizes = true;
+                    }
+
+                    if ($has_all_sizes) {
+                        $attrs[$tax] = ['__all__'];
+                    } else {
+                        $attrs[$tax] = $clean_terms;
+                    }
+                } else {
+                    $attrs[$tax] = $clean_terms[0];
+                }
          }
 
       }

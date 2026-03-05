@@ -558,15 +558,27 @@ $(document).on('change', '#styliiiish-per-row', function(){
 
             attributes.forEach(function (attr) {
 
+                let isSizeAttr = attr.taxonomy === 'pa_size';
+                let selectedValues = Array.isArray(attr.selected_values)
+                    ? attr.selected_values
+                    : (attr.selected ? [attr.selected] : []);
+                let allSizesSelected = !!attr.all_sizes || selectedValues.includes('__all__');
+
                 let html = `
                     <label style="font-weight:bold;margin-top:10px;display:block;">
                         ${attr.label}
                     </label>
                     <select class="single-attr"
                             data-tax="${attr.taxonomy}"
+                            ${isSizeAttr ? 'multiple' : ''}
                             style="width:100%;">
-                        <option value="">— Select —</option>
+                        ${isSizeAttr ? '' : '<option value="">— Select —</option>'}
                 `;
+
+                if (isSizeAttr) {
+                    let allSel = allSizesSelected ? 'selected' : '';
+                    html += `<option value="__all__" ${allSel}>All sizes</option>`;
+                }
 
                 attr.options.forEach(function (opt) {
 
@@ -584,7 +596,14 @@ $(document).on('change', '#styliiiish-per-row', function(){
                         }
                     }
                 
-                    let sel = (opt.value === attr.selected) ? 'selected' : '';
+                    let sel = '';
+
+                    if (isSizeAttr) {
+                        sel = (!allSizesSelected && selectedValues.includes(opt.value)) ? 'selected' : '';
+                    } else {
+                        sel = (opt.value === attr.selected) ? 'selected' : '';
+                    }
+
                     html += `<option value="${opt.value}" ${sel}>${opt.label}</option>`;
                 });
 
@@ -596,9 +615,13 @@ $(document).on('change', '#styliiiish-per-row', function(){
             });
 
             if ($.fn.select2) {
-                $('.single-attr').select2({
-                    width: '100%',
-                    dropdownParent: $('#attrModal .attr-modal-content')
+                $('.single-attr').each(function () {
+                    let $el = $(this);
+                    $el.select2({
+                        width: '100%',
+                        closeOnSelect: !$el.prop('multiple'),
+                        dropdownParent: $('#attrModal .attr-modal-content')
+                    });
                 });
             }
 
@@ -616,8 +639,18 @@ $(document).on('change', '#styliiiish-per-row', function(){
 
         $('.single-attr').each(function () {
             let tax = $(this).data('tax');
-            let val = $(this).val();
-            items[tax] = val;
+
+            if ($(this).prop('multiple')) {
+                let vals = $(this).val() || [];
+
+                if (!Array.isArray(vals)) {
+                    vals = vals ? [vals] : [];
+                }
+
+                items[tax] = vals;
+            } else {
+                items[tax] = $(this).val();
+            }
         });
 
         $.post(ajax_object.ajax_url, {
