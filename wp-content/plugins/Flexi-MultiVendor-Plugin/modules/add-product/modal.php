@@ -116,7 +116,7 @@ Leave sale empty if no discount
 
 <?php
 $wf_user_type_modal = function_exists('wf_od_get_user_type') ? wf_od_get_user_type(get_current_user_id()) : '';
-$wf_is_admin_modal = current_user_can('manage_woocommerce') || in_array($wf_user_type_modal, ['manager', 'dashboard'], true);
+$wf_is_admin_modal = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() || in_array($wf_user_type_modal, ['manager', 'dashboard'], true);
 ?>
 
 <?php if ($wf_is_admin_modal): ?>
@@ -145,7 +145,7 @@ $wf_is_admin_modal = current_user_can('manage_woocommerce') || in_array($wf_user
 
 <?php
 
-$is_vendor = ! current_user_can('manage_woocommerce');
+$is_vendor = ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() );
 
 if($is_vendor){
 

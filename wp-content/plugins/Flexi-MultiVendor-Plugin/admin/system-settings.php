@@ -428,6 +428,32 @@ function websiteflexi_render_system_settings_page() {
         ), admin_url('plugins.php')) );
         exit;
     }
+
+    // =========================
+    // Save Plugin Admin Emails
+    // =========================
+    if ( isset($_POST['wf_save_admin_emails_btn']) && check_admin_referer('wf_save_admin_emails') ) {
+
+        $raw = isset($_POST['wf_admin_emails']) ? wp_unslash($_POST['wf_admin_emails']) : '';
+        $parts = preg_split('/[\r\n,;]+/', (string) $raw);
+
+        $emails = array();
+        foreach ( (array) $parts as $email ) {
+            $email = strtolower(trim(sanitize_email($email)));
+            if ( $email !== '' ) {
+                $emails[] = $email;
+            }
+        }
+
+        update_option(wf_od_option_key_admin_emails(), array_values(array_unique($emails)));
+
+        wp_redirect( add_query_arg(array(
+            'page'   => 'websiteflexi-system-settings',
+            'wf_msg' => 'admins_saved',
+            'tab'    => 'admins',
+        ), admin_url('plugins.php')) );
+        exit;
+    }
     
    
 
@@ -442,6 +468,7 @@ function websiteflexi_render_system_settings_page() {
 
     $manager_ids    = wf_od_get_manager_ids();
     $dashboard_ids  = wf_od_get_dashboard_ids();
+    $admin_emails   = wf_od_get_admin_emails();
 
     $manager_users   = wf_od_get_users_from_ids($manager_ids);
     $dashboard_users = wf_od_get_users_from_ids($dashboard_ids);

@@ -140,7 +140,7 @@ function wf_user_can_access_order_chat($order_id){
      Admin = Full Access
   ===================== */
 
-  if(in_array('administrator',$user->roles)){
+    if ( wf_od_is_user_plugin_admin($uid) ) {
     return true;
   }
 
@@ -439,7 +439,7 @@ function wf_render_support_dashboard(){
     check_admin_referer('wf_assign_agent_nonce','wf_assign_nonce')
   ){
 
-    if(current_user_can('manage_options')){
+    if ( wf_od_is_user_plugin_admin() || current_user_can('manage_options') ) {
 
       wf_assign_agent(
         intval($_POST['order']),
@@ -500,7 +500,7 @@ function wf_render_support_dashboard(){
 
     echo '<td>';
 
-    if(current_user_can('manage_options')){
+    if ( wf_od_is_user_plugin_admin() || current_user_can('manage_options') ) {
 
       echo '<form method="post" style="display:flex;gap:6px">';
 

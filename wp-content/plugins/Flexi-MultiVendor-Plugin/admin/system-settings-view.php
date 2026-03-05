@@ -47,6 +47,9 @@ if ( ! defined('ABSPATH') ) {
                     case 'kyc_saved':
                         echo esc_html__('KYC settings saved successfully.', 'website-flexi');
                         break;
+                    case 'admins_saved':
+                        echo esc_html__('Plugin admin emails saved successfully.', 'website-flexi');
+                        break;
                     default:
                         echo esc_html__('Settings saved.', 'website-flexi');
                         break;
@@ -104,6 +107,11 @@ if ( ! defined('ABSPATH') ) {
             <?php esc_html_e('KYC', 'website-flexi'); ?>
         </a>
 
+        <a href="<?php echo esc_url( add_query_arg(array('page' => 'websiteflexi-system-settings', 'tab'  => 'admins'), admin_url('plugins.php'))); ?>"
+        class="nav-tab <?php echo ($active_tab === 'admins') ? 'nav-tab-active' : ''; ?>">
+            <?php esc_html_e('Admins', 'website-flexi'); ?>
+        </a>
+
         <!-- Future tabs here -->
          
         
@@ -156,6 +164,42 @@ if ( ! defined('ABSPATH') ) {
             <p class="submit">
                 <button type="submit" name="wf_save_kyc_settings" class="button button-primary">
                     <?php esc_html_e('Save KYC Settings', 'website-flexi'); ?>
+                </button>
+            </p>
+        </form>
+
+    <?php endif; ?>
+
+    <?php if ($active_tab === 'admins'): ?>
+
+        <?php
+        $saved_admin_emails = isset($admin_emails) && is_array($admin_emails) ? $admin_emails : array();
+        ?>
+
+        <form method="post" style="margin-top:20px;max-width:920px;">
+            <?php wp_nonce_field('wf_save_admin_emails'); ?>
+
+            <div class="wf-card">
+                <h3>Plugin Admins</h3>
+
+                <p class="wf-desc">
+                    <?php esc_html_e('Users with these emails are treated as admins inside this plugin.', 'website-flexi'); ?>
+                </p>
+
+                <textarea
+                    name="wf_admin_emails"
+                    rows="10"
+                    style="width:100%;max-width:800px;"
+                    placeholder="admin1@example.com&#10;admin2@example.com"><?php echo esc_textarea(implode("\n", $saved_admin_emails)); ?></textarea>
+
+                <p class="description">
+                    <?php esc_html_e('Add one email per line. You can also separate emails by comma.', 'website-flexi'); ?>
+                </p>
+            </div>
+
+            <p class="submit">
+                <button type="submit" name="wf_save_admin_emails_btn" class="button button-primary">
+                    <?php esc_html_e('Save Admin Emails', 'website-flexi'); ?>
                 </button>
             </p>
         </form>

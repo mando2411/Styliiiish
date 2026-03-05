@@ -22,6 +22,10 @@ function wf_od_option_key_dashboard_ids() {
     return 'styliiiish_dashboard_access_ids';
 }
 
+function wf_od_option_key_admin_emails() {
+    return 'styliiiish_admin_emails';
+}
+
 /**
  * هل الـ Marketplace مفعّل؟
  */
@@ -50,4 +54,29 @@ function wf_od_get_manager_ids() {
 function wf_od_get_dashboard_ids() {
     $ids = get_option(wf_od_option_key_dashboard_ids(), array());
     return is_array($ids) ? $ids : array();
+}
+
+/**
+ * Admin emails treated as plugin admins.
+ */
+function wf_od_get_admin_emails() {
+    $emails = get_option(wf_od_option_key_admin_emails(), array());
+
+    if ( is_string($emails) ) {
+        $emails = preg_split('/[\r\n,;]+/', $emails);
+    }
+
+    if ( ! is_array($emails) ) {
+        return array();
+    }
+
+    $clean = array();
+    foreach ( $emails as $email ) {
+        $email = strtolower(trim(sanitize_email($email)));
+        if ( $email !== '' ) {
+            $clean[] = $email;
+        }
+    }
+
+    return array_values(array_unique($clean));
 }

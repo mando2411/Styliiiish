@@ -24,7 +24,7 @@ function styliiiish_render_manage_products( $mode = 'owner' ){
     // - owner mode: لازم manage_woocommerce (نفس القديم)
     // - user mode: أي يوزر مسجل دخول، هنتحكم في الفلترة من AJAX بعدين
     if ($mode === 'owner') {
-        if (!current_user_can('manage_woocommerce')) {
+        if ( ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() ) ) {
             echo esc_html__('No permission', 'website-flexi');
             return;
         }

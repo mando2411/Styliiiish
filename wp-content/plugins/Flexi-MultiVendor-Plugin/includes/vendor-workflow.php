@@ -92,7 +92,7 @@ add_filter( 'woocommerce_account_menu_items', function ( $items ) {
     ];
 
     // Admin override
-    if ( in_array('administrator', $roles, true) ) {
+    if ( wf_od_is_user_plugin_admin(get_current_user_id()) ) {
         $vendor_tabs = [
             'moderate-site' => $labels['moderate_site'],
         ];
@@ -275,7 +275,7 @@ function aswaq_taj_vendor_dashboard_content() {
 // 2️⃣ محتوى التبويب Admin
 add_action('woocommerce_account_moderate-site_endpoint', function() {
     $user = wp_get_current_user();
-    if (!in_array('administrator', (array)$user->roles, true)) {
+    if ( ! wf_od_is_user_plugin_admin($user->ID) ) {
         wp_safe_redirect(wc_get_page_permalink('myaccount'));
         exit;
     }
@@ -525,7 +525,7 @@ add_action('template_redirect', function () {
     }
 
     $user = wp_get_current_user();
-    if ( ! in_array( 'administrator', (array) $user->roles, true ) ) {
+    if ( ! wf_od_is_user_plugin_admin($user->ID) ) {
         wp_safe_redirect( wc_get_page_permalink( 'myaccount' ) );
         exit;
     }

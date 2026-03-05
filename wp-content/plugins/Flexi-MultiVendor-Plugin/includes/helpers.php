@@ -32,6 +32,46 @@ function wf_od_get_users_from_ids($ids = array()) {
     return $users;
 }
 
+/**
+ * Plugin-level admin check.
+ * True for WP administrators or users whose email is listed in plugin settings.
+ */
+function wf_od_is_user_plugin_admin( $user_id = 0 ) {
+
+    if ( ! $user_id ) {
+        $user_id = get_current_user_id();
+    }
+
+    if ( ! $user_id ) {
+        return false;
+    }
+
+    $user = get_user_by('ID', (int) $user_id);
+    if ( ! $user ) {
+        return false;
+    }
+
+    if ( in_array('administrator', (array) $user->roles, true) || user_can($user, 'manage_options') ) {
+        return true;
+    }
+
+    if ( ! function_exists('wf_od_get_admin_emails') ) {
+        return false;
+    }
+
+    $emails = wf_od_get_admin_emails();
+    if ( empty($emails) ) {
+        return false;
+    }
+
+    $user_email = strtolower(trim((string) $user->user_email));
+    if ( $user_email === '' ) {
+        return false;
+    }
+
+    return in_array($user_email, $emails, true);
+}
+
 
 /**
  * Determine user type based on settings
@@ -59,6 +99,11 @@ function wf_od_get_user_type( $user_id = 0 ) {
 
     $manager_ids   = wf_od_get_manager_ids();
     $dashboard_ids = wf_od_get_dashboard_ids();
+
+    // Plugin admins (including email-based admins) get manager-level access.
+    if ( wf_od_is_user_plugin_admin($user_id) ) {
+        return 'manager';
+    }
 
     // 1) Manager
     if ( in_array($user_id, $manager_ids, true) ) {

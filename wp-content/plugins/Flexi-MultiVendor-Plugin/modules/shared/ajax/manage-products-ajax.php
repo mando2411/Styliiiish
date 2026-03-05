@@ -67,7 +67,7 @@ add_action('pre_get_posts', function ($q) {
     $manager_ids   = wf_od_get_manager_ids();     // managers
     $dashboard_ids = wf_od_get_dashboard_ids();   // owner-dashboard access
 
-    if (in_array($user_id, $manager_ids) || in_array($user_id, $dashboard_ids)) {
+    if ( wf_od_is_user_plugin_admin($user_id) || in_array($user_id, $manager_ids) || in_array($user_id, $dashboard_ids) ) {
         $template_id = 1905;  // OWNER TEMPLATE
     } else {
         $template_id = 1954;  // USER TEMPLATE
@@ -425,7 +425,7 @@ add_action('wp_ajax_styliiiish_upload_image_custom', function () {
 
     // السماح فقط لصاحب المنتج أو مدير
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -520,7 +520,7 @@ add_action('wp_ajax_styliiiish_get_images', function () {
 
     // السماح فقط لصاحب المنتج أو مدير
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -563,7 +563,7 @@ add_action('wp_ajax_styliiiish_add_image_to_product', function () {
 
     // السماح فقط لصاحب المنتج أو مدير
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -622,7 +622,7 @@ add_action('wp_ajax_styliiiish_set_featured_image', function () {
 
     // السماح فقط لصاحب المنتج أو مدير
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -666,7 +666,7 @@ add_action('wp_ajax_styliiiish_remove_image', function () {
 
     // السماح فقط لصاحب المنتج أو مدير
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -753,7 +753,7 @@ add_action('wp_ajax_styliiiish_get_cats', function () {
        Vendor / Owner Detection
     ============================ */
 
-    $is_vendor = ! current_user_can('manage_woocommerce');
+    $is_vendor = ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() );
 
 
     /* ============================
@@ -826,7 +826,7 @@ add_action('wp_ajax_styliiiish_save_cats', function () {
 
     $cats = array_map('intval', $_POST['cats'] ?? []);
 
-        $is_vendor = ! current_user_can('manage_woocommerce');
+        $is_vendor = ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() );
         
         if($is_vendor){
         
@@ -856,7 +856,7 @@ add_action('wp_ajax_styliiiish_save_cats', function () {
 add_action('wp_ajax_styliiiish_update_status', function () {
     check_ajax_referer('ajax_nonce','nonce');
 
-    if (!current_user_can('manage_woocommerce')) {
+    if ( ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() ) ) {
         wp_send_json_error(['message' => 'No permission']);
     }
 
@@ -899,7 +899,7 @@ add_action('wp_ajax_styliiiish_delete_product', function () {
     $user_id        = get_current_user_id();
     $product_author = (int) get_post_field('post_author', $product_id);
 
-    $is_manager = current_user_can('manage_woocommerce');
+    $is_manager = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner   = ($user_id && $user_id === $product_author);
 
     // 👇 إضافة من عندي:
@@ -999,7 +999,7 @@ add_action('wp_ajax_styliiiish_quick_update_product', function () {
 
     $user_id        = get_current_user_id();
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     // السماح فقط لصاحب المنتج أو مدير
@@ -1746,7 +1746,7 @@ add_action('wp_ajax_styliiiish_user_deactivate_product', function () {
 
     $user_id        = get_current_user_id();
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     // يسمح للـ owner + مدير
@@ -1789,7 +1789,7 @@ add_action('wp_ajax_styliiiish_user_activate_product', function () {
 
     $user_id        = get_current_user_id();
     $product_author = (int) get_post_field('post_author', $product_id);
-    $is_manager     = current_user_can('manage_woocommerce');
+    $is_manager     = current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin();
     $is_owner       = ($user_id && $user_id === $product_author);
 
     if (!$is_manager && !$is_owner) {
@@ -1867,7 +1867,7 @@ function sty_add_product(){
 
     $user_id = get_current_user_id();
     $user_type = function_exists('wf_od_get_user_type') ? wf_od_get_user_type($user_id) : '';
-    $is_admin_creator = in_array($user_type, ['manager', 'dashboard'], true) || current_user_can('manage_woocommerce');
+    $is_admin_creator = in_array($user_type, ['manager', 'dashboard'], true) || current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin($user_id);
     $requested_status = sanitize_key($_POST['admin_status'] ?? '');
 
     if ($is_admin_creator) {

@@ -427,7 +427,7 @@ add_action('wp_enqueue_scripts', function () {
         'nonce'       => wp_create_nonce('styliiiish_nonce'),
         'mode'        => 'owner',
         'old_add_url' => admin_url('admin-post.php?action=styliiiish_new_product'),
-        'is_manager'  => current_user_can('manage_woocommerce'),
+        'is_manager'  => ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() ),
     ]);
 });
 
@@ -729,7 +729,7 @@ function styliiiish_owner_dashboard_shortcode(){
     $user_id = $user->ID;
 
     $allowed_dashboard = wf_od_get_dashboard_ids();
-    $is_admin = in_array('administrator', (array) $user->roles, true);
+    $is_admin = wf_od_is_user_plugin_admin($user_id);
     $is_manager = (in_array($user_id, wf_od_get_manager_ids()) || $is_admin);
 
     if (!$is_manager && !in_array($user_id, $allowed_dashboard)) {
@@ -934,7 +934,7 @@ add_action('wp_footer', function () {
                         wp_send_json_error('invalid_product');
                     }
 
-                    if ( ! current_user_can('manage_woocommerce') && intval($post->post_author) !== intval($current->ID) && ! current_user_can('manage_options') ) {
+                    if ( ! wf_od_is_user_plugin_admin() && ! current_user_can('manage_woocommerce') && intval($post->post_author) !== intval($current->ID) && ! current_user_can('manage_options') ) {
                         wp_send_json_error('unauthorized');
                     }
 
@@ -970,7 +970,7 @@ add_action('wp_footer', function () {
                         wp_send_json_error('invalid_product');
                     }
 
-                    if ( ! current_user_can('manage_woocommerce') && intval($post->post_author) !== intval($current->ID) && ! current_user_can('manage_options') ) {
+                    if ( ! wf_od_is_user_plugin_admin() && ! current_user_can('manage_woocommerce') && intval($post->post_author) !== intval($current->ID) && ! current_user_can('manage_options') ) {
                         wp_send_json_error('unauthorized');
                     }
 
