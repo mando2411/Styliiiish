@@ -3881,6 +3881,20 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
 
+    $blogSingleCacheMinutes = max(1, (int) env('BLOG_SINGLE_CACHE_MINUTES', 15));
+    $cacheSlug = mb_strtolower(trim(rawurldecode((string) $slug)), 'UTF-8');
+    $blogSingleCacheKey = 'blog_single_v2:' . $currentLocale . ':' . md5($cacheSlug);
+
+    $cachedBlogSingle = Cache::get($blogSingleCacheKey);
+    if (is_array($cachedBlogSingle) && isset($cachedBlogSingle['post'], $cachedBlogSingle['related_posts'])) {
+        $post = is_array($cachedBlogSingle['post']) ? (object) $cachedBlogSingle['post'] : $cachedBlogSingle['post'];
+        $relatedPosts = collect($cachedBlogSingle['related_posts'])
+            ->map(fn ($item) => is_array($item) ? (object) $item : $item)
+            ->values();
+
+        return view('blog-single', compact('post', 'relatedPosts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
+    }
+
     $resolvePostBySlug = function (string $candidateSlug) {
         return DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as thumb', function ($join) {
@@ -3994,9 +4008,10 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     }
 
     $post = $localizeProductsCollectionByTranslatePress([$post], $currentLocale, true)->first();
+    $arLanguageCodes = $currentLocale === 'ar' ? $resolveTranslatePressLanguageCodes($currentLocale) : null;
 
     if ($currentLocale === 'ar' && $post) {
-        $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+        $languageCodes = $arLanguageCodes;
         if ($languageCodes) {
             $defaultLanguage = (string) ($languageCodes['default'] ?? '');
             $targetLanguage = (string) ($languageCodes['target'] ?? '');
@@ -4077,7 +4092,7 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     }
 
     if ($currentLocale === 'ar' && $post) {
-        $languageCodes = $resolveTranslatePressLanguageCodes($currentLocale);
+        $languageCodes = $arLanguageCodes;
         if ($languageCodes) {
             $defaultLanguage = (string) ($languageCodes['default'] ?? '');
             $targetLanguage = (string) ($languageCodes['target'] ?? '');
@@ -4170,7 +4185,8 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
         }
     }
 
-    if ($currentLocale === 'ar' && $post) {
+    $remoteScrapeEnabled = filter_var((string) env('BLOG_SINGLE_REMOTE_SCRAPE', 'false'), FILTER_VALIDATE_BOOLEAN);
+    if ($currentLocale === 'ar' && $post && $remoteScrapeEnabled) {
         $slugValue = trim((string) ($post->post_name ?? ''));
         $candidateUrls = collect([
             $wpBaseUrl . '/ar/' . rawurlencode($slugValue) . '/',
@@ -4180,7 +4196,7 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
 
         foreach ($candidateUrls as $candidateUrl) {
             try {
-                $articleResponse = Http::timeout(10)->get((string) $candidateUrl);
+                $articleResponse = Http::timeout(3)->get((string) $candidateUrl);
                 if (!$articleResponse->successful()) {
                     continue;
                 }
@@ -4432,6 +4448,14 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
     if ($relatedPosts->isNotEmpty()) {
         $relatedPosts = $localizeProductsCollectionByTranslatePress($relatedPosts, $currentLocale, false)->values();
     }
+
+    Cache::put($blogSingleCacheKey, [
+        'post' => is_object($post) ? get_object_vars($post) : (array) $post,
+        'related_posts' => collect($relatedPosts)
+            ->map(fn ($item) => is_object($item) ? get_object_vars($item) : (array) $item)
+            ->values()
+            ->all(),
+    ], now()->addMinutes($blogSingleCacheMinutes));
 
     return view('blog-single', compact('post', 'relatedPosts', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
