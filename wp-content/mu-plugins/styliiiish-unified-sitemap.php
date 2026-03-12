@@ -64,6 +64,26 @@ if (!function_exists('styliiiish_normalize_sitemap_url')) {
             $normalizedPath = '/';
         }
 
+        // Normalize pre-encoded and double-encoded path segments into a canonical URL form.
+        $decodedPath = $normalizedPath;
+        for ($i = 0; $i < 8; $i++) {
+            $nextDecoded = rawurldecode($decodedPath);
+            if ($nextDecoded === $decodedPath) {
+                break;
+            }
+
+            $decodedPath = $nextDecoded;
+        }
+
+        $segments = explode('/', $decodedPath);
+        $encodedSegments = [];
+
+        foreach ($segments as $segment) {
+            $encodedSegments[] = rawurlencode($segment);
+        }
+
+        $normalizedPath = implode('/', $encodedSegments);
+
         if (!str_starts_with($normalizedPath, '/')) {
             $normalizedPath = '/' . $normalizedPath;
         }
@@ -92,8 +112,8 @@ if (!function_exists('styliiiish_should_exclude_sitemap_url')) {
         }
 
         if (
-            preg_match('#^/(?:cart|wishlist|checkout|my-account|owner-dashboard)(?:/|$)#', $path) ||
-            preg_match('#^/(?:ar|en|ara)/(?:cart|wishlist|checkout|my-account|owner-dashboard)(?:/|$)#', $path) ||
+            preg_match('#^/(?:cart|wishlist|checkout|my-account|my-dresses|owner-dashboard)(?:/|$)#', $path) ||
+            preg_match('#^/(?:ar|en|ara)/(?:cart|wishlist|checkout|my-account|my-dresses|owner-dashboard)(?:/|$)#', $path) ||
             preg_match('#^/(?:حسابي|فساتيني)(?:/|$)#u', $path) ||
             preg_match('#^/(?:ar|ara)/(?:حسابي|فساتيني|لوحة-معلومات-المالك)(?:/|$)#u', $path)
         ) {
@@ -105,6 +125,35 @@ if (!function_exists('styliiiish_should_exclude_sitemap_url')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('styliiiish_prepare_sitemap_slug')) {
+    function styliiiish_prepare_sitemap_slug(string $slug): string
+    {
+        $normalized = trim($slug);
+        if ($normalized === '') {
+            return '';
+        }
+
+        // Some slugs are already percent-encoded by upstream imports.
+        if (preg_match('/%[0-9a-f]{2}/i', $normalized) === 1) {
+            for ($i = 0; $i < 8; $i++) {
+                $decoded = rawurldecode($normalized);
+                if ($decoded === $normalized) {
+                    break;
+                }
+
+                $normalized = $decoded;
+            }
+        }
+
+        $normalized = trim($normalized, "/ \t\n\r\0\x0B");
+        if ($normalized === '') {
+            return '';
+        }
+
+        return rawurlencode($normalized);
     }
 }
 
@@ -226,7 +275,11 @@ if (!function_exists('styliiiish_output_laravel_sitemap')) {
                     continue;
                 }
 
-                $encodedSlug = rawurlencode($slug);
+                $encodedSlug = styliiiish_prepare_sitemap_slug($slug);
+                if ($encodedSlug === '') {
+                    continue;
+                }
+
                 $lastmod = !empty($row->post_modified_gmt) ? gmdate('c', strtotime((string) $row->post_modified_gmt . ' UTC')) : $now;
 
                 $addUrl($base . '/product/' . $encodedSlug . '/', $lastmod);
@@ -247,7 +300,11 @@ if (!function_exists('styliiiish_output_laravel_sitemap')) {
                     continue;
                 }
 
-                $encodedSlug = rawurlencode($slug);
+                $encodedSlug = styliiiish_prepare_sitemap_slug($slug);
+                if ($encodedSlug === '') {
+                    continue;
+                }
+
                 $lastmod = !empty($row->post_modified_gmt) ? gmdate('c', strtotime((string) $row->post_modified_gmt . ' UTC')) : $now;
 
                 $addUrl($base . '/blog/' . $encodedSlug, $lastmod);
