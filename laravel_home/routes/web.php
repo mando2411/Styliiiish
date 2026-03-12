@@ -459,7 +459,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
             ->where('sale.meta_value', '!=', '')
             ->count();
 
-        $prices = DB::table('wp_posts as p')
+        $priceBounds = DB::table('wp_posts as p')
             ->join('wp_postmeta as price', function ($join) {
                 $join->on('p.ID', '=', 'price.post_id')
                     ->where('price.meta_key', '_price');
@@ -468,16 +468,26 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
             ->where('p.post_status', 'publish')
             ->whereNotNull('price.meta_value')
             ->where('price.meta_value', '!=', '')
-            ->pluck('price.meta_value')
-            ->map(fn ($value) => (float) $value)
-            ->filter(fn ($value) => $value > 0)
-            ->values();
+            ->selectRaw('MIN(CAST(price.meta_value AS DECIMAL(10,2))) as min_price')
+            ->selectRaw('MAX(CAST(price.meta_value AS DECIMAL(10,2))) as max_price')
+            ->first();
+
+        $minPrice = isset($priceBounds->min_price) ? (float) $priceBounds->min_price : null;
+        $maxPrice = isset($priceBounds->max_price) ? (float) $priceBounds->max_price : null;
+
+        if ($minPrice !== null && $minPrice <= 0) {
+            $minPrice = null;
+        }
+
+        if ($maxPrice !== null && $maxPrice <= 0) {
+            $maxPrice = null;
+        }
 
         return [
             'total_products' => $totalProducts,
             'sale_products' => $saleProducts,
-            'min_price' => $prices->isNotEmpty() ? $prices->min() : null,
-            'max_price' => $prices->isNotEmpty() ? $prices->max() : null,
+            'min_price' => $minPrice,
+            'max_price' => $maxPrice,
         ];
     });
 
@@ -2905,6 +2915,26 @@ $attachWishlistFallbackCookie = function ($response, array $ids) use ($wishlistF
     return $response;
 };
 
+$appendBridgeSetCookieHeaders = function ($response, $setCookieHeader) {
+    if (empty($setCookieHeader)) {
+        return $response;
+    }
+
+    $headers = is_array($setCookieHeader) ? $setCookieHeader : [$setCookieHeader];
+
+    foreach ($headers as $headerValue) {
+        $value = trim((string) $headerValue);
+        if ($value === '') {
+            continue;
+        }
+
+        // Append each Set-Cookie header separately to preserve cookie attributes.
+        $response->headers->set('Set-Cookie', $value, false);
+    }
+
+    return $response;
+};
+
 $buildWishlistFallbackItems = function (array $ids, string $locale, int $limit = 8) use ($normalizeBrandByLocale, $resolveTranslatePressLanguageCodes): array {
     $normalizedIds = collect($ids)
         ->map(fn ($value) => (int) $value)
@@ -3052,7 +3082,7 @@ $buildWishlistFallbackItems = function (array $ids, string $locale, int $limit =
     return $items->values()->all();
 };
 
-$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie) {
+$wishlistAddHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie, $appendBridgeSetCookieHeaders) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
@@ -3093,14 +3123,10 @@ $wishlistAddHandler = function (Request $request, string $slug, string $locale =
             : 'تمت إضافة المنتج إلى المفضلة.',
     ]);
 
-    if (!empty($bridge['set_cookie'])) {
-        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
-    }
-
-    return $response;
+    return $appendBridgeSetCookieHeaders($response, $bridge['set_cookie'] ?? null);
 };
 
-$wishlistRemoveHandler = function (Request $request, int $id, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie) {
+$wishlistRemoveHandler = function (Request $request, int $id, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds, $attachWishlistFallbackCookie, $appendBridgeSetCookieHeaders) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $productId = max(0, (int) $id);
 
@@ -3137,14 +3163,10 @@ $wishlistRemoveHandler = function (Request $request, int $id, string $locale = '
         'message' => $currentLocale === 'en' ? 'Item removed from wishlist.' : 'تم حذف المنتج من المفضلة.',
     ]);
 
-    if (!empty($bridge['set_cookie'])) {
-        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
-    }
-
-    return $response;
+    return $appendBridgeSetCookieHeaders($response, $bridge['set_cookie'] ?? null);
 };
 
-$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds) {
+$wishlistCountHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $readWishlistFallbackIds, $appendBridgeSetCookieHeaders) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'count',
@@ -3167,14 +3189,10 @@ $wishlistCountHandler = function (Request $request, string $locale = 'ar') use (
         'count' => max(0, (int) ($bridge['json']['count'] ?? 0)),
     ]);
 
-    if (!empty($bridge['set_cookie'])) {
-        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
-    }
-
-    return $response;
+    return $appendBridgeSetCookieHeaders($response, $bridge['set_cookie'] ?? null);
 };
 
-$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $resolveTranslatePressLanguageCodes, $readWishlistFallbackIds, $buildWishlistFallbackItems) {
+$wishlistItemsHandler = function (Request $request, string $locale = 'ar') use ($wishlistBridgeCall, $mapLocaleToWpmlCode, $normalizeBrandByLocale, $resolveTranslatePressLanguageCodes, $readWishlistFallbackIds, $buildWishlistFallbackItems, $appendBridgeSetCookieHeaders) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $bridge = $wishlistBridgeCall($request, [
         'action' => 'list',
@@ -3377,11 +3395,7 @@ $wishlistItemsHandler = function (Request $request, string $locale = 'ar') use (
         'items' => $items,
     ]);
 
-    if (!empty($bridge['set_cookie'])) {
-        $response->headers->set('Set-Cookie', is_array($bridge['set_cookie']) ? implode(', ', $bridge['set_cookie']) : (string) $bridge['set_cookie']);
-    }
-
-    return $response;
+    return $appendBridgeSetCookieHeaders($response, $bridge['set_cookie'] ?? null);
 };
 
 $wishlistPageHandler = function (Request $request, string $locale = 'ar') {
