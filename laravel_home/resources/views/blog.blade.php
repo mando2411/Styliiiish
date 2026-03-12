@@ -119,6 +119,37 @@
     $wpBlogArchiveBase = $isEnglish
         ? '/blog/'
         : ('/' . ltrim((string) ($arBlogArchivePath ?? '/ar/%d9%85%d8%af%d9%88%d9%86%d8%a9/'), '/'));
+    $fallbackImage = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp';
+
+    $normalizeBlogImageUrl = function (?string $value) use ($wpBaseUrl, $fallbackImage): string {
+        $candidate = trim(html_entity_decode((string) ($value ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        if ($candidate === '') {
+            return $fallbackImage;
+        }
+
+        if (str_starts_with($candidate, '//')) {
+            $candidate = 'https:' . $candidate;
+        } elseif (!preg_match('#^https?://#i', $candidate) && !str_starts_with($candidate, 'data:image/')) {
+            $candidate = str_starts_with($candidate, '/')
+                ? ($wpBaseUrl . $candidate)
+                : ($wpBaseUrl . '/' . ltrim($candidate, '/'));
+        }
+
+        if (str_starts_with($candidate, 'data:image/')) {
+            return $candidate;
+        }
+
+        $path = (string) parse_url($candidate, PHP_URL_PATH);
+        $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+        $isKnownImageExt = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp', 'ico', 'heic', 'heif'], true);
+        $looksLikeMediaPath = str_contains($path, '/wp-content/uploads/') || str_contains($path, '/google-reviews/');
+
+        if (!$isKnownImageExt && !$looksLikeMediaPath) {
+            return $fallbackImage;
+        }
+
+        return $candidate;
+    };
 @endphp
 <html lang="{{ $isEnglish ? 'en' : 'ar' }}" dir="{{ $isEnglish ? 'ltr' : 'rtl' }}">
 <head>
@@ -627,7 +658,7 @@
                             }
                         }
                         $excerpt = mb_strlen($excerptSource) > 170 ? mb_substr($excerptSource, 0, 170) . '…' : $excerptSource;
-                        $image = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
+                        $image = $normalizeBlogImageUrl((string) ($post->image ?? ''));
                     @endphp
 
                     <article class="post-card">

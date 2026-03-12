@@ -40,7 +40,39 @@
         : $t('meta_desc_fallback');
 
     $canonicalPath = $localePrefix . '/blog/' . rawurlencode(rawurldecode((string) ($post->post_name ?? '')));
-    $articleImage = $post->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
+    $fallbackImage = $wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp';
+
+    $normalizeBlogImageUrl = function (?string $value) use ($wpBaseUrl, $fallbackImage): string {
+        $candidate = trim(html_entity_decode((string) ($value ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        if ($candidate === '') {
+            return $fallbackImage;
+        }
+
+        if (str_starts_with($candidate, '//')) {
+            $candidate = 'https:' . $candidate;
+        } elseif (!preg_match('#^https?://#i', $candidate) && !str_starts_with($candidate, 'data:image/')) {
+            $candidate = str_starts_with($candidate, '/')
+                ? ($wpBaseUrl . $candidate)
+                : ($wpBaseUrl . '/' . ltrim($candidate, '/'));
+        }
+
+        if (str_starts_with($candidate, 'data:image/')) {
+            return $candidate;
+        }
+
+        $path = (string) parse_url($candidate, PHP_URL_PATH);
+        $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+        $isKnownImageExt = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'bmp', 'ico', 'heic', 'heif'], true);
+        $looksLikeMediaPath = str_contains($path, '/wp-content/uploads/') || str_contains($path, '/google-reviews/');
+
+        if (!$isKnownImageExt && !$looksLikeMediaPath) {
+            return $fallbackImage;
+        }
+
+        return $candidate;
+    };
+
+    $articleImage = $normalizeBlogImageUrl((string) ($post->image ?? ''));
 
     $contentHtml = (string) ($post->post_content ?? '');
     if (trim($contentHtml) === '') {
@@ -256,7 +288,7 @@
                     @php
                         $relatedSlug = rawurlencode(rawurldecode((string) ($related->post_name ?? '')));
                         $relatedUrl = $localePrefix . '/blog/' . $relatedSlug;
-                        $relatedImage = $related->image ?: ($wpBaseUrl . '/wp-content/uploads/woocommerce-placeholder.webp');
+                        $relatedImage = $normalizeBlogImageUrl((string) ($related->image ?? ''));
                     @endphp
                     <article class="related-card">
                         <a href="{{ $relatedUrl }}">
