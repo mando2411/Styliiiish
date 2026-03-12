@@ -190,8 +190,138 @@ Custom DB tables
 
 If you want, I can convert the remediation priorities into concrete PR-style changes (nonce standardization and a centralized permission helper).
 
+---
+
+## Comprehensive Audit (2026-03-11)
+
+### Scope and method
+- Type: static code/config audit (repository-level), no live penetration test and no server shell access.
+- Covered layers:
+  - WordPress core/runtime routing and hardening (`index.php`, `.htaccess`, `wp-config.php`)
+  - Custom plugin security/ACL/AJAX (`Flexi-MultiVendor-Plugin`)
+  - Laravel storefront integration and data bridge (`laravel_home/routes/web.php`, `wishlist-bridge.php`)
+  - Operational compatibility points (DB, routes, caching, translation stack)
+
+### Operating model (current system)
+- Platform topology (hybrid):
+  - Root front controller in `index.php` performs manual route switching between Laravel and WordPress.
+  - WordPress remains the source of truth for products/orders/users.
+  - Laravel reads/writes directly against WordPress tables (`wp_posts`, `wp_postmeta`, `wp_terms`, `wp_comments`, etc).
+- Runtime signals detected:
+  - WordPress version: `6.9.1` (`wp-includes/version.php`)
+  - WooCommerce version: `10.5.2` (`wp-content/plugins/woocommerce/woocommerce.php`)
+  - Laravel: `12.x`, requires PHP `^8.2` (`laravel_home/composer.json`)
+  - Hosting/caching indicators: LiteSpeed/Hostinger markers in `.htaccess` and `default.php`.
+- Complexity indicators:
+  - `laravel_home/routes/web.php`: ~4882 lines
+  - `modules/shared/ajax/manage-products-ajax.php`: ~2315 lines
+  - `vendor-orders/vendor-orders.php`: ~2680 lines
+
+### Laravel <-> WordPress compatibility assessment
+- Overall status: **working but tightly coupled and fragile**.
+- Why it works now:
+  - Both apps use same MySQL database and same `wp_` prefix.
+  - Root `index.php` explicitly routes some account/checkout/vendor paths to WordPress.
+  - Laravel storefront queries WP data directly, so content parity is immediate.
+- Fragility points:
+  - Hard dependency on WP schema/table names and plugins (TranslatePress/WPML tables).
+  - Any route not explicitly protected in `index.php` defaults to Laravel.
+  - Business logic duplicated across JS/PHP/Laravel in several flows.
+- Compatibility score (practical): **6.5/10**.
+
+### Risk register (ordered by severity)
+
+#### Critical
+1. Secret material present in runtime config files.
+  - Evidence: `wp-config.php`, `laravel_home/.env` contain production DB/application secrets.
+  - Note: both files are currently ignored by git (`.gitignore` / `laravel_home/.gitignore`), but exposure risk remains if backup/misconfig/file disclosure happens.
+
+2. Public debug endpoint in production routes.
+  - Evidence: `laravel_home/routes/web.php` exposes `/debug/wpml-product/{slug}` and returns internal translation/post mapping.
+  - Impact: information disclosure, easier reconnaissance.
+
+3. KYC file uploads lack explicit allowlist controls.
+  - Evidence: `includes/vendor-workflow.php` uses `wp_handle_upload(..., ['test_form' => false])` without explicit MIME/extension/size policy.
+  - Impact: upload abuse risk (malicious or oversized files).
+
+#### High
+1. Database error leakage to clients.
+  - Evidence: `vendor-orders/vendor-orders.php` returns `wp_send_json_error($wpdb->last_error)` on insert failure.
+  - Impact: SQL/internal schema leakage.
+
+2. No visible throttling/rate-limit on public write endpoints.
+  - Evidence: POST review/report/wishlist endpoints in `laravel_home/routes/web.php` with no route-level throttle.
+  - Impact: spam/flood abuse, moderation overhead.
+
+3. Excessive coupling and monolith route file.
+  - Evidence: very large `routes/web.php` with direct DB queries to WP tables across many concerns.
+  - Impact: regression risk, slower onboarding, higher change failure rate.
+
+4. Route arbitration risk between frameworks.
+  - Evidence: root `index.php` defaults to Laravel for non-explicit WordPress routes.
+  - Impact: silent SEO/404 regressions or plugin endpoint breakage when new WP pages/endpoints are added.
+
+#### Medium
+1. Hard-coded IDs and environment-bound constants.
+  - Evidence: template/product IDs and fixed assumptions in `manage-products-ajax.php` and related flows.
+  - Impact: migration/staging drift.
+
+2. Version compatibility drift.
+  - Evidence: custom plugin header in `owner-dashboard.php` says "Tested up to: 6.4" while site runs WP 6.9.1.
+  - Impact: unverified behavior on newer core.
+
+3. Duplicate env keys may create config ambiguity.
+  - Evidence: repeated `CACHE_STORE` and `QUEUE_CONNECTION` entries in `laravel_home/.env`.
+  - Impact: unexpected runtime behavior.
+
+4. Debug logging remains in business flows.
+  - Evidence: `error_log(...)` traces in `includes/vendor-workflow.php` and report flow in `functions.php`.
+  - Impact: noisy logs and potential data exposure in shared hosting logs.
+
+### Weakness summary
+- Security posture is uneven: strong nonce/capability checks in many endpoints, but still a few high-impact gaps.
+- Integration pattern is fast to ship but hard to maintain at scale (direct DB coupling + route-level arbitration).
+- Operational hygiene needs tightening (debug routes/logs/config duplication).
+
+### Recommended improvement plan
+
+#### Phase 0 (within 24h)
+1. Remove or protect `/debug/wpml-product/{slug}` behind admin auth and non-production guard.
+2. Replace DB error responses with generic messages (`Operation failed`) and log server-side only.
+3. Enforce upload policy in KYC flow:
+  - Allowed MIME/extensions (PDF/JPG/PNG/WEBP only)
+  - Max file size
+  - Reject double extensions
+4. Normalize `.env` duplicated keys and rotate secrets if ever exposed outside server.
+
+#### Phase 1 (within 7 days)
+1. Add request throttling for public POST endpoints (reviews/reports/wishlist bridge actions).
+2. Split Laravel `routes/web.php` into controllers/services by domain (catalog, product, wishlist, content).
+3. Centralize Laravel access to WP tables via repository/service layer to reduce query duplication.
+4. Replace hard-coded IDs with options/config values managed in WP admin.
+
+#### Phase 2 (within 30 days)
+1. Create a contract for framework boundaries:
+  - Which paths belong to WP vs Laravel
+  - Health checks and fallback behavior
+2. Add integration tests for critical journeys:
+  - Product page
+  - Wishlist add/remove
+  - Checkout/account redirects
+3. Add security checklist in deployment pipeline:
+  - No debug routes in production
+  - No verbose DB errors to client
+  - Upload restrictions validated
+
+### Executive conclusion
+- The current architecture is functional and commercially usable, but it is operating with **high coupling** and a few **high/critical security risks** that should be addressed immediately.
+- If Phase 0 + Phase 1 are implemented, expected gains are:
+  - lower abuse surface,
+  - more stable Laravel/WP coexistence,
+  - faster and safer releases.
+
 
 ## Brain Version
 - v1.0 — Initial architecture mapping (2026-02-05)
 - v1.1 — Added wallet flow (…)
-a
+- v1.2 — Added comprehensive site/system compatibility + risk audit (2026-03-11)
