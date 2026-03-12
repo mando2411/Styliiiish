@@ -25,6 +25,89 @@ if (!function_exists('styliiiish_get_sitemap_request_path')) {
     }
 }
 
+if (!function_exists('styliiiish_normalize_sitemap_url')) {
+    function styliiiish_normalize_sitemap_url(string $url, string $base): string
+    {
+        $trimmed = trim($url);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        $baseParts = wp_parse_url($base);
+        $baseScheme = isset($baseParts['scheme']) ? (string) $baseParts['scheme'] : 'https';
+        $baseHost = isset($baseParts['host']) ? strtolower((string) $baseParts['host']) : '';
+
+        $parts = wp_parse_url($trimmed);
+        if (!is_array($parts)) {
+            return '';
+        }
+
+        $scheme = isset($parts['scheme']) ? strtolower((string) $parts['scheme']) : '';
+        $host = isset($parts['host']) ? strtolower((string) $parts['host']) : '';
+        $path = isset($parts['path']) ? (string) $parts['path'] : '';
+
+        if ($scheme !== '' && $scheme !== 'http' && $scheme !== 'https') {
+            return '';
+        }
+
+        if ($host === '' && str_starts_with($trimmed, '/')) {
+            $host = $baseHost;
+            $scheme = $baseScheme;
+        }
+
+        if ($host === '' || $baseHost === '' || $host !== $baseHost) {
+            return '';
+        }
+
+        $normalizedPath = $path !== '' ? preg_replace('#/+#', '/', $path) : '/';
+        if (!is_string($normalizedPath) || $normalizedPath === '') {
+            $normalizedPath = '/';
+        }
+
+        if (!str_starts_with($normalizedPath, '/')) {
+            $normalizedPath = '/' . $normalizedPath;
+        }
+
+        if ($normalizedPath !== '/') {
+            $normalizedPath = rtrim($normalizedPath, '/');
+        }
+
+        return $scheme . '://' . $host . $normalizedPath;
+    }
+}
+
+if (!function_exists('styliiiish_should_exclude_sitemap_url')) {
+    function styliiiish_should_exclude_sitemap_url(string $url): bool
+    {
+        $parts = wp_parse_url($url);
+        if (!is_array($parts)) {
+            return true;
+        }
+
+        $path = isset($parts['path']) ? rawurldecode((string) $parts['path']) : '/';
+        $path = strtolower($path);
+
+        if ($path === '') {
+            $path = '/';
+        }
+
+        if (
+            preg_match('#^/(?:cart|wishlist|checkout|my-account|owner-dashboard)(?:/|$)#', $path) ||
+            preg_match('#^/(?:ar|en|ara)/(?:cart|wishlist|checkout|my-account|owner-dashboard)(?:/|$)#', $path) ||
+            preg_match('#^/(?:حسابي|فساتيني)(?:/|$)#u', $path) ||
+            preg_match('#^/(?:ar|ara)/(?:حسابي|فساتيني|لوحة-معلومات-المالك)(?:/|$)#u', $path)
+        ) {
+            return true;
+        }
+
+        if (str_contains($path, '/feed') || str_contains($path, '/tag/')) {
+            return true;
+        }
+
+        return false;
+    }
+}
+
 if (!function_exists('styliiiish_output_sitemap_index')) {
     function styliiiish_output_sitemap_index(): void
     {
@@ -62,13 +145,19 @@ if (!function_exists('styliiiish_output_laravel_sitemap')) {
         $now = gmdate('c');
         $urls = [];
 
-        $addUrl = static function (string $url, string $lastmod = '') use (&$urls, $now): void {
-            $normalized = trim($url);
-            if ($normalized === '' || isset($urls[$normalized])) {
+        $addUrl = static function (string $url, string $lastmod = '') use (&$urls, $now, $base): void {
+            $normalized = styliiiish_normalize_sitemap_url($url, $base);
+
+            if ($normalized === '' || styliiiish_should_exclude_sitemap_url($normalized)) {
                 return;
             }
 
-            $urls[$normalized] = [
+            $dedupeKey = strtolower($normalized);
+            if (isset($urls[$dedupeKey])) {
+                return;
+            }
+
+            $urls[$dedupeKey] = [
                 'loc' => $normalized,
                 'lastmod' => $lastmod !== '' ? $lastmod : $now,
             ];
@@ -120,14 +209,6 @@ if (!function_exists('styliiiish_output_laravel_sitemap')) {
             '/marketplace',
             '/ar/marketplace',
             '/en/marketplace',
-            '/wishlist',
-            '/ar/wishlist',
-            '/en/wishlist',
-            '/cart',
-            '/ar/cart',
-            '/en/cart',
-            '/merchant-feed.xml',
-            '/merchant-feed-en.xml',
         ];
 
         foreach ($staticPaths as $path) {
