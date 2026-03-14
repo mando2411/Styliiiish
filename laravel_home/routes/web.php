@@ -2442,12 +2442,121 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             $contentHtml
         );
 
+        $resolveAssetFromContentRef = function (?string $rawRef) use ($wpBaseUrl): string {
+            $value = trim((string) $rawRef);
+            if ($value === '') {
+                return '';
+            }
+
+            if (str_starts_with($value, 'data:') || str_starts_with($value, '#') || str_starts_with($value, 'mailto:') || str_starts_with($value, 'tel:')) {
+                return $value;
+            }
+
+            $normalized = str_replace(
+                ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+                [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+                $value
+            );
+
+            if (str_starts_with($normalized, '//')) {
+                return 'https:' . $normalized;
+            }
+
+            if (preg_match('#^https?://#i', $normalized) === 1) {
+                return $normalized;
+            }
+
+            $pathOnly = parse_url($normalized, PHP_URL_PATH);
+            $query = parse_url($normalized, PHP_URL_QUERY);
+            $fragment = parse_url($normalized, PHP_URL_FRAGMENT);
+
+            $path = trim((string) ($pathOnly ?? $normalized));
+            $path = ltrim($path, '/');
+            $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
+
+            if ($path === '') {
+                return '';
+            }
+
+            $querySuffix = $query ? ('?' . $query) : '';
+            $fragmentSuffix = $fragment ? ('#' . $fragment) : '';
+
+            // For slug-like refs (e.g., 1000277864-jpg), resolve to the real attachment file.
+            if (preg_match('/^[a-z0-9][a-z0-9._-]*$/i', $path) === 1) {
+                static $resolvedBySlug = [];
+                if (array_key_exists($path, $resolvedBySlug)) {
+                    return (string) $resolvedBySlug[$path] . $querySuffix . $fragmentSuffix;
+                }
+
+                $attachmentQuery = DB::table('wp_posts as p')
+                    ->leftJoin('wp_postmeta as pm', function ($join) {
+                        $join->on('p.ID', '=', 'pm.post_id')
+                            ->where('pm.meta_key', '_wp_attached_file');
+                    })
+                    ->where('p.post_type', 'attachment');
+
+                if (ctype_digit($path)) {
+                    $attachmentQuery->where('p.ID', (int) $path);
+                } else {
+                    $attachmentQuery->where('p.post_name', $path);
+                }
+
+                $attachment = $attachmentQuery
+                    ->select('p.guid', 'pm.meta_value as attached_file')
+                    ->first();
+
+                $resolved = '';
+                $attachedFile = ltrim(trim((string) ($attachment->attached_file ?? '')), '/');
+                if ($attachedFile !== '') {
+                    $resolved = rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $attachedFile;
+                } else {
+                    $guid = trim((string) ($attachment->guid ?? ''));
+                    if ($guid !== '' && preg_match('#^https?://#i', $guid) === 1) {
+                        $resolved = $guid;
+                    }
+                }
+
+                if ($resolved !== '') {
+                    $resolvedBySlug[$path] = $resolved;
+                    return $resolved . $querySuffix . $fragmentSuffix;
+                }
+            }
+
+            return rtrim($wpBaseUrl, '/') . '/' . $path . $querySuffix . $fragmentSuffix;
+        };
+
         $contentHtml = preg_replace_callback(
-            '/\b(src|href)\s*=\s*(["\'])(?!https?:\/\/|\/\/|data:|mailto:|tel:|#)([^"\']+)\2/i',
-            function (array $matches) use ($wpBaseUrl): string {
-                $path = ltrim((string) ($matches[3] ?? ''), '/');
-                $path = preg_replace('#^(ar|en|ara)/#i', '', $path);
-                return $matches[1] . '=' . $matches[2] . rtrim($wpBaseUrl, '/') . '/' . $path . $matches[2];
+            '/\b(src|href|data-src|data-lazy-src)\s*=\s*(["\'])(?!https?:\/\/|\/\/|data:|mailto:|tel:|#)([^"\']+)\2/i',
+            function (array $matches) use ($resolveAssetFromContentRef): string {
+                $resolved = $resolveAssetFromContentRef((string) ($matches[3] ?? ''));
+                return $matches[1] . '=' . $matches[2] . $resolved . $matches[2];
+            },
+            $contentHtml
+        );
+
+        $contentHtml = preg_replace_callback(
+            '/\b(srcset|data-srcset)\s*=\s*(["\'])([^"\']+)\2/i',
+            function (array $matches) use ($resolveAssetFromContentRef): string {
+                $rawSet = trim((string) ($matches[3] ?? ''));
+                if ($rawSet === '') {
+                    return $matches[0];
+                }
+
+                $entries = array_filter(array_map('trim', explode(',', $rawSet)), fn ($entry) => $entry !== '');
+                if (empty($entries)) {
+                    return $matches[0];
+                }
+
+                $normalizedEntries = [];
+                foreach ($entries as $entry) {
+                    $parts = preg_split('/\s+/', $entry, 2);
+                    $urlPart = (string) ($parts[0] ?? '');
+                    $descriptor = trim((string) ($parts[1] ?? ''));
+                    $resolvedUrl = $resolveAssetFromContentRef($urlPart);
+                    $normalizedEntries[] = trim($resolvedUrl . ($descriptor !== '' ? ' ' . $descriptor : ''));
+                }
+
+                return $matches[1] . '=' . $matches[2] . implode(', ', $normalizedEntries) . $matches[2];
             },
             $contentHtml
         );
