@@ -501,7 +501,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         })
         ->values();
 
-    $products = Cache::remember('home_products_v4_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
+    $products = Cache::remember('home_products_v5_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
 
         $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
@@ -548,14 +548,45 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
                   AND tt.taxonomy = 'product_cat'
                                     AND t.slug = 'used-dress'
             ) as is_marketplace")
-            ->limit(12)
+            ->limit(60)
             ->get();
 
-            return $localizeProductsCollectionByWpml($rows, $currentLocale)
+            $localizedRows = $localizeProductsCollectionByWpml($rows, $currentLocale)
                 ->map(function ($product) use ($resolveProductListingImageUrl, $wpBaseUrl) {
                     $product->image = $resolveProductListingImageUrl($product, $wpBaseUrl);
                     return $product;
-                });
+                })
+                ->values();
+
+            // Keep home cards diverse: prefer regular shop products, then fill with marketplace items.
+            $regularRows = $localizedRows
+                ->filter(fn ($product) => (int) ($product->is_marketplace ?? 0) !== 1)
+                ->take(8)
+                ->values();
+
+            $marketplaceRows = $localizedRows
+                ->filter(fn ($product) => (int) ($product->is_marketplace ?? 0) === 1)
+                ->take(4)
+                ->values();
+
+            $selected = $regularRows
+                ->concat($marketplaceRows)
+                ->unique(fn ($product) => (int) ($product->ID ?? 0))
+                ->values();
+
+            if ($selected->count() < 12) {
+                $remaining = $localizedRows
+                    ->reject(function ($product) use ($selected) {
+                        $id = (int) ($product->ID ?? 0);
+                        return $selected->contains(fn ($picked) => (int) ($picked->ID ?? 0) === $id);
+                    })
+                    ->take(12 - $selected->count())
+                    ->values();
+
+                $selected = $selected->concat($remaining)->values();
+            }
+
+            return $selected->take(12)->values();
 
     });
 
