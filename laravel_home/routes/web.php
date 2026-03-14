@@ -2476,6 +2476,26 @@ Route::get('/product/{slug}', fn (Request $request, string $slug) => $legacyProd
 Route::get('/ar/product/{slug}', fn (Request $request, string $slug) => $legacyProductPathRedirect($request, $slug, 'ar'));
 Route::get('/en/product/{slug}', fn (Request $request, string $slug) => $legacyProductPathRedirect($request, $slug, 'en'));
 
+$legacyLocalizedAttachmentRedirect = function (Request $request, string $locale, string $attachmentSlug) {
+    $slug = trim((string) $attachmentSlug, " \t\n\r\0\x0B/");
+
+    if ($slug === '' || preg_match('/^[a-z0-9._-]+-(png|jpe?g|webp|gif|avif|heic)$/i', $slug) !== 1) {
+        abort(404);
+    }
+
+    $target = '/' . rawurlencode($slug) . '/';
+    $query = (string) $request->getQueryString();
+    if ($query !== '') {
+        $target .= '?' . $query;
+    }
+
+    return redirect()->to($target, 301);
+};
+
+Route::get('/{locale}/{attachmentSlug}', fn (Request $request, string $locale, string $attachmentSlug) => $legacyLocalizedAttachmentRedirect($request, $locale, $attachmentSlug))
+    ->where('locale', 'ar|en')
+    ->where('attachmentSlug', '[A-Za-z0-9._-]+-(png|jpe?g|webp|gif|avif|heic)');
+
 $attachmentSlugHandler = function (Request $request, string $attachmentSlug) {
     $slug = trim((string) $attachmentSlug);
     if (!preg_match('/^att-[a-z0-9_-]+$/i', $slug)) {
