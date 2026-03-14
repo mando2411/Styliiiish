@@ -1208,8 +1208,9 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             return '';
         }
 
+        $looksLikeAttachmentSlug = preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue) === 1;
         $direct = $normalizePublicAssetUrl($metaValue);
-        if ($direct !== '' && !preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+        if ($direct !== '' && !$looksLikeAttachmentSlug) {
             return $direct;
         }
 
@@ -1227,7 +1228,7 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
         if (ctype_digit($metaValue)) {
             $attachmentQuery->where('p.ID', (int) $metaValue);
-        } elseif (preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+        } elseif (preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue)) {
             $attachmentQuery->where('p.post_name', $metaValue);
         } else {
             $resolvedByMeta[$metaValue] = $direct;
@@ -4983,8 +4984,9 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($l
             return '';
         }
 
+        $looksLikeAttachmentSlug = preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue) === 1;
         $direct = $normalizePublicAssetUrl($metaValue);
-        if ($direct !== '' && !preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+        if ($direct !== '' && !$looksLikeAttachmentSlug) {
             return $direct;
         }
 
@@ -5002,7 +5004,7 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($l
 
         if (ctype_digit($metaValue)) {
             $attachmentQuery->where('p.ID', (int) $metaValue);
-        } elseif (preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+        } elseif (preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue)) {
             $attachmentQuery->where('p.post_name', $metaValue);
         } else {
             $resolvedByMeta[$metaValue] = $direct;
