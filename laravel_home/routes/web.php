@@ -331,7 +331,7 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
         return $localizeProductsCollectionByTranslatePress($collection, $locale, $includeContentFields);
     }
 
-    return $collection->map(function ($row) use ($localizedIdBySourceId, $localizedPosts, $includeContentFields) {
+    return $collection->map(function ($row) use ($localizedIdBySourceId, $localizedPosts, $includeContentFields, $normalizeBrandByLocale, $locale) {
         $sourceId = (int) ($row->ID ?? 0);
         $localizedId = $localizedIdBySourceId[$sourceId] ?? null;
         if (!$localizedId) {
@@ -360,9 +360,119 @@ $localizeProductsCollectionByWpml = function ($rows, string $locale, bool $inclu
     });
 };
 
-$homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
+$isAbsolutePublicUrl = function (?string $value): bool {
+    $raw = strtolower(trim((string) $value));
+    return str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://') || str_starts_with($raw, '//');
+};
+
+$normalizeWpPublicAssetUrl = function (?string $value, string $wpBaseUrl) use ($isAbsolutePublicUrl): string {
+    $raw = trim((string) $value);
+    if ($raw === '') {
+        return '';
+    }
+
+    $normalized = str_replace(
+        ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+        [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+        $raw
+    );
+
+    if (str_starts_with($normalized, '//')) {
+        return 'https:' . $normalized;
+    }
+
+    if ($isAbsolutePublicUrl($normalized)) {
+        return $normalized;
+    }
+
+    $path = ltrim($normalized, '/');
+    if ($path === '') {
+        return '';
+    }
+
+    return rtrim($wpBaseUrl, '/') . '/' . $path;
+};
+
+$resolveWpAttachmentUrl = function (?string $guid, ?string $attachedFile, string $wpBaseUrl) use ($normalizeWpPublicAssetUrl): string {
+    $guidValue = $normalizeWpPublicAssetUrl((string) $guid, $wpBaseUrl);
+    if ($guidValue !== '') {
+        return $guidValue;
+    }
+
+    $fileValue = ltrim(trim((string) $attachedFile), '/');
+    if ($fileValue !== '') {
+        return rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $fileValue;
+    }
+
+    return '';
+};
+
+$resolveWpAttachmentUrlByMetaValue = function (?string $rawMetaValue, string $wpBaseUrl) use ($resolveWpAttachmentUrl, $normalizeWpPublicAssetUrl): string {
+    $metaValue = trim((string) $rawMetaValue);
+    if ($metaValue === '') {
+        return '';
+    }
+
+    $looksLikeAttachmentSlug = preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue) === 1;
+    $direct = $normalizeWpPublicAssetUrl($metaValue, $wpBaseUrl);
+    if ($direct !== '' && !$looksLikeAttachmentSlug) {
+        return $direct;
+    }
+
+    $cacheKey = strtolower($wpBaseUrl . '|' . $metaValue);
+    static $resolvedByMeta = [];
+    if (array_key_exists($cacheKey, $resolvedByMeta)) {
+        return (string) $resolvedByMeta[$cacheKey];
+    }
+
+    $attachmentQuery = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as pm', function ($join) {
+            $join->on('p.ID', '=', 'pm.post_id')
+                ->where('pm.meta_key', '_wp_attached_file');
+        })
+        ->where('p.post_type', 'attachment');
+
+    if (ctype_digit($metaValue)) {
+        $attachmentQuery->where('p.ID', (int) $metaValue);
+    } elseif (preg_match('/^[a-z0-9][a-z0-9_-]*$/i', $metaValue)) {
+        $attachmentQuery->where('p.post_name', $metaValue);
+    } else {
+        $resolvedByMeta[$cacheKey] = $direct;
+        return $direct;
+    }
+
+    $attachment = $attachmentQuery
+        ->select('p.guid', 'pm.meta_value as attached_file')
+        ->first();
+
+    $resolved = $resolveWpAttachmentUrl(
+        (string) ($attachment->guid ?? ''),
+        (string) ($attachment->attached_file ?? ''),
+        $wpBaseUrl
+    );
+
+    $resolvedByMeta[$cacheKey] = $resolved;
+    return $resolved;
+};
+
+$resolveProductListingImageUrl = function ($product, string $wpBaseUrl) use ($resolveWpAttachmentUrl, $resolveWpAttachmentUrlByMetaValue): string {
+    $resolved = $resolveWpAttachmentUrl(
+        (string) ($product->image ?? ''),
+        (string) ($product->image_file ?? ''),
+        $wpBaseUrl
+    );
+
+    if ($resolved === '') {
+        $resolved = $resolveWpAttachmentUrlByMetaValue((string) ($product->thumbnail_meta ?? ''), $wpBaseUrl);
+    }
+
+    return $resolved;
+};
+
+$homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveProductListingImageUrl) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: request()->getSchemeAndHttpHost()), '/');
 
     $reviewFiles = collect(array_merge(
         glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
@@ -391,7 +501,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         })
         ->values();
 
-    $products = Cache::remember('home_products_v3_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml) {
+    $products = Cache::remember('home_products_v4_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
 
         $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
@@ -411,6 +521,10 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
                      ->where('thumb.meta_key', '_thumbnail_id');
             })
             ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+            ->leftJoin('wp_postmeta as img_file', function ($join) {
+                $join->on('img.ID', '=', 'img_file.post_id')
+                    ->where('img_file.meta_key', '_wp_attached_file');
+            })
             ->where('p.post_type', 'product')
             ->where('p.post_status', 'publish')
             ->orderBy('p.post_date', 'desc')
@@ -421,7 +535,9 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
                 'price.meta_value as price',
                 'regular.meta_value as regular_price',
                 'sale.meta_value as sale_price',
-                'img.guid as image'
+                'img.guid as image',
+                'img_file.meta_value as image_file',
+                'thumb.meta_value as thumbnail_meta'
             )
             ->selectRaw("EXISTS (
                 SELECT 1
@@ -435,7 +551,11 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
             ->limit(12)
             ->get();
 
-            return $localizeProductsCollectionByWpml($rows, $currentLocale);
+            return $localizeProductsCollectionByWpml($rows, $currentLocale)
+                ->map(function ($product) use ($resolveProductListingImageUrl, $wpBaseUrl) {
+                    $product->image = $resolveProductListingImageUrl($product, $wpBaseUrl);
+                    return $product;
+                });
 
     });
 
@@ -498,13 +618,14 @@ Route::get('/', fn () => $homeHandler('ar'));
 Route::get('/ar', fn () => $homeHandler('ar'));
 Route::get('/en', fn () => $homeHandler('en'));
 
-$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes) {
+$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes, $resolveProductListingImageUrl) {
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'random');
     $category = trim((string) $request->query('category', ''));
     $category = trim(rawurldecode($category));
     $category = strtolower($category);
     $category = preg_replace('/[^a-z0-9\-_]/', '', $category) ?? '';
+    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
 
     $normalizeSearchText = static function (?string $value): string {
         $text = mb_strtolower(trim((string) $value), 'UTF-8');
@@ -641,7 +762,9 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         'p.post_content',
         'price.meta_value as price',
         'regular.meta_value as regular_price',
-        'img.guid as image'
+        'img.guid as image',
+        'img_file.meta_value as image_file',
+        'thumb.meta_value as thumbnail_meta'
     )
     ->selectRaw("EXISTS (
         SELECT 1
@@ -655,6 +778,10 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
     ->get();
 
     $products = $localizeProductsCollectionByWpml($products, $locale, true);
+    $products = $products->map(function ($product) use ($resolveProductListingImageUrl, $wpBaseUrl) {
+        $product->image = $resolveProductListingImageUrl($product, $wpBaseUrl);
+        return $product;
+    });
 
     if ($search !== '') {
         $needle = $normalizeSearchText($search);
@@ -1017,7 +1144,7 @@ $merchantFeedHandler = function (string $locale = 'ar') use ($localizeProductsCo
 Route::get('/merchant-feed.xml', fn () => $merchantFeedHandler('ar'));
 Route::get('/merchant-feed-en.xml', fn () => $merchantFeedHandler('en'));
 
-$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes, $buildProductSlugCandidates) {
+$singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes, $buildProductSlugCandidates, $resolveProductListingImageUrl) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
@@ -2079,6 +2206,10 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                     ->where('thumb.meta_key', '_thumbnail_id');
             })
             ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+            ->leftJoin('wp_postmeta as img_file', function ($join) {
+                $join->on('img.ID', '=', 'img_file.post_id')
+                    ->where('img_file.meta_key', '_wp_attached_file');
+            })
             ->where('p.post_type', 'product')
             ->where('p.post_status', 'publish')
             ->where('p.ID', '!=', (int) $product->ID)
@@ -2090,14 +2221,20 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 'p.post_name',
                 'price.meta_value as price',
                 'regular.meta_value as regular_price',
-                'img.guid as image'
+                'img.guid as image',
+                'img_file.meta_value as image_file',
+                'thumb.meta_value as thumbnail_meta'
             )
             ->distinct('p.ID')
             ->orderBy('p.post_date', 'desc')
             ->limit(8)
             ->get();
 
-            $relatedProducts = $localizeProductsCollectionByWpml($relatedProducts, $currentLocale);
+            $relatedProducts = $localizeProductsCollectionByWpml($relatedProducts, $currentLocale)
+                ->map(function ($relatedProduct) use ($resolveProductListingImageUrl, $wpBaseUrl) {
+                    $relatedProduct->image = $resolveProductListingImageUrl($relatedProduct, $wpBaseUrl);
+                    return $relatedProduct;
+                });
     }
 
     $allProductCategories = DB::table('wp_terms as t')
