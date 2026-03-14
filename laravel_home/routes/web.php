@@ -1076,7 +1076,8 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
             'regular.meta_value as regular_price',
             'sale.meta_value as sale_price',
             'img.guid as image',
-            'img_file.meta_value as image_file'
+            'img_file.meta_value as image_file',
+            'thumb.meta_value as thumbnail_meta'
         )
         ->first();
 
@@ -1156,12 +1157,40 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
     $isAbsoluteUrl = function (string $value): bool {
         $lower = strtolower(trim($value));
-        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
+        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://') || str_starts_with($lower, '//');
     };
 
-    $resolveAttachmentUrl = function (?string $guid, ?string $attachedFile) use ($wpBaseUrl, $isAbsoluteUrl): string {
-        $guidValue = trim((string) $guid);
-        if ($guidValue !== '' && $isAbsoluteUrl($guidValue)) {
+    $normalizePublicAssetUrl = function (?string $value) use ($wpBaseUrl, $isAbsoluteUrl): string {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return '';
+        }
+
+        $normalized = str_replace(
+            ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+            [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $raw
+        );
+
+        if (str_starts_with($normalized, '//')) {
+            return 'https:' . $normalized;
+        }
+
+        if ($isAbsoluteUrl($normalized)) {
+            return $normalized;
+        }
+
+        $path = ltrim($normalized, '/');
+        if ($path === '') {
+            return '';
+        }
+
+        return rtrim($wpBaseUrl, '/') . '/' . $path;
+    };
+
+    $resolveAttachmentUrl = function (?string $guid, ?string $attachedFile) use ($wpBaseUrl, $normalizePublicAssetUrl): string {
+        $guidValue = $normalizePublicAssetUrl((string) $guid);
+        if ($guidValue !== '') {
             return $guidValue;
         }
 
@@ -1173,7 +1202,55 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
         return '';
     };
 
+    $resolveAttachmentUrlByMetaValue = function (?string $rawMetaValue) use ($resolveAttachmentUrl, $normalizePublicAssetUrl): string {
+        $metaValue = trim((string) $rawMetaValue);
+        if ($metaValue === '') {
+            return '';
+        }
+
+        $direct = $normalizePublicAssetUrl($metaValue);
+        if ($direct !== '' && !preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+            return $direct;
+        }
+
+        static $resolvedByMeta = [];
+        if (array_key_exists($metaValue, $resolvedByMeta)) {
+            return (string) $resolvedByMeta[$metaValue];
+        }
+
+        $attachmentQuery = DB::table('wp_posts as p')
+            ->leftJoin('wp_postmeta as pm', function ($join) {
+                $join->on('p.ID', '=', 'pm.post_id')
+                    ->where('pm.meta_key', '_wp_attached_file');
+            })
+            ->where('p.post_type', 'attachment');
+
+        if (ctype_digit($metaValue)) {
+            $attachmentQuery->where('p.ID', (int) $metaValue);
+        } elseif (preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+            $attachmentQuery->where('p.post_name', $metaValue);
+        } else {
+            $resolvedByMeta[$metaValue] = $direct;
+            return $direct;
+        }
+
+        $attachment = $attachmentQuery
+            ->select('p.guid', 'pm.meta_value as attached_file')
+            ->first();
+
+        $resolved = $resolveAttachmentUrl(
+            (string) ($attachment->guid ?? ''),
+            (string) ($attachment->attached_file ?? '')
+        );
+
+        $resolvedByMeta[$metaValue] = $resolved;
+        return $resolved;
+    };
+
     $product->image = $resolveAttachmentUrl((string) ($product->image ?? ''), (string) ($product->image_file ?? ''));
+    if ($product->image === '') {
+        $product->image = $resolveAttachmentUrlByMetaValue((string) ($product->thumbnail_meta ?? ''));
+    }
 
     $galleryImages = [];
 
@@ -1183,8 +1260,14 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
 
     $galleryMetaValue = trim((string) ($metaByKey['_product_image_gallery'] ?? ''));
     if ($galleryMetaValue !== '') {
-        $galleryIds = collect(explode(',', $galleryMetaValue))
-            ->map(fn ($value) => (int) trim((string) $value))
+        $galleryTokens = collect(explode(',', $galleryMetaValue))
+            ->map(fn ($value) => trim((string) $value))
+            ->filter(fn ($value) => $value !== '')
+            ->values();
+
+        $galleryIds = $galleryTokens
+            ->filter(fn ($value) => ctype_digit((string) $value))
+            ->map(fn ($value) => (int) $value)
             ->filter(fn ($value) => $value > 0)
             ->values();
 
@@ -1200,12 +1283,25 @@ $singleProductHandler = function (Request $request, string $slug, string $locale
                 ->get()
                 ->keyBy('ID');
 
-            foreach ($galleryIds as $galleryId) {
-                $galleryRow = $galleryRows->get($galleryId);
-                $url = $resolveAttachmentUrl(
-                    (string) ($galleryRow->guid ?? ''),
-                    (string) ($galleryRow->attached_file ?? '')
-                );
+            foreach ($galleryTokens as $galleryToken) {
+                $url = '';
+                if (ctype_digit((string) $galleryToken)) {
+                    $galleryRow = $galleryRows->get((int) $galleryToken);
+                    $url = $resolveAttachmentUrl(
+                        (string) ($galleryRow->guid ?? ''),
+                        (string) ($galleryRow->attached_file ?? '')
+                    );
+                } else {
+                    $url = $resolveAttachmentUrlByMetaValue($galleryToken);
+                }
+
+                if ($url !== '') {
+                    $galleryImages[] = $url;
+                }
+            }
+        } else {
+            foreach ($galleryTokens as $galleryToken) {
+                $url = $resolveAttachmentUrlByMetaValue($galleryToken);
                 if ($url !== '') {
                     $galleryImages[] = $url;
                 }
@@ -4801,6 +4897,10 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($l
                 ->where('thumb.meta_key', '_thumbnail_id');
         })
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->leftJoin('wp_postmeta as img_file', function ($join) {
+            $join->on('img.ID', '=', 'img_file.post_id')
+                ->where('img_file.meta_key', '_wp_attached_file');
+        })
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish')
         ->where('tt.taxonomy', 'product_cat');
@@ -4834,6 +4934,8 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($l
             'regular.meta_value as regular_price',
             'sale.meta_value as sale_price',
             'img.guid as image',
+            'img_file.meta_value as image_file',
+            'thumb.meta_value as thumbnail_meta',
             'p.post_date'
         )
         ->distinct('p.ID')
@@ -4841,6 +4943,105 @@ $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($l
         ->withQueryString();
 
     $products->setCollection($localizeProductsCollectionByWpml($products->getCollection(), $currentLocale));
+
+    $isAbsoluteUrl = function (?string $value): bool {
+        $raw = strtolower(trim((string) $value));
+        return str_starts_with($raw, 'http://') || str_starts_with($raw, 'https://') || str_starts_with($raw, '//');
+    };
+
+    $normalizePublicAssetUrl = function (?string $value) use ($wpBaseUrl, $isAbsoluteUrl): string {
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return '';
+        }
+
+        $normalized = str_replace(
+            ['https://l.styliiiish.com', 'http://l.styliiiish.com', '//l.styliiiish.com'],
+            [$wpBaseUrl, $wpBaseUrl, $wpBaseUrl],
+            $raw
+        );
+
+        if (str_starts_with($normalized, '//')) {
+            return 'https:' . $normalized;
+        }
+
+        if ($isAbsoluteUrl($normalized)) {
+            return $normalized;
+        }
+
+        $path = ltrim($normalized, '/');
+        if ($path === '') {
+            return '';
+        }
+
+        return rtrim($wpBaseUrl, '/') . '/' . $path;
+    };
+
+    $resolveAttachmentUrlByMetaValue = function (?string $rawMetaValue) use ($normalizePublicAssetUrl): string {
+        $metaValue = trim((string) $rawMetaValue);
+        if ($metaValue === '') {
+            return '';
+        }
+
+        $direct = $normalizePublicAssetUrl($metaValue);
+        if ($direct !== '' && !preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+            return $direct;
+        }
+
+        static $resolvedByMeta = [];
+        if (array_key_exists($metaValue, $resolvedByMeta)) {
+            return (string) $resolvedByMeta[$metaValue];
+        }
+
+        $attachmentQuery = DB::table('wp_posts as p')
+            ->leftJoin('wp_postmeta as pm', function ($join) {
+                $join->on('p.ID', '=', 'pm.post_id')
+                    ->where('pm.meta_key', '_wp_attached_file');
+            })
+            ->where('p.post_type', 'attachment');
+
+        if (ctype_digit($metaValue)) {
+            $attachmentQuery->where('p.ID', (int) $metaValue);
+        } elseif (preg_match('/^att-[a-z0-9_-]+$/i', $metaValue)) {
+            $attachmentQuery->where('p.post_name', $metaValue);
+        } else {
+            $resolvedByMeta[$metaValue] = $direct;
+            return $direct;
+        }
+
+        $attachment = $attachmentQuery
+            ->select('p.guid', 'pm.meta_value as attached_file')
+            ->first();
+
+        $resolved = '';
+        $attachedFile = ltrim(trim((string) ($attachment->attached_file ?? '')), '/');
+        if ($attachedFile !== '') {
+            $resolved = rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $attachedFile;
+        } else {
+            $resolved = $normalizePublicAssetUrl((string) ($attachment->guid ?? ''));
+        }
+
+        $resolvedByMeta[$metaValue] = $resolved;
+        return $resolved;
+    };
+
+    $products->setCollection($products->getCollection()->map(function ($product) use ($normalizePublicAssetUrl, $resolveAttachmentUrlByMetaValue, $wpBaseUrl) {
+        $resolvedImage = $normalizePublicAssetUrl((string) ($product->image ?? ''));
+
+        if ($resolvedImage === '') {
+            $imageFile = ltrim(trim((string) ($product->image_file ?? '')), '/');
+            if ($imageFile !== '') {
+                $resolvedImage = rtrim($wpBaseUrl, '/') . '/wp-content/uploads/' . $imageFile;
+            }
+        }
+
+        if ($resolvedImage === '') {
+            $resolvedImage = $resolveAttachmentUrlByMetaValue((string) ($product->thumbnail_meta ?? ''));
+        }
+
+        $product->image = $resolvedImage;
+        return $product;
+    }));
 
     return view('marketplace', compact('products', 'search', 'sort', 'currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
