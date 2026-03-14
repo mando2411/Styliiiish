@@ -2460,6 +2460,22 @@ Route::get('/item/{slug}', fn (Request $request, string $slug) => $singleProduct
 Route::get('/ar/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'ar'));
 Route::get('/en/item/{slug}', fn (Request $request, string $slug) => $singleProductHandler($request, $slug, 'en'));
 
+$legacyProductPathRedirect = function (Request $request, string $slug, string $locale = 'ar') {
+    $prefix = $locale === 'en' ? '/en' : '/ar';
+    $target = $prefix . '/item/' . rawurlencode(trim((string) $slug));
+    $query = (string) $request->getQueryString();
+
+    if ($query !== '') {
+        $target .= '?' . $query;
+    }
+
+    return redirect()->to($target, 301);
+};
+
+Route::get('/product/{slug}', fn (Request $request, string $slug) => $legacyProductPathRedirect($request, $slug, 'ar'));
+Route::get('/ar/product/{slug}', fn (Request $request, string $slug) => $legacyProductPathRedirect($request, $slug, 'ar'));
+Route::get('/en/product/{slug}', fn (Request $request, string $slug) => $legacyProductPathRedirect($request, $slug, 'en'));
+
 $attachmentSlugHandler = function (Request $request, string $attachmentSlug) {
     $slug = trim((string) $attachmentSlug);
     if (!preg_match('/^att-[a-z0-9_-]+$/i', $slug)) {
