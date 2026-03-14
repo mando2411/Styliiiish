@@ -2479,7 +2479,7 @@ Route::get('/en/product/{slug}', fn (Request $request, string $slug) => $legacyP
 $legacyLocalizedAttachmentRedirect = function (Request $request, string $locale, string $attachmentSlug) {
     $slug = trim((string) $attachmentSlug, " \t\n\r\0\x0B/");
 
-    if ($slug === '' || preg_match('/^[a-z0-9._-]+-(png|jpe?g|webp|gif|avif|heic)$/i', $slug) !== 1) {
+    if ($slug === '' || preg_match('/^[a-z0-9._-]+-(png|jpe?g|webp|gif|avif|heic)(-[0-9]+)*$/i', $slug) !== 1) {
         abort(404);
     }
 
@@ -2494,7 +2494,7 @@ $legacyLocalizedAttachmentRedirect = function (Request $request, string $locale,
 
 Route::get('/{locale}/{attachmentSlug}', fn (Request $request, string $locale, string $attachmentSlug) => $legacyLocalizedAttachmentRedirect($request, $locale, $attachmentSlug))
     ->where('locale', 'ar|en')
-    ->where('attachmentSlug', '[A-Za-z0-9._-]+-(png|jpe?g|webp|gif|avif|heic)');
+    ->where('attachmentSlug', '[A-Za-z0-9._-]+-(?:png|jpe?g|webp|gif|avif|heic)(?:-[0-9]+)*');
 
 $attachmentSlugHandler = function (Request $request, string $attachmentSlug) {
     $slug = trim((string) $attachmentSlug);
