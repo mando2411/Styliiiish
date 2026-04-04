@@ -88,6 +88,26 @@ RewriteCond %{QUERY_STRING} (^|&)srsltid= [NC]
 RewriteRule ^ %{REQUEST_URI}? [R=301,L]
 </IfModule>
 
+# =====================================
+# HYBRID ROUTER (WordPress + Laravel)
+# =====================================
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^hybrid-router\.php$ - [L]
+RewriteRule ^$ /hybrid-router.php [L]
+RewriteRule ^index\.php$ /hybrid-router.php [L]
+RewriteCond %{REQUEST_URI} !^/wp-admin/ [NC]
+RewriteCond %{REQUEST_URI} !^/wp-content/ [NC]
+RewriteCond %{REQUEST_URI} !^/wp-includes/ [NC]
+RewriteCond %{REQUEST_URI} !^/wp-json/ [NC]
+RewriteCond %{REQUEST_URI} !^/wp-login\.php$ [NC]
+RewriteCond %{REQUEST_URI} !^/wp-cron\.php$ [NC]
+RewriteCond %{REQUEST_URI} !^/xmlrpc\.php$ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /hybrid-router.php [L]
+</IfModule>
+
 
 
 
