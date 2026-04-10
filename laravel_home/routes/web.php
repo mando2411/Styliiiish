@@ -515,7 +515,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         })
         ->values();
 
-    $products = Cache::remember('home_products_v6_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
+    $products = Cache::remember('home_products_v6_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl, $applyMarketplaceCategoryExclusion) {
 
         $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
