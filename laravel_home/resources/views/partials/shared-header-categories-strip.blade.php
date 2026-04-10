@@ -98,29 +98,18 @@
                 $parents = $localizedTerms->where('parent', 0)->keyBy('term_id');
                 $childrenByParent = $localizedTerms
                     ->where('parent', '!=', 0)
-                    ->where('count', '>', 0)
                     ->groupBy('parent');
 
                 $categoryGroups = $parents
                     ->map(function ($parent) use ($childrenByParent) {
                         $children = $childrenByParent->get($parent->term_id, collect())->values();
-                        $childrenTotal = (int) $children->sum('count');
-                        $parentCount = (int) ($parent->count ?? 0);
-                        $score = max($parentCount, $childrenTotal);
-
-                        if ($score <= 0) {
-                            return null;
-                        }
 
                         return [
                             'parent' => $parent,
                             'children' => $children,
-                            'score' => $score,
                         ];
                     })
                     ->filter()
-                    ->sortByDesc('score')
-                    ->take(10)
                     ->values();
             }
         }
@@ -143,7 +132,7 @@
                     <a class="category-strip-chip category-strip-parent {{ $isParentActive ? 'is-active' : '' }}" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $parent->slug) }}" @if($isParentActive) aria-current="page" @endif>
                         {{ $parent->name }}
                     </a>
-                    @foreach($children->take(6) as $child)
+                    @foreach($children as $child)
                         @php
                             $childSlug = strtolower(trim((string) ($child->slug ?? '')));
                             $isChildActive = $activeCategorySlug !== '' && $childSlug === $activeCategorySlug;
