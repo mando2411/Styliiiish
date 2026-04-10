@@ -1703,7 +1703,6 @@
             <div class="product-tabs-head" role="tablist" aria-label="Product Sections">
                 <button type="button" class="product-tab-btn is-active" data-product-tab="description" role="tab" aria-selected="true">{{ $t('tab_description') }}</button>
                 <button type="button" class="product-tab-btn" data-product-tab="specifications" role="tab" aria-selected="false">{{ $t('tab_specifications') }}</button>
-                <button type="button" class="product-tab-btn" data-product-tab="reviews" role="tab" aria-selected="false">{{ $t('tab_reviews') }}</button>
                 <button type="button" class="product-tab-btn" data-product-tab="policies" role="tab" aria-selected="false">{{ $t('tab_policies') }}</button>
             </div>
             <div class="product-tabs-body" id="productTabsBody">
@@ -2459,6 +2458,8 @@
                 });
             };
 
+            const hasReviewsTab = tabButtons.some((button) => (button.getAttribute('data-product-tab') || '').trim() === 'reviews');
+
             const loadTabContent = async (tab, forceReload = false) => {
                 if (!tabsBody) return;
 
@@ -2632,7 +2633,9 @@
                         reviewForm.reset();
                         paintReviewStars(0);
                         tabCache.delete('reviews');
-                        await loadTabContent('reviews', true);
+                        if (hasReviewsTab) {
+                            await loadTabContent('reviews', true);
+                        }
                         setTimeout(() => {
                             closeReviewModal();
                         }, 900);

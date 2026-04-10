@@ -3016,6 +3016,24 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             'privacy-policy',
             'terms-conditions',
         ];
+        $fallbackPolicyMeta = [
+            'shipping-delivery-policy' => [
+                'ar' => ['title' => 'سياسة الشحن والتوصيل', 'excerpt' => 'تعرفي على تفاصيل الشحن، مدة التجهيز، ووقت التسليم المتوقع داخل مصر.'],
+                'en' => ['title' => 'Shipping & Delivery Policy', 'excerpt' => 'Read shipping timelines, preparation windows, and delivery terms across Egypt.'],
+            ],
+            'refund-return-policy' => [
+                'ar' => ['title' => 'سياسة الاسترجاع والاستبدال', 'excerpt' => 'راجعي شروط الاسترجاع والاستبدال والمدة المتاحة لإرجاع الطلبات.'],
+                'en' => ['title' => 'Refund & Return Policy', 'excerpt' => 'Check return and exchange eligibility, steps, and refund conditions.'],
+            ],
+            'privacy-policy' => [
+                'ar' => ['title' => 'سياسة الخصوصية', 'excerpt' => 'تعرفي على كيفية جمع بياناتك واستخدامها وحمايتها داخل الموقع.'],
+                'en' => ['title' => 'Privacy Policy', 'excerpt' => 'Learn how your data is collected, used, and protected on our platform.'],
+            ],
+            'terms-conditions' => [
+                'ar' => ['title' => 'الشروط والأحكام', 'excerpt' => 'اطلعي على البنود المنظمة لعمليات الشراء واستخدام الموقع.'],
+                'en' => ['title' => 'Terms & Conditions', 'excerpt' => 'Review the terms governing purchases and website usage.'],
+            ],
+        ];
 
         $basePolicyRows = DB::table('wp_posts')
             ->where('post_type', 'page')
@@ -3026,10 +3044,25 @@ $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, stri
             ->keyBy('post_name');
 
         if ($basePolicyRows->isEmpty()) {
-            $html = $currentLocale === 'en'
-                ? '<p>Policies are not available right now.</p>'
-                : '<p>السياسات غير متاحة حالياً.</p>';
-            return response()->json(['success' => true, 'tab' => 'policies', 'html' => $html]);
+            $fallbackCards = [];
+            foreach ($policySlugs as $policySlug) {
+                $meta = $fallbackPolicyMeta[$policySlug][$currentLocale] ?? $fallbackPolicyMeta[$policySlug]['en'];
+                $url = $wpBaseUrl . $localePrefix . '/' . trim((string) $policySlug, '/') . '/';
+
+                $fallbackCards[] = '<article style="border:1px solid rgba(189,189,189,.4);border-radius:12px;padding:12px;background:#fff;">'
+                    . '<h4 style="margin:0 0 8px;font-size:15px;color:#17273B;">' . e((string) ($meta['title'] ?? '')) . '</h4>'
+                    . '<p style="margin:0;color:#5a6678;line-height:1.8;">' . e((string) ($meta['excerpt'] ?? '')) . '</p>'
+                    . '<a href="' . e($url) . '" target="_blank" rel="noopener" style="display:inline-flex;margin-top:8px;font-size:13px;font-weight:700;color:#D51522;">'
+                    . ($currentLocale === 'en' ? 'Read policy' : 'قراءة السياسة')
+                    . '</a>'
+                    . '</article>';
+            }
+
+            return response()->json([
+                'success' => true,
+                'tab' => 'policies',
+                'html' => '<div style="display:grid;gap:10px;">' . implode('', $fallbackCards) . '</div>',
+            ]);
         }
 
         $policyRows = collect();
