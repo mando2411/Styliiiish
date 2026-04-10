@@ -91,6 +91,20 @@ $buildProductSlugCandidates = function (string $slug): array {
     return $variants;
 };
 
+$excludedMarketplaceCategorySlugs = ['used-dress', 'used-dresses', 'marketplace', 'marketplace-dresses'];
+
+$applyMarketplaceCategoryExclusion = function ($query, string $productIdColumn = 'p.ID') use ($excludedMarketplaceCategorySlugs) {
+    return $query->whereNotExists(function ($subQuery) use ($productIdColumn, $excludedMarketplaceCategorySlugs) {
+        $subQuery->select(DB::raw(1))
+            ->from('wp_term_relationships as tr_ex')
+            ->join('wp_term_taxonomy as tt_ex', 'tr_ex.term_taxonomy_id', '=', 'tt_ex.term_taxonomy_id')
+            ->join('wp_terms as t_ex', 'tt_ex.term_id', '=', 't_ex.term_id')
+            ->whereColumn('tr_ex.object_id', $productIdColumn)
+            ->where('tt_ex.taxonomy', 'product_cat')
+            ->whereIn('t_ex.slug', $excludedMarketplaceCategorySlugs);
+    });
+};
+
 $localizeProductsCollectionByTranslatePress = function ($rows, string $locale, bool $includeContentFields = false) use ($resolveTranslatePressLanguageCodes, $normalizeBrandByLocale) {
     $collection = collect($rows);
     if ($collection->isEmpty()) {
@@ -469,7 +483,7 @@ $resolveProductListingImageUrl = function ($product, string $wpBaseUrl) use ($re
     return $resolved;
 };
 
-$homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveProductListingImageUrl) {
+$homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $applyMarketplaceCategoryExclusion) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: request()->getSchemeAndHttpHost()), '/');
@@ -501,7 +515,7 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
         })
         ->values();
 
-    $products = Cache::remember('home_products_v5_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
+    $products = Cache::remember('home_products_v6_' . $currentLocale, 300, function () use ($currentLocale, $localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $wpBaseUrl) {
 
         $rows = DB::table('wp_posts as p')
             ->leftJoin('wp_postmeta as price', function ($join) {
@@ -546,10 +560,11 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
                 INNER JOIN wp_terms t ON t.term_id = tt.term_id
                 WHERE tr.object_id = p.ID
                   AND tt.taxonomy = 'product_cat'
-                                    AND t.slug = 'used-dress'
+                  AND t.slug IN ('used-dress', 'used-dresses', 'marketplace', 'marketplace-dresses')
             ) as is_marketplace")
-            ->limit(60)
-            ->get();
+            ->limit(60);
+
+        $rows = $applyMarketplaceCategoryExclusion($rows)->get();
 
             $localizedRows = $localizeProductsCollectionByWpml($rows, $currentLocale)
                 ->map(function ($product) use ($resolveProductListingImageUrl, $wpBaseUrl) {
@@ -592,10 +607,12 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
 
             $products = collect($products)->shuffle()->values();
 
-    $stats = Cache::remember('home_stats', 300, function () {
-        $base = DB::table('wp_posts')
-            ->where('post_type', 'product')
-            ->where('post_status', 'publish');
+    $stats = Cache::remember('home_stats_v2', 300, function () use ($applyMarketplaceCategoryExclusion) {
+        $base = DB::table('wp_posts as p')
+            ->where('p.post_type', 'product')
+            ->where('p.post_status', 'publish');
+
+        $base = $applyMarketplaceCategoryExclusion($base, 'p.ID');
 
         $totalProducts = (clone $base)->count();
 
@@ -607,8 +624,9 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
             ->where('p.post_type', 'product')
             ->where('p.post_status', 'publish')
             ->whereNotNull('sale.meta_value')
-            ->where('sale.meta_value', '!=', '')
-            ->count();
+            ->where('sale.meta_value', '!=', '');
+
+        $saleProducts = $applyMarketplaceCategoryExclusion($saleProducts, 'p.ID')->count();
 
         $priceBounds = DB::table('wp_posts as p')
             ->join('wp_postmeta as price', function ($join) {
@@ -618,7 +636,9 @@ $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollection
             ->where('p.post_type', 'product')
             ->where('p.post_status', 'publish')
             ->whereNotNull('price.meta_value')
-            ->where('price.meta_value', '!=', '')
+            ->where('price.meta_value', '!=', '');
+
+        $priceBounds = $applyMarketplaceCategoryExclusion($priceBounds, 'p.ID')
             ->selectRaw('MIN(CAST(price.meta_value AS DECIMAL(10,2))) as min_price')
             ->selectRaw('MAX(CAST(price.meta_value AS DECIMAL(10,2))) as max_price')
             ->first();
@@ -649,7 +669,7 @@ Route::get('/', fn () => $homeHandler('ar'));
 Route::get('/ar', fn () => $homeHandler('ar'));
 Route::get('/en', fn () => $homeHandler('en'));
 
-$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes, $resolveProductListingImageUrl) {
+$shopDataHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveTranslatePressLanguageCodes, $resolveProductListingImageUrl, $applyMarketplaceCategoryExclusion) {
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'random');
     $category = trim((string) $request->query('category', ''));
@@ -698,6 +718,8 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         })
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish');
+
+    $query = $applyMarketplaceCategoryExclusion($query, 'p.ID');
 
     if ($category !== '') {
         $baseCategoryTerm = DB::table('wp_terms as t')
@@ -804,7 +826,7 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
         INNER JOIN wp_terms t ON t.term_id = tt.term_id
         WHERE tr.object_id = p.ID
           AND tt.taxonomy = 'product_cat'
-          AND t.slug = 'used-dress'
+            AND t.slug IN ('used-dress', 'used-dresses', 'marketplace', 'marketplace-dresses')
     ) as is_marketplace")
     ->get();
 
@@ -3899,7 +3921,7 @@ Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slu
     ]);
 });
 
-$adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
+$adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $applyMarketplaceCategoryExclusion) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
 
@@ -3935,17 +3957,20 @@ $adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionB
             INNER JOIN wp_terms t ON t.term_id = tt.term_id
             WHERE tr.object_id = p.ID
               AND tt.taxonomy = 'product_cat'
-              AND t.slug = 'used-dress'
+              AND t.slug IN ('used-dress', 'used-dresses', 'marketplace', 'marketplace-dresses')
         ) as is_marketplace")
-        ->get();
+          ;
+
+        $rows = $applyMarketplaceCategoryExclusion($rows, 'p.ID')->get();
 
     $products = $localizeProductsCollectionByWpml($rows, $currentLocale);
 
-    $total = Cache::remember('ads_total_products', 300, function () {
-        return DB::table('wp_posts')
-            ->where('post_type', 'product')
-            ->where('post_status', 'publish')
-            ->count();
+    $total = Cache::remember('ads_total_products_v2', 300, function () use ($applyMarketplaceCategoryExclusion) {
+        $query = DB::table('wp_posts as p')
+            ->where('p.post_type', 'product')
+            ->where('p.post_status', 'publish');
+
+        return $applyMarketplaceCategoryExclusion($query, 'p.ID')->count();
     });
 
     return response()->view('ads-landing', compact('products', 'total', 'currentLocale', 'localePrefix'))
