@@ -1743,7 +1743,7 @@
                 <p class="category-intro">{{ $t('categories_intro') }}</p>
                 <div class="category-chip-list">
                     @foreach($allProductCategories as $category)
-                        <a class="category-chip" href="{{ $wpBaseUrl }}/product-category/{{ rawurlencode($category['slug']) }}/" target="_blank" rel="noopener">{{ $category['name'] }}</a>
+                        <a class="category-chip" href="{{ $localePrefix }}/shop?category={{ rawurlencode((string) $category['slug']) }}">{{ $category['name'] }}</a>
                     @endforeach
                 </div>
             </section>
