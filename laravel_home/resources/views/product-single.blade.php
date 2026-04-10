@@ -50,9 +50,21 @@
             'currency' => 'ج.م',
             'qty' => 'الكمية',
             'select_option' => 'اختاري :label',
-            'add_to_cart' => 'أضيفي إلى العربة',
+            'add_to_cart' => 'اطلبي الآن 🔥',
             'choose_options_first' => 'اختاري المقاس/اللون أولاً',
             'out_of_stock' => 'هذا الاختيار غير متاح حالياً',
+            'social_proof' => '⭐⭐⭐⭐⭐ أكثر من :count عميلة قيّموا المنتج',
+            'urgency' => 'العرض لفترة محدودة • متبقي :count قطع فقط',
+            'value_points_title' => 'ليه الفستان ده يستحق الشراء؟',
+            'value_point_1' => 'خامة عالية الجودة ولمسة فخمة مريحة',
+            'value_point_2' => 'تصميم أنيق مناسب للسهرات والمناسبات',
+            'value_point_3' => 'تشطيب احترافي يظهر جمال الإطلالة',
+            'trust_cod' => 'الدفع عند الاستلام',
+            'trust_return' => 'استرجاع خلال 14 يوم',
+            'trust_ship' => 'شحن سريع داخل مصر',
+            'cta_micro_1' => 'استلمي بسرعة داخل مصر 🚚',
+            'cta_micro_2' => 'الدفع عند الاستلام 💰',
+            'cta_micro_3' => 'استرجاع سهل خلال 14 يوم ↩️',
             'related' => 'منتجات مشابهة',
             'quick_links' => 'روابط سريعة',
             'official_info' => 'معلومات رسمية',
@@ -150,9 +162,21 @@
             'currency' => 'EGP',
             'qty' => 'Quantity',
             'select_option' => 'Select :label',
-            'add_to_cart' => 'Add to Cart',
+            'add_to_cart' => 'Order Now 🔥',
             'choose_options_first' => 'Please select options first',
             'out_of_stock' => 'This selection is out of stock',
+            'social_proof' => '⭐⭐⭐⭐⭐ Rated by :count+ happy customers',
+            'urgency' => 'Limited-time offer • Only :count pieces left',
+            'value_points_title' => 'Why this dress is worth it',
+            'value_point_1' => 'Premium quality fabric with a comfortable luxury feel',
+            'value_point_2' => 'Elegant design suitable for events and evening occasions',
+            'value_point_3' => 'Refined finishing that elevates your full look',
+            'trust_cod' => 'Cash on Delivery',
+            'trust_return' => '14-day return policy',
+            'trust_ship' => 'Fast shipping across Egypt',
+            'cta_micro_1' => 'Fast delivery across Egypt 🚚',
+            'cta_micro_2' => 'Cash on delivery 💰',
+            'cta_micro_3' => 'Easy returns within 14 days ↩️',
             'related' => 'Related Products',
             'quick_links' => 'Quick Links',
             'official_info' => 'Official Info',
@@ -495,6 +519,13 @@
         ? $hasAnyInStockVariation
         : ($productStockStatus === '' || $productStockStatus === 'instock');
 
+    $rawStockQty = (int) ($product->stock_quantity ?? 0);
+    $urgencyCount = $rawStockQty > 0 ? max(1, min($rawStockQty, 3)) : 3;
+    $socialProofCount = (int) ($schemaReviewCount ?? 0);
+    if ($socialProofCount <= 0) {
+        $socialProofCount = 100;
+    }
+
     $schemaProduct = [
         '@context' => 'https://schema.org',
         '@type' => 'Product',
@@ -828,6 +859,70 @@
         .prices { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .price { color: var(--primary); font-weight: 900; font-size: 22px; }
         .old { color: #8b8b97; text-decoration: line-through; font-size: 14px; }
+        .social-proof {
+            margin: -4px 0 10px;
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #fff7e9;
+            border: 1px solid #f1d38e;
+            color: #8a5a00;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .urgency {
+            margin: 0 0 12px;
+            border: 1px solid #ffd4b8;
+            background: #fff3ea;
+            color: #9b3600;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .value-points {
+            margin: 0 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fff;
+            padding: 10px 12px;
+        }
+        .value-points h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: var(--secondary);
+        }
+        .value-points ul {
+            margin: 0;
+            padding-inline-start: 18px;
+            color: var(--secondary);
+            display: grid;
+            gap: 6px;
+            font-size: 13px;
+            line-height: 1.7;
+            font-weight: 700;
+        }
+        .trust-pills {
+            margin: 0 0 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .trust-pill {
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            border: 1px solid rgba(23, 39, 59, 0.14);
+            background: #fbfcff;
+            padding: 0 10px;
+            color: var(--secondary);
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
 
         .section-title { margin: 0 0 10px; font-size: 20px; color: var(--secondary); }
         .detail-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
@@ -921,6 +1016,14 @@
         }
         .btn-main:disabled { opacity: .55; cursor: not-allowed; }
         .help-text { margin-top: 8px; font-size: 13px; color: var(--muted); min-height: 18px; }
+        .cta-micro {
+            margin-top: 8px;
+            display: grid;
+            gap: 5px;
+            font-size: 12px;
+            color: #2d3a4f;
+            font-weight: 700;
+        }
         .attr-warning {
             margin-top: 8px;
             border: 1px solid #F2D58A;
@@ -1403,6 +1506,26 @@
                     <span class="old" id="productOldPrice" style="{{ $isSale ? '' : 'display:none;' }}">{{ $isSale ? number_format($regular) . ' ' . $t('currency') : '' }}</span>
                 </div>
 
+                <div class="social-proof">{{ str_replace(':count', (string) $socialProofCount, $t('social_proof')) }}</div>
+                @if($isInStock)
+                    <div class="urgency">{{ str_replace(':count', (string) $urgencyCount, $t('urgency')) }}</div>
+                @endif
+
+                <section class="value-points" aria-label="Value points">
+                    <h3>{{ $t('value_points_title') }}</h3>
+                    <ul>
+                        <li>{{ $t('value_point_1') }}</li>
+                        <li>{{ $t('value_point_2') }}</li>
+                        <li>{{ $t('value_point_3') }}</li>
+                    </ul>
+                </section>
+
+                <div class="trust-pills" aria-label="Trust badges">
+                    <span class="trust-pill">{{ $t('trust_ship') }}</span>
+                    <span class="trust-pill">{{ $t('trust_cod') }}</span>
+                    <span class="trust-pill">{{ $t('trust_return') }}</span>
+                </div>
+
                 <h2 class="section-title">{{ $t('dress_details') }}</h2>
                 <ul class="detail-list">
                     <li><strong>{{ $t('category') }}:</strong> {{ $productCategoryNames->isNotEmpty() ? $productCategoryNames->implode(', ') : $t('na') }}</li>
@@ -1481,6 +1604,11 @@
                     <div class="cart-row">
                         <input class="qty-input" type="number" min="1" step="1" value="1" name="quantity" aria-label="{{ $t('qty') }}">
                         <button class="btn-main" id="addToCartBtn" type="submit">{{ $t('add_to_cart') }}</button>
+                    </div>
+                    <div class="cta-micro" aria-live="polite">
+                        <span>{{ $t('cta_micro_1') }}</span>
+                        <span>{{ $t('cta_micro_2') }}</span>
+                        <span>{{ $t('cta_micro_3') }}</span>
                     </div>
                     <div class="help-text" id="cartHelpText"></div>
                 </form>
