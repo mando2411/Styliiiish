@@ -13,6 +13,8 @@
         : ($currentLocale === 'en' ? '/en' : '/ar');
     $currentLocale = $localePrefix === '/en' ? 'en' : 'ar';
     $activeCategorySlug = strtolower(trim((string) request()->query('category', '')));
+    $marketplacePath = trim($localePrefix, '/') . '/marketplace';
+    $isMarketplaceActive = request()->is($marketplacePath) || request()->is($marketplacePath . '/');
 
     $categoryGroups = collect();
 
@@ -121,6 +123,11 @@
 @if($categoryGroups->isNotEmpty())
     <div class="header-categories-strip" aria-label="{{ $currentLocale === 'en' ? 'Product Categories' : 'أقسام المنتجات' }}">
         <div class="container categories-strip-inner">
+            <span class="category-strip-group">
+                <a class="category-strip-chip category-strip-parent {{ $isMarketplaceActive ? 'is-active' : '' }}" href="{{ $localePrefix }}/marketplace" @if($isMarketplaceActive) aria-current="page" @endif>
+                    {{ $currentLocale === 'en' ? 'Used Dresses' : 'فساتين مستعملة' }}
+                </a>
+            </span>
             @foreach($categoryGroups as $group)
                 @php
                     $parent = $group['parent'];
